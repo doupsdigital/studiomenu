@@ -118,6 +118,16 @@ button {
 /* Background Photo Subtle Zoom Effect (Todas as Telas com Foto) */
 @keyframes heroKenBurns {
   0% {
+    transform: scale(1);
+  }
+
+  100% {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes heroKenBurnsClassico {
+  0% {
     transform: scale(1.10);
   }
 
@@ -129,10 +139,10 @@ button {
 .hero__foto-wrap,
 .secao-orientacoes__foto-wrap,
 .secao-contato__foto-wrap {
-  position: absolute !important;
-  inset: -15% !important;
-  overflow: hidden !important;
-  will-change: transform !important;
+  position: absolute;
+  inset: -12%;
+  overflow: hidden;
+  will-change: transform;
 }
 
 .hero__foto,
@@ -173,9 +183,9 @@ button {
 }
 
 .hero__foto-wrap {
-  position: absolute !important;
-  inset: -15% !important;
-  overflow: hidden !important;
+  position: absolute;
+  inset: -12%;
+  overflow: hidden;
 }
 
 .hero__foto {
@@ -186,7 +196,15 @@ button {
   filter: saturate(1.08) contrast(1.06) brightness(0.97);
 }
 
+.hero--classico .hero__foto-wrap {
+  position: absolute !important;
+  inset: -15% !important;
+  overflow: hidden !important;
+}
+
 .hero--classico .hero__foto {
+  animation: heroKenBurnsClassico 7s ease-in-out infinite alternate !important;
+  -webkit-animation: heroKenBurnsClassico 7s ease-in-out infinite alternate !important;
   object-position: 45% 18% !important;
 }
 
@@ -1270,23 +1288,23 @@ button {
    ========================================================================== */
 @keyframes heroKenBurns {
   0% {
-    transform: scale(1.10) translate3d(0, 0, 0);
-    -webkit-transform: scale(1.10) translate3d(0, 0, 0);
+    transform: scale(1) translate3d(0, 0, 0);
+    -webkit-transform: scale(1) translate3d(0, 0, 0);
   }
 
   100% {
-    transform: scale(1.20) translate3d(0, 0, 0);
-    -webkit-transform: scale(1.20) translate3d(0, 0, 0);
+    transform: scale(1.08) translate3d(0, 0, 0);
+    -webkit-transform: scale(1.08) translate3d(0, 0, 0);
   }
 }
 
 @-webkit-keyframes heroKenBurns {
   0% {
-    -webkit-transform: scale(1.10) translate3d(0, 0, 0);
+    -webkit-transform: scale(1) translate3d(0, 0, 0);
   }
 
   100% {
-    -webkit-transform: scale(1.20) translate3d(0, 0, 0);
+    -webkit-transform: scale(1.08) translate3d(0, 0, 0);
   }
 }
 
@@ -1297,12 +1315,12 @@ button {
 .agendamento__foto-wrap,
 .cuidados__foto-wrap,
 .contato__foto-wrap {
-  position: absolute !important;
-  inset: -15% !important;
-  overflow: hidden !important;
-  will-change: transform !important;
-  transform: translate3d(0, 0, 0) !important;
-  -webkit-transform: translate3d(0, 0, 0) !important;
+  position: absolute;
+  inset: -12%;
+  overflow: hidden;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
 }
 
 .hero__foto,
@@ -1468,18 +1486,18 @@ body[data-theme="luxury"] .delay-6 { transition-delay: 0.70s; }
 /* Background Photo Subtle Zoom Effect (Todas as Telas com Foto) */
 @keyframes heroKenBurns {
   0% {
-    transform: scale(1.10);
+    transform: scale(1);
   }
   100% {
-    transform: scale(1.20);
+    transform: scale(1.08);
   }
 }
 
 body[data-theme="luxury"] .hero__foto-wrap, body[data-theme="luxury"] .secao-orientacoes__foto-wrap, body[data-theme="luxury"] .secao-contato__foto-wrap {
-  position: absolute !important;
-  inset: -15% !important;
-  overflow: hidden !important;
-  will-change: transform !important;
+  position: absolute;
+  inset: -12%;
+  overflow: hidden;
+  will-change: transform;
 }
 
 body[data-theme="luxury"] .hero__foto, body[data-theme="luxury"] .secao-orientacoes__foto, body[data-theme="luxury"] .secao-contato__foto {
@@ -1515,6 +1533,12 @@ body[data-theme="luxury"] .hero {
 }
 
 body[data-theme="luxury"] .hero__foto-wrap {
+  position: absolute;
+  inset: -12%;
+  overflow: hidden;
+}
+
+body[data-theme="luxury"] .hero--classico .hero__foto-wrap {
   position: absolute !important;
   inset: -15% !important;
   overflow: hidden !important;
@@ -2563,33 +2587,33 @@ body[data-theme="luxury"] .modal__proximo:hover {
    ========================================================================== */
 @keyframes heroKenBurns {
   0% {
-    transform: scale(1.10) translate3d(0, 0, 0);
-    -webkit-transform: scale(1.10) translate3d(0, 0, 0);
+    transform: scale(1) translate3d(0, 0, 0);
+    -webkit-transform: scale(1) translate3d(0, 0, 0);
   }
 
   100% {
-    transform: scale(1.20) translate3d(0, 0, 0);
-    -webkit-transform: scale(1.20) translate3d(0, 0, 0);
+    transform: scale(1.08) translate3d(0, 0, 0);
+    -webkit-transform: scale(1.08) translate3d(0, 0, 0);
   }
 }
 
 @-webkit-keyframes heroKenBurns {
   0% {
-    -webkit-transform: scale(1.10) translate3d(0, 0, 0);
+    -webkit-transform: scale(1) translate3d(0, 0, 0);
   }
 
   100% {
-    -webkit-transform: scale(1.20) translate3d(0, 0, 0);
+    -webkit-transform: scale(1.08) translate3d(0, 0, 0);
   }
 }
 
 body[data-theme="luxury"] .hero__foto-wrap, body[data-theme="luxury"] .secao-orientacoes__foto-wrap, body[data-theme="luxury"] .secao-contato__foto-wrap, body[data-theme="luxury"] .procedimentos__foto-wrap, body[data-theme="luxury"] .agendamento__foto-wrap, body[data-theme="luxury"] .cuidados__foto-wrap, body[data-theme="luxury"] .contato__foto-wrap {
-  position: absolute !important;
-  inset: -15% !important;
-  overflow: hidden !important;
-  will-change: transform !important;
-  transform: translate3d(0, 0, 0) !important;
-  -webkit-transform: translate3d(0, 0, 0) !important;
+  position: absolute;
+  inset: -12%;
+  overflow: hidden;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
 }
 
 body[data-theme="luxury"] .hero__foto, body[data-theme="luxury"] .secao-orientacoes__foto, body[data-theme="luxury"] .secao-contato__foto, body[data-theme="luxury"] .procedimentos__foto, body[data-theme="luxury"] .agendamento__foto, body[data-theme="luxury"] .cuidados__foto, body[data-theme="luxury"] .contato__foto {
