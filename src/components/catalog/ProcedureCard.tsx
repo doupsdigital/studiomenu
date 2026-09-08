@@ -14,7 +14,10 @@ export const ProcedureCard: React.FC<ProcedureCardProps> = ({
 }) => {
   const formatPrice = (val: string) => {
     if (!val) return 'Sob Consulta';
-    if (val.toLowerCase().includes('r$')) return val;
+    const lower = val.toLowerCase();
+    if (lower.includes('r$') || lower.includes('incluso') || lower.includes('guia') || lower.includes('consulta')) {
+      return val;
+    }
     return `R$ ${val}`;
   };
 
