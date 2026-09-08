@@ -1,4 +1,7 @@
+'use client';
+
 import React, { useState, useMemo } from 'react';
+
 import { ProcedureItem } from '@/types/catalog';
 import { ProcedureCard } from './ProcedureCard';
 

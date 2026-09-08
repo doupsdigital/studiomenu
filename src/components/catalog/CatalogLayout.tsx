@@ -1,4 +1,7 @@
+'use client';
+
 import React, { useMemo } from 'react';
+
 import { CatalogOrderData, ThemeVariant } from '@/types/catalog';
 import { HeaderCover } from './HeaderCover';
 import { ProcedureGrid } from './ProcedureGrid';
