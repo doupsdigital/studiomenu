@@ -28,7 +28,8 @@ function walkFiles(dir, ext) {
   try {
     fs.readdirSync(dir).forEach(f => {
       let full = path.join(dir, f);
-      if (f === 'node_modules' || f === '.git' || f === 'scratch') return;
+      if (f === 'node_modules' || f === '.git' || f === '.next' || f === 'scratch') return;
+
       if (fs.statSync(full).isDirectory()) {
         files = files.concat(walkFiles(full, ext));
       } else if (full.endsWith(ext)) {
