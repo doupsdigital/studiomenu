@@ -182,7 +182,7 @@ button {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 65% 18%;
+  object-position: center 18% !important;
   filter: saturate(1.08) contrast(1.06) brightness(0.97);
 }
 
@@ -1520,7 +1520,7 @@ body[data-theme="luxury"] .hero__foto {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 65% 18%;
+  object-position: center 18% !important;
   filter: saturate(1.02) contrast(1.08) brightness(0.96);
 }
 
