@@ -105,59 +105,7 @@ export const lashPreset: CatalogOrderData = {
         ['Manutenção', 'R$ 140 (até 18 dias)'],
       ],
     },
-    {
-      id: 'gatinho',
-      title: 'Mapping Gatinho',
-      description: 'Crescimento milimétrico dos fios em direção ao canto externo. Alonga o olhar, cria um efeito felino refinado e valoriza o contorno dos olhos.',
-      price: 'Incluso',
-      duration: 'Design',
-      category: 'Extensão de Cílios',
-      image_url: '/modelos/mosaico/assets/img/mapping-gatinho.png',
-      specs: [
-        ['Investimento', 'Incluso na técnica escolhida'],
-        ['Duração', 'Incluso no procedimento'],
-      ],
-    },
-    {
-      id: 'boneca',
-      title: 'Mapping Boneca',
-      description: 'Fios com maior comprimento posicionados estrategicamente no centro da íris. Abre e ilumina o olhar, proporcionando aspecto doce, expressivo e jovial.',
-      price: 'Incluso',
-      duration: 'Design',
-      category: 'Extensão de Cílios',
-      image_url: '/modelos/mosaico/assets/img/mapping-boneca.png',
-      specs: [
-        ['Investimento', 'Incluso na técnica escolhida'],
-        ['Duração', 'Incluso no procedimento'],
-      ],
-    },
-    {
-      id: 'esquilo',
-      title: 'Mapping Esquilo',
-      description: 'Pico de comprimento posicionado exatamente no arco da sobrancelha (ponto alto). Disfarça pálpebra caída e cria um efeito de lifting imediato.',
-      price: 'Incluso',
-      duration: 'Design',
-      category: 'Extensão de Cílios',
-      image_url: '/modelos/mosaico/assets/img/mapping-esquilo.png',
-      specs: [
-        ['Investimento', 'Incluso na técnica escolhida'],
-        ['Duração', 'Incluso no procedimento'],
-      ],
-    },
-    {
-      id: 'fox',
-      title: 'Fox Eyes Signature',
-      description: 'O desenho de maior sucesso do estúdio: extremidade externa esticada e alinhada com mapping milimétrico para um visual sensual, moderno e marcante.',
-      price: 'R$ 170',
-      duration: '1h45',
-      category: 'Extensão de Cílios',
-      image_url: '/modelos/mosaico/assets/img/fox-eyes.png',
-      specs: [
-        ['Investimento', 'R$ 170'],
-        ['Duração', '1h45'],
-        ['Manutenção', 'R$ 100 (até 20 dias)'],
-      ],
-    },
+
     {
       id: 'design-sobrancelha',
       title: 'Design de Sobrancelha',
@@ -187,19 +135,7 @@ export const lashPreset: CatalogOrderData = {
         ['Duração', '50 minutos'],
       ],
     },
-    {
-      id: 'lifting',
-      title: 'Lash Lifting & Nutrição',
-      description: 'Tratamento de curvatura, nutrição profunda com queratina e tintura preta nos seus próprios cílios naturais. Zero manutenção e durabilidade de 6 a 8 semanas.',
-      price: 'R$ 130',
-      duration: '1h00',
-      category: 'Especiais & Cuidados',
-      image_url: '/modelos/mosaico/assets/img/lash-lifting.png',
-      specs: [
-        ['Investimento', 'R$ 130'],
-        ['Duração', '1h00'],
-      ],
-    },
+
     {
       id: 'remocao',
       title: 'Remoção Segura',
