@@ -1376,17 +1376,14 @@ body[data-theme="luxury"] *, body[data-theme="luxury"] *::before, body[data-them
   -ms-overflow-style: none !important;
 }
 
-html[data-theme="luxury"], body[data-theme="luxury"], html:has(body[data-theme="luxury"]), html[data-theme="luxury"], body[data-theme="luxury"], html:has(body[data-theme="luxury"]) {
+html[data-theme="luxury"], body[data-theme="luxury"] {
   width: 100%;
-  height: 100%;
-  overflow: hidden;
+  min-height: 100%;
   background: #0a0807;
   color: #f3efe9;
   font-family: 'Jost', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  scrollbar-width: none !important;
-  -ms-overflow-style: none !important;
 }
 
 body[data-theme="luxury"] img {
@@ -1417,14 +1414,11 @@ body[data-theme="luxury"] .mosaico-app {
   width: 100%;
   max-width: 480px;
   margin: 0 auto;
-  height: 100%;
+  min-height: 100vh;
   background: #0f0c0b;
   color: #f3efe9;
   position: relative;
   box-shadow: 0 0 60px rgba(0, 0, 0, 0.8);
-  overflow-y: auto;
-  overflow-x: hidden;
-  scroll-snap-type: y mandatory;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -1444,8 +1438,8 @@ body[data-theme="luxury"] .etiqueta {
 
 /* ---------- Entrance Animations & Stagger (Lento, Fluido & Sofisticado) ---------- */
 body[data-theme="luxury"] .anim-fade-up {
-  opacity: 0;
-  transform: translateY(26px);
+  opacity: 1;
+  transform: translateY(0);
   transition: opacity 1.35s cubic-bezier(0.16, 1, 0.3, 1), transform 1.35s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, transform;
 }
@@ -1509,14 +1503,11 @@ body[data-theme="luxury"] .secao-contato__foto {
    1. HERO SECTION (SNAP SCREEN 1)
    ========================================================================== */
 body[data-theme="luxury"] .hero {
-  min-height: 100%;
-  height: 100%;
+  min-height: 100vh;
   width: 100%;
   position: relative;
   overflow: hidden;
   background: #14100e;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
 }
 
 body[data-theme="luxury"] .hero__foto-wrap {
@@ -1999,14 +1990,11 @@ body[data-theme="luxury"] .tile__toque-cue {
    3. SEÇÃO ORIENTAÇÕES (SNAP SCREEN 3 - TELA CHEIA PADRÃO VITRINE)
    ========================================================================== */
 body[data-theme="luxury"] .secao-orientacoes {
-  min-height: 100%;
-  height: 100%;
+  min-height: 100vh;
   width: 100%;
   position: relative;
   overflow: hidden;
   background: #0f0c0b;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
 }
 
 body[data-theme="luxury"] .secao-orientacoes__foto-wrap {
@@ -2158,15 +2146,12 @@ body[data-theme="luxury"] .secao-orientacoes__scroll-cue span {
    4. SEÇÃO CONTATO & RODAPÉ (SNAP SCREEN 4 - TELA CHEIA 100DVH)
    ========================================================================== */
 body[data-theme="luxury"] .secao-contato {
-  min-height: 100%;
-  height: 100%;
+  min-height: 100vh;
   width: 100%;
   position: relative;
   overflow: hidden;
   background: #0f0c0b;
   color: #f3efe9;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
 }
 
 body[data-theme="luxury"] .secao-contato__foto-wrap {
