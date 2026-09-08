@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 
 import { CatalogOrderData, ThemeVariant } from '@/types/catalog';
 import { HeaderCover } from './HeaderCover';
@@ -15,6 +15,17 @@ interface CatalogLayoutProps {
 
 export const CatalogLayout: React.FC<CatalogLayoutProps> = ({ data, onThemeChange }) => {
   const isLuxury = data.theme_variant === 'luxury';
+
+  // Sincronizar data-theme no <body> para ativar as regras CSS do tema Luxury/Rosé
+  useEffect(() => {
+    const theme = data.theme_variant || 'rose';
+    document.body.setAttribute('data-theme', theme);
+    document.documentElement.setAttribute('data-theme', theme);
+    return () => {
+      document.body.removeAttribute('data-theme');
+      document.documentElement.removeAttribute('data-theme');
+    };
+  }, [data.theme_variant]);
 
   // Extrair categorias para os chips da Hero
   const categories = useMemo(() => {
@@ -63,8 +74,13 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({ data, onThemeChang
 
         <HeaderCover data={data} categories={categories} />
 
-        {/* 2. Seção Mosaico de Procedimentos */}
-        <ProcedureGrid procedures={data.procedures} whatsappNumber={data.whatsapp_number} clientName={data.client_name} />
+        {/* 2. Seção Mosaico/Clássico de Procedimentos */}
+        <ProcedureGrid
+          procedures={data.procedures}
+          whatsappNumber={data.whatsapp_number}
+          clientName={data.client_name}
+          layoutModel={data.layout_model}
+        />
 
         {/* 3. Seção Orientações */}
         <InstructionsSection instructions={data.instructions} bgUrl={data.instructions_bg_url} />
