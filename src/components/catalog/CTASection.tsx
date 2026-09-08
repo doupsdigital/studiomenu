@@ -11,7 +11,7 @@ export const CTASection: React.FC<CTASectionProps> = ({ data }) => {
   const instagramHandle = data.instagram_handle ? (data.instagram_handle.startsWith('@') ? data.instagram_handle : `@${data.instagram_handle}`) : '@instagram';
   const instagramUrl = data.instagram_handle ? `https://instagram.com/${data.instagram_handle.replace('@', '')}` : '#';
 
-  const footerBg = data.final_screen_bg_url || data.cover_media_url || 'https://lashmenu.com/modelos/mosaico/assets/img/Footer.png';
+  const footerBg = data.cta_bg_url || data.final_screen_bg_url || data.cover_media_url || 'https://lashmenu.com/modelos/mosaico/assets/img/Footer.png';
 
   return (
     <section className="secao-contato is-visible" id="contato" data-screen-label="Contato">
