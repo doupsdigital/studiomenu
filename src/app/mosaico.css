@@ -118,21 +118,21 @@ button {
 /* Background Photo Subtle Zoom Effect (Todas as Telas com Foto) */
 @keyframes heroKenBurns {
   0% {
-    transform: scale(1);
+    transform: scale(1.10);
   }
 
   100% {
-    transform: scale(1.08);
+    transform: scale(1.20);
   }
 }
 
 .hero__foto-wrap,
 .secao-orientacoes__foto-wrap,
 .secao-contato__foto-wrap {
-  position: absolute;
-  inset: -12%;
-  overflow: hidden;
-  will-change: transform;
+  position: absolute !important;
+  inset: -15% !important;
+  overflow: hidden !important;
+  will-change: transform !important;
 }
 
 .hero__foto,
@@ -173,9 +173,9 @@ button {
 }
 
 .hero__foto-wrap {
-  position: absolute;
-  inset: -12%;
-  overflow: hidden;
+  position: absolute !important;
+  inset: -15% !important;
+  overflow: hidden !important;
 }
 
 .hero__foto {
@@ -187,7 +187,7 @@ button {
 }
 
 .hero--classico .hero__foto {
-  object-position: 65% 18% !important;
+  object-position: 45% 18% !important;
 }
 
 .hero__scrim {
@@ -1270,23 +1270,23 @@ button {
    ========================================================================== */
 @keyframes heroKenBurns {
   0% {
-    transform: scale(1) translate3d(0, 0, 0);
-    -webkit-transform: scale(1) translate3d(0, 0, 0);
+    transform: scale(1.10) translate3d(0, 0, 0);
+    -webkit-transform: scale(1.10) translate3d(0, 0, 0);
   }
 
   100% {
-    transform: scale(1.12) translate3d(0, 0, 0);
-    -webkit-transform: scale(1.12) translate3d(0, 0, 0);
+    transform: scale(1.20) translate3d(0, 0, 0);
+    -webkit-transform: scale(1.20) translate3d(0, 0, 0);
   }
 }
 
 @-webkit-keyframes heroKenBurns {
   0% {
-    -webkit-transform: scale(1) translate3d(0, 0, 0);
+    -webkit-transform: scale(1.10) translate3d(0, 0, 0);
   }
 
   100% {
-    -webkit-transform: scale(1.12) translate3d(0, 0, 0);
+    -webkit-transform: scale(1.20) translate3d(0, 0, 0);
   }
 }
 
@@ -1298,7 +1298,7 @@ button {
 .cuidados__foto-wrap,
 .contato__foto-wrap {
   position: absolute !important;
-  inset: -8% !important;
+  inset: -15% !important;
   overflow: hidden !important;
   will-change: transform !important;
   transform: translate3d(0, 0, 0) !important;
@@ -1468,18 +1468,18 @@ body[data-theme="luxury"] .delay-6 { transition-delay: 0.70s; }
 /* Background Photo Subtle Zoom Effect (Todas as Telas com Foto) */
 @keyframes heroKenBurns {
   0% {
-    transform: scale(1);
+    transform: scale(1.10);
   }
   100% {
-    transform: scale(1.08);
+    transform: scale(1.20);
   }
 }
 
 body[data-theme="luxury"] .hero__foto-wrap, body[data-theme="luxury"] .secao-orientacoes__foto-wrap, body[data-theme="luxury"] .secao-contato__foto-wrap {
-  position: absolute;
-  inset: -12%;
-  overflow: hidden;
-  will-change: transform;
+  position: absolute !important;
+  inset: -15% !important;
+  overflow: hidden !important;
+  will-change: transform !important;
 }
 
 body[data-theme="luxury"] .hero__foto, body[data-theme="luxury"] .secao-orientacoes__foto, body[data-theme="luxury"] .secao-contato__foto {
@@ -1515,9 +1515,9 @@ body[data-theme="luxury"] .hero {
 }
 
 body[data-theme="luxury"] .hero__foto-wrap {
-  position: absolute;
-  inset: -4%;
-  overflow: hidden;
+  position: absolute !important;
+  inset: -15% !important;
+  overflow: hidden !important;
 }
 
 body[data-theme="luxury"] .hero__foto {
@@ -2563,29 +2563,29 @@ body[data-theme="luxury"] .modal__proximo:hover {
    ========================================================================== */
 @keyframes heroKenBurns {
   0% {
-    transform: scale(1) translate3d(0, 0, 0);
-    -webkit-transform: scale(1) translate3d(0, 0, 0);
+    transform: scale(1.10) translate3d(0, 0, 0);
+    -webkit-transform: scale(1.10) translate3d(0, 0, 0);
   }
 
   100% {
-    transform: scale(1.12) translate3d(0, 0, 0);
-    -webkit-transform: scale(1.12) translate3d(0, 0, 0);
+    transform: scale(1.20) translate3d(0, 0, 0);
+    -webkit-transform: scale(1.20) translate3d(0, 0, 0);
   }
 }
 
 @-webkit-keyframes heroKenBurns {
   0% {
-    -webkit-transform: scale(1) translate3d(0, 0, 0);
+    -webkit-transform: scale(1.10) translate3d(0, 0, 0);
   }
 
   100% {
-    -webkit-transform: scale(1.12) translate3d(0, 0, 0);
+    -webkit-transform: scale(1.20) translate3d(0, 0, 0);
   }
 }
 
 body[data-theme="luxury"] .hero__foto-wrap, body[data-theme="luxury"] .secao-orientacoes__foto-wrap, body[data-theme="luxury"] .secao-contato__foto-wrap, body[data-theme="luxury"] .procedimentos__foto-wrap, body[data-theme="luxury"] .agendamento__foto-wrap, body[data-theme="luxury"] .cuidados__foto-wrap, body[data-theme="luxury"] .contato__foto-wrap {
   position: absolute !important;
-  inset: -8% !important;
+  inset: -15% !important;
   overflow: hidden !important;
   will-change: transform !important;
   transform: translate3d(0, 0, 0) !important;
