@@ -11,10 +11,16 @@ export default function DemoPage() {
   const [layoutModel, setLayoutModel] = useState<LayoutModel>('mosaico');
   const [themeVariant, setThemeVariant] = useState<ThemeVariant>('rose');
 
+  const basePreset = nichePresetsMap[selectedNiche];
+
   const catalog = {
-    ...nichePresetsMap[selectedNiche],
+    ...basePreset,
     layout_model: layoutModel,
     theme_variant: themeVariant,
+    client_name: layoutModel === 'classico' ? 'Amanda Carvalho' : basePreset.client_name,
+    cover_media_url: layoutModel === 'classico' ? '/modelos/classico/assets/img/Hero.png' : basePreset.cover_media_url,
+    avatar_url: layoutModel === 'classico' ? '/modelos/classico/assets/img/Hero.png' : basePreset.avatar_url,
+    instagram_handle: layoutModel === 'classico' ? '@amandacarvalho.lash' : basePreset.instagram_handle,
   };
 
   return (
