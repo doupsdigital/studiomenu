@@ -1,19 +1,22 @@
 import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
 import { getCatalogBySlug } from '@/lib/catalog-service';
 import { CatalogLayout } from '@/components/catalog/CatalogLayout';
 import Link from 'next/link';
 import { Sparkles, ArrowLeft } from 'lucide-react';
 
 interface CatalogPageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
+  searchParams: Promise<{
+    edit?: string;
+  }>;
 }
 
 // 1. Geração Dinâmica de Meta-Tags OpenGraph (SSR Previews para WhatsApp / Instagram / Social)
 export async function generateMetadata({ params }: CatalogPageProps): Promise<Metadata> {
-  const catalog = await getCatalogBySlug(params.slug);
+  const { slug } = await params;
+  const catalog = await getCatalogBySlug(slug);
 
   if (!catalog) {
     return {
@@ -52,8 +55,10 @@ export async function generateMetadata({ params }: CatalogPageProps): Promise<Me
 }
 
 // 2. Renderização SSR Principal da Página do Catálogo do Cliente
-export default async function CatalogPage({ params }: CatalogPageProps) {
-  const catalog = await getCatalogBySlug(params.slug);
+export default async function CatalogPage({ params, searchParams }: CatalogPageProps) {
+  const { slug } = await params;
+  const { edit } = await searchParams;
+  const catalog = await getCatalogBySlug(slug);
 
   if (!catalog) {
     return (
@@ -64,7 +69,7 @@ export default async function CatalogPage({ params }: CatalogPageProps) {
           </div>
           <h1 className="font-serif text-2xl font-bold mb-2">Catálogo Não Encontrado</h1>
           <p className="text-xs text-slate-400 mb-6 leading-relaxed">
-            Não encontramos nenhum catálogo ativo para o endereço <code className="text-rose-400 font-mono">/c/{params.slug}</code>.
+            Não encontramos nenhum catálogo ativo para o endereço <code className="text-rose-400 font-mono">/c/{slug}</code>.
           </p>
           <Link
             href="/"
@@ -78,5 +83,7 @@ export default async function CatalogPage({ params }: CatalogPageProps) {
     );
   }
 
-  return <CatalogLayout data={catalog} />;
+  const isEditAuthorized = Boolean(edit && catalog.edit_token && edit === catalog.edit_token);
+
+  return <CatalogLayout data={catalog} isEditMode={isEditAuthorized} editToken={edit || ''} />;
 }

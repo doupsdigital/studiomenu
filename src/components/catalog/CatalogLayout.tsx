@@ -8,36 +8,61 @@ import { ProcedureGrid } from './ProcedureGrid';
 import { InstructionsSection } from './InstructionsSection';
 import { CTASection } from './CTASection';
 
+import { ClientEditBar } from './ClientEditBar';
+
 interface CatalogLayoutProps {
   data: CatalogOrderData;
+  isEditMode?: boolean;
+  editToken?: string;
   onThemeChange?: (theme: ThemeVariant) => void;
 }
 
-export const CatalogLayout: React.FC<CatalogLayoutProps> = ({ data, onThemeChange }) => {
-  const isLuxury = data.theme_variant === 'luxury';
+export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
+  data,
+  isEditMode = false,
+  editToken = '',
+  onThemeChange,
+}) => {
+  const [catalogState, setCatalogState] = React.useState<CatalogOrderData>(data);
+
+  // Manter estado sincronizado se data prop mudar externamente
+  useEffect(() => {
+    setCatalogState(data);
+  }, [data]);
+
+  const isLuxury = catalogState.theme_variant === 'luxury';
 
   // Sincronizar data-theme no <body> para ativar as regras CSS do tema Luxury/Rosé
   useEffect(() => {
-    const theme = data.theme_variant || 'rose';
+    const theme = catalogState.theme_variant || 'rose';
     document.body.setAttribute('data-theme', theme);
     document.documentElement.setAttribute('data-theme', theme);
     return () => {
       document.body.removeAttribute('data-theme');
       document.documentElement.removeAttribute('data-theme');
     };
-  }, [data.theme_variant]);
+  }, [catalogState.theme_variant]);
 
   // Extrair categorias para os chips da Hero
   const categories = useMemo(() => {
     const set = new Set<string>();
-    data.procedures.forEach((p) => {
+    catalogState.procedures.forEach((p) => {
       if (p.category) set.add(p.category);
     });
     return Array.from(set);
-  }, [data.procedures]);
+  }, [catalogState.procedures]);
 
   return (
     <div className={`mosaico-wrapper ${isLuxury ? 'theme-luxury' : 'theme-rose'}`}>
+      {/* SELETOR / BARRA DE EDIÇÃO DA CLIENTE */}
+      {isEditMode && (
+        <ClientEditBar
+          catalogData={catalogState}
+          editToken={editToken}
+          onUpdateCatalog={setCatalogState}
+        />
+      )}
+
       {/* SELETOR FLUTUANTE DUAL DE TEMA ULTRA PREMIUM (ROSÉ 🌸 / LUXURY 👑) */}
       {onThemeChange && (
         <nav className="theme-switcher-widget" id="theme-switcher-widget" aria-label="Alternar Tema do Catálogo">
@@ -71,22 +96,21 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({ data, onThemeChang
       {/* App Mobile Container Original */}
       <div className={`mosaico-app is-visible ${isLuxury ? 'is-luxury' : ''}`}>
         {/* 1. Hero Section */}
-
-        <HeaderCover data={data} categories={categories} />
+        <HeaderCover data={catalogState} categories={categories} />
 
         {/* 2. Seção Mosaico/Clássico de Procedimentos */}
         <ProcedureGrid
-          procedures={data.procedures}
-          whatsappNumber={data.whatsapp_number}
-          clientName={data.client_name}
-          layoutModel={data.layout_model}
+          procedures={catalogState.procedures}
+          whatsappNumber={catalogState.whatsapp_number}
+          clientName={catalogState.client_name}
+          layoutModel={catalogState.layout_model}
         />
 
         {/* 3. Seção Orientações */}
-        <InstructionsSection instructions={data.instructions} bgUrl={data.instructions_bg_url} />
+        <InstructionsSection instructions={catalogState.instructions} bgUrl={catalogState.instructions_bg_url} />
 
         {/* 4. Seção Contato & Localização */}
-        <CTASection data={data} />
+        <CTASection data={catalogState} />
       </div>
     </div>
   );

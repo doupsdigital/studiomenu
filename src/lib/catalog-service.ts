@@ -46,6 +46,7 @@ export async function getCatalogBySlug(slug: string): Promise<CatalogOrderData |
     const catalog: CatalogOrderData = {
       id: orderData.id,
       slug: orderData.slug || normalizedSlug,
+      edit_token: orderData.edit_token,
       client_name: orderData.client_name || orderData.name || normalizedSlug,
       studio_name: orderData.studio_name || `Studio ${orderData.client_name || normalizedSlug}`,
       hero_phrase: orderData.hero_phrase || 'A arte de transformar a sua beleza com leveza e precisão.',

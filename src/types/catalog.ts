@@ -41,6 +41,8 @@ export interface CatalogOrderData {
   maps_url?: string;
   instructions_bg_url?: string;
   final_screen_bg_url?: string;
+  cta_bg_url?: string;
+  edit_token?: string;
   procedures: ProcedureItem[];
   instructions?: CatalogInstructions;
   created_at?: string;
