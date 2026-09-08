@@ -1,0 +1,67 @@
+import { CatalogOrderData } from '@/types/catalog';
+
+export const nailPreset: CatalogOrderData = {
+  slug: 'modelo-nail',
+  client_name: 'Carla Souza',
+  studio_name: 'Carla Souza Nail Designer',
+  hero_phrase: 'Unhas de Gel, Blindagem e Nail Art Exclusiva com Acabamento Perfeito e Resistente.',
+  bio_description: 'Especialista em Alongamento em Gel, Banho de Gel e Esmaltação em Gel.',
+  cover_media_url: 'https://images.unsplash.com/photo-1604654894610-df63bc536371?auto=format&fit=crop&w=800&q=80',
+  avatar_url: 'https://images.unsplash.com/photo-1604654894610-df63bc536371?auto=format&fit=crop&w=300&q=80',
+  niche: 'nail',
+  layout_model: 'mosaico',
+  theme_variant: 'luxury',
+  whatsapp_number: '5562991083435',
+  instagram_handle: '@carlasouza.nails',
+  address: 'São Paulo',
+  procedures: [
+    {
+      id: 'n1',
+      title: 'Alongamento em Gel no Molde',
+      description: 'Estruturação natural e resistente com curvatura C perfeita, acabamento fino e esmaltação em gel.',
+      price: '220,00',
+      duration: '2h30min',
+      category: 'Unhas de Gel',
+      badge: 'Destaque',
+      is_highlight: true,
+      image_url: 'https://images.unsplash.com/photo-1604654894610-df63bc536371?auto=format&fit=crop&w=400&q=80',
+    },
+    {
+      id: 'n2',
+      title: 'Banho de Gel nas Unhas Naturais',
+      description: 'Blindagem de alta resistência para fortalecer as unhas naturais contra quebras e descamações.',
+      price: '130,00',
+      duration: '1h30min',
+      category: 'Blindagem',
+    },
+    {
+      id: 'n3',
+      title: 'Manutenção de Gel (Até 25 dias)',
+      description: 'Nivelamento da raiz, reposição de estrutura em gel e nova esmaltação.',
+      price: '140,00',
+      duration: '1h45min',
+      category: 'Manutenção',
+    },
+    {
+      id: 'n4',
+      title: 'Nail Art Encapsulada / Francesa',
+      description: 'Decoração exclusiva encapsulada em gel ou francesa reversa personalizada.',
+      price: '40,00',
+      duration: '30min',
+      category: 'Decoração',
+      badge: 'Tendência',
+    },
+  ],
+  instructions: {
+    pre_care: [
+      'Venha com as unhas limpas e sem esmalte tradicional.',
+      'Evite usar cremes nas mãos 1 hora antes do procedimento.',
+    ],
+    post_care: [
+      'Não use as unhas como ferramentas para abrir recipientes.',
+      'Hidrate as cutículas com óleo reparador diariamente.',
+      'Realize a manutenção a cada 20 a 25 dias.',
+    ],
+    tolerances: 'Tolerância máxima de 10 minutos de atraso.',
+  },
+};

@@ -1,0 +1,65 @@
+import { CatalogOrderData } from '@/types/catalog';
+
+export const esteticaPreset: CatalogOrderData = {
+  slug: 'modelo-estetica',
+  client_name: 'Dra. Beatriz Lima',
+  studio_name: 'Bella Estética Avançada',
+  hero_phrase: 'Tratamentos Faciais, Limpeza de Pele Fotônica e Procedimentos Corporais de Alta Performance.',
+  bio_description: 'Biomédica Esteta especialista em Rejuvenescimento Facial e Estética Corporal.',
+  cover_media_url: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=800&q=80',
+  avatar_url: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=300&q=80',
+  niche: 'estetica',
+  layout_model: 'classico',
+  theme_variant: 'rose',
+  whatsapp_number: '5562991083435',
+  instagram_handle: '@bella.esteticago',
+  address: 'São Paulo',
+  procedures: [
+    {
+      id: 'e1',
+      title: 'Limpeza de Pele Fotônica',
+      description: 'Extração profunda de cravos, esfoliação ultrassônica, LED fototerápico e máscara regeneradora.',
+      price: '190,00',
+      duration: '1h45min',
+      category: 'Estética Facial',
+      badge: 'Queridinho',
+      is_highlight: true,
+      image_url: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=400&q=80',
+    },
+    {
+      id: 'e2',
+      title: 'Peeling Químico Renovador',
+      description: 'Aplicação de ácidos manipulados para clareamento de manchas, acne e estímulo de colágeno.',
+      price: '210,00',
+      duration: '1h',
+      category: 'Estética Facial',
+    },
+    {
+      id: 'e3',
+      title: 'Drenagem Linfática Corporal',
+      description: 'Manobras manuais para desinchamento, eliminação de toxinas e melhora da circulação.',
+      price: '160,00',
+      duration: '1h',
+      category: 'Estética Corporal',
+    },
+    {
+      id: 'e4',
+      title: 'Depilação a Laser (Sessão Avulsa)',
+      description: 'Tecnologia de díodo indolor para remoção duradoura dos pelos com máxima segurança.',
+      price: '120,00',
+      duration: '30min',
+      category: 'Depilação',
+    },
+  ],
+  instructions: {
+    pre_care: [
+      'Evite exposição solar intensa no dia anterior ao procedimento.',
+      'Não use ácidos na pele 3 dias antes da sessão.',
+    ],
+    post_care: [
+      'Use protetor solar FPS 50+ a cada 3 horas religiosamente.',
+      'Mantenha a pele hidratada com o dermocosmético indicado.',
+    ],
+    tolerances: 'Tolerância de 15 minutos de atraso.',
+  },
+};

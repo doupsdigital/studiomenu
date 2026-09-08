@@ -1,0 +1,65 @@
+import { CatalogOrderData } from '@/types/catalog';
+
+export const studioPreset: CatalogOrderData = {
+  slug: 'modelo-studio',
+  client_name: 'Juliana & Equipe',
+  studio_name: 'Beauty Lounge Studio',
+  hero_phrase: 'Seu espaço completo de beleza: Lash, Nails, Cabelo e Estética em um só lugar.',
+  bio_description: 'Studio de Beleza Multi-disciplinar com especialistas de alto padrão.',
+  cover_media_url: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80',
+  avatar_url: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=300&q=80',
+  niche: 'studio',
+  layout_model: 'mosaico',
+  theme_variant: 'luxury',
+  whatsapp_number: '5562991083435',
+  instagram_handle: '@beautylounge.studio',
+  address: 'São Paulo',
+  procedures: [
+    {
+      id: 's1',
+      title: 'Combo Lash + Sobrancelha VIP',
+      description: 'Volume Brasileiro + Design de Sobrancelha com Henna no mesmo atendimento.',
+      price: '230,00',
+      duration: '2h30min',
+      category: 'Combos VIP',
+      badge: 'Super Combo',
+      is_highlight: true,
+      image_url: 'https://images.unsplash.com/photo-1583001809873-a1284d563391?auto=format&fit=crop&w=400&q=80',
+    },
+    {
+      id: 's2',
+      title: 'Alongamento em Gel + Esmaltação',
+      description: 'Unhas impecáveis por até 30 dias com estrutura perfeita.',
+      price: '210,00',
+      duration: '2h',
+      category: 'Nails & Gel',
+      image_url: 'https://images.unsplash.com/photo-1604654894610-df63bc536371?auto=format&fit=crop&w=400&q=80',
+    },
+    {
+      id: 's3',
+      title: 'Limpeza de Pele Fotônica',
+      description: 'Higienização facial profunda, extração de cravos e LED regenerador.',
+      price: '190,00',
+      duration: '1h30min',
+      category: 'Estética',
+    },
+    {
+      id: 's4',
+      title: 'Escova Modeladora + Tratamento',
+      description: 'Lavagem especial, reconstrução capilar intensiva e escova modeladora.',
+      price: '130,00',
+      duration: '1h',
+      category: 'Hair Studio',
+    },
+  ],
+  instructions: {
+    pre_care: [
+      'Chegue com 5 a 10 minutos de antecedência.',
+      'Siga as orientações prévias de cada procedimento agendado.',
+    ],
+    post_care: [
+      'Seguir os guias de cuidados pós fornecidos por cada profissional.',
+    ],
+    tolerances: 'Tolerância de 15 minutos de atraso.',
+  },
+};
