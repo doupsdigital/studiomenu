@@ -130,7 +130,7 @@ button {
 .secao-orientacoes__foto-wrap,
 .secao-contato__foto-wrap {
   position: absolute;
-  inset: -6%;
+  inset: -12%;
   overflow: hidden;
   will-change: transform;
 }
@@ -1473,7 +1473,7 @@ body[data-theme="luxury"] .delay-6 { transition-delay: 0.70s; }
 
 body[data-theme="luxury"] .hero__foto-wrap, body[data-theme="luxury"] .secao-orientacoes__foto-wrap, body[data-theme="luxury"] .secao-contato__foto-wrap {
   position: absolute;
-  inset: -6%;
+  inset: -12%;
   overflow: hidden;
   will-change: transform;
 }
