@@ -13,7 +13,7 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({ data, categories }) =>
   // Se não houver foto de capa especificada, usamos o asset original do modelo
   const heroImage = data.cover_media_url || data.avatar_url || 'https://lashmenu.com/modelos/mosaico/assets/img/Hero.png';
   const isClassico = data.layout_model === 'classico' || heroImage.toLowerCase().includes('classico');
-  const objectPosition = isClassico ? '12% 18%' : 'center 18%';
+  const objectPosition = isClassico ? '65% 18%' : 'center 18%';
 
   return (
     <section className={`hero is-visible ${isClassico ? 'hero--classico' : ''}`} id="hero" data-screen-label="Capa">
