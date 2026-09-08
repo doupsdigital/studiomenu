@@ -1,8 +1,14 @@
 .claude/
 .DS_Store
 .env
+.env*.local
 *.env
+node_modules/
+.next/
+out/
+build/
 __pycache__/
 *.pyc
+
 
 
