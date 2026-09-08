@@ -64,7 +64,7 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({ data, onThemeChang
         <HeaderCover data={data} categories={categories} />
 
         {/* 2. Seção Mosaico de Procedimentos */}
-        <ProcedureGrid procedures={data.procedures} whatsappNumber={data.whatsapp_number} />
+        <ProcedureGrid procedures={data.procedures} whatsappNumber={data.whatsapp_number} clientName={data.client_name} />
 
         {/* 3. Seção Orientações */}
         <InstructionsSection instructions={data.instructions} bgUrl={data.instructions_bg_url} />

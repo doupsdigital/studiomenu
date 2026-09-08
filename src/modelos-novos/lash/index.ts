@@ -27,6 +27,11 @@ export const lashPreset: CatalogOrderData = {
       badge: 'Mais Pedido',
       is_highlight: true,
       image_url: '/modelos/mosaico/assets/img/volume-brasileiro.png',
+      specs: [
+        ['Investimento', 'R$ 150'],
+        ['Duração', '1h30'],
+        ['Manutenção', 'R$ 90 (até 20 dias)'],
+      ],
     },
     {
       id: 'classico',
@@ -36,6 +41,11 @@ export const lashPreset: CatalogOrderData = {
       duration: '1h30',
       category: 'Extensão de Cílios',
       image_url: '/modelos/mosaico/assets/img/classico-fio-a-fio.png',
+      specs: [
+        ['Investimento', 'R$ 120'],
+        ['Duração', '1h30'],
+        ['Manutenção', 'R$ 70 (até 18 dias)'],
+      ],
     },
     {
       id: 'egipcio',
@@ -45,6 +55,11 @@ export const lashPreset: CatalogOrderData = {
       duration: '1h30',
       category: 'Extensão de Cílios',
       image_url: '/modelos/mosaico/assets/img/volume-egipcio.png',
+      specs: [
+        ['Investimento', 'R$ 160'],
+        ['Duração', '1h30'],
+        ['Manutenção', 'R$ 95 (até 20 dias)'],
+      ],
     },
     {
       id: 'hibrido',
@@ -54,6 +69,11 @@ export const lashPreset: CatalogOrderData = {
       duration: '1h45',
       category: 'Extensão de Cílios',
       image_url: '/modelos/mosaico/assets/img/volume-hibrido.png',
+      specs: [
+        ['Investimento', 'R$ 160'],
+        ['Duração', '1h45'],
+        ['Manutenção', 'R$ 95 (até 20 dias)'],
+      ],
     },
     {
       id: 'russo',
@@ -63,6 +83,11 @@ export const lashPreset: CatalogOrderData = {
       duration: '2h00',
       category: 'Extensão de Cílios',
       image_url: '/modelos/mosaico/assets/img/volume-russo.png',
+      specs: [
+        ['Investimento', 'R$ 190'],
+        ['Duração', '2h00'],
+        ['Manutenção', 'R$ 110 (até 20 dias)'],
+      ],
     },
     {
       id: 'mega',
@@ -74,6 +99,11 @@ export const lashPreset: CatalogOrderData = {
       badge: 'Densidade Máxima',
       is_highlight: true,
       image_url: '/modelos/mosaico/assets/img/mega-volume.png',
+      specs: [
+        ['Investimento', 'R$ 240'],
+        ['Duração', '2h30'],
+        ['Manutenção', 'R$ 140 (até 18 dias)'],
+      ],
     },
     {
       id: 'gatinho',
@@ -83,6 +113,10 @@ export const lashPreset: CatalogOrderData = {
       duration: 'Design',
       category: 'Extensão de Cílios',
       image_url: '/modelos/mosaico/assets/img/mapping-gatinho.png',
+      specs: [
+        ['Investimento', 'Incluso na técnica escolhida'],
+        ['Duração', 'Incluso no procedimento'],
+      ],
     },
     {
       id: 'boneca',
@@ -92,6 +126,10 @@ export const lashPreset: CatalogOrderData = {
       duration: 'Design',
       category: 'Extensão de Cílios',
       image_url: '/modelos/mosaico/assets/img/mapping-boneca.png',
+      specs: [
+        ['Investimento', 'Incluso na técnica escolhida'],
+        ['Duração', 'Incluso no procedimento'],
+      ],
     },
     {
       id: 'esquilo',
@@ -101,6 +139,10 @@ export const lashPreset: CatalogOrderData = {
       duration: 'Design',
       category: 'Extensão de Cílios',
       image_url: '/modelos/mosaico/assets/img/mapping-esquilo.png',
+      specs: [
+        ['Investimento', 'Incluso na técnica escolhida'],
+        ['Duração', 'Incluso no procedimento'],
+      ],
     },
     {
       id: 'fox',
@@ -110,6 +152,11 @@ export const lashPreset: CatalogOrderData = {
       duration: '1h45',
       category: 'Extensão de Cílios',
       image_url: '/modelos/mosaico/assets/img/fox-eyes.png',
+      specs: [
+        ['Investimento', 'R$ 170'],
+        ['Duração', '1h45'],
+        ['Manutenção', 'R$ 100 (até 20 dias)'],
+      ],
     },
     {
       id: 'design-sobrancelha',
@@ -121,6 +168,11 @@ export const lashPreset: CatalogOrderData = {
       badge: 'Visagismo Facial',
       is_highlight: true,
       image_url: '/modelos/mosaico/assets/img/design-sobrancelha.jpg',
+      specs: [
+        ['Investimento', 'R$ 60'],
+        ['Duração', '45 minutos'],
+        ['Manutenção', 'Recomendado a cada 15 a 20 dias'],
+      ],
     },
     {
       id: 'sobrancelha-henna',
@@ -130,6 +182,10 @@ export const lashPreset: CatalogOrderData = {
       duration: '50min',
       category: 'Sobrancelhas',
       image_url: '/modelos/mosaico/assets/img/sobrancelha-henna.jpg',
+      specs: [
+        ['Investimento', 'R$ 80'],
+        ['Duração', '50 minutos'],
+      ],
     },
     {
       id: 'lifting',
@@ -139,6 +195,10 @@ export const lashPreset: CatalogOrderData = {
       duration: '1h00',
       category: 'Especiais & Cuidados',
       image_url: '/modelos/mosaico/assets/img/lash-lifting.png',
+      specs: [
+        ['Investimento', 'R$ 130'],
+        ['Duração', '1h00'],
+      ],
     },
     {
       id: 'remocao',
@@ -148,6 +208,10 @@ export const lashPreset: CatalogOrderData = {
       duration: '30min',
       category: 'Especiais & Cuidados',
       image_url: '/modelos/mosaico/assets/img/remocao.png',
+      specs: [
+        ['Investimento', 'R$ 50'],
+        ['Duração', '30 minutos'],
+      ],
     },
     {
       id: 'cuidados',
@@ -157,6 +221,10 @@ export const lashPreset: CatalogOrderData = {
       duration: 'Diário',
       category: 'Especiais & Cuidados',
       image_url: '/modelos/mosaico/assets/img/cuidados.jpg',
+      specs: [
+        ['Investimento', 'Guia Informativo Gratuito'],
+        ['Duração', 'Rotina Diária'],
+      ],
     },
   ],
   instructions: {

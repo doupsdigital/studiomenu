@@ -12,6 +12,7 @@ export interface ProcedureItem {
   image_url?: string;
   badge?: string;
   is_highlight?: boolean;
+  specs?: [string, string][];
 }
 
 export interface CatalogInstructions {

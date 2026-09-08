@@ -4,16 +4,21 @@ import React, { useState, useMemo } from 'react';
 
 import { ProcedureItem } from '@/types/catalog';
 import { ProcedureCard } from './ProcedureCard';
+import { ProcedureModal } from './ProcedureModal';
 
 interface ProcedureGridProps {
   procedures: ProcedureItem[];
   whatsappNumber: string;
+  clientName?: string;
 }
 
 export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
   procedures,
   whatsappNumber,
+  clientName = 'Mariana',
 }) => {
+  const [selectedProcedure, setSelectedProcedure] = useState<ProcedureItem | null>(null);
+
   // Extrair categorias únicas existentes
   const categories = useMemo(() => {
     const set = new Set<string>();
@@ -29,6 +34,15 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
     if (activeCategory === 'Todos') return procedures;
     return procedures.filter((p) => p.category === activeCategory);
   }, [procedures, activeCategory]);
+
+  const handleNextProcedure = () => {
+    if (!selectedProcedure) return;
+    const currentIndex = filteredProcedures.findIndex((p) => p.id === selectedProcedure.id);
+    if (currentIndex !== -1) {
+      const nextIndex = (currentIndex + 1) % filteredProcedures.length;
+      setSelectedProcedure(filteredProcedures[nextIndex]);
+    }
+  };
 
   return (
     <section className="secao-catalogo is-visible" id="catalogo" data-screen-label="Mosaico">
@@ -73,10 +87,22 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
               key={item.id}
               item={item}
               whatsappNumber={whatsappNumber}
+              onSelect={(proc) => setSelectedProcedure(proc)}
             />
           ))}
         </div>
       </div>
+
+      {/* Modal de Detalhes do Procedimento */}
+      {selectedProcedure && (
+        <ProcedureModal
+          item={selectedProcedure}
+          clientName={clientName}
+          whatsappNumber={whatsappNumber}
+          onClose={() => setSelectedProcedure(null)}
+          onNext={handleNextProcedure}
+        />
+      )}
     </section>
   );
 };
