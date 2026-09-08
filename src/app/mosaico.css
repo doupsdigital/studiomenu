@@ -2762,6 +2762,12 @@ body:has(.theme-switcher-widget) .hero__conteudo {
   padding-top: 118px !important;
 }
 
+.hero--classico .hero__foto,
+.hero--classico img.hero__foto,
+body[data-theme="luxury"] .hero--classico .hero__foto {
+  object-position: -20% 18% !important;
+}
+
 /* ==========================================================================
    SUPORTE AO MODELO CLÁSSICO (LISTA EDITORIAL) - ROSÉ & LUXURY
    ========================================================================== */
