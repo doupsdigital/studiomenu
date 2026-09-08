@@ -62,49 +62,50 @@ studiomenu/
 ## 🚦 3. Etapas de Execução Fasedas & Bloco de Testes
 
 ### 🔷 ETAPA 1 — Infraestrutura Base & Configuração Next.js + Tailwind
-- [ ] Inicialização do projeto Next.js com TypeScript e Tailwind CSS.
-- [ ] Configuração do `tailwind.config.js` com tokens de cor (Rosé 🌸 & Luxury 👑), sombras e utilitários glassmorphism.
-- [ ] Definição das interfaces TypeScript (`types/catalog.ts`) para os pedidos e procedimentos do Supabase.
-- [ ] Configuração do cliente Supabase (`src/lib/supabase.ts`).
+- [x] Inicialização do projeto Next.js com TypeScript e Tailwind CSS.
+- [x] Configuração do `tailwind.config.js` com tokens de cor (Rosé 🌸 & Luxury 👑), sombras e utilitários glassmorphism.
+- [x] Definição das interfaces TypeScript (`types/catalog.ts`) para os pedidos e procedimentos do Supabase.
+- [x] Configuração do cliente Supabase (`src/lib/supabase.ts`).
 - **Validação Técnica:** Compilação limpa (`npm run build`) e servidor local operacional (`npm run dev`).
 - **Validação Visual (Usuário):** O usuário valida a página inicial inicializada.
 
 ---
 
 ### 🔷 ETAPA 2 — Componentização dos Catálogos (Mosaico & Clássico)
-- [ ] Construção do componente `<HeaderCover />` (Foto, bio, avatar do estúdio).
-- [ ] Construção dos componentes `<ProcedureCard />` e `<ProcedureGrid />` com ordenação e categorias.
-- [ ] Construção do componente `<InstructionsSection />` (Cuidados, regras, tolerâncias).
-- [ ] Construção do componente `<CTASection />` (WhatsApp, Instagram, Mapa).
-- [ ] Criação do orchestrador `<CatalogLayout />` suportando as variações Mosaico e Clássico nos temas Rosé e Luxury.
+- [x] Construção do componente `<HeaderCover />` (Foto, bio, avatar do estúdio).
+- [x] Construção dos componentes `<ProcedureCard />` e `<ProcedureGrid />` com ordenação e categorias.
+- [x] Construção do componente `<InstructionsSection />` (Cuidados, regras, tolerâncias).
+- [x] Construção do componente `<CTASection />` (WhatsApp, Instagram, Mapa).
+- [x] Criação do orchestrador `<CatalogLayout />` suportando as variações Mosaico e Clássico nos temas Rosé e Luxury.
 - **Validação Técnica:** Verificação de sintaxe e renderização com dados mockados.
 - **Validação Visual (Usuário):** O usuário testa no navegador em `localhost:3000/c/demo` e aprova a fidelidade visual perante os modelos antigos.
 
 ---
 
 ### 🔷 ETAPA 3 — Motor SSR & Roteamento Dinâmico de Subdomínios (`/c/[slug]`)
-- [ ] Implementação da página `src/app/c/[slug]/page.tsx` com busca SSR dos dados no Supabase.
-- [ ] Implementação da função `generateMetadata` para inclusão automática das tags OpenGraph do WhatsApp por cliente.
-- [ ] Migração e adaptação do `middleware.ts` para capturar subdomínios (`jessica.studiomenu.art`).
+- [x] Implementação da página `src/app/c/[slug]/page.tsx` com busca SSR dos dados no Supabase.
+- [x] Implementação da função `generateMetadata` para inclusão automática das tags OpenGraph do WhatsApp por cliente.
+- [x] Migração e adaptação do `middleware.ts` para capturar subdomínios (`jessica.studiomenu.art`).
 - **Validação Técnica:** Verificação de resposta HTTP 200 e montagem correta das meta tags sociais no HTML SSR.
 - **Validação Visual (Usuário):** O usuário testa slugs reais no navegador (ex: `localhost:3000/c/amanda-carvalho`) e aprova a injeção dinâmica.
 
 ---
 
 ### 🔷 ETAPA 4 — Formulário de Onboarding (`/form`) & Painel Admin (`/admin`)
-- [ ] Componentização do formulário de cadastro de procedimentos e escolha de tema (`/form`).
-- [ ] Componentização do painel administrativo e editor rápido de procedimentos (`/admin`).
-- [ ] Integração com o Supabase para gravação de novos catálogos e edição de dados.
+- [x] Componentização do formulário de cadastro de procedimentos e escolha de tema (`/form`).
+- [x] Componentização do painel administrativo e editor rápido de procedimentos (`/admin`).
+- [x] Integração com o Supabase para gravação de novos catálogos e edição de dados.
 - **Validação Técnica:** Testes de requisições de gravação/leitura no Supabase.
 - **Validação Visual (Usuário):** O usuário faz um teste completo de preenchimento e edição de um catálogo teste.
 
 ---
 
 ### 🔷 ETAPA 5 — Landing Page Principal (`/`) & Limpeza do Código Legado
-- [ ] Migração da Landing Page principal de vendas para `src/app/(sales)/page.tsx`.
-- [ ] Auditoria final de integridade e remoção de arquivos estáticos legados substituídos.
+- [x] Migração da Landing Page principal de vendas para `src/app/(sales)/page.tsx`.
+- [x] Auditoria final de integridade e remoção de arquivos estáticos legados substituídos.
 - **Validação Técnica:** Build final de produção sem avisos nem erros.
 - **Validação Visual (Usuário):** O usuário aprova a versão final completa.
+
 
 ---
 
