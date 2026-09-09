@@ -158,10 +158,10 @@ html[data-theme="luxury"] .lm-mb-btn-save {
   border-radius: 8px !important;
 }
 
-/* Botão Flutuante de Alterar Foto de Capa (Centralizado abaixo do SEJA BEM VINDA) */
+/* Botão Flutuante de Alterar Foto de Capa (Alinhado à direita, abaixo do SEJA BEM VINDA) */
 .lm-cover-edit-overlay {
   display: flex !important;
-  justify-content: center !important;
+  justify-content: flex-end !important;
   width: 100% !important;
   position: relative !important;
   top: auto !important;
@@ -170,7 +170,9 @@ html[data-theme="luxury"] .lm-mb-btn-save {
   bottom: auto !important;
   transform: none !important;
   z-index: 99995 !important;
-  margin: 14px 0 !important;
+  margin-top: 28px !important;
+  margin-bottom: 8px !important;
+  padding-right: 4px !important;
   pointer-events: auto !important;
 }
 
