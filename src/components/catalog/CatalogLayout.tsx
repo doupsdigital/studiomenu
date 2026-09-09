@@ -1,14 +1,15 @@
 'use client';
 
-import React, { useMemo, useEffect } from 'react';
-
-import { CatalogOrderData, ThemeVariant } from '@/types/catalog';
+import React, { useMemo, useEffect, useState } from 'react';
+import { CatalogOrderData, ProcedureItem, ThemeVariant } from '@/types/catalog';
 import { HeaderCover } from './HeaderCover';
 import { ProcedureGrid } from './ProcedureGrid';
 import { InstructionsSection } from './InstructionsSection';
 import { CTASection } from './CTASection';
+import { VisualEditorBottomBar } from './VisualEditorBottomBar';
+import { VisualEditorModals } from './VisualEditorModals';
 
-import { ClientEditBar } from './ClientEditBar';
+import '@/app/visual-editor.css';
 
 interface CatalogLayoutProps {
   data: CatalogOrderData;
@@ -23,14 +24,78 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
   editToken = '',
   onThemeChange,
 }) => {
-  const [catalogState, setCatalogState] = React.useState<CatalogOrderData>(data);
+  const [catalogState, setCatalogState] = useState<CatalogOrderData>(data);
+  const [isSaved, setIsSaved] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
-  // Manter estado sincronizado se data prop mudar externamente
+  // Pilha de Histórico para Undo/Redo (↩️ e ↪️)
+  const [historyStack, setHistoryStack] = useState<CatalogOrderData[]>([data]);
+  const [historyIndex, setHistoryIndex] = useState<number>(0);
+
+  // Modais Ativos
+  const [activeModal, setActiveModal] = useState<'none' | 'cover' | 'procedure' | 'social' | 'category' | 'save_confirm'>('none');
+  const [editingProc, setEditingProc] = useState<ProcedureItem | null>(null);
+  const [editingProcIndex, setEditingProcIndex] = useState<number | null>(null);
+  const [editingSocialType, setEditingSocialType] = useState<'whatsapp' | 'instagram' | 'address' | null>(null);
+
+  // Ativar classe no body em modo edição para ajuste de padding inferior
   useEffect(() => {
-    setCatalogState(data);
-  }, [data]);
+    if (isEditMode) {
+      document.body.classList.add('has-lm-editor');
+    } else {
+      document.body.classList.remove('has-lm-editor');
+    }
+    return () => {
+      document.body.classList.remove('has-lm-editor');
+    };
+  }, [isEditMode]);
 
-  const isLuxury = catalogState.theme_variant === 'luxury';
+  // Push para pilha de histórico
+  const pushState = (newState: CatalogOrderData) => {
+    const updatedHistory = historyStack.slice(0, historyIndex + 1);
+    updatedHistory.push(newState);
+    setHistoryStack(updatedHistory);
+    setHistoryIndex(updatedHistory.length - 1);
+    setCatalogState(newState);
+    setIsSaved(false);
+  };
+
+  // Undo (Desfazer ↩️)
+  const handleUndo = () => {
+    if (historyIndex > 0) {
+      const prevIdx = historyIndex - 1;
+      setHistoryIndex(prevIdx);
+      setCatalogState(historyStack[prevIdx]);
+      setIsSaved(false);
+    }
+  };
+
+  // Redo (Refazer ↪️)
+  const handleRedo = () => {
+    if (historyIndex < historyStack.length - 1) {
+      const nextIdx = historyIndex + 1;
+      setHistoryIndex(nextIdx);
+      setCatalogState(historyStack[nextIdx]);
+      setIsSaved(false);
+    }
+  };
+
+  // Descartar alterações (Reset 🗑️)
+  const handleDiscard = () => {
+    if (confirm('Deseja descartar todas as alterações não salvas?')) {
+      setCatalogState(data);
+      setHistoryStack([data]);
+      setHistoryIndex(0);
+      setIsSaved(true);
+    }
+  };
+
+  // Alternar Tema (🌸 / 👑)
+  const handleToggleTheme = () => {
+    const nextTheme: ThemeVariant = catalogState.theme_variant === 'luxury' ? 'rose' : 'luxury';
+    pushState({ ...catalogState, theme_variant: nextTheme });
+    if (onThemeChange) onThemeChange(nextTheme);
+  };
 
   // Sincronizar data-theme no <body> para ativar as regras CSS do tema Luxury/Rosé
   useEffect(() => {
@@ -43,6 +108,97 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
     };
   }, [catalogState.theme_variant]);
 
+  // Persistir no Supabase ao confirmar no modal de salvamento
+  const handleConfirmSaveDatabase = async () => {
+    setIsSaving(true);
+    try {
+      const response = await fetch('/api/catalog/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          slug: catalogState.slug,
+          edit_token: editToken,
+          catalogData: catalogState,
+        }),
+      });
+
+      const res = await response.json();
+      if (res.success) {
+        setIsSaved(true);
+        setActiveModal('none');
+        alert('✨ Catálogo salvo com sucesso no Supabase!');
+      } else {
+        alert(`❌ Erro ao salvar: ${res.message}`);
+      }
+    } catch (err) {
+      alert('❌ Falha na conexão ao salvar catálogo.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Manipuladores In-Place
+  const handleUpdateClientName = (newName: string) => {
+    if (newName && newName !== catalogState.client_name) {
+      pushState({ ...catalogState, client_name: newName });
+    }
+  };
+
+  const handleUpdateHeroPhrase = (newPhrase: string) => {
+    if (newPhrase !== catalogState.hero_phrase) {
+      pushState({ ...catalogState, hero_phrase: newPhrase });
+    }
+  };
+
+  const handleUpdateAddress = (newAddress: string) => {
+    if (newAddress !== catalogState.address) {
+      pushState({ ...catalogState, address: newAddress });
+    }
+  };
+
+  const handleSaveCoverUrl = (url: string) => {
+    pushState({ ...catalogState, cover_media_url: url });
+  };
+
+  const handleSaveSocial = (type: 'whatsapp' | 'instagram' | 'address', val: string) => {
+    if (type === 'whatsapp') {
+      pushState({ ...catalogState, whatsapp_number: val });
+    } else if (type === 'instagram') {
+      pushState({ ...catalogState, instagram_handle: val });
+    } else if (type === 'address') {
+      pushState({ ...catalogState, address: val });
+    }
+  };
+
+  const handleSaveProcedure = (proc: ProcedureItem, index: number | null) => {
+    const newProcs = [...catalogState.procedures];
+    if (index !== null && index >= 0) {
+      newProcs[index] = proc;
+    } else {
+      newProcs.push({ ...proc, id: String(Date.now()) });
+    }
+    pushState({ ...catalogState, procedures: newProcs });
+  };
+
+  const handleDeleteProcedure = (proc: ProcedureItem) => {
+    if (!confirm(`Excluir o procedimento "${proc.title}"?`)) return;
+    const newProcs = catalogState.procedures.filter((p) => p.id !== proc.id);
+    pushState({ ...catalogState, procedures: newProcs });
+  };
+
+  const handleAddCategory = (categoryName: string) => {
+    const newProc: ProcedureItem = {
+      id: String(Date.now()),
+      title: `Novo Procedimento (${categoryName})`,
+      price: 'Sob Consulta',
+      category: categoryName,
+      description: 'Descrição do procedimento...',
+    };
+    pushState({ ...catalogState, procedures: [...catalogState.procedures, newProc] });
+  };
+
+  const isLuxury = catalogState.theme_variant === 'luxury';
+
   // Extrair categorias para os chips da Hero
   const categories = useMemo(() => {
     const set = new Set<string>();
@@ -54,63 +210,88 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
 
   return (
     <div className={`mosaico-wrapper ${isLuxury ? 'theme-luxury' : 'theme-rose'}`}>
-      {/* SELETOR / BARRA DE EDIÇÃO DA CLIENTE */}
+      {/* 1. CONTROLES DO EDITOR VISUAL IN-PLACE (BARRA INFERIOR E TOP STATUS) */}
       {isEditMode && (
-        <ClientEditBar
+        <VisualEditorBottomBar
           catalogData={catalogState}
-          editToken={editToken}
-          onUpdateCatalog={setCatalogState}
+          isSaved={isSaved}
+          canUndo={historyIndex > 0}
+          canRedo={historyIndex < historyStack.length - 1}
+          onUndo={handleUndo}
+          onRedo={handleRedo}
+          onToggleTheme={handleToggleTheme}
+          onDiscard={handleDiscard}
+          onSave={() => setActiveModal('save_confirm')}
+          isSaving={isSaving}
         />
       )}
 
-      {/* SELETOR FLUTUANTE DUAL DE TEMA ULTRA PREMIUM (ROSÉ 🌸 / LUXURY 👑) */}
-      {onThemeChange && (
-        <nav className="theme-switcher-widget" id="theme-switcher-widget" aria-label="Alternar Tema do Catálogo">
-          <div className="theme-switcher-label">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
-            </svg>
-            <span>Clique para mudar o tema</span>
-          </div>
-          <div className="theme-switcher-options">
-            <button
-              type="button"
-              className={`theme-switcher-btn ${!isLuxury ? 'is-active' : ''}`}
-              onClick={() => onThemeChange('rose')}
-            >
-              <span className="theme-switcher-icon">🌸</span>
-              <span className="theme-switcher-title">Modo Rosé</span>
-            </button>
-            <button
-              type="button"
-              className={`theme-switcher-btn ${isLuxury ? 'is-active' : ''}`}
-              onClick={() => onThemeChange('luxury')}
-            >
-              <span className="theme-switcher-icon">👑</span>
-              <span className="theme-switcher-title">Modo Luxury</span>
-            </button>
-          </div>
-        </nav>
+      {/* 2. MODAIS DE EDIÇÃO VISUAL */}
+      {isEditMode && (
+        <VisualEditorModals
+          catalogData={catalogState}
+          editToken={editToken}
+          activeModal={activeModal}
+          editingProc={editingProc}
+          editingProcIndex={editingProcIndex}
+          editingSocialType={editingSocialType}
+          onClose={() => setActiveModal('none')}
+          onSaveProcedure={handleSaveProcedure}
+          onSaveCoverUrl={handleSaveCoverUrl}
+          onSaveSocial={handleSaveSocial}
+          onAddCategory={handleAddCategory}
+          onConfirmSaveDatabase={handleConfirmSaveDatabase}
+          isSaving={isSaving}
+        />
       )}
 
-      {/* App Mobile Container Original */}
+      {/* 3. APP MOBILE CONTAINER COM SUPORTE A EDIÇÃO IN-PLACE */}
       <div className={`mosaico-app is-visible ${isLuxury ? 'is-luxury' : ''}`}>
-        {/* 1. Hero Section */}
-        <HeaderCover data={catalogState} categories={categories} />
+        {/* Hero Section (Foto da Capa, Nome da Profissional, Frase Hero) */}
+        <HeaderCover
+          data={catalogState}
+          categories={categories}
+          isEditMode={isEditMode}
+          onOpenCoverModal={() => setActiveModal('cover')}
+          onUpdateClientName={handleUpdateClientName}
+          onUpdateHeroPhrase={handleUpdateHeroPhrase}
+        />
 
-        {/* 2. Seção Mosaico/Clássico de Procedimentos */}
+        {/* Seção Mosaico/Clássico de Procedimentos */}
         <ProcedureGrid
           procedures={catalogState.procedures}
           whatsappNumber={catalogState.whatsapp_number}
           clientName={catalogState.client_name}
           layoutModel={catalogState.layout_model}
+          isEditMode={isEditMode}
+          onEditProc={(proc) => {
+            const idx = catalogState.procedures.findIndex((p) => p.id === proc.id);
+            setEditingProc(proc);
+            setEditingProcIndex(idx >= 0 ? idx : null);
+            setActiveModal('procedure');
+          }}
+          onDeleteProc={handleDeleteProcedure}
+          onOpenAddProcModal={() => {
+            setEditingProc(null);
+            setEditingProcIndex(null);
+            setActiveModal('procedure');
+          }}
+          onOpenAddCatModal={() => setActiveModal('category')}
         />
 
-        {/* 3. Seção Orientações */}
+        {/* Seção Orientações */}
         <InstructionsSection instructions={catalogState.instructions} bgUrl={catalogState.instructions_bg_url} />
 
-        {/* 4. Seção Contato & Localização */}
-        <CTASection data={catalogState} />
+        {/* Seção Contato & Localização */}
+        <CTASection
+          data={catalogState}
+          isEditMode={isEditMode}
+          onOpenSocialModal={(type) => {
+            setEditingSocialType(type);
+            setActiveModal('social');
+          }}
+          onUpdateAddress={handleUpdateAddress}
+        />
       </div>
     </div>
   );

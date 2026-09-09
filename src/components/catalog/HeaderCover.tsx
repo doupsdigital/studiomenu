@@ -4,9 +4,20 @@ import { CatalogOrderData } from '@/types/catalog';
 interface HeaderCoverProps {
   data: CatalogOrderData;
   categories: string[];
+  isEditMode?: boolean;
+  onOpenCoverModal?: () => void;
+  onUpdateClientName?: (newName: string) => void;
+  onUpdateHeroPhrase?: (newPhrase: string) => void;
 }
 
-export const HeaderCover: React.FC<HeaderCoverProps> = ({ data, categories }) => {
+export const HeaderCover: React.FC<HeaderCoverProps> = ({
+  data,
+  categories,
+  isEditMode = false,
+  onOpenCoverModal,
+  onUpdateClientName,
+  onUpdateHeroPhrase,
+}) => {
   const wspText = encodeURIComponent(`Olá! Vim pelo seu catálogo digital e gostaria de tirar uma dúvida.`);
   const wspUrl = `https://wa.me/${data.whatsapp_number}?text=${wspText}`;
 
@@ -18,7 +29,6 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({ data, categories }) =>
   return (
     <section className={`hero is-visible ${isClassico ? 'hero--classico' : ''}`} id="hero" data-screen-label="Capa">
       {/* 1. Foto de Fundo Ken Burns */}
-
       <div className="hero__foto-wrap">
         <img
           src={heroImage}
@@ -27,6 +37,20 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({ data, categories }) =>
           style={{ objectPosition }}
           fetchPriority="high"
         />
+
+        {/* BOTÃO FLUTUANTE SOBRE A CAPA: 📷 Alterar Foto de Capa */}
+        {isEditMode && (
+          <div className="lm-cover-edit-overlay">
+            <button
+              type="button"
+              className="lm-cover-edit-btn"
+              title="Clique para alterar a foto de capa"
+              onClick={onOpenCoverModal}
+            >
+              📷 Alterar Foto de Capa
+            </button>
+          </div>
+        )}
       </div>
 
       {/* 2. Scrim (Gradiente Esfumaçado) */}
@@ -45,12 +69,35 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({ data, categories }) =>
             <span className="hero__studio-label">STUDIO</span>
             <span className="hero__studio-divider"></span>
           </div>
-          <h1 className="anim-fade-up delay-2">{data.client_name}</h1>
+
+          <h1
+            className="anim-fade-up delay-2"
+            data-lm-editable={isEditMode ? 'true' : undefined}
+            contentEditable={isEditMode}
+            suppressContentEditableWarning={true}
+            onBlur={(e) => {
+              if (isEditMode && onUpdateClientName) {
+                onUpdateClientName(e.currentTarget.innerText.trim());
+              }
+            }}
+          >
+            {data.client_name}
+          </h1>
+
           <div className="hero__filete anim-fade-up delay-3"></div>
-          <p className="hero__frase-cilios anim-fade-up delay-4">
-            {data.hero_phrase || data.bio_description || (
-              <>A arte de transformar o <em>seu olhar</em> — leveza incomparável, precisão e elegância.</>
-            )}
+
+          <p
+            className="hero__frase-cilios anim-fade-up delay-4"
+            data-lm-editable={isEditMode ? 'true' : undefined}
+            contentEditable={isEditMode}
+            suppressContentEditableWarning={true}
+            onBlur={(e) => {
+              if (isEditMode && onUpdateHeroPhrase) {
+                onUpdateHeroPhrase(e.currentTarget.innerText.trim());
+              }
+            }}
+          >
+            {data.hero_phrase || data.bio_description || 'A arte de transformar o seu olhar — leveza incomparável, precisão e elegância.'}
           </p>
         </div>
 
