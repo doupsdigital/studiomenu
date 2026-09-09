@@ -18,6 +18,7 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
   onUpdateClientName,
   onUpdateHeroPhrase,
 }) => {
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
   const wspText = encodeURIComponent(`Olá! Vim pelo seu catálogo digital e gostaria de tirar uma dúvida.`);
   const wspUrl = `https://wa.me/${data.whatsapp_number}?text=${wspText}`;
 
@@ -25,6 +26,14 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
   const heroImage = data.cover_media_url || data.avatar_url || 'https://lashmenu.com/modelos/mosaico/assets/img/Hero.png';
   const isClassico = data.layout_model === 'classico' || heroImage.toLowerCase().includes('classico');
   const objectPosition = isClassico ? '45% 18%' : 'center 18%';
+
+  const handleCoverClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    } else if (onOpenCoverModal) {
+      onOpenCoverModal();
+    }
+  };
 
   return (
     <section className={`hero is-visible ${isClassico ? 'hero--classico' : ''}`} id="hero" data-screen-label="Capa">
@@ -45,10 +54,26 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
               type="button"
               className="lm-cover-edit-btn"
               title="Clique para alterar a foto de capa"
-              onClick={onOpenCoverModal}
+              onClick={handleCoverClick}
             >
               📷 Alterar Foto de Capa
             </button>
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file && onOpenCoverModal) {
+                  const url = URL.createObjectURL(file);
+                  if (onUpdateHeroPhrase) {
+                    // passar imagem via callback
+                  }
+                  if (onOpenCoverModal) onOpenCoverModal();
+                }
+              }}
+            />
           </div>
         )}
       </div>

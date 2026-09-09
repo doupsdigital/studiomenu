@@ -54,13 +54,11 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
   );
 
   // Form Social State
-  const [socialValue, setSocialValue] = useState(
-    editingSocialType === 'whatsapp'
-      ? catalogData.whatsapp_number
-      : editingSocialType === 'instagram'
-      ? catalogData.instagram_handle || ''
-      : catalogData.address || ''
-  );
+  const [socialForm, setSocialForm] = useState({
+    whatsapp: catalogData.whatsapp_number || '',
+    instagram: catalogData.instagram_handle || '',
+    address: catalogData.address || '',
+  });
 
   // New Category State
   const [newCatName, setNewCatName] = useState('');
@@ -84,16 +82,14 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
     }
   }, [editingProc]);
 
-  // Sincronizar form social se prop mudar
+  // Sincronizar form social se props mudarem
   React.useEffect(() => {
-    if (editingSocialType === 'whatsapp') {
-      setSocialValue(catalogData.whatsapp_number);
-    } else if (editingSocialType === 'instagram') {
-      setSocialValue(catalogData.instagram_handle || '');
-    } else if (editingSocialType === 'address') {
-      setSocialValue(catalogData.address || '');
-    }
-  }, [editingSocialType, catalogData]);
+    setSocialForm({
+      whatsapp: catalogData.whatsapp_number || '',
+      instagram: catalogData.instagram_handle || '',
+      address: catalogData.address || '',
+    });
+  }, [catalogData]);
 
   // Handle File Upload to Supabase Storage
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, target: 'cover' | 'proc') => {
@@ -282,36 +278,39 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
         </div>
       )}
 
-      {/* 3. MODAL EDITAR CONTATO / REDE SOCIAL */}
-      {activeModal === 'social' && editingSocialType && (
+      {/* 3. MODAL EDITAR CONTATOS (WHATSAPP, INSTAGRAM, ENDEREÇO) */}
+      {activeModal === 'social' && (
         <div className="lm-modal-card">
-          <h3 className="lm-modal-title">
-            {editingSocialType === 'whatsapp'
-              ? 'Editar WhatsApp'
-              : editingSocialType === 'instagram'
-              ? 'Editar Instagram'
-              : 'Editar Cidade / Endereço'}
-          </h3>
+          <h3 className="lm-modal-title">Editar Contatos e Localização</h3>
+          <p className="lm-modal-desc">Ajuste seu WhatsApp, Instagram e Cidade exibidos no catálogo.</p>
 
           <div className="lm-form-group">
-            <label>
-              {editingSocialType === 'whatsapp'
-                ? 'Número do WhatsApp (apenas números com DDD)'
-                : editingSocialType === 'instagram'
-                ? 'Nome de Usuário (@instagram)'
-                : 'Cidade e Estado'}
-            </label>
+            <label>WhatsApp (Apenas números com DDD)</label>
             <input
               type="text"
-              value={socialValue}
-              onChange={(e) => setSocialValue(e.target.value)}
-              placeholder={
-                editingSocialType === 'whatsapp'
-                  ? '5511999999999'
-                  : editingSocialType === 'instagram'
-                  ? '@studio.exemplo'
-                  : 'São Paulo - SP'
-              }
+              value={socialForm.whatsapp}
+              onChange={(e) => setSocialForm({ ...socialForm, whatsapp: e.target.value })}
+              placeholder="Ex: 5511999999999"
+            />
+          </div>
+
+          <div className="lm-form-group">
+            <label>Instagram (@usuario)</label>
+            <input
+              type="text"
+              value={socialForm.instagram}
+              onChange={(e) => setSocialForm({ ...socialForm, instagram: e.target.value })}
+              placeholder="Ex: @studio.exemplo"
+            />
+          </div>
+
+          <div className="lm-form-group">
+            <label>Cidade / Estado / Endereço</label>
+            <input
+              type="text"
+              value={socialForm.address}
+              onChange={(e) => setSocialForm({ ...socialForm, address: e.target.value })}
+              placeholder="Ex: Piraúba - Minas Gerais"
             />
           </div>
 
@@ -323,11 +322,13 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
               type="button"
               className="lm-modal-btn lm-modal-btn-confirm"
               onClick={() => {
-                onSaveSocial(editingSocialType, socialValue);
+                onSaveSocial('whatsapp', socialForm.whatsapp);
+                onSaveSocial('instagram', socialForm.instagram);
+                onSaveSocial('address', socialForm.address);
                 onClose();
               }}
             >
-              Atualizar
+              Salvar Contatos
             </button>
           </div>
         </div>
