@@ -6,7 +6,6 @@ interface HeaderCoverProps {
   categories: string[];
   isEditMode?: boolean;
   onOpenCoverModal?: () => void;
-  onSaveCoverUrl?: (url: string) => void;
   onUpdateClientName?: (newName: string) => void;
   onUpdateHeroPhrase?: (newPhrase: string) => void;
 }
@@ -16,11 +15,9 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
   categories,
   isEditMode = false,
   onOpenCoverModal,
-  onSaveCoverUrl,
   onUpdateClientName,
   onUpdateHeroPhrase,
 }) => {
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
   const wspText = encodeURIComponent(`Olá! Vim pelo seu catálogo digital e gostaria de tirar uma dúvida.`);
   const wspUrl = `https://wa.me/${data.whatsapp_number}?text=${wspText}`;
 
@@ -30,11 +27,7 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
   const objectPosition = isClassico ? '45% 18%' : 'center 18%';
 
   const handleCoverClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    } else if (onOpenCoverModal) {
-      onOpenCoverModal();
-    }
+    onOpenCoverModal?.();
   };
 
   return (
@@ -64,19 +57,6 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
           >
             📷 Alterar Foto de Capa
           </button>
-          <input
-            type="file"
-            ref={fileInputRef}
-            accept="image/*"
-            style={{ display: 'none' }}
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file && onSaveCoverUrl) {
-                const previewUrl = URL.createObjectURL(file);
-                onSaveCoverUrl(previewUrl);
-              }
-            }}
-          />
         </div>
       )}
 

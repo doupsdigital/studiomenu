@@ -16,6 +16,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: 'Token de edição necessário para upload.' }, { status: 403 });
     }
 
+    if (!file.type.startsWith('image/')) {
+      return NextResponse.json({ success: false, message: 'Apenas arquivos de imagem são permitidos.' }, { status: 400 });
+    }
+
+    const MAX_FILE_SIZE = 8 * 1024 * 1024; // 8MB
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json({ success: false, message: 'Imagem muito grande. O limite é 8MB.' }, { status: 400 });
+    }
+
     // Validar token no Supabase
     const { data: order } = await supabase
       .from('orders')

@@ -46,6 +46,7 @@ export interface CatalogOrderData {
   categories?: string[];
   procedures: ProcedureItem[];
   instructions?: CatalogInstructions;
+  status?: string;
   created_at?: string;
   updated_at?: string;
 }

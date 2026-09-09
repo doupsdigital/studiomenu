@@ -32,6 +32,16 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
   const [historyStack, setHistoryStack] = useState<CatalogOrderData[]>([data]);
   const [historyIndex, setHistoryIndex] = useState<number>(0);
 
+  // Re-sincroniza o estado interno quando a prop `data` representa um catálogo/variante
+  // diferente (ex: showroom trocando nicho/modelo/tema). Sem isso, como o estado só é
+  // inicializado uma vez via useState(data), a troca seria ignorada. Não afeta a página
+  // real do catálogo (`/c/[slug]`), onde `data` é estático e nunca muda após o mount.
+  useEffect(() => {
+    setCatalogState(data);
+    setHistoryStack([data]);
+    setHistoryIndex(0);
+  }, [data.slug, data.layout_model, data.theme_variant]);
+
   // Modais Ativos
   const [activeModal, setActiveModal] = useState<
     | 'none'
@@ -328,7 +338,6 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
           categories={categories}
           isEditMode={isEditMode}
           onOpenCoverModal={() => setActiveModal('cover')}
-          onSaveCoverUrl={handleSaveCoverUrl}
           onUpdateClientName={handleUpdateClientName}
           onUpdateHeroPhrase={handleUpdateHeroPhrase}
         />

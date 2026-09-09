@@ -1,0 +1,277 @@
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase';
+import { CatalogOrderData } from '@/types/catalog';
+import Link from 'next/link';
+import { ArrowLeft, Sparkles, ExternalLink, Search, RefreshCw, Scissors, Plus, Trash2, MessageCircle, Phone, Clock } from 'lucide-react';
+
+export default function AdminCatalogosPage() {
+  const [catalogs, setCatalogs] = useState<CatalogOrderData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3500);
+  };
+
+  const fetchCatalogs = async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (data) {
+        setCatalogs(data as CatalogOrderData[]);
+      }
+    } catch (err) {
+      console.error('Erro ao buscar catálogos:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCatalogs();
+  }, []);
+
+  const filteredCatalogs = catalogs.filter(
+    (c) =>
+      c.client_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.studio_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.slug?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const deleteCatalog = async (id?: string) => {
+    if (!id || !confirm('Tem certeza que deseja excluir este catálogo?')) return;
+    try {
+      await supabase.from('orders').delete().eq('id', id);
+      fetchCatalogs();
+    } catch (e) {}
+  };
+
+  const approveAndDeliver = async (item: CatalogOrderData) => {
+    if (!item.id) return;
+    try {
+      await supabase.from('orders').update({ status: 'aprovado' }).eq('id', item.id);
+      fetchCatalogs();
+    } catch (e) {
+      console.error('Erro ao aprovar catálogo:', e);
+    }
+  };
+
+  const buildDeliveryWhatsappUrl = (item: CatalogOrderData) => {
+    const cleanPhone = (item.whatsapp_number || '').replace(/\D/g, '');
+    const firstName = (item.client_name || '').split(' ')[0];
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const catalogUrl = `${origin}/c/${item.slug}`;
+    const message = `Olá, ${firstName}! ✨\n\nSeu catálogo digital oficial StudioMenu está pronto, calibrado e no ar! 🚀\n\n🔗 *Seu Link Exclusivo:*\n👉 ${catalogUrl}\n\n📌 *O que fazer agora:*\n1. Abra o link no seu celular e confira seu catálogo completo.\n2. Coloque este link na bio do seu Instagram e no seu perfil do WhatsApp Business.\n3. Comece a enviar para suas clientes no momento do agendamento!\n\nQualquer dúvida ou ajuste que precisar, nossa equipe está à sua inteira disposição. Parabéns pelo seu novo posicionamento! 💖✨`;
+    return `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(message)}`;
+  };
+
+  return (
+    <main className="min-h-screen bg-slate-950 text-white p-4 md:p-8">
+      <div className="max-w-5xl mx-auto space-y-6">
+        {/* Header Superior */}
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-800">
+          <div>
+            <Link
+              href="/admin"
+              className="inline-flex items-center gap-1 text-[10px] font-semibold text-slate-500 hover:text-slate-300 mb-2 transition-all"
+            >
+              <ArrowLeft className="w-3 h-3" />
+              <span>Voltar ao Painel</span>
+            </Link>
+            <div className="flex items-center gap-2">
+              <span className="p-2 rounded-xl bg-rose-500/10 text-rose-400">
+                <Sparkles className="w-5 h-5" />
+              </span>
+              <h1 className="font-serif text-2xl md:text-3xl font-bold">Catálogos</h1>
+            </div>
+            <p className="text-xs text-slate-400 mt-1">
+              Administração, criação e edição dos catálogos do <span className="text-rose-400 font-semibold">StudioMenu</span>.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={fetchCatalogs}
+              className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 transition-all text-xs font-semibold flex items-center gap-1.5"
+            >
+              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+              <span>Atualizar</span>
+            </button>
+            <Link
+              href="/form"
+              className="px-4 py-2.5 rounded-xl bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold tracking-wider uppercase flex items-center gap-1.5 shadow-lg transition-all"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Novo Catálogo</span>
+            </Link>
+          </div>
+        </header>
+
+        {/* Campo de Busca */}
+        <div className="relative">
+          <Search className="w-4 h-4 absolute left-3.5 top-3.5 text-slate-500" />
+          <input
+            type="text"
+            placeholder="Buscar por cliente, nome do studio ou slug..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full bg-slate-900 border border-slate-800 rounded-2xl pl-10 pr-4 py-3 text-xs text-white placeholder-slate-500 focus:border-rose-500 focus:outline-none"
+          />
+        </div>
+
+        {/* Tabela / Grid de Catálogos Registrados */}
+        {isLoading ? (
+          <div className="text-center py-16 text-slate-500 text-xs animate-pulse">
+            Carregando catálogos cadastrados no Supabase...
+          </div>
+        ) : filteredCatalogs.length === 0 ? (
+          <div className="text-center py-16 bg-slate-900/50 rounded-3xl border border-slate-800 p-8 space-y-3">
+            <p className="text-sm font-semibold text-slate-300">Nenhum catálogo encontrado.</p>
+            <p className="text-xs text-slate-500">Crie o primeiro catálogo clicando em Novo Catálogo.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredCatalogs.map((item) => {
+              const isPending = item.status !== 'aprovado';
+              const dateStr = item.created_at
+                ? new Date(item.created_at).toLocaleDateString('pt-BR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })
+                : null;
+
+              return (
+                <div
+                  key={item.id || item.slug}
+                  className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between space-y-3 hover:border-slate-700 transition-all shadow-xl"
+                >
+                  <div>
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-rose-500/10 text-rose-400 border border-rose-500/20 flex items-center gap-1">
+                        <Scissors className="w-3 h-3" />
+                        <span>{item.niche || 'Lash'}</span>
+                      </span>
+                      <span
+                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                          isPending
+                            ? 'bg-amber-500/10 text-amber-400 border-amber-500/30'
+                            : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                        }`}
+                      >
+                        {isPending ? 'Pendente' : 'Aprovado'}
+                      </span>
+                    </div>
+
+                    <h2 className="font-serif text-lg font-bold text-white leading-tight">
+                      {item.studio_name || item.client_name}
+                    </h2>
+                    <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                      <p className="text-xs text-slate-400">Por {item.client_name}</p>
+                      {dateStr && (
+                        <span className="flex items-center gap-1 text-[10px] text-slate-500">
+                          <Clock className="w-3 h-3" />
+                          {dateStr}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="mt-2 flex items-center gap-1.5 text-xs text-slate-400">
+                      <Phone className="w-3 h-3 text-slate-500" />
+                      <span>{item.whatsapp_number || 'WhatsApp não informado'}</span>
+                    </div>
+
+                    <div className="mt-2 text-[10px] text-slate-500 uppercase font-mono">
+                      {item.layout_model || 'mosaico'} / {item.theme_variant || 'rose'}
+                    </div>
+
+                    <div className="mt-3 p-2 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Link Mágico da Cliente</span>
+                        {item.edit_token && (
+                          <button
+                            onClick={() => {
+                              const url = `${window.location.origin}/c/${item.slug}?edit=${item.edit_token}`;
+                              navigator.clipboard.writeText(url);
+                              showToast('🔗 Link Mágico de Edição copiado!');
+                            }}
+                            className="text-[10px] text-rose-400 hover:text-rose-300 font-bold underline flex items-center gap-1"
+                          >
+                            Copiar Link
+                          </button>
+                        )}
+                      </div>
+                      <p className="text-[10px] font-mono text-slate-400 truncate">
+                        /c/{item.slug}{item.edit_token ? `?edit=${item.edit_token.substring(0, 8)}...` : ''}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-1.5">
+                      <Link
+                        href={`/c/${item.slug}`}
+                        target="_blank"
+                        className="flex-1 px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-white flex items-center justify-center gap-1 transition-all"
+                      >
+                        <span>Ver</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </Link>
+
+                      {item.edit_token && (
+                        <Link
+                          href={`/c/${item.slug}?edit=${item.edit_token}`}
+                          target="_blank"
+                          className="flex-1 px-2.5 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 text-xs font-bold flex items-center justify-center gap-1 transition-all"
+                        >
+                          <span>Editar</span>
+                        </Link>
+                      )}
+                    </div>
+
+                    <a
+                      href={buildDeliveryWhatsappUrl(item)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => approveAndDeliver(item)}
+                      className="w-full py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:opacity-95 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-lg transition-all"
+                    >
+                      <MessageCircle className="w-3.5 h-3.5" />
+                      <span>Aprovar & Entregar</span>
+                    </a>
+
+                    <div className="pt-1.5 border-t border-slate-800/80 flex items-center justify-end">
+                      <button
+                        onClick={() => deleteCatalog(item.id)}
+                        className="p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-all flex items-center gap-1 text-[10px] font-semibold"
+                        title="Excluir Catálogo"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Excluir Catálogo</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {toastMessage && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-3 rounded-2xl bg-slate-800 border border-slate-700 text-white text-xs font-semibold shadow-2xl z-50">
+          {toastMessage}
+        </div>
+      )}
+    </main>
+  );
+}

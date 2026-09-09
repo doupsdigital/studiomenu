@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { NicheType, LayoutModel, ThemeVariant, ProcedureItem } from '@/types/catalog';
+import { nichePresetsMap } from '@/modelos-novos';
 import { Sparkles, ArrowRight, ArrowLeft, Check, Plus, Trash2, Scissors, Palette, Layers, UserCheck } from 'lucide-react';
 import Link from 'next/link';
 
@@ -27,23 +28,20 @@ export default function OnboardingFormPage() {
   const [coverMediaUrl, setCoverMediaUrl] = useState('');
   const [heroPhrase, setHeroPhrase] = useState('');
 
-  const [procedures, setProcedures] = useState<ProcedureItem[]>([
-    {
-      id: '1',
-      title: 'Volume Brasileiro',
-      price: '180,00',
-      duration: '2h',
-      category: 'Extensão de Cílios',
-      description: 'Efeito leve e preenchido com fios tecnológicos em formato Y.',
-      is_highlight: true,
-      badge: 'Mais Pedido',
-    },
-  ]);
+  const [procedures, setProcedures] = useState<ProcedureItem[]>(nichePresetsMap.lash.procedures);
+
+  // Ao trocar o nicho, recarrega os procedimentos padrão do preset correspondente
+  const handleNicheChange = (newNiche: NicheType) => {
+    setNiche(newNiche);
+    setProcedures(nichePresetsMap[newNiche].procedures);
+  };
 
   const [tolerances, setTolerances] = useState('Tolerância máxima de 15 minutos de atraso.');
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successSlug, setSuccessSlug] = useState<string | null>(null);
+  const [successEditToken, setSuccessEditToken] = useState<string | null>(null);
+  const [linkCopied, setLinkCopied] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
   // Funções de manipulação de procedimentos
@@ -87,6 +85,9 @@ export default function OnboardingFormPage() {
 
       const finalSlug = `${baseSlug}-${Math.floor(100 + Math.random() * 900)}`;
 
+      // Preset do nicho escolhido: preenche campos padrão que o formulário ainda não coleta
+      const preset = nichePresetsMap[niche];
+
       // 1. Gravar na tabela `orders`
       const { data: orderData, error: orderErr } = await supabase
         .from('orders')
@@ -94,9 +95,13 @@ export default function OnboardingFormPage() {
           slug: finalSlug,
           client_name: clientName,
           studio_name: studioName || `Studio ${clientName}`,
-          hero_phrase: heroPhrase || 'A arte de transformar a sua beleza com leveza e precisão.',
-          cover_media_url: coverMediaUrl || 'https://lashmenu.com/modelos/mosaico/assets/img/Hero.png',
-          avatar_url: coverMediaUrl || 'https://lashmenu.com/modelos/mosaico/assets/img/Hero.png',
+          hero_phrase: heroPhrase || preset.hero_phrase || 'A arte de transformar a sua beleza com leveza e precisão.',
+          bio_description: preset.bio_description || '',
+          cover_media_url: coverMediaUrl || preset.cover_media_url || 'https://lashmenu.com/modelos/mosaico/assets/img/Hero.png',
+          avatar_url: coverMediaUrl || preset.avatar_url || 'https://lashmenu.com/modelos/mosaico/assets/img/Hero.png',
+          instructions_bg_url: preset.instructions_bg_url || null,
+          final_screen_bg_url: preset.final_screen_bg_url || null,
+          cta_bg_url: preset.cta_bg_url || null,
           niche: niche,
           layout_model: layoutModel,
           theme_variant: themeVariant,
@@ -104,6 +109,9 @@ export default function OnboardingFormPage() {
           instagram_handle: instagramHandle,
           address: address,
           tolerances: tolerances,
+          pre_care: preset.instructions?.pre_care || [],
+          post_care: preset.instructions?.post_care || [],
+          categories: [],
         })
         .select()
         .single();
@@ -118,20 +126,24 @@ export default function OnboardingFormPage() {
           order_id: orderData.id,
           order_index: index,
           title: p.title || 'Procedimento sem nome',
-          desc: p.description || '',
-          preco: p.price || 'Sob Consulta',
-          duracao: p.duration || '',
-          cat: p.category?.toLowerCase() || 'geral',
-          catLabel: p.category || 'Geral',
-          img: p.image_url || '',
-          destaque: Boolean(p.is_highlight),
+          description: p.description || '',
+          price: p.price || 'Sob Consulta',
+          duration: p.duration || '',
+          category: p.category || 'Geral',
+          image_url: p.image_url || '',
+          is_highlight: Boolean(p.is_highlight),
           badge: p.badge || '',
+          specs: p.specs || [],
         }));
 
-        await supabase.from('order_services').insert(servicesPayload);
+        const { error: servicesErr } = await supabase.from('order_services').insert(servicesPayload);
+        if (servicesErr) {
+          throw new Error(servicesErr.message);
+        }
       }
 
       setSuccessSlug(finalSlug);
+      setSuccessEditToken(orderData?.edit_token || null);
     } catch (err: any) {
       console.error('Erro ao salvar no Supabase:', err);
       setErrorMsg(err.message || 'Erro ao criar o catálogo. Tente novamente.');
@@ -155,6 +167,30 @@ export default function OnboardingFormPage() {
           <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 font-mono text-sm text-rose-400 break-all">
             studiomenu.art/c/{successSlug}
           </div>
+
+          {successEditToken && (
+            <div className="text-left space-y-1.5">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                Link Mágico de Edição (envie para a cliente)
+              </p>
+              <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 font-mono text-[11px] text-emerald-400 break-all">
+                studiomenu.art/c/{successSlug}?edit={successEditToken}
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  const url = `${window.location.origin}/c/${successSlug}?edit=${successEditToken}`;
+                  navigator.clipboard.writeText(url);
+                  setLinkCopied(true);
+                  setTimeout(() => setLinkCopied(false), 2000);
+                }}
+                className="w-full py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-xs font-bold tracking-wider uppercase transition-all"
+              >
+                {linkCopied ? '✓ Link Copiado!' : 'Copiar Link de Edição'}
+              </button>
+            </div>
+          )}
+
           <div className="flex flex-col gap-2 pt-2">
             <Link
               href={`/c/${successSlug}`}
@@ -163,7 +199,7 @@ export default function OnboardingFormPage() {
               VISUALIZAR CATÁLOGO AGORA
             </Link>
             <Link
-              href="/admin"
+              href="/admin/catalogos"
               className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300"
             >
               Ir para o Painel Administrativo
@@ -244,7 +280,7 @@ export default function OnboardingFormPage() {
                 </label>
                 <select
                   value={niche}
-                  onChange={(e) => setNiche(e.target.value as NicheType)}
+                  onChange={(e) => handleNicheChange(e.target.value as NicheType)}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:border-rose-500 focus:outline-none"
                 >
                   <option value="lash">Lash Designer (Cílios & Sobrancelhas)</option>

@@ -73,7 +73,6 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
     return list;
   }, [categories, editingProc]);
 
-  const [coverInputUrl, setCoverInputUrl] = useState(catalogData.cover_media_url || '');
   const [isUploading, setIsUploading] = useState(false);
 
   // Gerar resumo de alterações da sessão de edição
@@ -219,7 +218,6 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
       const result = await res.json();
       if (result.success && result.url) {
         if (target === 'cover') {
-          setCoverInputUrl(result.url);
           onSaveCoverUrl(result.url);
           onClose();
         } else if (target === 'proc') {
@@ -259,7 +257,6 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
           <p className="lm-modal-desc">Escolha uma nova imagem para o topo do seu catálogo:</p>
 
           <div className="lm-form-group">
-            <label>UPLOAD DE FOTO (GALERIA)</label>
             <label className="lm-svc-photo-upload-btn" style={{ width: '100%', justifyContent: 'center' }}>
               <Upload className="w-4 h-4" />
               <span>{isUploading ? 'Enviando foto...' : 'Escolher Imagem do Dispositivo'}</span>
@@ -267,33 +264,14 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
                 type="file"
                 accept="image/*"
                 onChange={(e) => handleFileUpload(e, 'cover')}
+                style={{ display: 'none' }}
               />
             </label>
-          </div>
-
-          <div className="lm-form-group" style={{ marginTop: '14px' }}>
-            <label>OU LINK PÚBLICO DA IMAGEM</label>
-            <input
-              type="text"
-              value={coverInputUrl}
-              onChange={(e) => setCoverInputUrl(e.target.value)}
-              placeholder="https://..."
-            />
           </div>
 
           <div className="lm-modal-actions">
             <button type="button" className="lm-modal-btn lm-modal-btn-cancel" onClick={onClose}>
               Cancelar
-            </button>
-            <button
-              type="button"
-              className="lm-modal-btn lm-modal-btn-confirm"
-              onClick={() => {
-                onSaveCoverUrl(coverInputUrl);
-                onClose();
-              }}
-            >
-              ✨ Salvar Capa
             </button>
           </div>
         </div>

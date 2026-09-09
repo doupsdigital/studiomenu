@@ -77,6 +77,8 @@ export default function DemoPage() {
       </div>
 
       {/* Renderização do Catálogo Fiel */}
+      {/* CatalogLayout re-sincroniza sozinho quando slug/layout_model/theme_variant mudam
+          (ver useEffect em CatalogLayout.tsx) — sem precisar remontar e sem perder o scroll. */}
       <CatalogLayout
         data={catalog}
         onThemeChange={(newTheme) => setThemeVariant(newTheme)}
