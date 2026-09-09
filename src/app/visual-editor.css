@@ -160,14 +160,17 @@ html[data-theme="luxury"] .lm-mb-btn-save {
 
 /* Botão Flutuante de Alterar Foto de Capa (Centralizado abaixo do SEJA BEM VINDA) */
 .lm-cover-edit-overlay {
-  position: absolute !important;
-  top: 125px !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
+  display: flex !important;
+  justify-content: center !important;
+  width: 100% !important;
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
   right: auto !important;
   bottom: auto !important;
+  transform: none !important;
   z-index: 99995 !important;
-  margin: 0 !important;
+  margin: 14px 0 !important;
   pointer-events: auto !important;
 }
 

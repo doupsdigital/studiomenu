@@ -48,6 +48,17 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
           style={{ objectPosition }}
           fetchPriority="high"
         />
+      </div>
+
+      {/* 2. Scrim (Gradiente Esfumaçado) */}
+      <div className="hero__scrim"></div>
+
+      {/* 3. Conteúdo Sobreposto */}
+      <div className="hero__conteudo">
+        {/* Selo Seja Bem Vinda */}
+        <div className="hero__selo anim-fade-up delay-1">
+          <span>Seja Bem Vinda</span>
+        </div>
 
         {/* BOTÃO FLUTUANTE SOBRE A CAPA: 📷 Alterar Foto de Capa */}
         {isEditMode && (
@@ -75,17 +86,6 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
             />
           </div>
         )}
-      </div>
-
-      {/* 2. Scrim (Gradiente Esfumaçado) */}
-      <div className="hero__scrim"></div>
-
-      {/* 3. Conteúdo Sobreposto */}
-      <div className="hero__conteudo">
-        {/* Selo Seja Bem Vinda */}
-        <div className="hero__selo anim-fade-up delay-1">
-          <span>Seja Bem Vinda</span>
-        </div>
 
         {/* Título & Nome */}
         <div className="hero__titulo">
