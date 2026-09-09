@@ -10,7 +10,9 @@ export const InstructionsSection: React.FC<InstructionsSectionProps> = ({
   instructions,
   bgUrl,
 }) => {
-  const bgImage = bgUrl || 'https://lashmenu.com/modelos/mosaico/assets/img/hero.jpg';
+  const defaultBg = '/modelos/mosaico/assets/img/hero.jpg';
+  const isHeroPng = bgUrl?.toLowerCase().endsWith('hero.png');
+  const bgImage = bgUrl && !isHeroPng ? bgUrl : defaultBg;
 
   const defaultItems = [
     {

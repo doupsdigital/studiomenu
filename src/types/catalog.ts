@@ -43,6 +43,7 @@ export interface CatalogOrderData {
   final_screen_bg_url?: string;
   cta_bg_url?: string;
   edit_token?: string;
+  categories?: string[];
   procedures: ProcedureItem[];
   instructions?: CatalogInstructions;
   created_at?: string;

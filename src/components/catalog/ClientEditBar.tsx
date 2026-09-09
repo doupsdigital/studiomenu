@@ -170,7 +170,6 @@ export const ClientEditBar: React.FC<ClientEditBarProps> = ({
 
   // Remover procedimento
   const handleDeleteProcedure = (index: number) => {
-    if (!confirm('Deseja excluir este procedimento?')) return;
     const newProcedures = catalogData.procedures.filter((_, i) => i !== index);
     onUpdateCatalog({ ...catalogData, procedures: newProcedures });
     showToast('Procedimento removido.', 'success');

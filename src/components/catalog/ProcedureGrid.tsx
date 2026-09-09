@@ -8,6 +8,7 @@ import { ProcedureModal } from './ProcedureModal';
 
 interface ProcedureGridProps {
   procedures: ProcedureItem[];
+  allCategories?: string[];
   whatsappNumber: string;
   clientName?: string;
   layoutModel?: LayoutModel;
@@ -16,10 +17,12 @@ interface ProcedureGridProps {
   onDeleteProc?: (item: ProcedureItem) => void;
   onOpenAddProcModal?: () => void;
   onOpenAddCatModal?: () => void;
+  onDeleteCategory?: (categoryName: string, count: number) => void;
 }
 
 export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
   procedures,
+  allCategories,
   whatsappNumber,
   clientName = 'Mariana',
   layoutModel = 'mosaico',
@@ -28,17 +31,23 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
   onDeleteProc,
   onOpenAddProcModal,
   onOpenAddCatModal,
+  onDeleteCategory,
 }) => {
   const [selectedProcedure, setSelectedProcedure] = useState<ProcedureItem | null>(null);
 
-  // Extrair categorias únicas existentes
+  // Extrair categorias únicas existentes (incluindo categorias vazias recém-criadas)
   const categories = useMemo(() => {
     const set = new Set<string>();
+    if (Array.isArray(allCategories)) {
+      allCategories.forEach((cat) => {
+        if (cat) set.add(cat);
+      });
+    }
     procedures.forEach((item) => {
       if (item.category) set.add(item.category);
     });
     return ['Todos', ...Array.from(set)];
-  }, [procedures]);
+  }, [allCategories, procedures]);
 
   const [activeCategory, setActiveCategory] = useState('Todos');
 
@@ -103,7 +112,19 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
                 className={`filtro-chip ${isActive ? 'is-ativo' : ''}`}
                 onClick={() => setActiveCategory(cat)}
               >
-                {cat} ({count})
+                <span>{cat} ({count})</span>
+                {isEditMode && cat !== 'Todos' && (
+                  <span
+                    className="lm-chip-trash-icon"
+                    title={`Excluir Categoria ${cat}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (onDeleteCategory) onDeleteCategory(cat, count);
+                    }}
+                  >
+                    ✕
+                  </span>
+                )}
               </button>
             );
           })}

@@ -33,10 +33,26 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
   const [historyIndex, setHistoryIndex] = useState<number>(0);
 
   // Modais Ativos
-  const [activeModal, setActiveModal] = useState<'none' | 'cover' | 'procedure' | 'social' | 'category' | 'save_confirm'>('none');
+  const [activeModal, setActiveModal] = useState<
+    | 'none'
+    | 'cover'
+    | 'procedure'
+    | 'social'
+    | 'category'
+    | 'save_confirm'
+    | 'save_success'
+    | 'save_error'
+    | 'category_delete_confirm'
+    | 'category_delete_blocked'
+    | 'proc_delete_confirm'
+    | 'discard_confirm'
+  >('none');
   const [editingProc, setEditingProc] = useState<ProcedureItem | null>(null);
   const [editingProcIndex, setEditingProcIndex] = useState<number | null>(null);
   const [editingSocialType, setEditingSocialType] = useState<'whatsapp' | 'instagram' | 'address' | null>(null);
+  const [categoryToDelete, setCategoryToDelete] = useState<{ name: string; count: number } | null>(null);
+  const [procToDelete, setProcToDelete] = useState<ProcedureItem | null>(null);
+  const [saveErrorMessage, setSaveErrorMessage] = useState<string>('');
 
   // Ativar classe no body em modo edição para ajuste de padding inferior
   useEffect(() => {
@@ -49,6 +65,18 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
       document.body.classList.remove('has-lm-editor');
     };
   }, [isEditMode]);
+
+  // Alerta ao tentar recarregar a página sem salvar alterações
+  useEffect(() => {
+    if (!isSaved && isEditMode) {
+      const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+        e.preventDefault();
+        e.returnValue = 'Você possui alterações não salvas. Lembre-se de clicar em SALVAR no rodapé para publicar!';
+      };
+      window.addEventListener('beforeunload', handleBeforeUnload);
+      return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    }
+  }, [isSaved, isEditMode]);
 
   // Push para pilha de histórico
   const pushState = (newState: CatalogOrderData) => {
@@ -82,12 +110,15 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
 
   // Descartar alterações (Reset 🗑️)
   const handleDiscard = () => {
-    if (confirm('Deseja descartar todas as alterações não salvas?')) {
-      setCatalogState(data);
-      setHistoryStack([data]);
-      setHistoryIndex(0);
-      setIsSaved(true);
-    }
+    setActiveModal('discard_confirm');
+  };
+
+  const handleConfirmDiscard = () => {
+    setCatalogState(data);
+    setHistoryStack([data]);
+    setHistoryIndex(0);
+    setIsSaved(true);
+    setActiveModal('none');
   };
 
   // Alternar Tema (🌸 / 👑)
@@ -108,7 +139,7 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
     };
   }, [catalogState.theme_variant]);
 
-  // Persistir no Supabase ao confirmar no modal de salvamento
+  // Persistir ao confirmar no modal de salvamento (sem alerts nativos de navegador)
   const handleConfirmSaveDatabase = async () => {
     setIsSaving(true);
     try {
@@ -125,13 +156,14 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
       const res = await response.json();
       if (res.success) {
         setIsSaved(true);
-        setActiveModal('none');
-        alert('✨ Catálogo salvo com sucesso no Supabase!');
+        setActiveModal('save_success');
       } else {
-        alert(`❌ Erro ao salvar: ${res.message}`);
+        setSaveErrorMessage(res.message || 'Erro ao salvar as alterações no catálogo.');
+        setActiveModal('save_error');
       }
     } catch (err) {
-      alert('❌ Falha na conexão ao salvar catálogo.');
+      setSaveErrorMessage('Falha na conexão de rede ao salvar o catálogo.');
+      setActiveModal('save_error');
     } finally {
       setIsSaving(false);
     }
@@ -181,32 +213,66 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
   };
 
   const handleDeleteProcedure = (proc: ProcedureItem) => {
-    if (!confirm(`Excluir o procedimento "${proc.title}"?`)) return;
-    const newProcs = catalogState.procedures.filter((p) => p.id !== proc.id);
-    pushState({ ...catalogState, procedures: newProcs });
+    setProcToDelete(proc);
+    setActiveModal('proc_delete_confirm');
+  };
+
+  const handleConfirmDeleteProcedure = () => {
+    if (!procToDelete) return;
+    const currentCats = Array.isArray(catalogState.categories) ? catalogState.categories : categories;
+    const newProcs = catalogState.procedures.filter((p) => p.id !== procToDelete.id);
+    // Garante que as categorias existentes permaneçam salvas mesmo se ficarem com 0 procedimentos
+    pushState({ ...catalogState, categories: currentCats, procedures: newProcs });
+    setProcToDelete(null);
+    setActiveModal('none');
   };
 
   const handleAddCategory = (categoryName: string) => {
-    const newProc: ProcedureItem = {
-      id: String(Date.now()),
-      title: `Novo Procedimento (${categoryName})`,
-      price: 'Sob Consulta',
-      category: categoryName,
-      description: 'Descrição do procedimento...',
-    };
-    pushState({ ...catalogState, procedures: [...catalogState.procedures, newProc] });
+    const trimmed = categoryName.trim();
+    if (!trimmed) return;
+    const currentCats = Array.isArray(catalogState.categories) ? catalogState.categories : categories;
+    if (!currentCats.includes(trimmed)) {
+      const updatedCategories = [...currentCats, trimmed];
+      pushState({ ...catalogState, categories: updatedCategories });
+    }
+    setActiveModal('none');
+  };
+
+  const handleAttemptDeleteCategory = (categoryName: string, count: number) => {
+    setCategoryToDelete({ name: categoryName, count });
+    if (count > 0) {
+      setActiveModal('category_delete_blocked');
+    } else {
+      setActiveModal('category_delete_confirm');
+    }
+  };
+
+  const handleConfirmDeleteCategory = () => {
+    if (!categoryToDelete) return;
+    const catName = categoryToDelete.name;
+    const currentCats = Array.isArray(catalogState.categories) ? catalogState.categories : categories;
+    const newCategories = currentCats.filter((c) => c !== catName);
+    const newProcs = catalogState.procedures.filter((p) => p.category !== catName);
+    pushState({ ...catalogState, categories: newCategories, procedures: newProcs });
+    setCategoryToDelete(null);
+    setActiveModal('none');
   };
 
   const isLuxury = catalogState.theme_variant === 'luxury';
 
-  // Extrair categorias para os chips da Hero
+  // Extrair categorias para os chips da Hero e Filtros
   const categories = useMemo(() => {
     const set = new Set<string>();
+    if (Array.isArray(catalogState.categories)) {
+      catalogState.categories.forEach((cat) => {
+        if (cat) set.add(cat);
+      });
+    }
     catalogState.procedures.forEach((p) => {
       if (p.category) set.add(p.category);
     });
     return Array.from(set);
-  }, [catalogState.procedures]);
+  }, [catalogState.categories, catalogState.procedures]);
 
   return (
     <div className={`mosaico-wrapper ${isLuxury ? 'theme-luxury' : 'theme-rose'}`}>
@@ -230,16 +296,25 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
       {isEditMode && (
         <VisualEditorModals
           catalogData={catalogState}
+          initialCatalogData={data}
           editToken={editToken}
+          categories={categories}
           activeModal={activeModal}
+          errorMessage={saveErrorMessage}
           editingProc={editingProc}
           editingProcIndex={editingProcIndex}
           editingSocialType={editingSocialType}
+          categoryToDelete={categoryToDelete}
+          procToDelete={procToDelete}
           onClose={() => setActiveModal('none')}
           onSaveProcedure={handleSaveProcedure}
           onSaveCoverUrl={handleSaveCoverUrl}
           onSaveSocial={handleSaveSocial}
           onAddCategory={handleAddCategory}
+          onConfirmDeleteCategory={handleConfirmDeleteCategory}
+          onConfirmDeleteProc={handleConfirmDeleteProcedure}
+          onConfirmDiscard={handleConfirmDiscard}
+          onOpenAddCatModal={() => setActiveModal('category')}
           onConfirmSaveDatabase={handleConfirmSaveDatabase}
           isSaving={isSaving}
         />
@@ -261,6 +336,7 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
         {/* Seção Mosaico/Clássico de Procedimentos */}
         <ProcedureGrid
           procedures={catalogState.procedures}
+          allCategories={categories}
           whatsappNumber={catalogState.whatsapp_number}
           clientName={catalogState.client_name}
           layoutModel={catalogState.layout_model}
@@ -272,6 +348,7 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
             setActiveModal('procedure');
           }}
           onDeleteProc={handleDeleteProcedure}
+          onDeleteCategory={handleAttemptDeleteCategory}
           onOpenAddProcModal={() => {
             setEditingProc(null);
             setEditingProcIndex(null);

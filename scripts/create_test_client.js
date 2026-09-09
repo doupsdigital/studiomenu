@@ -31,7 +31,7 @@ async function createTestClient() {
     bio_description: 'Lash Designer especialista em Cílios Tecnológicos e Design de Sobrancelhas.',
     cover_media_url: 'https://lashmenu.com/modelos/mosaico/assets/img/Hero.png',
     avatar_url: 'https://lashmenu.com/modelos/mosaico/assets/img/Hero.png',
-    instructions_bg_url: 'https://lashmenu.com/modelos/mosaico/assets/img/Hero.png',
+    instructions_bg_url: '/modelos/mosaico/assets/img/hero.jpg',
     final_screen_bg_url: 'https://lashmenu.com/modelos/mosaico/assets/img/Footer.png',
     cta_bg_url: 'https://lashmenu.com/modelos/mosaico/assets/img/Footer.png',
     address: 'São Paulo - SP',

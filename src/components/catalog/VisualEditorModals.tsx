@@ -2,85 +2,193 @@
 
 import React, { useState } from 'react';
 import { CatalogOrderData, ProcedureItem } from '@/types/catalog';
-import { Upload, X, CheckCircle, Sparkles } from 'lucide-react';
+import { Upload, CheckCircle } from 'lucide-react';
 
 interface VisualEditorModalsProps {
   catalogData: CatalogOrderData;
+  initialCatalogData?: CatalogOrderData;
   editToken: string;
-  activeModal: 'none' | 'cover' | 'procedure' | 'social' | 'category' | 'save_confirm';
+  categories: string[];
+  activeModal:
+    | 'none'
+    | 'cover'
+    | 'procedure'
+    | 'social'
+    | 'category'
+    | 'save_confirm'
+    | 'save_success'
+    | 'save_error'
+    | 'category_delete_confirm'
+    | 'category_delete_blocked'
+    | 'proc_delete_confirm'
+    | 'discard_confirm';
+  errorMessage?: string;
   editingProc: ProcedureItem | null;
   editingProcIndex: number | null;
   editingSocialType: 'whatsapp' | 'instagram' | 'address' | null;
+  categoryToDelete?: { name: string; count: number } | null;
+  procToDelete?: ProcedureItem | null;
   onClose: () => void;
   onSaveProcedure: (proc: ProcedureItem, index: number | null) => void;
   onSaveCoverUrl: (url: string) => void;
   onSaveSocial: (type: 'whatsapp' | 'instagram' | 'address', value: string) => void;
   onAddCategory: (categoryName: string) => void;
+  onConfirmDeleteCategory?: () => void;
+  onConfirmDeleteProc?: () => void;
+  onConfirmDiscard?: () => void;
+  onOpenAddCatModal?: () => void;
   onConfirmSaveDatabase: () => void;
   isSaving: boolean;
 }
 
 export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
   catalogData,
+  initialCatalogData,
   editToken,
+  categories = [],
   activeModal,
+  errorMessage = '',
   editingProc,
   editingProcIndex,
   editingSocialType,
+  categoryToDelete,
+  procToDelete,
   onClose,
   onSaveProcedure,
   onSaveCoverUrl,
   onSaveSocial,
   onAddCategory,
+  onConfirmDeleteCategory,
+  onConfirmDeleteProc,
+  onConfirmDiscard,
+  onOpenAddCatModal,
   onConfirmSaveDatabase,
   isSaving,
 }) => {
+  const safeCategories = React.useMemo(() => {
+    const list = categories && categories.length > 0 ? [...categories] : ['Extensão de Cílios', 'Lash Lifting', 'Sobrancelhas'];
+    if (editingProc?.category && !list.includes(editingProc.category)) {
+      list.push(editingProc.category);
+    }
+    return list;
+  }, [categories, editingProc]);
+
   const [coverInputUrl, setCoverInputUrl] = useState(catalogData.cover_media_url || '');
   const [isUploading, setIsUploading] = useState(false);
 
-  // Form Proc State
-  const [procForm, setProcForm] = useState<ProcedureItem>(
-    editingProc || {
-      id: '',
-      title: '',
-      price: '',
-      duration: '',
-      category: 'Geral',
-      description: '',
-      image_url: '',
-      badge: '',
-      is_highlight: false,
+  // Gerar resumo de alterações da sessão de edição
+  const getChangesSummary = (): string[] => {
+    const initial = initialCatalogData || catalogData;
+    const current = catalogData;
+    const changes: string[] = [];
+
+    if (initial.client_name !== current.client_name) {
+      changes.push(`✏️ Nome do Catálogo: ${current.client_name}`);
     }
+    if (initial.hero_phrase !== current.hero_phrase) {
+      changes.push(`💬 Frase de Destaque: Alterada`);
+    }
+    if (initial.whatsapp_number !== current.whatsapp_number) {
+      changes.push(`📱 WhatsApp: ${current.whatsapp_number}`);
+    }
+    if (initial.instagram_handle !== current.instagram_handle) {
+      changes.push(`📸 Instagram: @${(current.instagram_handle || '').replace(/^@/, '')}`);
+    }
+    if (initial.address !== current.address) {
+      changes.push(`📍 Localização: ${current.address}`);
+    }
+    if (initial.cover_media_url !== current.cover_media_url) {
+      changes.push(`📷 Foto de Capa: Nova imagem selecionada`);
+    }
+
+    const initialProcs = initial.procedures || [];
+    const currentProcs = current.procedures || [];
+
+    if (currentProcs.length < initialProcs.length) {
+      changes.push(`🗑️ Procedimentos removidos: ${initialProcs.length - currentProcs.length} item(ns)`);
+    } else if (currentProcs.length > initialProcs.length) {
+      changes.push(`✨ Novos procedimentos: ${currentProcs.length - initialProcs.length} item(ns)`);
+    }
+
+    let modifiedCount = 0;
+    currentProcs.forEach((proc, idx) => {
+      const orig = initialProcs[idx];
+      if (
+        orig &&
+        (proc.title !== orig.title ||
+          proc.price !== orig.price ||
+          proc.duration !== orig.duration ||
+          proc.image_url !== orig.image_url ||
+          proc.category !== orig.category ||
+          proc.description !== orig.description)
+      ) {
+        modifiedCount++;
+      }
+    });
+
+    if (modifiedCount > 0) {
+      changes.push(`✏️ Procedimentos alterados: ${modifiedCount} item(ns)`);
+    }
+
+    if (changes.length === 0) {
+      changes.push('Nenhuma alteração pendente');
+    }
+
+    return changes;
+  };
+
+  // Proc Form State
+  const [procForm, setProcForm] = useState<ProcedureItem & { maintenance?: string; visualEffect?: string }>(
+    editingProc
+      ? { ...editingProc }
+      : {
+          id: '',
+          title: '',
+          price: '',
+          duration: '',
+          category: safeCategories[0] || 'Extensão de Cílios',
+          description: '',
+          image_url: '',
+          badge: '',
+          is_highlight: false,
+          maintenance: '',
+          visualEffect: '',
+        }
   );
 
-  // Form Social State
+  // Social Form State
   const [socialForm, setSocialForm] = useState({
     whatsapp: catalogData.whatsapp_number || '',
     instagram: catalogData.instagram_handle || '',
     address: catalogData.address || '',
   });
 
-  // New Category State
+  // Category State
   const [newCatName, setNewCatName] = useState('');
+
+  // Form Error State
+  const [procFormError, setProcFormError] = useState('');
 
   // Sincronizar form proc se prop mudar
   React.useEffect(() => {
     if (editingProc) {
-      setProcForm(editingProc);
+      setProcForm({ ...editingProc });
     } else {
       setProcForm({
         id: '',
         title: '',
         price: '',
         duration: '',
-        category: 'Geral',
+        category: safeCategories[0] || 'Extensão de Cílios',
         description: '',
         image_url: '',
         badge: '',
         is_highlight: false,
+        maintenance: '',
+        visualEffect: '',
       });
     }
-  }, [editingProc]);
+  }, [editingProc, activeModal]);
 
   // Sincronizar form social se props mudarem
   React.useEffect(() => {
@@ -91,7 +199,7 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
     });
   }, [catalogData]);
 
-  // Handle File Upload to Supabase Storage
+  // Upload de Imagem para Supabase Storage
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, target: 'cover' | 'proc') => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -118,10 +226,23 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
           setProcForm((prev) => ({ ...prev, image_url: result.url }));
         }
       } else {
-        alert(result.message || 'Erro ao enviar imagem.');
+        // Fallback local se upload der algum aviso
+        const localUrl = URL.createObjectURL(file);
+        if (target === 'cover') {
+          onSaveCoverUrl(localUrl);
+          onClose();
+        } else {
+          setProcForm((prev) => ({ ...prev, image_url: localUrl }));
+        }
       }
     } catch (err) {
-      alert('Falha ao conectar com o servidor para upload.');
+      const localUrl = URL.createObjectURL(file);
+      if (target === 'cover') {
+        onSaveCoverUrl(localUrl);
+        onClose();
+      } else {
+        setProcForm((prev) => ({ ...prev, image_url: localUrl }));
+      }
     } finally {
       setIsUploading(false);
     }
@@ -134,11 +255,11 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
       {/* 1. MODAL ALTERAR FOTO DE CAPA */}
       {activeModal === 'cover' && (
         <div className="lm-modal-card">
-          <h3 className="lm-modal-title">Alterar Foto de Capa</h3>
-          <p className="lm-modal-desc">Envie uma imagem do seu dispositivo ou cole um link público.</p>
+          <h3 className="lm-modal-title">📷 Alterar Foto de Capa</h3>
+          <p className="lm-modal-desc">Escolha uma nova imagem para o topo do seu catálogo:</p>
 
           <div className="lm-form-group">
-            <label>Upload de Arquivo (Galeria)</label>
+            <label>UPLOAD DE FOTO (GALERIA)</label>
             <label className="lm-svc-photo-upload-btn" style={{ width: '100%', justifyContent: 'center' }}>
               <Upload className="w-4 h-4" />
               <span>{isUploading ? 'Enviando foto...' : 'Escolher Imagem do Dispositivo'}</span>
@@ -151,7 +272,7 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
           </div>
 
           <div className="lm-form-group" style={{ marginTop: '14px' }}>
-            <label>Ou URL Direta da Imagem</label>
+            <label>OU LINK PÚBLICO DA IMAGEM</label>
             <input
               type="text"
               value={coverInputUrl}
@@ -172,41 +293,41 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
                 onClose();
               }}
             >
-              Aplicar Capa
+              ✨ Salvar Capa
             </button>
           </div>
         </div>
       )}
 
-      {/* 2. MODAL ADICIONAR / EDITAR PROCEDIMENTO */}
+      {/* 2. MODAL EDITAR / NOVO PROCEDIMENTO (MATCHING PRINT 4 EXACTLY) */}
       {activeModal === 'procedure' && (
         <div className="lm-modal-card">
           <h3 className="lm-modal-title">
-            {editingProcIndex !== null ? 'Editar Procedimento' : 'Novo Procedimento'}
+            {editingProcIndex !== null ? `✏️ Editar: ${procForm.title || 'Procedimento'}` : '➕ Criar Novo Procedimento'}
           </h3>
 
           <div className="lm-form-group">
-            <label>Título do Procedimento *</label>
+            <label>NOME DO SERVIÇO *</label>
             <input
               type="text"
               value={procForm.title}
               onChange={(e) => setProcForm({ ...procForm, title: e.target.value })}
-              placeholder="Ex: Extensão Volume Brasileiro"
+              placeholder="Clássico Fio a Fio"
             />
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
             <div className="lm-form-group">
-              <label>Preço *</label>
+              <label>PREÇO (R$) *</label>
               <input
                 type="text"
                 value={procForm.price}
                 onChange={(e) => setProcForm({ ...procForm, price: e.target.value })}
-                placeholder="R$ 150,00"
+                placeholder="100,00"
               />
             </div>
             <div className="lm-form-group">
-              <label>Duração</label>
+              <label>DURAÇÃO *</label>
               <input
                 type="text"
                 value={procForm.duration || ''}
@@ -217,44 +338,90 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
           </div>
 
           <div className="lm-form-group">
-            <label>Categoria</label>
-            <input
-              type="text"
-              value={procForm.category || ''}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+              <label style={{ marginBottom: 0 }}>CATEGORIA *</label>
+              <button
+                type="button"
+                className="lm-btn-add-cat-inline"
+                onClick={() => {
+                  if (onOpenAddCatModal) {
+                    onOpenAddCatModal();
+                  }
+                }}
+              >
+                + Nova Categoria
+              </button>
+            </div>
+            <select
+              className="lm-form-select"
+              value={procForm.category || safeCategories[0] || 'Geral'}
               onChange={(e) => setProcForm({ ...procForm, category: e.target.value })}
-              placeholder="Ex: Cílios"
-            />
+            >
+              {safeCategories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+            <div className="lm-form-group">
+              <label>MANUTENÇÃO (OPCIONAL)</label>
+              <input
+                type="text"
+                value={procForm.maintenance || ''}
+                onChange={(e) => setProcForm({ ...procForm, maintenance: e.target.value })}
+                placeholder="Ex: 60,00 (até 20 dias)"
+              />
+            </div>
+            <div className="lm-form-group">
+              <label>EFEITO VISUAL (OPCIONAL)</label>
+              <input
+                type="text"
+                value={procForm.visualEffect || ''}
+                onChange={(e) => setProcForm({ ...procForm, visualEffect: e.target.value })}
+                placeholder="Natural, Discreto & Elegante"
+              />
+            </div>
           </div>
 
           <div className="lm-form-group">
-            <label>Imagem do Procedimento</label>
+            <label>FOTO DO SERVIÇO</label>
             <div className="lm-svc-photo-row">
-              {procForm.image_url && (
-                <div className="lm-svc-photo-preview-wrap">
-                  <img src={procForm.image_url} alt="Preview" />
-                </div>
-              )}
+              <div className="lm-svc-photo-preview-wrap">
+                <img
+                  src={procForm.image_url || 'https://images.unsplash.com/photo-1583001809873-a1284d563391?auto=format&fit=crop&w=400&q=80'}
+                  alt="Preview"
+                />
+              </div>
               <label className="lm-svc-photo-upload-btn">
-                <Upload className="w-4 h-4" />
-                <span>{isUploading ? 'Enviando...' : 'Trocar Foto'}</span>
+                <span>📤 ESCOLHER FOTO</span>
                 <input
                   type="file"
                   accept="image/*"
                   onChange={(e) => handleFileUpload(e, 'proc')}
+                  style={{ display: 'none' }}
                 />
               </label>
             </div>
           </div>
 
           <div className="lm-form-group">
-            <label>Descrição</label>
+            <label>DESCRIÇÃO</label>
             <textarea
-              rows={2}
+              rows={3}
               value={procForm.description || ''}
               onChange={(e) => setProcForm({ ...procForm, description: e.target.value })}
-              placeholder="Detalhes sobre técnica, durabilidade e cuidados..."
+              placeholder="Um fio sintético ultrafino acoplado a cada cílio natural saudável. O resultado mais elegante e discreto: olhar iluminado com efeito de rímel perfeito."
             />
           </div>
+
+          {procFormError && (
+            <div style={{ color: '#dc2626', fontSize: '0.82rem', fontWeight: 600, marginBottom: '12px', textAlign: 'center' }}>
+              ⚠️ {procFormError}
+            </div>
+          )}
 
           <div className="lm-modal-actions">
             <button type="button" className="lm-modal-btn lm-modal-btn-cancel" onClick={onClose}>
@@ -265,14 +432,15 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
               className="lm-modal-btn lm-modal-btn-confirm"
               onClick={() => {
                 if (!procForm.title || !procForm.price) {
-                  alert('Por favor informe o título e o preço.');
+                  setProcFormError('Por favor informe o título e o preço do procedimento.');
                   return;
                 }
+                setProcFormError('');
                 onSaveProcedure(procForm, editingProcIndex);
                 onClose();
               }}
             >
-              Salvar Procedimento
+              💾 Salvar Alterações
             </button>
           </div>
         </div>
@@ -281,21 +449,21 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
       {/* 3. MODAL EDITAR CONTATOS (WHATSAPP, INSTAGRAM, ENDEREÇO) */}
       {activeModal === 'social' && (
         <div className="lm-modal-card">
-          <h3 className="lm-modal-title">Editar Contatos e Localização</h3>
-          <p className="lm-modal-desc">Ajuste seu WhatsApp, Instagram e Cidade exibidos no catálogo.</p>
+          <h3 className="lm-modal-title">✏️ Editar Contatos</h3>
+          <p className="lm-modal-desc">Ajuste seu WhatsApp, Instagram e Cidade exibidos no catálogo:</p>
 
           <div className="lm-form-group">
-            <label>WhatsApp (Apenas números com DDD)</label>
+            <label>WHATSAPP (COM DDD) *</label>
             <input
               type="text"
               value={socialForm.whatsapp}
               onChange={(e) => setSocialForm({ ...socialForm, whatsapp: e.target.value })}
-              placeholder="Ex: 5511999999999"
+              placeholder="Ex: 11999998888"
             />
           </div>
 
           <div className="lm-form-group">
-            <label>Instagram (@usuario)</label>
+            <label>INSTAGRAM (@USUARIO)</label>
             <input
               type="text"
               value={socialForm.instagram}
@@ -305,7 +473,7 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
           </div>
 
           <div className="lm-form-group">
-            <label>Cidade / Estado / Endereço</label>
+            <label>CIDADE E ESTADO</label>
             <input
               type="text"
               value={socialForm.address}
@@ -328,24 +496,25 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
                 onClose();
               }}
             >
-              Salvar Contatos
+              💾 Salvar Contatos
             </button>
           </div>
         </div>
       )}
 
-      {/* 4. MODAL ADICIONAR CATEGORIA */}
+      {/* 4. MODAL CRIAR CATEGORIA (MATCHING PRINT 5 EXACTLY) */}
       {activeModal === 'category' && (
         <div className="lm-modal-card">
-          <h3 className="lm-modal-title">Adicionar Nova Categoria</h3>
+          <h3 className="lm-modal-title">➕ Criar Nova Categoria</h3>
+          <p className="lm-modal-desc">Digite o nome da nova categoria para organizar seus procedimentos:</p>
 
           <div className="lm-form-group">
-            <label>Nome da Categoria</label>
+            <label>NOME DA CATEGORIA *</label>
             <input
               type="text"
               value={newCatName}
               onChange={(e) => setNewCatName(e.target.value)}
-              placeholder="Ex: Manutenção, Sobrancelhas, Labial..."
+              placeholder="Ex: Lash Lifting, Micropigmentação, Cursos..."
             />
           </div>
 
@@ -358,32 +527,44 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
               className="lm-modal-btn lm-modal-btn-confirm"
               onClick={() => {
                 if (newCatName.trim()) {
-                  onAddCategory(newCatName.trim());
+                  const catName = newCatName.trim();
                   setNewCatName('');
+                  onAddCategory(catName);
+                } else {
+                  onClose();
                 }
-                onClose();
               }}
             >
-              Criar Categoria
+              ✨ Criar Categoria
             </button>
           </div>
         </div>
       )}
 
-      {/* 5. MODAL DE CONFIRMAÇÃO AO SALVAR NO BANCO DE DADOS */}
+      {/* 5. MODAL DE CONFIRMAÇÃO E RESUMO DE ALTERAÇÕES */}
       {activeModal === 'save_confirm' && (
-        <div className="lm-modal-card" style={{ textAlign: 'center' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px auto' }}>
-            <CheckCircle className="w-6 h-6" />
-          </div>
-          <h3 className="lm-modal-title">Salvar Alterações no Supabase?</h3>
+        <div className="lm-modal-card">
+          <h3 className="lm-modal-title">✨ Publicar Alterações</h3>
           <p className="lm-modal-desc">
-            Seu catálogo online será atualizado imediatamente com todas as modificações que você realizou.
+            Confira o resumo das alterações antes de publicar no seu catálogo:
           </p>
 
+          <div className="lm-save-summary-container">
+            {getChangesSummary().map((itemText, idx) => (
+              <div key={idx} className="lm-save-summary-item">
+                {itemText}
+              </div>
+            ))}
+          </div>
+
           <div className="lm-modal-actions">
-            <button type="button" className="lm-modal-btn lm-modal-btn-cancel" onClick={onClose} disabled={isSaving}>
-              Voltar ao Editor
+            <button
+              type="button"
+              className="lm-modal-btn lm-modal-btn-cancel"
+              onClick={onClose}
+              disabled={isSaving}
+            >
+              Cancelar
             </button>
             <button
               type="button"
@@ -391,7 +572,201 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
               onClick={onConfirmSaveDatabase}
               disabled={isSaving}
             >
-              {isSaving ? 'Gravando...' : 'Confirmar e Salvar'}
+              {isSaving ? 'Publicando...' : '🚀 Confirmar'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 6. MODAL DE SUCESSO DO SISTEMA */}
+      {activeModal === 'save_success' && (
+        <div className="lm-modal-card" style={{ textAlign: 'center' }}>
+          <div
+            style={{
+              width: '54px',
+              height: '54px',
+              borderRadius: '50%',
+              background: 'rgba(16, 185, 129, 0.12)',
+              color: '#10b981',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 14px auto',
+            }}
+          >
+            <CheckCircle className="w-7 h-7" />
+          </div>
+          <h3 className="lm-modal-title" style={{ fontSize: '1.3rem' }}>
+            Catálogo Publicado!
+          </h3>
+          <p className="lm-modal-desc" style={{ marginBottom: '22px' }}>
+            Suas alterações foram salvas com sucesso e já estão ao vivo no seu catálogo online!
+          </p>
+
+          <div className="lm-modal-actions">
+            <button
+              type="button"
+              className="lm-modal-btn lm-modal-btn-confirm"
+              onClick={onClose}
+              style={{ width: '100%', flex: '1 1 100%' }}
+            >
+              ✨ Entendido!
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 7. MODAL DE ERRO DO SISTEMA (SUBSTITUI BROWSER ALERTS) */}
+      {activeModal === 'save_error' && (
+        <div className="lm-modal-card" style={{ textAlign: 'center' }}>
+          <div
+            style={{
+              width: '54px',
+              height: '54px',
+              borderRadius: '50%',
+              background: 'rgba(239, 68, 68, 0.12)',
+              color: '#ef4444',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 14px auto',
+            }}
+          >
+            <span style={{ fontSize: '24px' }}>⚠️</span>
+          </div>
+          <h3 className="lm-modal-title" style={{ color: '#ef4444', fontSize: '1.25rem' }}>
+            Ops! Algo deu errado
+          </h3>
+          <p className="lm-modal-desc" style={{ color: '#4a3239', marginBottom: '22px' }}>
+            {errorMessage || 'Ocorreu um erro ao tentar salvar as alterações no catálogo.'}
+          </p>
+
+          <div className="lm-modal-actions">
+            <button
+              type="button"
+              className="lm-modal-btn lm-modal-btn-cancel"
+              onClick={onClose}
+              style={{ width: '100%', flex: '1 1 100%', background: '#f4e6e9', color: '#6b4c55' }}
+            >
+              Entendido
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 8. MODAL DE BLOQUEIO DE EXCLUSÃO DE CATEGORIA COM PROCEDIMENTOS VINCULADOS */}
+      {activeModal === 'category_delete_blocked' && (
+        <div className="lm-modal-card" style={{ textAlign: 'center' }}>
+          <div
+            style={{
+              width: '54px',
+              height: '54px',
+              borderRadius: '50%',
+              background: 'rgba(239, 68, 68, 0.12)',
+              color: '#ef4444',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 14px auto',
+            }}
+          >
+            <span style={{ fontSize: '24px' }}>🛑</span>
+          </div>
+          <h3 className="lm-modal-title" style={{ color: '#c04b6b', fontSize: '1.25rem' }}>
+            Não é possível excluir
+          </h3>
+          <p className="lm-modal-desc" style={{ color: '#4a3239', marginBottom: '22px', lineHeight: '1.5' }}>
+            A categoria <strong>"{categoryToDelete?.name}"</strong> possui <strong>{categoryToDelete?.count} procedimento(s)</strong> vinculado(s).
+            <br />
+            Para excluí-la, remova ou altere a categoria desses procedimentos primeiro.
+          </p>
+
+          <div className="lm-modal-actions">
+            <button
+              type="button"
+              className="lm-modal-btn lm-modal-btn-confirm"
+              onClick={onClose}
+              style={{ width: '100%', flex: '1 1 100%' }}
+            >
+              ✨ Entendido!
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 9. MODAL DE CONFIRMAÇÃO DE EXCLUSÃO DE CATEGORIA VAZIA */}
+      {activeModal === 'category_delete_confirm' && (
+        <div className="lm-modal-card">
+          <h3 className="lm-modal-title">🗑️ Excluir Categoria</h3>
+          <p className="lm-modal-desc">
+            Tem certeza que deseja excluir a categoria <strong>"{categoryToDelete?.name}"</strong>?
+          </p>
+
+          <div className="lm-modal-actions">
+            <button type="button" className="lm-modal-btn lm-modal-btn-cancel" onClick={onClose}>
+              Cancelar
+            </button>
+            <button
+              type="button"
+              className="lm-modal-btn lm-modal-btn-confirm"
+              style={{ background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)' }}
+              onClick={() => {
+                if (onConfirmDeleteCategory) onConfirmDeleteCategory();
+              }}
+            >
+              🗑️ Excluir Categoria
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 10. MODAL DE CONFIRMAÇÃO DE EXCLUSÃO DE PROCEDIMENTO */}
+      {activeModal === 'proc_delete_confirm' && (
+        <div className="lm-modal-card">
+          <h3 className="lm-modal-title">🗑️ Excluir Procedimento</h3>
+          <p className="lm-modal-desc">
+            Tem certeza que deseja excluir o procedimento <strong>"{procToDelete?.title}"</strong>?
+          </p>
+
+          <div className="lm-modal-actions">
+            <button type="button" className="lm-modal-btn lm-modal-btn-cancel" onClick={onClose}>
+              Cancelar
+            </button>
+            <button
+              type="button"
+              className="lm-modal-btn lm-modal-btn-confirm"
+              style={{ background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)' }}
+              onClick={() => {
+                if (onConfirmDeleteProc) onConfirmDeleteProc();
+              }}
+            >
+              🗑️ Excluir Procedimento
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 11. MODAL DE CONFIRMAÇÃO DE DESCARTAR ALTERAÇÕES (RESET) */}
+      {activeModal === 'discard_confirm' && (
+        <div className="lm-modal-card">
+          <h3 className="lm-modal-title">🗑️ Descartar Alterações</h3>
+          <p className="lm-modal-desc">
+            Deseja descartar todas as alterações não salvas da sessão de edição?
+          </p>
+
+          <div className="lm-modal-actions">
+            <button type="button" className="lm-modal-btn lm-modal-btn-cancel" onClick={onClose}>
+              Cancelar
+            </button>
+            <button
+              type="button"
+              className="lm-modal-btn lm-modal-btn-confirm"
+              style={{ background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)' }}
+              onClick={() => {
+                if (onConfirmDiscard) onConfirmDiscard();
+              }}
+            >
+              🗑️ Descartar Alterações
             </button>
           </div>
         </div>
@@ -399,3 +774,4 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
     </div>
   );
 };
+

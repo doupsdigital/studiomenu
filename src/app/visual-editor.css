@@ -23,8 +23,11 @@
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-body.has-lm-editor {
-  padding-bottom: 80px !important;
+body.has-lm-editor .hero__conteudo,
+body.has-lm-editor .secao-orientacoes__conteudo,
+body.has-lm-editor .secao-contato,
+body.has-lm-editor #contato {
+  padding-bottom: 85px !important;
 }
 
 /* Indicador Discreto de Status no Topo Direito */
@@ -160,19 +163,14 @@ html[data-theme="luxury"] .lm-mb-btn-save {
 
 /* Botão Flutuante de Alterar Foto de Capa (Alinhado à direita, abaixo do SEJA BEM VINDA) */
 .lm-cover-edit-overlay {
-  display: flex !important;
-  justify-content: flex-end !important;
-  width: 100% !important;
-  position: relative !important;
-  top: auto !important;
+  position: absolute !important;
+  top: 108px !important;
+  right: 16px !important;
   left: auto !important;
-  right: auto !important;
   bottom: auto !important;
   transform: none !important;
   z-index: 99995 !important;
-  margin-top: 28px !important;
-  margin-bottom: 8px !important;
-  padding-right: 4px !important;
+  margin: 0 !important;
   pointer-events: auto !important;
 }
 
@@ -342,60 +340,87 @@ body[data-theme="luxury"] .lm-btn-add-service {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
 }
 
-/* Modais e Bottom Sheets */
+/* Chip + Nova Categoria na Barra de Filtros */
+.lm-btn-add-category-chip {
+  background: rgba(255, 240, 243, 0.95) !important;
+  border: 1.5px dashed #c04b6b !important;
+  color: #c04b6b !important;
+  font-size: 0.78rem !important;
+  font-weight: 700 !important;
+  padding: 8px 16px !important;
+  height: 38px !important;
+  border-radius: 100px !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  transition: all 0.2s ease !important;
+  user-select: none !important;
+  font-family: inherit !important;
+  box-shadow: 0 2px 8px rgba(192, 75, 107, 0.12) !important;
+}
+
+.lm-btn-add-category-chip:hover,
+.lm-btn-add-category-chip:active {
+  background: #ffe3e9 !important;
+  transform: scale(0.97) !important;
+}
+
+/* ── MODAIS E BOTTOM SHEETS (ALINHADOS AO BOTTOM - REFERÊNCIA PRINT 3 & 5) ── */
 .lm-modal-overlay {
   position: fixed !important;
   inset: 0 !important;
-  background: rgba(14, 10, 11, 0.85) !important;
+  background: rgba(14, 10, 11, 0.65) !important;
+  backdrop-filter: blur(5px) !important;
+  -webkit-backdrop-filter: blur(5px) !important;
   z-index: 999999 !important;
   display: flex !important;
-  align-items: flex-end !important;
+  align-items: flex-end !important; /* Alinhado à parte inferior (Bottom Sheet) */
   justify-content: center !important;
   padding: 0 !important;
   margin: 0 !important;
+  box-sizing: border-box !important;
 }
 
 .lm-modal-card {
   width: 100% !important;
   max-width: 500px !important;
+  background: #fff8f9 !important;
+  border: none !important;
+  border-top: 4px solid #c04b6b !important;
+  border-radius: 28px 28px 0 0 !important; /* Arredondamento apenas nas quinas superiores */
   padding: 24px 20px 28px 20px !important;
-  margin: 0 !important;
-  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.6) !important;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.4), 0 -2px 10px rgba(192, 75, 107, 0.2) !important;
   max-height: 85vh !important;
   overflow-y: auto !important;
   box-sizing: border-box !important;
   display: block !important;
-  border-radius: 24px 24px 0 0 !important;
-}
-
-html[data-theme="luxury"] .lm-modal-card,
-body[data-theme="luxury"] .lm-modal-card,
-.theme-luxury .lm-modal-card {
-  background: #14100f !important;
-  border-top: 3px solid rgba(229, 169, 184, 0.5) !important;
-  color: #f5ede6 !important;
-}
-
-.lm-modal-card,
-html[data-theme="rose"] .lm-modal-card,
-body[data-theme="rose"] .lm-modal-card,
-.theme-rose .lm-modal-card {
-  background: #fff8f9 !important;
-  border-top: 4px solid #c04b6b !important;
   color: #2b141b !important;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  margin: 0 !important;
 }
 
 .lm-modal-title {
-  font-size: 1.25rem !important;
+  font-size: 1.2rem !important;
   font-weight: 700 !important;
+  color: #c04b6b !important;
   margin: 0 0 6px 0 !important;
   text-align: center !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
 }
 
 .lm-modal-desc {
   font-size: 0.82rem !important;
+  color: #7a525f !important;
   text-align: center !important;
-  margin: 0 0 16px 0 !important;
+  margin: 0 0 18px 0 !important;
+  line-height: 1.4 !important;
 }
 
 .lm-form-group {
@@ -406,21 +431,104 @@ body[data-theme="rose"] .lm-modal-card,
   display: block !important;
   font-size: 0.72rem !important;
   font-weight: 700 !important;
+  color: #b03e5e !important;
   margin-bottom: 6px !important;
   text-transform: uppercase !important;
+  letter-spacing: 0.03em !important;
+}
+
+.lm-btn-add-cat-inline {
+  background: none !important;
+  border: none !important;
+  color: #c04b6b !important;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+  cursor: pointer !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  transition: opacity 0.2s ease !important;
+}
+
+.lm-btn-add-cat-inline:hover {
+  opacity: 0.8 !important;
 }
 
 .lm-form-group input:not([type="file"]),
 .lm-form-group textarea,
 .lm-form-select {
   width: 100% !important;
-  border-radius: 12px !important;
-  padding: 11px 14px !important;
-  font-size: 0.9rem !important;
+  background: #fff0f3 !important;
+  border: 1.5px solid #f2bdc9 !important;
+  border-radius: 14px !important;
+  padding: 10px 14px !important;
+  font-size: 0.88rem !important;
+  color: #2b141b !important;
   outline: none !important;
   box-sizing: border-box !important;
+  transition: all 0.2s ease !important;
+  font-family: inherit !important;
 }
 
+.lm-form-group input:not([type="file"]):focus,
+.lm-form-group textarea:focus,
+.lm-form-select:focus {
+  border-color: #c04b6b !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(192, 75, 107, 0.15) !important;
+}
+
+.lm-form-group input::placeholder,
+.lm-form-group textarea::placeholder {
+  color: #bfa0a8 !important;
+  font-weight: 400 !important;
+}
+
+/* Row Foto do Serviço */
+.lm-svc-photo-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+}
+
+.lm-svc-photo-preview-wrap {
+  width: 56px !important;
+  height: 56px !important;
+  border-radius: 12px !important;
+  border: 2px dashed #f2bdc9 !important;
+  overflow: hidden !important;
+  flex-shrink: 0 !important;
+  background: #fff0f3 !important;
+}
+
+.lm-svc-photo-preview-wrap img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+.lm-svc-photo-upload-btn {
+  background: #fff0f3 !important;
+  border: 2px dashed #c04b6b !important;
+  color: #c04b6b !important;
+  font-size: 0.78rem !important;
+  font-weight: 700 !important;
+  padding: 10px 16px !important;
+  border-radius: 100px !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  transition: all 0.2s ease !important;
+  user-select: none !important;
+}
+
+.lm-svc-photo-upload-btn:hover {
+  background: #ffe3e9 !important;
+}
+
+/* Modal Action Buttons (Footer) */
 .lm-modal-actions {
   display: flex !important;
   align-items: center !important;
@@ -430,7 +538,6 @@ body[data-theme="rose"] .lm-modal-card,
 }
 
 .lm-modal-btn {
-  flex: 1 1 0% !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -440,25 +547,87 @@ body[data-theme="rose"] .lm-modal-card,
   font-weight: 700 !important;
   cursor: pointer !important;
   border: none !important;
+  transition: all 0.2s ease !important;
+  text-decoration: none !important;
+  user-select: none !important;
+  -webkit-tap-highlight-color: transparent !important;
 }
 
-.lm-btn-add-category-chip {
-  background: rgba(192, 75, 107, 0.12) !important;
-  border: 1.5px dashed #c04b6b !important;
-  color: #c04b6b !important;
+.lm-modal-btn-cancel {
+  flex: 1 1 0% !important;
+  background: #f4e6e9 !important;
+  color: #6b4c55 !important;
+}
+
+.lm-modal-btn-cancel:hover {
+  background: #ebd8dc !important;
+}
+
+.lm-modal-btn-confirm {
+  flex: 1.4 1 0% !important;
+  background: linear-gradient(135deg, #d85b7c 0%, #c04b6b 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 6px 18px rgba(192, 75, 107, 0.4) !important;
+}
+
+.lm-modal-btn-confirm:hover {
+  opacity: 0.95 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 8px 22px rgba(192, 75, 107, 0.5) !important;
+}
+
+.lm-modal-btn:active {
+  transform: scale(0.97) !important;
+}
+
+/* Resumo de Alterações no Modal de Publicação (Publicar Alterações) */
+.lm-save-summary-container {
+  background: #fff0f3 !important;
+  border: 1.5px solid #f2bdc9 !important;
+  border-radius: 14px !important;
+  padding: 12px 16px !important;
+  margin-bottom: 18px !important;
+  max-height: 180px !important;
+  overflow-y: auto !important;
+  text-align: left !important;
+  box-sizing: border-box !important;
+}
+
+.lm-save-summary-item {
   font-size: 0.82rem !important;
+  color: #2b141b !important;
   font-weight: 600 !important;
-  padding: 6px 14px !important;
-  border-radius: 100px !important;
-  cursor: pointer !important;
+  padding: 6px 0 !important;
+  border-bottom: 1px dashed rgba(242, 189, 201, 0.7) !important;
+  line-height: 1.4 !important;
+}
+
+.lm-save-summary-item:last-child {
+  border-bottom: none !important;
+}
+
+/* Ícone 'X' de Remoção nos Chips de Filtro de Categoria */
+.lm-chip-trash-icon {
   display: inline-flex !important;
   align-items: center !important;
-  gap: 4px !important;
-  white-space: nowrap !important;
+  justify-content: center !important;
+  margin-left: 6px !important;
+  width: 18px !important;
+  height: 18px !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  border-radius: 50% !important;
+  background: rgba(169, 50, 89, 0.14) !important;
+  color: #a93259 !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+  line-height: 1 !important;
 }
 
-html[data-theme="luxury"] .lm-btn-add-category-chip {
-  background: rgba(229, 169, 184, 0.12) !important;
-  border: 1.5px dashed #e5a9b8 !important;
-  color: #e5a9b8 !important;
+.lm-chip-trash-icon:hover {
+  background: #c04b6b !important;
+  color: #ffffff !important;
+  transform: scale(1.12) !important;
 }
+
+

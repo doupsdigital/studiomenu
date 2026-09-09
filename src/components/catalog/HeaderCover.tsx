@@ -53,39 +53,39 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
       {/* 2. Scrim (Gradiente Esfumaçado) */}
       <div className="hero__scrim"></div>
 
-      {/* 3. Conteúdo Sobreposto */}
+      {/* 3. BOTÃO FLUTUANTE SOBRE A CAPA: 📷 Alterar Foto de Capa (Absolute na Section Hero) */}
+      {isEditMode && (
+        <div className="lm-cover-edit-overlay">
+          <button
+            type="button"
+            className="lm-cover-edit-btn"
+            title="Clique para alterar a foto de capa"
+            onClick={handleCoverClick}
+          >
+            📷 Alterar Foto de Capa
+          </button>
+          <input
+            type="file"
+            ref={fileInputRef}
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file && onSaveCoverUrl) {
+                const previewUrl = URL.createObjectURL(file);
+                onSaveCoverUrl(previewUrl);
+              }
+            }}
+          />
+        </div>
+      )}
+
+      {/* 4. Conteúdo Sobreposto */}
       <div className="hero__conteudo">
         {/* Selo Seja Bem Vinda */}
         <div className="hero__selo anim-fade-up delay-1">
           <span>Seja Bem Vinda</span>
         </div>
-
-        {/* BOTÃO FLUTUANTE SOBRE A CAPA: 📷 Alterar Foto de Capa */}
-        {isEditMode && (
-          <div className="lm-cover-edit-overlay">
-            <button
-              type="button"
-              className="lm-cover-edit-btn"
-              title="Clique para alterar a foto de capa"
-              onClick={handleCoverClick}
-            >
-              📷 Alterar Foto de Capa
-            </button>
-            <input
-              type="file"
-              ref={fileInputRef}
-              accept="image/*"
-              style={{ display: 'none' }}
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file && onSaveCoverUrl) {
-                  const previewUrl = URL.createObjectURL(file);
-                  onSaveCoverUrl(previewUrl);
-                }
-              }}
-            />
-          </div>
-        )}
 
         {/* Título & Nome */}
         <div className="hero__titulo">
