@@ -32,10 +32,10 @@ export const VisualEditorBottomBar: React.FC<VisualEditorBottomBarProps> = ({
 
   return (
     <>
-      {/* 1. Indicador Discreto no Topo Direito: ● Edição Ativa */}
+      {/* 1. Indicador Discreto no Topo Direito: ● Edição Ativa / ● Rascunho Não Salvo */}
       <div id="lm-editor-top-status" aria-label="Status do Editor">
         <span className={`lm-status-dot ${isSaved ? 'is-saved' : ''}`} />
-        <span id="lm-status-text">{isSaved ? 'Salvo' : 'Edição Ativa'}</span>
+        <span id="lm-status-text">{isSaved ? 'Edição Ativa' : 'Rascunho Não Salvo'}</span>
       </div>
 
       {/* 2. Barra Flutuante Inferior Arredondada (#lm-editor-bottom-bar) */}

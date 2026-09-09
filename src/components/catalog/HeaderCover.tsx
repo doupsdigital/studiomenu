@@ -6,6 +6,7 @@ interface HeaderCoverProps {
   categories: string[];
   isEditMode?: boolean;
   onOpenCoverModal?: () => void;
+  onSaveCoverUrl?: (url: string) => void;
   onUpdateClientName?: (newName: string) => void;
   onUpdateHeroPhrase?: (newPhrase: string) => void;
 }
@@ -15,6 +16,7 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
   categories,
   isEditMode = false,
   onOpenCoverModal,
+  onSaveCoverUrl,
   onUpdateClientName,
   onUpdateHeroPhrase,
 }) => {
@@ -65,12 +67,9 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
               style={{ display: 'none' }}
               onChange={(e) => {
                 const file = e.target.files?.[0];
-                if (file && onOpenCoverModal) {
-                  const url = URL.createObjectURL(file);
-                  if (onUpdateHeroPhrase) {
-                    // passar imagem via callback
-                  }
-                  if (onOpenCoverModal) onOpenCoverModal();
+                if (file && onSaveCoverUrl) {
+                  const previewUrl = URL.createObjectURL(file);
+                  onSaveCoverUrl(previewUrl);
                 }
               }}
             />

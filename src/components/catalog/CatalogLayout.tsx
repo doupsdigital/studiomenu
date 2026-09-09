@@ -253,6 +253,7 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
           categories={categories}
           isEditMode={isEditMode}
           onOpenCoverModal={() => setActiveModal('cover')}
+          onSaveCoverUrl={handleSaveCoverUrl}
           onUpdateClientName={handleUpdateClientName}
           onUpdateHeroPhrase={handleUpdateHeroPhrase}
         />
