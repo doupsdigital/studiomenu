@@ -230,9 +230,15 @@ button {
   padding: 44px 24px 40px;
 }
 
+/* O bloco nome/frase/chips/botão (.hero__titulo pra baixo) é ancorado ao
+   RODAPÉ do hero via margin-top:auto (ver .hero__titulo) — isso o mantém
+   sempre colado à área mais escura do gradiente, em qualquer altura de tela.
+   Por isso ele NÃO se move com padding-top (só o selo "Seja Bem-Vinda" se
+   move com padding-top). Pra descer/subir esse bloco, o controle é o
+   padding-bottom daqui. */
 @media (max-width: 480px) {
   .hero__conteudo {
-    padding-top: 84px;
+    padding-bottom: 16px;
   }
 }
 
@@ -2792,14 +2798,6 @@ body[data-theme="rose"] .theme-switcher-widget {
   font-weight: 700 !important;
   border-color: transparent !important;
   box-shadow: 0 3px 12px rgba(201, 163, 137, 0.5) !important;
-}
-
-/* Espaçamento exclusivo do modelo showroom (apenas quando o seletor de tema estiver presente no DOM) */
-/* Espaçamento exclusivo do modelo showroom (apenas quando o seletor de tema estiver presente no DOM) */
-body.has-theme-switcher .hero__conteudo,
-body:has(#theme-switcher-widget) .hero__conteudo,
-body:has(.theme-switcher-widget) .hero__conteudo {
-  padding-top: 118px !important;
 }
 
 .hero--classico .hero__foto,
