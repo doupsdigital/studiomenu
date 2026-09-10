@@ -109,10 +109,11 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
           </p>
         </div>
 
-        {/* Chips de Categorias Sobre a Foto */}
+        {/* Chips de Categorias Sobre a Foto — no máximo 4, mesma ordem dos
+            filtros da tela de Procedimentos (reordenável lá, no modo edição) */}
         {categories.length > 0 && (
           <div className="hero__chips anim-fade-up delay-5" id="hero-chips">
-            {categories.map((cat) => (
+            {categories.slice(0, 4).map((cat) => (
               <span className="hero__chip" key={cat}>
                 {cat}
               </span>

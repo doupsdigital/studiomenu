@@ -669,4 +669,31 @@ body[data-theme="luxury"] .lm-btn-add-service {
   transform: scale(1.12) !important;
 }
 
+/* Ícones ‹ › de Mover Categoria (reordenar) nos Chips de Filtro */
+.lm-chip-move-icon {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 18px !important;
+  height: 18px !important;
+  border-radius: 50% !important;
+  background: rgba(169, 50, 89, 0.14) !important;
+  color: #a93259 !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+  flex-shrink: 0 !important;
+}
+
+.lm-chip-move-icon:hover {
+  background: #a93259 !important;
+  color: #ffffff !important;
+  transform: scale(1.12) !important;
+}
+
+.lm-chip-move-icon.is-disabled {
+  opacity: 0.3 !important;
+  cursor: default !important;
+  pointer-events: none !important;
+}
+
 

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { ProcedureItem, LayoutModel } from '@/types/catalog';
 import { ProcedureCard } from './ProcedureCard';
@@ -18,6 +19,7 @@ interface ProcedureGridProps {
   onOpenAddProcModal?: () => void;
   onOpenAddCatModal?: () => void;
   onDeleteCategory?: (categoryName: string, count: number) => void;
+  onMoveCategory?: (categoryName: string, direction: 'left' | 'right') => void;
 }
 
 export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
@@ -32,6 +34,7 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
   onOpenAddProcModal,
   onOpenAddCatModal,
   onDeleteCategory,
+  onMoveCategory,
 }) => {
   const [selectedProcedure, setSelectedProcedure] = useState<ProcedureItem | null>(null);
 
@@ -102,9 +105,13 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
             </button>
           )}
 
-          {categories.map((cat) => {
+          {categories.map((cat, idx) => {
             const isActive = activeCategory === cat;
             const count = cat === 'Todos' ? procedures.length : procedures.filter(p => p.category === cat).length;
+            // idx 0 é sempre "Todos" (não reordenável), então a primeira
+            // categoria de verdade é idx 1.
+            const isFirstReal = idx <= 1;
+            const isLastReal = idx === categories.length - 1;
             return (
               <button
                 key={cat}
@@ -112,18 +119,42 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
                 className={`filtro-chip ${isActive ? 'is-ativo' : ''}`}
                 onClick={() => setActiveCategory(cat)}
               >
-                <span>{cat} ({count})</span>
                 {isEditMode && cat !== 'Todos' && (
                   <span
-                    className="lm-chip-trash-icon"
-                    title={`Excluir Categoria ${cat}`}
+                    className={`lm-chip-move-icon ${isFirstReal ? 'is-disabled' : ''}`}
+                    title="Mover pra esquerda"
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (onDeleteCategory) onDeleteCategory(cat, count);
+                      if (!isFirstReal && onMoveCategory) onMoveCategory(cat, 'left');
                     }}
                   >
-                    ✕
+                    <ChevronLeft className="w-3 h-3" />
                   </span>
+                )}
+                <span>{cat} ({count})</span>
+                {isEditMode && cat !== 'Todos' && (
+                  <>
+                    <span
+                      className={`lm-chip-move-icon ${isLastReal ? 'is-disabled' : ''}`}
+                      title="Mover pra direita"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (!isLastReal && onMoveCategory) onMoveCategory(cat, 'right');
+                      }}
+                    >
+                      <ChevronRight className="w-3 h-3" />
+                    </span>
+                    <span
+                      className="lm-chip-trash-icon"
+                      title={`Excluir Categoria ${cat}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (onDeleteCategory) onDeleteCategory(cat, count);
+                      }}
+                    >
+                      ✕
+                    </span>
+                  </>
                 )}
               </button>
             );

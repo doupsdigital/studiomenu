@@ -301,6 +301,23 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
     return Array.from(set);
   }, [catalogState.categories, catalogState.procedures]);
 
+  // Reordenar categoria (setas ‹ › nos chips de filtro, modo edição).
+  // Usa a lista `categories` completa (não só catalogState.categories) pra
+  // funcionar mesmo com categorias "implícitas" (que só existem porque um
+  // procedimento usa elas, nunca foram adicionadas explicitamente) -- o
+  // resultado sempre vira a lista explícita completa, na mesma ordem que
+  // aparece tanto nos filtros quanto nas cápsulas da capa.
+  const handleMoveCategory = (categoryName: string, direction: 'left' | 'right') => {
+    const currentCats = [...categories];
+    const idx = currentCats.indexOf(categoryName);
+    if (idx === -1) return;
+    const targetIdx = direction === 'left' ? idx - 1 : idx + 1;
+    if (targetIdx < 0 || targetIdx >= currentCats.length) return;
+    [currentCats[idx], currentCats[targetIdx]] = [currentCats[targetIdx], currentCats[idx]];
+    pushState({ ...catalogState, categories: currentCats });
+    showToast('↔️ Ordem atualizada!');
+  };
+
   return (
     <div className={`mosaico-wrapper ${isLuxury ? 'theme-luxury' : 'theme-rose'}`}>
       {/* 0. TOAST DE FEEDBACK DAS EDIÇÕES LOCAIS */}
@@ -378,6 +395,7 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
           }}
           onDeleteProc={handleDeleteProcedure}
           onDeleteCategory={handleAttemptDeleteCategory}
+          onMoveCategory={handleMoveCategory}
           onOpenAddProcModal={() => {
             setEditingProc(null);
             setEditingProcIndex(null);
