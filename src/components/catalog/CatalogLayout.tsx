@@ -64,6 +64,13 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
   const [procToDelete, setProcToDelete] = useState<ProcedureItem | null>(null);
   const [saveErrorMessage, setSaveErrorMessage] = useState<string>('');
 
+  // Toast discreto pra cada edição local (feedback imediato antes de "Salvar")
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const showToast = (text: string) => {
+    setToastMessage(text);
+    setTimeout(() => setToastMessage(null), 2600);
+  };
+
   // Ativar classe no body em modo edição para ajuste de padding inferior
   useEffect(() => {
     if (isEditMode) {
@@ -183,23 +190,27 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
   const handleUpdateClientName = (newName: string) => {
     if (newName && newName !== catalogState.client_name) {
       pushState({ ...catalogState, client_name: newName });
+      showToast('✅ Nome atualizado!');
     }
   };
 
   const handleUpdateHeroPhrase = (newPhrase: string) => {
     if (newPhrase !== catalogState.hero_phrase) {
       pushState({ ...catalogState, hero_phrase: newPhrase });
+      showToast('✅ Frase atualizada!');
     }
   };
 
   const handleUpdateAddress = (newAddress: string) => {
     if (newAddress !== catalogState.address) {
       pushState({ ...catalogState, address: newAddress });
+      showToast('✅ Endereço atualizado!');
     }
   };
 
   const handleSaveCoverUrl = (url: string) => {
     pushState({ ...catalogState, cover_media_url: url });
+    showToast('📷 Foto de capa atualizada!');
   };
 
   const handleSaveSocial = (type: 'whatsapp' | 'instagram' | 'address', val: string) => {
@@ -210,16 +221,19 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
     } else if (type === 'address') {
       pushState({ ...catalogState, address: val });
     }
+    showToast('✅ Contato atualizado!');
   };
 
   const handleSaveProcedure = (proc: ProcedureItem, index: number | null) => {
     const newProcs = [...catalogState.procedures];
-    if (index !== null && index >= 0) {
-      newProcs[index] = proc;
+    const isNew = index === null || index < 0;
+    if (!isNew) {
+      newProcs[index as number] = proc;
     } else {
       newProcs.push({ ...proc, id: String(Date.now()) });
     }
     pushState({ ...catalogState, procedures: newProcs });
+    showToast(isNew ? '✨ Procedimento adicionado!' : '✅ Procedimento salvo!');
   };
 
   const handleDeleteProcedure = (proc: ProcedureItem) => {
@@ -235,6 +249,7 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
     pushState({ ...catalogState, categories: currentCats, procedures: newProcs });
     setProcToDelete(null);
     setActiveModal('none');
+    showToast('🗑️ Procedimento excluído!');
   };
 
   const handleAddCategory = (categoryName: string) => {
@@ -244,6 +259,7 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
     if (!currentCats.includes(trimmed)) {
       const updatedCategories = [...currentCats, trimmed];
       pushState({ ...catalogState, categories: updatedCategories });
+      showToast('✨ Categoria criada!');
     }
     setActiveModal('none');
   };
@@ -266,6 +282,7 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
     pushState({ ...catalogState, categories: newCategories, procedures: newProcs });
     setCategoryToDelete(null);
     setActiveModal('none');
+    showToast('🗑️ Categoria excluída!');
   };
 
   const isLuxury = catalogState.theme_variant === 'luxury';
@@ -286,6 +303,9 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
 
   return (
     <div className={`mosaico-wrapper ${isLuxury ? 'theme-luxury' : 'theme-rose'}`}>
+      {/* 0. TOAST DE FEEDBACK DAS EDIÇÕES LOCAIS */}
+      {isEditMode && toastMessage && <div className="lm-inline-toast">{toastMessage}</div>}
+
       {/* 1. CONTROLES DO EDITOR VISUAL IN-PLACE (BARRA INFERIOR E TOP STATUS) */}
       {isEditMode && (
         <VisualEditorBottomBar
