@@ -11,13 +11,18 @@ interface Particle {
   maxOpacity: number;
 }
 
+const IMMEDIATE_START_COUNT = 4;
+
 function generateParticles(count: number): Particle[] {
   return Array.from({ length: count }, (_, i) => ({
     id: i,
     left: Math.floor(Math.random() * 90) + 5,
     size: Math.floor(Math.random() * 8) + 6,
     duration: Number((Math.random() * 4 + 4.5).toFixed(1)),
-    delay: Number((Math.random() * 2.5).toFixed(1)),
+    // As primeiras partículas começam quase na hora (delay curto), pra
+    // ter movimento visível assim que a tela carrega -- o resto mantém o
+    // delay aleatório original (0-5s) pra entrada escalonada e orgânica.
+    delay: i < IMMEDIATE_START_COUNT ? Number((Math.random() * 0.4).toFixed(1)) : Number((Math.random() * 5).toFixed(1)),
     maxOpacity: Number((Math.random() * 0.4 + 0.4).toFixed(2)),
   }));
 }
