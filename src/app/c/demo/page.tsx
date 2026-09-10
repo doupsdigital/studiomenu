@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { LayoutModel, ThemeVariant, NicheType } from '@/types/catalog';
 import { CatalogLayout } from '@/components/catalog/CatalogLayout';
-import { nichePresetsMap } from '@/modelos-novos';
+import { nichePresetsMap } from '@/data/niche-presets';
 import { Sparkles, Palette, Layers, Scissors } from 'lucide-react';
 
 export default function DemoPage() {

@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { NicheType, LayoutModel, ThemeVariant, ProcedureItem } from '@/types/catalog';
-import { nichePresetsMap } from '@/modelos-novos';
+import { nichePresetsMap } from '@/data/niche-presets';
 import {
   Sparkles,
   ArrowRight,

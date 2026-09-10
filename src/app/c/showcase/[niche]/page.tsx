@@ -3,7 +3,7 @@
 import React, { use, useEffect, useState } from 'react';
 import { LayoutModel, ThemeVariant, NicheType } from '@/types/catalog';
 import { CatalogLayout } from '@/components/catalog/CatalogLayout';
-import { nichePresetsMap } from '@/modelos-novos';
+import { nichePresetsMap } from '@/data/niche-presets';
 import { Sparkles, Layers, ChevronDown, Wand2 } from 'lucide-react';
 
 export default function ShowcasePage({ params }: { params: Promise<{ niche: string }> }) {

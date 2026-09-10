@@ -3,7 +3,7 @@
 import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, MessageCircle, Search, Copy, Lightbulb } from 'lucide-react';
-import { SCRIPTS_DATA, SCRIPT_CATEGORIES } from '@/data/vendasX1Scripts';
+import { SCRIPTS_DATA, SCRIPT_CATEGORIES } from '@/data/vendas-x1-scripts';
 
 export default function AdminScriptsPage() {
   const [activeCategory, setActiveCategory] = useState<string>('all');
