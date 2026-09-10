@@ -247,6 +247,16 @@ body[data-theme="rose"] .hero__conteudo {
   justify-content: center;
 }
 
+/* Tema Rose: o selo sai do fluxo do grupo (que agora é ancorado no rodapé)
+   e fica fixo perto do topo da foto, igual estava originalmente — sem isso
+   ele seria puxado pra baixo junto com o resto do bloco. */
+body[data-theme="rose"] .hero__selo {
+  position: absolute;
+  top: 44px;
+  left: 24px;
+  right: 24px;
+}
+
 .hero__selo span {
   font-size: 10px;
   font-weight: 600;
@@ -359,6 +369,12 @@ body[data-theme="rose"] .hero__titulo {
   justify-content: flex-start;
   margin: 10px 0 30px;
   width: 100%;
+}
+
+/* Tema Rose: menos respiro entre os chips e o "Ver Catálogo" — esse era o
+   maior espaço solto do bloco. */
+body[data-theme="rose"] .hero__chips {
+  margin-bottom: 18px;
 }
 
 .hero__chip {
