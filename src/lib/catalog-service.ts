@@ -111,6 +111,7 @@ export async function getCatalogBySlug(slug: string): Promise<CatalogOrderData |
       maps_url: orderData.maps_url || '',
       instructions_bg_url: orderData.instructions_bg_url,
       final_screen_bg_url: orderData.final_screen_bg_url,
+      cta_bg_url: orderData.cta_bg_url,
       categories: Array.isArray(orderData.categories) ? orderData.categories : [],
       procedures: procedures,
       instructions: {
