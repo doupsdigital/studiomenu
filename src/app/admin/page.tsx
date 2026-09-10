@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { LayoutGrid, ArrowRight, Palette, MessageCircle, ClipboardList, Gem, Target, Clapperboard } from 'lucide-react';
+import { LayoutGrid, ArrowRight, Palette, MessageCircle, ClipboardList, Gem, Target, Clapperboard, Sparkles } from 'lucide-react';
 
 export default function AdminHubPage() {
   return (
@@ -33,6 +33,24 @@ export default function AdminHubPage() {
               </p>
             </div>
             <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-rose-400 group-hover:translate-x-1 transition-all flex-shrink-0" />
+          </Link>
+
+          <Link
+            href="/admin/criar-com-ia"
+            className="group p-5 rounded-2xl border transition-all flex items-center justify-between gap-3"
+            style={{ background: 'rgba(16, 185, 129, 0.08)', borderColor: 'rgba(16, 185, 129, 0.35)' }}
+          >
+            <div>
+              <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider mb-1.5" style={{ color: '#10b981' }}>
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Criação Automática</span>
+              </div>
+              <h2 className="font-bold text-white text-base">🤖 Criar Catálogo com IA</h2>
+              <p className="text-xs text-slate-400 mt-0.5 leading-relaxed">
+                Envie a foto de capa e o print/PDF de preços — a IA monta o catálogo pra você revisar.
+              </p>
+            </div>
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-all flex-shrink-0" style={{ color: '#10b981' }} />
           </Link>
 
           <Link

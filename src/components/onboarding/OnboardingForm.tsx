@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { formatPhoneBR } from '@/lib/format';
 import { NicheType, LayoutModel, ThemeVariant } from '@/types/catalog';
 import { nichePresetsMap } from '@/data/niche-presets';
+import { NICHE_OPTIONS } from '@/data/niche-options';
 import { CatalogLayout } from '@/components/catalog/CatalogLayout';
 import { StylePickerPanel } from '@/components/catalog/StylePickerPanel';
 import {
@@ -18,8 +19,6 @@ import {
   Gem,
   Lightbulb,
   Scissors,
-  Sparkle,
-  Layers,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -29,13 +28,6 @@ interface OnboardingFormProps {
    *  para envio por WhatsApp/X1). */
   withWelcome?: boolean;
 }
-
-const NICHE_OPTIONS: { value: NicheType; label: string; sublabel: string; icon: React.ReactNode }[] = [
-  { value: 'lash', label: 'Lash Designer', sublabel: 'Cílios & Sobrancelhas', icon: <Sparkle className="w-5 h-5" /> },
-  { value: 'nail', label: 'Nail Designer', sublabel: 'Unhas de Gel & Nail Art', icon: <Gem className="w-5 h-5" /> },
-  { value: 'estetica', label: 'Estética', sublabel: 'Clínica Facial & Corporal', icon: <Sparkles className="w-5 h-5" /> },
-  { value: 'studio', label: 'Studio de Beleza', sublabel: 'Multi-serviços', icon: <Layers className="w-5 h-5" /> },
-];
 
 export function OnboardingForm({ withWelcome = false }: OnboardingFormProps) {
   const router = useRouter();
