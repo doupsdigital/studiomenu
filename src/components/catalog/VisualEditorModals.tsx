@@ -2,7 +2,11 @@
 
 import React, { useState } from 'react';
 import { CatalogOrderData, ProcedureItem } from '@/types/catalog';
-import { Upload, CheckCircle } from 'lucide-react';
+import { CoverModal } from './modals/CoverModal';
+import { ProcedureModal } from './modals/ProcedureModal';
+import { SocialModal } from './modals/SocialModal';
+import { CategoryModal } from './modals/CategoryModal';
+import { ConfirmModals } from './modals/ConfirmModals';
 
 interface VisualEditorModalsProps {
   catalogData: CatalogOrderData;
@@ -50,7 +54,6 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
   errorMessage = '',
   editingProc,
   editingProcIndex,
-  editingSocialType,
   categoryToDelete,
   procToDelete,
   onClose,
@@ -250,506 +253,51 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
 
   return (
     <div className="lm-modal-overlay is-open">
-      {/* 1. MODAL ALTERAR FOTO DE CAPA */}
       {activeModal === 'cover' && (
-        <div className="lm-modal-card">
-          <h3 className="lm-modal-title">📷 Alterar Foto de Capa</h3>
-          <p className="lm-modal-desc">Escolha uma nova imagem para o topo do seu catálogo:</p>
-
-          <div className="lm-form-group">
-            <label className="lm-svc-photo-upload-btn" style={{ width: '100%', justifyContent: 'center' }}>
-              <Upload className="w-4 h-4" />
-              <span>{isUploading ? 'Enviando foto...' : 'Escolher Imagem do Dispositivo'}</span>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => handleFileUpload(e, 'cover')}
-                style={{ display: 'none' }}
-              />
-            </label>
-          </div>
-
-          <div className="lm-modal-actions">
-            <button type="button" className="lm-modal-btn lm-modal-btn-cancel" onClick={onClose}>
-              Cancelar
-            </button>
-          </div>
-        </div>
+        <CoverModal isUploading={isUploading} onFileUpload={(e) => handleFileUpload(e, 'cover')} onClose={onClose} />
       )}
 
-      {/* 2. MODAL EDITAR / NOVO PROCEDIMENTO (MATCHING PRINT 4 EXACTLY) */}
       {activeModal === 'procedure' && (
-        <div className="lm-modal-card">
-          <h3 className="lm-modal-title">
-            {editingProcIndex !== null ? `✏️ Editar: ${procForm.title || 'Procedimento'}` : '➕ Criar Novo Procedimento'}
-          </h3>
-
-          <div className="lm-form-group">
-            <label>NOME DO SERVIÇO *</label>
-            <input
-              type="text"
-              value={procForm.title}
-              onChange={(e) => setProcForm({ ...procForm, title: e.target.value })}
-              placeholder="Clássico Fio a Fio"
-            />
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-            <div className="lm-form-group">
-              <label>PREÇO (R$) *</label>
-              <input
-                type="text"
-                value={procForm.price}
-                onChange={(e) => setProcForm({ ...procForm, price: e.target.value })}
-                placeholder="100,00"
-              />
-            </div>
-            <div className="lm-form-group">
-              <label>DURAÇÃO *</label>
-              <input
-                type="text"
-                value={procForm.duration || ''}
-                onChange={(e) => setProcForm({ ...procForm, duration: e.target.value })}
-                placeholder="1h30"
-              />
-            </div>
-          </div>
-
-          <div className="lm-form-group">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-              <label style={{ marginBottom: 0 }}>CATEGORIA *</label>
-              <button
-                type="button"
-                className="lm-btn-add-cat-inline"
-                onClick={() => {
-                  if (onOpenAddCatModal) {
-                    onOpenAddCatModal();
-                  }
-                }}
-              >
-                + Nova Categoria
-              </button>
-            </div>
-            <select
-              className="lm-form-select"
-              value={procForm.category || safeCategories[0] || 'Geral'}
-              onChange={(e) => setProcForm({ ...procForm, category: e.target.value })}
-            >
-              {safeCategories.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-            <div className="lm-form-group">
-              <label>MANUTENÇÃO (OPCIONAL)</label>
-              <input
-                type="text"
-                value={procForm.maintenance || ''}
-                onChange={(e) => setProcForm({ ...procForm, maintenance: e.target.value })}
-                placeholder="Ex: 60,00 (até 20 dias)"
-              />
-            </div>
-            <div className="lm-form-group">
-              <label>EFEITO VISUAL (OPCIONAL)</label>
-              <input
-                type="text"
-                value={procForm.visualEffect || ''}
-                onChange={(e) => setProcForm({ ...procForm, visualEffect: e.target.value })}
-                placeholder="Natural, Discreto & Elegante"
-              />
-            </div>
-          </div>
-
-          <div className="lm-form-group">
-            <label>FOTO DO SERVIÇO</label>
-            <div className="lm-svc-photo-row">
-              <div className="lm-svc-photo-preview-wrap">
-                <img
-                  src={procForm.image_url || 'https://images.unsplash.com/photo-1583001809873-a1284d563391?auto=format&fit=crop&w=400&q=80'}
-                  alt="Preview"
-                />
-              </div>
-              <label className="lm-svc-photo-upload-btn">
-                <span>📤 ESCOLHER FOTO</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handleFileUpload(e, 'proc')}
-                  style={{ display: 'none' }}
-                />
-              </label>
-            </div>
-          </div>
-
-          <div className="lm-form-group">
-            <label>DESCRIÇÃO</label>
-            <textarea
-              rows={3}
-              value={procForm.description || ''}
-              onChange={(e) => setProcForm({ ...procForm, description: e.target.value })}
-              placeholder="Um fio sintético ultrafino acoplado a cada cílio natural saudável. O resultado mais elegante e discreto: olhar iluminado com efeito de rímel perfeito."
-            />
-          </div>
-
-          {procFormError && (
-            <div style={{ color: '#dc2626', fontSize: '0.82rem', fontWeight: 600, marginBottom: '12px', textAlign: 'center' }}>
-              ⚠️ {procFormError}
-            </div>
-          )}
-
-          <div className="lm-modal-actions">
-            <button type="button" className="lm-modal-btn lm-modal-btn-cancel" onClick={onClose}>
-              Cancelar
-            </button>
-            <button
-              type="button"
-              className="lm-modal-btn lm-modal-btn-confirm"
-              onClick={() => {
-                if (!procForm.title || !procForm.price) {
-                  setProcFormError('Por favor informe o título e o preço do procedimento.');
-                  return;
-                }
-                setProcFormError('');
-                onSaveProcedure(procForm, editingProcIndex);
-                onClose();
-              }}
-            >
-              💾 Salvar Alterações
-            </button>
-          </div>
-        </div>
+        <ProcedureModal
+          procForm={procForm}
+          setProcForm={setProcForm}
+          editingProcIndex={editingProcIndex}
+          safeCategories={safeCategories}
+          procFormError={procFormError}
+          setProcFormError={setProcFormError}
+          onOpenAddCatModal={onOpenAddCatModal}
+          onFileUpload={(e) => handleFileUpload(e, 'proc')}
+          onSaveProcedure={onSaveProcedure}
+          onClose={onClose}
+        />
       )}
 
-      {/* 3. MODAL EDITAR CONTATOS (WHATSAPP, INSTAGRAM, ENDEREÇO) */}
       {activeModal === 'social' && (
-        <div className="lm-modal-card">
-          <h3 className="lm-modal-title">✏️ Editar Contatos</h3>
-          <p className="lm-modal-desc">Ajuste seu WhatsApp, Instagram e Cidade exibidos no catálogo:</p>
-
-          <div className="lm-form-group">
-            <label>WHATSAPP (COM DDD) *</label>
-            <input
-              type="text"
-              value={socialForm.whatsapp}
-              onChange={(e) => setSocialForm({ ...socialForm, whatsapp: e.target.value })}
-              placeholder="Ex: 11999998888"
-            />
-          </div>
-
-          <div className="lm-form-group">
-            <label>INSTAGRAM (@USUARIO)</label>
-            <input
-              type="text"
-              value={socialForm.instagram}
-              onChange={(e) => setSocialForm({ ...socialForm, instagram: e.target.value })}
-              placeholder="Ex: @studio.exemplo"
-            />
-          </div>
-
-          <div className="lm-form-group">
-            <label>CIDADE E ESTADO</label>
-            <input
-              type="text"
-              value={socialForm.address}
-              onChange={(e) => setSocialForm({ ...socialForm, address: e.target.value })}
-              placeholder="Ex: Piraúba - Minas Gerais"
-            />
-          </div>
-
-          <div className="lm-modal-actions">
-            <button type="button" className="lm-modal-btn lm-modal-btn-cancel" onClick={onClose}>
-              Cancelar
-            </button>
-            <button
-              type="button"
-              className="lm-modal-btn lm-modal-btn-confirm"
-              onClick={() => {
-                onSaveSocial('whatsapp', socialForm.whatsapp);
-                onSaveSocial('instagram', socialForm.instagram);
-                onSaveSocial('address', socialForm.address);
-                onClose();
-              }}
-            >
-              💾 Salvar Contatos
-            </button>
-          </div>
-        </div>
+        <SocialModal socialForm={socialForm} setSocialForm={setSocialForm} onSaveSocial={onSaveSocial} onClose={onClose} />
       )}
 
-      {/* 4. MODAL CRIAR CATEGORIA (MATCHING PRINT 5 EXACTLY) */}
       {activeModal === 'category' && (
-        <div className="lm-modal-card">
-          <h3 className="lm-modal-title">➕ Criar Nova Categoria</h3>
-          <p className="lm-modal-desc">Digite o nome da nova categoria para organizar seus procedimentos:</p>
-
-          <div className="lm-form-group">
-            <label>NOME DA CATEGORIA *</label>
-            <input
-              type="text"
-              value={newCatName}
-              onChange={(e) => setNewCatName(e.target.value)}
-              placeholder="Ex: Lash Lifting, Micropigmentação, Cursos..."
-            />
-          </div>
-
-          <div className="lm-modal-actions">
-            <button type="button" className="lm-modal-btn lm-modal-btn-cancel" onClick={onClose}>
-              Cancelar
-            </button>
-            <button
-              type="button"
-              className="lm-modal-btn lm-modal-btn-confirm"
-              onClick={() => {
-                if (newCatName.trim()) {
-                  const catName = newCatName.trim();
-                  setNewCatName('');
-                  onAddCategory(catName);
-                } else {
-                  onClose();
-                }
-              }}
-            >
-              ✨ Criar Categoria
-            </button>
-          </div>
-        </div>
+        <CategoryModal newCatName={newCatName} setNewCatName={setNewCatName} onAddCategory={onAddCategory} onClose={onClose} />
       )}
 
-      {/* 5. MODAL DE CONFIRMAÇÃO E RESUMO DE ALTERAÇÕES */}
-      {activeModal === 'save_confirm' && (
-        <div className="lm-modal-card">
-          <h3 className="lm-modal-title">✨ Publicar Alterações</h3>
-          <p className="lm-modal-desc">
-            Confira o resumo das alterações antes de publicar no seu catálogo:
-          </p>
-
-          <div className="lm-save-summary-container">
-            {getChangesSummary().map((itemText, idx) => (
-              <div key={idx} className="lm-save-summary-item">
-                {itemText}
-              </div>
-            ))}
-          </div>
-
-          <div className="lm-modal-actions">
-            <button
-              type="button"
-              className="lm-modal-btn lm-modal-btn-cancel"
-              onClick={onClose}
-              disabled={isSaving}
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              className="lm-modal-btn lm-modal-btn-confirm"
-              onClick={onConfirmSaveDatabase}
-              disabled={isSaving}
-            >
-              {isSaving ? 'Publicando...' : '🚀 Confirmar'}
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* 6. MODAL DE SUCESSO DO SISTEMA */}
-      {activeModal === 'save_success' && (
-        <div className="lm-modal-card" style={{ textAlign: 'center' }}>
-          <div
-            style={{
-              width: '54px',
-              height: '54px',
-              borderRadius: '50%',
-              background: 'rgba(16, 185, 129, 0.12)',
-              color: '#10b981',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 14px auto',
-            }}
-          >
-            <CheckCircle className="w-7 h-7" />
-          </div>
-          <h3 className="lm-modal-title" style={{ fontSize: '1.3rem' }}>
-            Catálogo Publicado!
-          </h3>
-          <p className="lm-modal-desc" style={{ marginBottom: '22px' }}>
-            Suas alterações foram salvas com sucesso e já estão ao vivo no seu catálogo online!
-          </p>
-
-          <div className="lm-modal-actions">
-            <button
-              type="button"
-              className="lm-modal-btn lm-modal-btn-confirm"
-              onClick={onClose}
-              style={{ width: '100%', flex: '1 1 100%' }}
-            >
-              ✨ Entendido!
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* 7. MODAL DE ERRO DO SISTEMA (SUBSTITUI BROWSER ALERTS) */}
-      {activeModal === 'save_error' && (
-        <div className="lm-modal-card" style={{ textAlign: 'center' }}>
-          <div
-            style={{
-              width: '54px',
-              height: '54px',
-              borderRadius: '50%',
-              background: 'rgba(239, 68, 68, 0.12)',
-              color: '#ef4444',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 14px auto',
-            }}
-          >
-            <span style={{ fontSize: '24px' }}>⚠️</span>
-          </div>
-          <h3 className="lm-modal-title" style={{ color: '#ef4444', fontSize: '1.25rem' }}>
-            Ops! Algo deu errado
-          </h3>
-          <p className="lm-modal-desc" style={{ color: '#4a3239', marginBottom: '22px' }}>
-            {errorMessage || 'Ocorreu um erro ao tentar salvar as alterações no catálogo.'}
-          </p>
-
-          <div className="lm-modal-actions">
-            <button
-              type="button"
-              className="lm-modal-btn lm-modal-btn-cancel"
-              onClick={onClose}
-              style={{ width: '100%', flex: '1 1 100%', background: '#f4e6e9', color: '#6b4c55' }}
-            >
-              Entendido
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* 8. MODAL DE BLOQUEIO DE EXCLUSÃO DE CATEGORIA COM PROCEDIMENTOS VINCULADOS */}
-      {activeModal === 'category_delete_blocked' && (
-        <div className="lm-modal-card" style={{ textAlign: 'center' }}>
-          <div
-            style={{
-              width: '54px',
-              height: '54px',
-              borderRadius: '50%',
-              background: 'rgba(239, 68, 68, 0.12)',
-              color: '#ef4444',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 14px auto',
-            }}
-          >
-            <span style={{ fontSize: '24px' }}>🛑</span>
-          </div>
-          <h3 className="lm-modal-title" style={{ color: '#c04b6b', fontSize: '1.25rem' }}>
-            Não é possível excluir
-          </h3>
-          <p className="lm-modal-desc" style={{ color: '#4a3239', marginBottom: '22px', lineHeight: '1.5' }}>
-            A categoria <strong>"{categoryToDelete?.name}"</strong> possui <strong>{categoryToDelete?.count} procedimento(s)</strong> vinculado(s).
-            <br />
-            Para excluí-la, remova ou altere a categoria desses procedimentos primeiro.
-          </p>
-
-          <div className="lm-modal-actions">
-            <button
-              type="button"
-              className="lm-modal-btn lm-modal-btn-confirm"
-              onClick={onClose}
-              style={{ width: '100%', flex: '1 1 100%' }}
-            >
-              ✨ Entendido!
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* 9. MODAL DE CONFIRMAÇÃO DE EXCLUSÃO DE CATEGORIA VAZIA */}
-      {activeModal === 'category_delete_confirm' && (
-        <div className="lm-modal-card">
-          <h3 className="lm-modal-title">🗑️ Excluir Categoria</h3>
-          <p className="lm-modal-desc">
-            Tem certeza que deseja excluir a categoria <strong>"{categoryToDelete?.name}"</strong>?
-          </p>
-
-          <div className="lm-modal-actions">
-            <button type="button" className="lm-modal-btn lm-modal-btn-cancel" onClick={onClose}>
-              Cancelar
-            </button>
-            <button
-              type="button"
-              className="lm-modal-btn lm-modal-btn-confirm"
-              style={{ background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)' }}
-              onClick={() => {
-                if (onConfirmDeleteCategory) onConfirmDeleteCategory();
-              }}
-            >
-              🗑️ Excluir Categoria
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* 10. MODAL DE CONFIRMAÇÃO DE EXCLUSÃO DE PROCEDIMENTO */}
-      {activeModal === 'proc_delete_confirm' && (
-        <div className="lm-modal-card">
-          <h3 className="lm-modal-title">🗑️ Excluir Procedimento</h3>
-          <p className="lm-modal-desc">
-            Tem certeza que deseja excluir o procedimento <strong>"{procToDelete?.title}"</strong>?
-          </p>
-
-          <div className="lm-modal-actions">
-            <button type="button" className="lm-modal-btn lm-modal-btn-cancel" onClick={onClose}>
-              Cancelar
-            </button>
-            <button
-              type="button"
-              className="lm-modal-btn lm-modal-btn-confirm"
-              style={{ background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)' }}
-              onClick={() => {
-                if (onConfirmDeleteProc) onConfirmDeleteProc();
-              }}
-            >
-              🗑️ Excluir Procedimento
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* 11. MODAL DE CONFIRMAÇÃO DE DESCARTAR ALTERAÇÕES (RESET) */}
-      {activeModal === 'discard_confirm' && (
-        <div className="lm-modal-card">
-          <h3 className="lm-modal-title">🗑️ Descartar Alterações</h3>
-          <p className="lm-modal-desc">
-            Deseja descartar todas as alterações não salvas da sessão de edição?
-          </p>
-
-          <div className="lm-modal-actions">
-            <button type="button" className="lm-modal-btn lm-modal-btn-cancel" onClick={onClose}>
-              Cancelar
-            </button>
-            <button
-              type="button"
-              className="lm-modal-btn lm-modal-btn-confirm"
-              style={{ background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)' }}
-              onClick={() => {
-                if (onConfirmDiscard) onConfirmDiscard();
-              }}
-            >
-              🗑️ Descartar Alterações
-            </button>
-          </div>
-        </div>
-      )}
+      {activeModal !== 'cover' &&
+        activeModal !== 'procedure' &&
+        activeModal !== 'social' &&
+        activeModal !== 'category' && (
+          <ConfirmModals
+            activeModal={activeModal}
+            changesSummary={getChangesSummary()}
+            isSaving={isSaving}
+            errorMessage={errorMessage}
+            categoryToDelete={categoryToDelete}
+            procToDelete={procToDelete}
+            onClose={onClose}
+            onConfirmSaveDatabase={onConfirmSaveDatabase}
+            onConfirmDeleteCategory={onConfirmDeleteCategory}
+            onConfirmDeleteProc={onConfirmDeleteProc}
+            onConfirmDiscard={onConfirmDiscard}
+          />
+        )}
     </div>
   );
 };
-
