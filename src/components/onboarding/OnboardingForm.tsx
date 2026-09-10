@@ -1,24 +1,25 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { NicheType, LayoutModel, ThemeVariant, ProcedureItem } from '@/types/catalog';
+import { formatPhoneBR } from '@/lib/format';
+import { NicheType, LayoutModel, ThemeVariant } from '@/types/catalog';
 import { nichePresetsMap } from '@/data/niche-presets';
+import { CatalogLayout } from '@/components/catalog/CatalogLayout';
+import { StylePickerPanel } from '@/components/catalog/StylePickerPanel';
 import {
   Sparkles,
   ArrowRight,
   ArrowLeft,
-  Check,
-  Plus,
-  Trash2,
-  Scissors,
-  Palette,
-  Layers,
   UserCheck,
   Clock,
   ClipboardList,
   Gem,
   Lightbulb,
+  Scissors,
+  Sparkle,
+  Layers,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -29,109 +30,98 @@ interface OnboardingFormProps {
   withWelcome?: boolean;
 }
 
+const NICHE_OPTIONS: { value: NicheType; label: string; sublabel: string; icon: React.ReactNode }[] = [
+  { value: 'lash', label: 'Lash Designer', sublabel: 'Cílios & Sobrancelhas', icon: <Sparkle className="w-5 h-5" /> },
+  { value: 'nail', label: 'Nail Designer', sublabel: 'Unhas de Gel & Nail Art', icon: <Gem className="w-5 h-5" /> },
+  { value: 'estetica', label: 'Estética', sublabel: 'Clínica Facial & Corporal', icon: <Sparkles className="w-5 h-5" /> },
+  { value: 'studio', label: 'Studio de Beleza', sublabel: 'Multi-serviços', icon: <Layers className="w-5 h-5" /> },
+];
+
 export function OnboardingForm({ withWelcome = false }: OnboardingFormProps) {
+  const router = useRouter();
+
   // Etapa 0: Tela de Boas-vindas (opcional)
   const [showWelcome, setShowWelcome] = useState(withWelcome);
   const [showLaterNote, setShowLaterNote] = useState(false);
 
-  // Estado das Etapas
+  // Estado das Etapas (1: Identidade, 2: Nicho, 3: Estilo ao vivo)
   const [currentStep, setCurrentStep] = useState(1);
 
-  // Estados dos Dados do Formulário
   const [clientName, setClientName] = useState('');
-  const [studioName, setStudioName] = useState('');
+  const [whatsappDisplay, setWhatsappDisplay] = useState('');
   const [niche, setNiche] = useState<NicheType>('lash');
-  const [whatsappNumber, setWhatsappNumber] = useState('');
-  const [instagramHandle, setInstagramHandle] = useState('');
-  const [address, setAddress] = useState('');
 
-  const [layoutModel, setLayoutModel] = useState<LayoutModel>('mosaico');
-  const [themeVariant, setThemeVariant] = useState<ThemeVariant>('rose');
-
-  const [coverMediaUrl, setCoverMediaUrl] = useState('');
-  const [heroPhrase, setHeroPhrase] = useState('');
-
-  const [procedures, setProcedures] = useState<ProcedureItem[]>(nichePresetsMap.lash.procedures);
-
-  // Ao trocar o nicho, recarrega os procedimentos padrão do preset correspondente
-  const handleNicheChange = (newNiche: NicheType) => {
-    setNiche(newNiche);
-    setProcedures(nichePresetsMap[newNiche].procedures);
-  };
-
-  const [tolerances, setTolerances] = useState('Tolerância máxima de 15 minutos de atraso.');
+  const preset = nichePresetsMap[niche];
+  const [layoutModel, setLayoutModel] = useState<LayoutModel>(preset.layout_model);
+  const [themeVariant, setThemeVariant] = useState<ThemeVariant>(preset.theme_variant);
+  const [onCoverScreen, setOnCoverScreen] = useState(true);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [successSlug, setSuccessSlug] = useState<string | null>(null);
-  const [successEditToken, setSuccessEditToken] = useState<string | null>(null);
-  const [linkCopied, setLinkCopied] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
-  // Funções de manipulação de procedimentos
-  const addProcedure = () => {
-    const newProc: ProcedureItem = {
-      id: String(Date.now()),
-      title: '',
-      price: '',
-      duration: '1h',
-      category: niche === 'nail' ? 'Unhas' : niche === 'estetica' ? 'Facial' : 'Geral',
-      description: '',
-    };
-    setProcedures([...procedures, newProc]);
-  };
+  const whatsappDigits = whatsappDisplay.replace(/\D/g, '');
 
-  const removeProcedure = (id: string) => {
-    setProcedures(procedures.filter((p) => p.id !== id));
-  };
+  // No Passo 3 (preview ao vivo): na capa destaca o Tema; a partir da tela de
+  // procedimentos em diante, destaca o Modelo. Mesmo comportamento do Showroom.
+  useEffect(() => {
+    if (currentStep !== 3) return;
+    const heroEl = document.getElementById('hero');
+    if (!heroEl) return;
 
-  const updateProcedure = (id: string, field: keyof ProcedureItem, val: any) => {
-    setProcedures(
-      procedures.map((p) => (p.id === id ? { ...p, [field]: val } : p))
+    const observer = new IntersectionObserver(
+      ([entry]) => setOnCoverScreen(entry.isIntersecting),
+      { threshold: 0.5 }
     );
+    observer.observe(heroEl);
+    return () => observer.disconnect();
+  }, [currentStep, niche, layoutModel, themeVariant]);
+
+  // Ao trocar o nicho, reseta modelo/tema pro padrão do preset correspondente
+  const handleNicheChange = (newNiche: NicheType) => {
+    setNiche(newNiche);
+    setLayoutModel(nichePresetsMap[newNiche].layout_model);
+    setThemeVariant(nichePresetsMap[newNiche].theme_variant);
   };
 
-  // Envio Final para o Supabase
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Publicação Final no Supabase — cria o pedido e já redireciona pro catálogo real,
+  // em modo edição, com os dados do preset do nicho + estilo escolhidos ao vivo
+  const handleCreateCatalog = async () => {
     setIsSubmitting(true);
     setErrorMsg('');
 
     try {
-      // Gerar slug a partir do nome do estúdio ou cliente
-      const baseSlug = (studioName || clientName || 'studio')
+      const baseSlug = clientName
         .toLowerCase()
         .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[̀-ͯ]/g, '')
         .replace(/[^a-z0-9]/g, '-')
         .replace(/-+/g, '-')
         .replace(/^-|-$/g, '');
 
       const finalSlug = `${baseSlug}-${Math.floor(100 + Math.random() * 900)}`;
 
-      // Preset do nicho escolhido: preenche campos padrão que o formulário ainda não coleta
-      const preset = nichePresetsMap[niche];
+      const coverUrl =
+        layoutModel === 'classico' ? '/modelos/classico/assets/img/Hero.png' : '/modelos/mosaico/assets/img/Hero.png';
 
-      // 1. Gravar na tabela `orders`
       const { data: orderData, error: orderErr } = await supabase
         .from('orders')
         .insert({
           slug: finalSlug,
           client_name: clientName,
-          studio_name: studioName || `Studio ${clientName}`,
-          hero_phrase: heroPhrase || preset.hero_phrase || 'A arte de transformar a sua beleza com leveza e precisão.',
+          hero_phrase: preset.hero_phrase,
           bio_description: preset.bio_description || '',
-          cover_media_url: coverMediaUrl || preset.cover_media_url || 'https://lashmenu.com/modelos/mosaico/assets/img/Hero.png',
-          avatar_url: coverMediaUrl || preset.avatar_url || 'https://lashmenu.com/modelos/mosaico/assets/img/Hero.png',
+          cover_media_url: coverUrl,
+          avatar_url: coverUrl,
           instructions_bg_url: preset.instructions_bg_url || null,
           final_screen_bg_url: preset.final_screen_bg_url || null,
           cta_bg_url: preset.cta_bg_url || null,
           niche: niche,
           layout_model: layoutModel,
           theme_variant: themeVariant,
-          whatsapp_number: whatsappNumber.replace(/\D/g, ''),
-          instagram_handle: instagramHandle,
-          address: address,
-          tolerances: tolerances,
+          whatsapp_number: whatsappDigits,
+          instagram_handle: '',
+          address: '',
+          tolerances: preset.instructions?.tolerances || 'Tolerância máxima de 15 minutos de atraso.',
           pre_care: preset.instructions?.pre_care || [],
           post_care: preset.instructions?.post_care || [],
           categories: [],
@@ -139,16 +129,13 @@ export function OnboardingForm({ withWelcome = false }: OnboardingFormProps) {
         .select()
         .single();
 
-      if (orderErr) {
-        throw new Error(orderErr.message);
-      }
+      if (orderErr) throw new Error(orderErr.message);
 
-      // 2. Gravar serviços na tabela `order_services`
-      if (orderData && procedures.length > 0) {
-        const servicesPayload = procedures.map((p, index) => ({
+      if (orderData && preset.procedures.length > 0) {
+        const servicesPayload = preset.procedures.map((p, index) => ({
           order_id: orderData.id,
           order_index: index,
-          title: p.title || 'Procedimento sem nome',
+          title: p.title,
           description: p.description || '',
           price: p.price || 'Sob Consulta',
           duration: p.duration || '',
@@ -160,13 +147,8 @@ export function OnboardingForm({ withWelcome = false }: OnboardingFormProps) {
         }));
 
         const { error: servicesErr } = await supabase.from('order_services').insert(servicesPayload);
-        if (servicesErr) {
-          throw new Error(servicesErr.message);
-        }
+        if (servicesErr) throw new Error(servicesErr.message);
       }
-
-      setSuccessSlug(finalSlug);
-      setSuccessEditToken(orderData?.edit_token || null);
 
       // Notifica o admin no Telegram (não bloqueia o fluxo se falhar)
       fetch('/api/notify-telegram', {
@@ -174,18 +156,19 @@ export function OnboardingForm({ withWelcome = false }: OnboardingFormProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           clientName,
-          whatsapp: whatsappNumber,
-          instagram: instagramHandle,
+          whatsapp: whatsappDigits,
           layoutModel,
           themeVariant,
           slug: finalSlug,
           editToken: orderData?.edit_token,
         }),
       }).catch((err) => console.warn('Aviso: falha ao notificar Telegram:', err));
+
+      // Cai direto no catálogo real, já em modo edição, com o overlay de boas-vindas
+      router.push(`/c/${finalSlug}?edit=${orderData?.edit_token}&new=1`);
     } catch (err: any) {
-      console.error('Erro ao salvar no Supabase:', err);
+      console.error('Erro ao criar catálogo no Supabase:', err);
       setErrorMsg(err.message || 'Erro ao criar o catálogo. Tente novamente.');
-    } finally {
       setIsSubmitting(false);
     }
   };
@@ -213,7 +196,7 @@ export function OnboardingForm({ withWelcome = false }: OnboardingFormProps) {
                 <span className="text-rose-400 italic">Seu catálogo oficial está a poucos minutos de ir ao ar.</span>
               </h1>
               <p className="text-xs text-slate-400 mt-3 leading-relaxed">
-                Preparamos este assistente prático para você personalizar seu catálogo interativo com seu nome, modelo preferido, procedimentos e fotos em poucos cliques.
+                Você vai criar seu catálogo já vendo como ele fica de verdade, ao vivo — nada de preencher formulário às cegas.
               </p>
             </div>
 
@@ -221,12 +204,12 @@ export function OnboardingForm({ withWelcome = false }: OnboardingFormProps) {
               <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
                 <Clock className="w-5 h-5 text-rose-400" />
                 <h3 className="font-bold text-xs text-white">Rápido & Prático</h3>
-                <p className="text-[11px] text-slate-400 leading-snug">Menos de 10 minutos para preencher tudo.</p>
+                <p className="text-[11px] text-slate-400 leading-snug">Menos de 2 minutos até ver seu catálogo no ar.</p>
               </div>
               <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
                 <ClipboardList className="w-5 h-5 text-rose-400" />
-                <h3 className="font-bold text-xs text-white">4 Etapas Guiadas</h3>
-                <p className="text-[11px] text-slate-400 leading-snug">Identidade, Modelo, Capa e Procedimentos.</p>
+                <h3 className="font-bold text-xs text-white">Feedback Visual</h3>
+                <p className="text-[11px] text-slate-400 leading-snug">Você escolhe o estilo já vendo o resultado real.</p>
               </div>
               <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
                 <Gem className="w-5 h-5 text-rose-400" />
@@ -238,7 +221,8 @@ export function OnboardingForm({ withWelcome = false }: OnboardingFormProps) {
             <div className="flex items-start gap-2.5 p-3.5 rounded-2xl bg-white/[0.03] border border-slate-800">
               <Lightbulb className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
               <p className="text-[11px] text-slate-400 leading-relaxed">
-                <strong className="text-slate-200">Não pode preencher tudo agora?</strong> Sem problemas! Você pode fechar esta página e voltar a este mesmo link quando tiver suas fotos e tabela de preços em mãos.
+                <strong className="text-slate-200">Não pode preencher tudo agora?</strong> Sem problemas! Depois de criado,
+                você pode fechar e voltar ao catálogo quando quiser usando o link mágico de edição.
               </p>
             </div>
 
@@ -248,7 +232,7 @@ export function OnboardingForm({ withWelcome = false }: OnboardingFormProps) {
                 onClick={() => setShowWelcome(false)}
                 className="w-full py-3.5 rounded-xl bg-gradient-to-r from-rose-500 to-rose-600 hover:opacity-95 font-bold text-xs tracking-wider uppercase text-white flex items-center justify-center gap-2 shadow-lg"
               >
-                <span>✨ Sim, quero personalizar meu catálogo agora!</span>
+                <span>✨ Sim, quero criar meu catálogo agora!</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
               <button
@@ -261,7 +245,7 @@ export function OnboardingForm({ withWelcome = false }: OnboardingFormProps) {
 
               {showLaterNote && (
                 <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 text-[11px] text-slate-400 leading-relaxed text-center">
-                  Sem problemas! Guarde este link — quando estiver pronta com fotos e tabela de preços, é só voltar aqui para personalizar seu catálogo oficial. 💖
+                  Sem problemas! Guarde este link — quando estiver pronta, é só voltar aqui pra criar seu catálogo oficial. 💖
                 </div>
               )}
             </div>
@@ -271,61 +255,60 @@ export function OnboardingForm({ withWelcome = false }: OnboardingFormProps) {
     );
   }
 
-  // Se já tiver sido gerado com sucesso
-  if (successSlug) {
+  // PASSO 3: Estilo ao Vivo — preview real em tela cheia do catálogo, com o painel
+  // flutuante de Personalizar (Tema/Modelo) e um CTA fixo pra confirmar a criação.
+  if (currentStep === 3) {
+    const previewCatalog = {
+      ...preset,
+      client_name: clientName || preset.client_name,
+      whatsapp_number: whatsappDigits || preset.whatsapp_number,
+      layout_model: layoutModel,
+      theme_variant: themeVariant,
+      cover_media_url:
+        layoutModel === 'classico' ? '/modelos/classico/assets/img/Hero.png' : '/modelos/mosaico/assets/img/Hero.png',
+      avatar_url:
+        layoutModel === 'classico' ? '/modelos/classico/assets/img/Hero.png' : '/modelos/mosaico/assets/img/Hero.png',
+    };
+
     return (
-      <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center p-6 text-center">
-        <div className="max-w-md w-full p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl space-y-5">
-          <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto text-2xl font-bold">
-            <Check className="w-8 h-8" />
-          </div>
-          <h1 className="font-serif text-3xl font-bold">Catálogo Criado!</h1>
-          <p className="text-xs text-slate-300 leading-relaxed">
-            Seu catálogo no **StudioMenu** foi publicado com sucesso no endereço:
-          </p>
-          <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 font-mono text-sm text-rose-400 break-all">
-            studiomenu.art/c/{successSlug}
-          </div>
+      <div className="relative min-h-screen pb-24">
+        <button
+          type="button"
+          onClick={() => setCurrentStep(2)}
+          className="fixed top-4 right-4 z-50 w-9 h-9 rounded-full bg-slate-950/90 backdrop-blur-xl border border-white/10 text-white flex items-center justify-center shadow-2xl"
+          title="Voltar"
+        >
+          <ArrowLeft className="w-4 h-4" />
+        </button>
 
-          {successEditToken && (
-            <div className="text-left space-y-1.5">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                Link Mágico de Edição (envie para a cliente)
-              </p>
-              <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 font-mono text-[11px] text-emerald-400 break-all">
-                studiomenu.art/c/{successSlug}?edit={successEditToken}
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  const url = `${window.location.origin}/c/${successSlug}?edit=${successEditToken}`;
-                  navigator.clipboard.writeText(url);
-                  setLinkCopied(true);
-                  setTimeout(() => setLinkCopied(false), 2000);
-                }}
-                className="w-full py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-xs font-bold tracking-wider uppercase transition-all"
-              >
-                {linkCopied ? '✓ Link Copiado!' : 'Copiar Link de Edição'}
-              </button>
-            </div>
-          )}
+        <StylePickerPanel
+          layoutModel={layoutModel}
+          themeVariant={themeVariant}
+          onChangeLayout={setLayoutModel}
+          onChangeTheme={setThemeVariant}
+          onCoverScreen={onCoverScreen}
+          defaultOpen
+        />
 
-          <div className="flex flex-col gap-2 pt-2">
-            <Link
-              href={`/c/${successSlug}`}
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-rose-500 to-rose-600 font-bold text-xs tracking-wider uppercase text-white shadow-lg"
-            >
-              VISUALIZAR CATÁLOGO AGORA
-            </Link>
-            <Link
-              href="/admin/catalogos"
-              className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300"
-            >
-              Ir para o Painel Administrativo
-            </Link>
+        <CatalogLayout data={previewCatalog} />
+
+        {errorMsg && (
+          <div className="fixed bottom-20 left-4 right-4 z-50 max-w-md mx-auto p-3 rounded-xl bg-rose-500/95 backdrop-blur text-white text-xs text-center font-medium shadow-2xl">
+            {errorMsg}
           </div>
+        )}
+
+        <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-gradient-to-t from-slate-950 via-slate-950/90 to-transparent">
+          <button
+            type="button"
+            onClick={handleCreateCatalog}
+            disabled={isSubmitting}
+            className="w-full max-w-md mx-auto flex items-center justify-center gap-2 py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 disabled:opacity-60 font-bold text-xs tracking-wider uppercase text-white shadow-2xl"
+          >
+            {isSubmitting ? 'Criando seu catálogo...' : '✨ Criar meu catálogo com esse estilo'}
+          </button>
         </div>
-      </main>
+      </div>
     );
   }
 
@@ -338,12 +321,12 @@ export function OnboardingForm({ withWelcome = false }: OnboardingFormProps) {
             Studio<span className="text-rose-400 font-normal italic">Menu</span>
           </Link>
           <p className="text-xs text-slate-400 uppercase tracking-widest font-semibold">
-            Formulário Oficial de Personalização
+            Criação Rápida do Catálogo
           </p>
 
           {/* Barra de Progresso de Passos */}
-          <div className="grid grid-cols-4 gap-2 mt-6 max-w-sm mx-auto">
-            {[1, 2, 3, 4].map((step) => (
+          <div className="grid grid-cols-3 gap-2 mt-6 max-w-xs mx-auto">
+            {[1, 2, 3].map((step) => (
               <div
                 key={step}
                 className={`h-1.5 rounded-full transition-all duration-300 ${
@@ -354,20 +337,19 @@ export function OnboardingForm({ withWelcome = false }: OnboardingFormProps) {
           </div>
         </header>
 
-        {/* Formulário Interativo Multi-Passos */}
-        <form onSubmit={handleSubmit} className="bg-slate-900/90 border border-slate-800/80 rounded-3xl p-6 shadow-2xl backdrop-blur-xl">
+        <div className="bg-slate-900/90 border border-slate-800/80 rounded-3xl p-6 shadow-2xl backdrop-blur-xl">
           {errorMsg && (
             <div className="mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs text-center font-medium">
               {errorMsg}
             </div>
           )}
 
-          {/* PASSO 1: Identidade & Nicho */}
+          {/* PASSO 1: Identidade */}
           {currentStep === 1 && (
             <div className="space-y-4">
               <div className="flex items-center gap-2 mb-2">
                 <UserCheck className="w-5 h-5 text-rose-400" />
-                <h2 className="font-serif text-xl font-bold text-white">1. Identidade & Nicho</h2>
+                <h2 className="font-serif text-xl font-bold text-white">1. Identidade</h2>
               </div>
 
               <div>
@@ -380,67 +362,17 @@ export function OnboardingForm({ withWelcome = false }: OnboardingFormProps) {
                   onChange={(e) => setClientName(e.target.value)}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:border-rose-500 focus:outline-none"
                 />
+                <p className="text-[10px] text-slate-500 mt-1">Esse será o nome do seu catálogo e do seu studio.</p>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Nome do Studio / Marca</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">WhatsApp com DDD *</label>
                 <input
-                  type="text"
-                  placeholder="Ex: Studio Mariana Alves"
-                  value={studioName}
-                  onChange={(e) => setStudioName(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:border-rose-500 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1 flex items-center gap-1">
-                  <Scissors className="w-3.5 h-3.5 text-rose-400" /> Seu Nicho de Atuação *
-                </label>
-                <select
-                  value={niche}
-                  onChange={(e) => handleNicheChange(e.target.value as NicheType)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:border-rose-500 focus:outline-none"
-                >
-                  <option value="lash">Lash Designer (Cílios & Sobrancelhas)</option>
-                  <option value="nail">Nail Designer (Unhas de Gel & Nail Art)</option>
-                  <option value="estetica">Estética / Clínica Facial & Corporal</option>
-                  <option value="studio">Studio de Beleza (Multi-serviços)</option>
-                </select>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">WhatsApp com DDD *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Ex: 62999999999"
-                    value={whatsappNumber}
-                    onChange={(e) => setWhatsappNumber(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:border-rose-500 focus:outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Instagram (@handle)</label>
-                  <input
-                    type="text"
-                    placeholder="@seu.studio"
-                    value={instagramHandle}
-                    onChange={(e) => setInstagramHandle(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:border-rose-500 focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Cidade / Endereço</label>
-                <input
-                  type="text"
-                  placeholder="Ex: São Paulo / Setor Bueno"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
+                  type="tel"
+                  required
+                  placeholder="(11) 99999-9999"
+                  value={whatsappDisplay}
+                  onChange={(e) => setWhatsappDisplay(formatPhoneBR(e.target.value))}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:border-rose-500 focus:outline-none"
                 />
               </div>
@@ -448,87 +380,45 @@ export function OnboardingForm({ withWelcome = false }: OnboardingFormProps) {
               <button
                 type="button"
                 onClick={() => setCurrentStep(2)}
-                disabled={!clientName || !whatsappNumber}
+                disabled={!clientName || whatsappDigits.length < 10}
                 className="w-full mt-4 py-3 rounded-xl bg-rose-500 hover:bg-rose-600 disabled:opacity-50 font-bold text-xs tracking-wider uppercase text-white flex items-center justify-center gap-2 shadow-lg"
               >
-                <span>Avançar para Modelo & Cores</span>
+                <span>Avançar para Nicho</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           )}
 
-          {/* PASSO 2: Modelo & Tema */}
+          {/* PASSO 2: Nicho */}
           {currentStep === 2 && (
             <div className="space-y-4">
               <div className="flex items-center gap-2 mb-2">
-                <Palette className="w-5 h-5 text-rose-400" />
-                <h2 className="font-serif text-xl font-bold text-white">2. Modelo & Tema Visual</h2>
+                <Scissors className="w-5 h-5 text-rose-400" />
+                <h2 className="font-serif text-xl font-bold text-white">2. Seu Nicho de Atuação</h2>
               </div>
+              <p className="text-[11px] text-slate-400 -mt-2">
+                Vamos usar isso pra sugerir procedimentos de exemplo, editáveis depois.
+              </p>
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-2">Escolha a Estrutura do Modelo *</label>
-                <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-3">
+                {NICHE_OPTIONS.map((opt) => (
                   <button
+                    key={opt.value}
                     type="button"
-                    onClick={() => setLayoutModel('mosaico')}
+                    onClick={() => handleNicheChange(opt.value)}
                     className={`p-4 rounded-2xl border text-left transition-all ${
-                      layoutModel === 'mosaico'
+                      niche === opt.value
                         ? 'border-rose-500 bg-rose-500/10 text-white'
                         : 'border-slate-800 bg-slate-950 text-slate-400'
                     }`}
                   >
-                    <div className="font-bold text-sm mb-1 flex items-center gap-1.5">
-                      <Layers className="w-4 h-4 text-rose-400" /> Mosaico
+                    <div className="font-bold text-sm mb-1 flex items-center gap-1.5 text-rose-400">
+                      {opt.icon}
                     </div>
-                    <p className="text-[11px] leading-tight">Grid interativo visual com cards sofisticados e foto em profundidade.</p>
+                    <div className="font-bold text-sm text-white">{opt.label}</div>
+                    <p className="text-[11px] leading-tight mt-0.5">{opt.sublabel}</p>
                   </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setLayoutModel('classico')}
-                    className={`p-4 rounded-2xl border text-left transition-all ${
-                      layoutModel === 'classico'
-                        ? 'border-rose-500 bg-rose-500/10 text-white'
-                        : 'border-slate-800 bg-slate-950 text-slate-400'
-                    }`}
-                  >
-                    <div className="font-bold text-sm mb-1 flex items-center gap-1.5">
-                      <Sparkles className="w-4 h-4 text-rose-400" /> Clássico
-                    </div>
-                    <p className="text-[11px] leading-tight">Lista editorial limpa, clássica e direta com foco nos procedimentos.</p>
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-2">Escolha o Tema de Cor *</label>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setThemeVariant('rose')}
-                    className={`p-4 rounded-2xl border text-left transition-all ${
-                      themeVariant === 'rose'
-                        ? 'border-rose-400 bg-rose-500/10 text-white'
-                        : 'border-slate-800 bg-slate-950 text-slate-400'
-                    }`}
-                  >
-                    <div className="font-bold text-sm mb-1">Modo Rosé 🌸</div>
-                    <p className="text-[11px] leading-tight">Rosa acetinado delicado com tons ameixa e visual romântico.</p>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setThemeVariant('luxury')}
-                    className={`p-4 rounded-2xl border text-left transition-all ${
-                      themeVariant === 'luxury'
-                        ? 'border-amber-400 bg-amber-500/10 text-white'
-                        : 'border-slate-800 bg-slate-950 text-slate-400'
-                    }`}
-                  >
-                    <div className="font-bold text-sm mb-1 text-amber-400">Modo Luxury 👑</div>
-                    <p className="text-[11px] leading-tight">Preto obsidian com dourado reluzente e estética luxuosa.</p>
-                  </button>
-                </div>
+                ))}
               </div>
 
               <div className="flex gap-2 pt-2">
@@ -544,153 +434,13 @@ export function OnboardingForm({ withWelcome = false }: OnboardingFormProps) {
                   onClick={() => setCurrentStep(3)}
                   className="w-2/3 py-3 rounded-xl bg-rose-500 hover:bg-rose-600 font-bold text-xs tracking-wider uppercase text-white flex items-center justify-center gap-2 shadow-lg"
                 >
-                  <span>Avançar para Foto & Capa</span>
+                  <span>Ver Meu Catálogo ao Vivo</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
             </div>
           )}
-
-          {/* PASSO 3: Foto & Frase Hero */}
-          {currentStep === 3 && (
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 mb-2">
-                <Sparkles className="w-5 h-5 text-rose-400" />
-                <h2 className="font-serif text-xl font-bold text-white">3. Foto de Capa & Apresentação</h2>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">URL da Foto de Capa / Foto de Perfil</label>
-                <input
-                  type="url"
-                  placeholder="https://suafoto.com/imagem.png"
-                  value={coverMediaUrl}
-                  onChange={(e) => setCoverMediaUrl(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:border-rose-500 focus:outline-none"
-                />
-                <p className="text-[10px] text-slate-500 mt-1">Cole o link direto da sua imagem. Se deixar em branco, usaremos o padrão profissional.</p>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Frase Principal de Apresentação (Hero)</label>
-                <textarea
-                  rows={2}
-                  placeholder="Ex: A arte de transformar o seu olhar com leveza e precisão."
-                  value={heroPhrase}
-                  onChange={(e) => setHeroPhrase(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:border-rose-500 focus:outline-none"
-                />
-              </div>
-
-              <div className="flex gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setCurrentStep(2)}
-                  className="w-1/3 py-3 rounded-xl bg-slate-800 text-slate-300 font-bold text-xs tracking-wider uppercase flex items-center justify-center gap-1"
-                >
-                  <ArrowLeft className="w-4 h-4" /> Volta
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setCurrentStep(4)}
-                  className="w-2/3 py-3 rounded-xl bg-rose-500 hover:bg-rose-600 font-bold text-xs tracking-wider uppercase text-white flex items-center justify-center gap-2 shadow-lg"
-                >
-                  <span>Avançar para Procedimentos</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* PASSO 4: Cadastrar Procedimentos & Publicar */}
-          {currentStep === 4 && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between mb-2">
-                <h2 className="font-serif text-xl font-bold text-white">4. Procedimentos ({procedures.length})</h2>
-                <button
-                  type="button"
-                  onClick={addProcedure}
-                  className="px-3 py-1.5 rounded-lg bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs font-bold flex items-center gap-1"
-                >
-                  <Plus className="w-3.5 h-3.5" /> Adicionar
-                </button>
-              </div>
-
-              {/* Lista Dinâmica de Procedimentos */}
-              <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
-                {procedures.map((proc, index) => (
-                  <div key={proc.id} className="p-3.5 bg-slate-950 rounded-2xl border border-slate-800 space-y-2.5 relative">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-rose-400">
-                        Item #{index + 1}
-                      </span>
-                      {procedures.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => removeProcedure(proc.id)}
-                          className="text-slate-500 hover:text-rose-400 p-1"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                      <input
-                        type="text"
-                        placeholder="Nome do Serviço"
-                        value={proc.title}
-                        onChange={(e) => updateProcedure(proc.id, 'title', e.target.value)}
-                        className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-white"
-                      />
-                      <input
-                        type="text"
-                        placeholder="Valor (Ex: 180,00)"
-                        value={proc.price}
-                        onChange={(e) => updateProcedure(proc.id, 'price', e.target.value)}
-                        className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-white"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                      <input
-                        type="text"
-                        placeholder="Duração (Ex: 1h30)"
-                        value={proc.duration}
-                        onChange={(e) => updateProcedure(proc.id, 'duration', e.target.value)}
-                        className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-white"
-                      />
-                      <input
-                        type="text"
-                        placeholder="Categoria (Ex: Cílios, Unhas)"
-                        value={proc.category}
-                        onChange={(e) => updateProcedure(proc.id, 'category', e.target.value)}
-                        className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-white"
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="flex gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setCurrentStep(3)}
-                  className="w-1/3 py-3 rounded-xl bg-slate-800 text-slate-300 font-bold text-xs tracking-wider uppercase"
-                >
-                  Volta
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-2/3 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 disabled:opacity-50 font-bold text-xs tracking-wider uppercase text-white shadow-lg flex items-center justify-center gap-2"
-                >
-                  {isSubmitting ? 'Gerando Catálogo...' : '✨ PUBLICAR MEU CATÁLOGO'}
-                </button>
-              </div>
-            </div>
-          )}
-        </form>
+        </div>
       </div>
     </main>
   );

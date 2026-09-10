@@ -11,6 +11,7 @@ interface VisualEditorBottomBarProps {
   onUndo: () => void;
   onRedo: () => void;
   onToggleTheme: () => void;
+  onToggleLayout: () => void;
   onDiscard: () => void;
   onSave: () => void;
   isSaving: boolean;
@@ -24,11 +25,13 @@ export const VisualEditorBottomBar: React.FC<VisualEditorBottomBarProps> = ({
   onUndo,
   onRedo,
   onToggleTheme,
+  onToggleLayout,
   onDiscard,
   onSave,
   isSaving,
 }) => {
   const isLuxury = catalogData.theme_variant === 'luxury';
+  const isClassico = catalogData.layout_model === 'classico';
 
   return (
     <>
@@ -69,6 +72,15 @@ export const VisualEditorBottomBar: React.FC<VisualEditorBottomBarProps> = ({
             onClick={onToggleTheme}
           >
             {isLuxury ? '👑' : '🌸'}
+          </button>
+          <button
+            type="button"
+            className="lm-mb-btn"
+            id="lm-btn-layout"
+            title="Alternar Modelo (Mosaico / Clássico)"
+            onClick={onToggleLayout}
+          >
+            {isClassico ? '📋' : '🔲'}
           </button>
           <button
             type="button"

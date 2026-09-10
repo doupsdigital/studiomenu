@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useMemo, useEffect, useState } from 'react';
-import { CatalogOrderData, ProcedureItem, ThemeVariant } from '@/types/catalog';
+import { CatalogOrderData, ProcedureItem, ThemeVariant, LayoutModel } from '@/types/catalog';
 import { HeaderCover } from './HeaderCover';
 import { ProcedureGrid } from './ProcedureGrid';
 import { InstructionsSection } from './InstructionsSection';
 import { CTASection } from './CTASection';
 import { VisualEditorBottomBar } from './VisualEditorBottomBar';
 import { VisualEditorModals } from './VisualEditorModals';
+import { NewCatalogWelcomeOverlay } from './NewCatalogWelcomeOverlay';
 
 import '@/styles/visual-editor.css';
 
@@ -15,6 +16,7 @@ interface CatalogLayoutProps {
   data: CatalogOrderData;
   isEditMode?: boolean;
   editToken?: string;
+  isNewCatalog?: boolean;
   onThemeChange?: (theme: ThemeVariant) => void;
 }
 
@@ -22,8 +24,10 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
   data,
   isEditMode = false,
   editToken = '',
+  isNewCatalog = false,
   onThemeChange,
 }) => {
+  const [showWelcomeOverlay, setShowWelcomeOverlay] = useState(isNewCatalog);
   const [catalogState, setCatalogState] = useState<CatalogOrderData>(data);
   const [isSaved, setIsSaved] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -143,6 +147,13 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
     const nextTheme: ThemeVariant = catalogState.theme_variant === 'luxury' ? 'rose' : 'luxury';
     pushState({ ...catalogState, theme_variant: nextTheme });
     if (onThemeChange) onThemeChange(nextTheme);
+  };
+
+  // Alternar Modelo (Mosaico / Clássico)
+  const handleToggleLayout = () => {
+    const nextLayout: LayoutModel = catalogState.layout_model === 'classico' ? 'mosaico' : 'classico';
+    pushState({ ...catalogState, layout_model: nextLayout });
+    showToast('🔄 Modelo alterado!');
   };
 
   // Sincronizar data-theme no <body> para ativar as regras CSS do tema Luxury/Rosé
@@ -323,6 +334,15 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
       {/* 0. TOAST DE FEEDBACK DAS EDIÇÕES LOCAIS */}
       {isEditMode && toastMessage && <div className="lm-inline-toast">{toastMessage}</div>}
 
+      {/* 0.5 OVERLAY DE BOAS-VINDAS (SÓ NO PRIMEIRO ACESSO DE UM CATÁLOGO RECÉM-CRIADO) */}
+      {isEditMode && showWelcomeOverlay && (
+        <NewCatalogWelcomeOverlay
+          slug={catalogState.slug}
+          editToken={editToken}
+          onClose={() => setShowWelcomeOverlay(false)}
+        />
+      )}
+
       {/* 1. CONTROLES DO EDITOR VISUAL IN-PLACE (BARRA INFERIOR E TOP STATUS) */}
       {isEditMode && (
         <VisualEditorBottomBar
@@ -333,6 +353,7 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
           onUndo={handleUndo}
           onRedo={handleRedo}
           onToggleTheme={handleToggleTheme}
+          onToggleLayout={handleToggleLayout}
           onDiscard={handleDiscard}
           onSave={() => setActiveModal('save_confirm')}
           isSaving={isSaving}

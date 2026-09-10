@@ -18,7 +18,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 10px;
+  padding: 0 8px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(192, 75, 107, 0.2);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
@@ -108,17 +108,18 @@ body.has-lm-editor #contato {
 .lm-mb-btn-group {
   display: flex !important;
   align-items: center !important;
-  gap: 6px !important;
+  gap: 4px !important;
 }
 
 .lm-mb-btn {
   background: rgba(255, 255, 255, 0.08) !important;
   border: 1px solid rgba(255, 255, 255, 0.14) !important;
   color: #f5ede6 !important;
-  width: 38px !important;
-  height: 38px !important;
-  min-width: 38px !important;
-  min-height: 38px !important;
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  min-height: 34px !important;
+  font-size: 0.85rem !important;
   border-radius: 50% !important;
   display: flex !important;
   align-items: center !important;
@@ -147,10 +148,10 @@ html[data-theme="luxury"] .lm-mb-btn-save {
   border: none !important;
   color: #ffffff !important;
   font-weight: 700 !important;
-  font-size: 0.8rem !important;
-  padding: 0 18px !important;
-  height: 38px !important;
-  min-height: 38px !important;
+  font-size: 0.76rem !important;
+  padding: 0 14px !important;
+  height: 34px !important;
+  min-height: 34px !important;
   border-radius: 100px !important;
   display: flex !important;
   align-items: center !important;
@@ -694,6 +695,127 @@ body[data-theme="luxury"] .lm-btn-add-service {
   opacity: 0.3 !important;
   cursor: default !important;
   pointer-events: none !important;
+}
+
+/* ── OVERLAY DE BOAS-VINDAS DE CATÁLOGO RECÉM-CRIADO (PRIMEIRO ACESSO) ── */
+.lm-new-catalog-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(14, 10, 11, 0.72) !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+  z-index: 9999999 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 20px !important;
+  box-sizing: border-box !important;
+}
+
+.lm-new-catalog-card {
+  width: 100% !important;
+  max-width: 400px !important;
+  background: #fff8f9 !important;
+  border-radius: 28px !important;
+  padding: 28px 22px 22px 22px !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5) !important;
+  text-align: center !important;
+  color: #2b141b !important;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+.lm-new-catalog-icon {
+  width: 52px !important;
+  height: 52px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, #d85b7c 0%, #c04b6b 100%) !important;
+  color: #ffffff !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 auto 14px auto !important;
+  box-shadow: 0 8px 20px rgba(192, 75, 107, 0.4) !important;
+}
+
+.lm-new-catalog-card h2 {
+  font-size: 1.15rem !important;
+  font-weight: 700 !important;
+  color: #c04b6b !important;
+  margin: 0 0 8px 0 !important;
+}
+
+.lm-new-catalog-card p {
+  font-size: 0.82rem !important;
+  color: #7a525f !important;
+  line-height: 1.5 !important;
+  margin: 0 0 18px 0 !important;
+}
+
+.lm-new-catalog-link {
+  background: #fff0f3 !important;
+  border: 1.5px solid #f2bdc9 !important;
+  border-radius: 14px !important;
+  padding: 12px 14px !important;
+  margin-bottom: 18px !important;
+  text-align: left !important;
+}
+
+.lm-new-catalog-link-label {
+  display: block !important;
+  font-size: 0.65rem !important;
+  font-weight: 700 !important;
+  color: #b03e5e !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.03em !important;
+  margin-bottom: 6px !important;
+}
+
+.lm-new-catalog-link-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.lm-new-catalog-link-text {
+  flex: 1 1 0% !important;
+  font-size: 0.68rem !important;
+  font-family: monospace !important;
+  color: #2b141b !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.lm-new-catalog-copy-btn {
+  flex-shrink: 0 !important;
+  width: 30px !important;
+  height: 30px !important;
+  border-radius: 50% !important;
+  background: #c04b6b !important;
+  color: #ffffff !important;
+  border: none !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+}
+
+.lm-new-catalog-start-btn {
+  width: 100% !important;
+  height: 48px !important;
+  border-radius: 100px !important;
+  border: none !important;
+  background: linear-gradient(135deg, #d85b7c 0%, #c04b6b 100%) !important;
+  color: #ffffff !important;
+  font-size: 0.88rem !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  box-shadow: 0 6px 18px rgba(192, 75, 107, 0.4) !important;
+  transition: all 0.2s ease !important;
+}
+
+.lm-new-catalog-start-btn:active {
+  transform: scale(0.97) !important;
 }
 
 

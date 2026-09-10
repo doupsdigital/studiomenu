@@ -10,6 +10,7 @@ interface CatalogPageProps {
   }>;
   searchParams: Promise<{
     edit?: string;
+    new?: string;
   }>;
 }
 
@@ -57,7 +58,7 @@ export async function generateMetadata({ params }: CatalogPageProps): Promise<Me
 // 2. Renderização SSR Principal da Página do Catálogo do Cliente
 export default async function CatalogPage({ params, searchParams }: CatalogPageProps) {
   const { slug } = await params;
-  const { edit } = await searchParams;
+  const { edit, new: isNew } = await searchParams;
   const catalog = await getCatalogBySlug(slug);
 
   if (!catalog) {
@@ -85,5 +86,12 @@ export default async function CatalogPage({ params, searchParams }: CatalogPageP
 
   const isEditAuthorized = Boolean(edit && catalog.edit_token && edit === catalog.edit_token);
 
-  return <CatalogLayout data={catalog} isEditMode={isEditAuthorized} editToken={edit || ''} />;
+  return (
+    <CatalogLayout
+      data={catalog}
+      isEditMode={isEditAuthorized}
+      editToken={edit || ''}
+      isNewCatalog={isEditAuthorized && isNew === '1'}
+    />
+  );
 }
