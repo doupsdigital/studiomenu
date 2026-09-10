@@ -220,37 +220,24 @@ button {
       #f2cad5 100%);
 }
 
+/* Bloco selo+nome+frase+chips+botão ancorado como UM grupo só no rodapé do
+   hero (justify-content: flex-end + padding-bottom). Vale IGUAL pros dois
+   temas — só cor muda entre eles, nunca essa lógica de posição. */
 .hero__conteudo {
   position: relative;
   z-index: 3;
   height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  padding: 44px 24px 40px;
-}
-
-/* TEMA ROSE: o bloco selo+nome+frase+chips+botão anda junto, ancorado como
-   UM grupo só no rodapé do hero (justify-content: flex-end). Antes o selo
-   ficava preso no topo (via padding-top) e o resto era empurrado pro rodapé
-   separadamente (via margin-top:auto em .hero__titulo, ver abaixo) — dois
-   mecanismos diferentes, então a posição final dependia de quanto texto/chip
-   o cliente tinha. Agora é um grupo único: padding-bottom é o único controle
-   de "descer/subir o bloco todo". */
-body[data-theme="rose"] .hero__conteudo {
   justify-content: flex-end;
-  padding-bottom: 6px;
+  padding: 44px 24px 6px;
 }
 
+/* O selo sai do fluxo do grupo ancorado no rodapé e fica fixo perto do
+   topo da foto — igual nos dois temas. */
 .hero__selo {
   display: flex;
   justify-content: center;
-}
-
-/* Tema Rose: o selo sai do fluxo do grupo (que agora é ancorado no rodapé)
-   e fica fixo perto do topo da foto, igual estava originalmente — sem isso
-   ele seria puxado pra baixo junto com o resto do bloco. */
-body[data-theme="rose"] .hero__selo {
   position: absolute;
   top: 44px;
   left: 24px;
@@ -297,21 +284,15 @@ body[data-theme="rose"] .hero__selo {
   background: linear-gradient(to right, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0));
 }
 
+/* Espaçamento fixo entre o selo e o título (igual nos dois temas) — sem
+   isso o título voltaria a "grudar" no rodapé via auto-margin, com posição
+   dependendo de quanto texto/chip o cliente tem (bug antigo). */
 .hero__titulo {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  margin-top: auto;
-  margin-bottom: 12px;
-}
-
-/* Tema Rose: espaçamento fixo entre o selo e o título, já que o grupo
-   inteiro se move junto agora (ver body[data-theme="rose"] .hero__conteudo
-   acima) — sem isso o navegador ainda usaria a regra base (margin-top:auto)
-   dentro do grupo e o selo ficaria colado no título. */
-body[data-theme="rose"] .hero__titulo {
-  margin-top: 20px;
   gap: 10px;
+  margin-top: 20px;
+  margin-bottom: 12px;
 }
 
 .hero__titulo h1 {
@@ -368,14 +349,8 @@ body[data-theme="rose"] .hero__titulo {
   flex-wrap: wrap;
   gap: 8px;
   justify-content: flex-start;
-  margin: 10px 0 30px;
+  margin: 10px 0 18px;
   width: 100%;
-}
-
-/* Tema Rose: menos respiro entre os chips e o "Ver Catálogo" — esse era o
-   maior espaço solto do bloco. */
-body[data-theme="rose"] .hero__chips {
-  margin-bottom: 18px;
 }
 
 .hero__chip {
@@ -1566,38 +1541,19 @@ body[data-theme="luxury"] .secao-contato__foto {
 
 /* ==========================================================================
    1. HERO SECTION (SNAP SCREEN 1)
+   Layout/espaçamento/tamanho são os MESMOS do tema Rose (regras base acima
+   e sem seletor de tema) — aqui só entra o que é de fato cor/tom, pra nunca
+   mais os dois temas desalinharem estruturalmente.
    ========================================================================== */
 body[data-theme="luxury"] .hero {
-  min-height: 100vh;
-  width: 100%;
-  position: relative;
-  overflow: hidden;
   background: #14100e;
 }
 
-body[data-theme="luxury"] .hero__foto-wrap {
-  position: absolute;
-  inset: -12%;
-  overflow: hidden;
-}
-
-body[data-theme="luxury"] .hero--classico .hero__foto-wrap {
-  position: absolute !important;
-  inset: -15% !important;
-  overflow: hidden !important;
-}
-
 body[data-theme="luxury"] .hero__foto {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center 18% !important;
   filter: saturate(1.02) contrast(1.08) brightness(0.96);
 }
 
 body[data-theme="luxury"] .hero__scrim {
-  position: absolute;
-  inset: 0;
   background: linear-gradient(
     180deg,
     rgba(12, 10, 9, 0.35) 0%,
@@ -1607,177 +1563,72 @@ body[data-theme="luxury"] .hero__scrim {
   );
 }
 
-body[data-theme="luxury"] .hero__conteudo {
-  position: relative;
-  z-index: 3;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  padding: 44px 24px 16px;
-}
-
-body[data-theme="luxury"] .hero__selo {
-  display: flex;
-  justify-content: center;
-}
-
 body[data-theme="luxury"] .hero__selo span {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: .38em;
-  text-transform: uppercase;
   color: #f3efe9;
   background: rgba(25, 20, 17, 0.45);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  padding: 4px 14px;
-  border-radius: 999px;
-  border: 1px solid rgba(201, 163, 137, 0.35);
+  border-color: rgba(201, 163, 137, 0.35);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
 body[data-theme="luxury"] .hero__studio-label {
   color: #ffffff;
-  font-weight: 700;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
 }
 
-body[data-theme="luxury"] .hero__studio-divider {
-  height: 1.5px;
-  background: linear-gradient(to right, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0));
-}
-
-body[data-theme="luxury"] .hero__chips {
-  margin: 12px 0 20px;
-}
-
 body[data-theme="luxury"] .hero__chip {
-  padding: 8px 16px;
-  font-size: 10.5px;
-  letter-spacing: .12em;
-  line-height: 1.2;
-  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-color: rgba(255, 255, 255, 0.45);
   color: #0f0c0b;
   background: linear-gradient(135deg, #c9a389 0%, #dfa87a 100%);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(201, 163, 137, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.50);
   text-shadow: none;
-  font-weight: 700;
 }
 
 body[data-theme="luxury"] .hero__chip:hover {
   background: linear-gradient(135deg, #d8b298 0%, #ebb98e 100%);
   border-color: rgba(255, 255, 255, 0.70);
   color: #000000;
-  transform: translateY(-1px);
-}
-
-body[data-theme="luxury"] .hero__titulo {
-  margin-top: auto;
-  margin-bottom: 12px;
 }
 
 body[data-theme="luxury"] .hero__titulo h1 {
-  margin: 0;
-  font-family: 'Fraunces', Georgia, serif;
-  font-size: 40px;
-  line-height: 1.05;
-  font-weight: 400;
-  font-style: italic;
   color: #c9a389;
-  letter-spacing: -.02em;
 }
 
 body[data-theme="luxury"] .hero__titulo h1 em {
-  font-style: italic;
-  font-weight: 400;
   color: #c9a389;
 }
 
 body[data-theme="luxury"] .hero__filete {
-  width: 44px;
-  height: 2px;
   background: #c9a389;
 }
 
 body[data-theme="luxury"] .hero__frase {
-  margin: 0;
-  font-size: 18px;
-  line-height: 1.45;
   color: rgba(243, 239, 233, 0.85);
-  max-width: 340px;
 }
 
 body[data-theme="luxury"] .hero__frase-cilios {
-  margin: 0;
-  font-family: 'Fraunces', Georgia, serif;
-  font-size: 21px;
-  line-height: 1.25;
-  font-weight: 400;
-  font-style: italic;
   color: #f3efe9;
-  text-wrap: normal;
-}
-
-body[data-theme="luxury"] .hero__frase-cilios em {
-  font-style: italic;
-  color: inherit;
 }
 
 body[data-theme="luxury"] .hero__scroll-cue {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
   color: #c9a389;
-  text-decoration: none;
 }
 
 body[data-theme="luxury"] .hero__scroll-cue span {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: .32em;
-  text-transform: uppercase;
   color: #f3efe9;
   background: rgba(25, 20, 17, 0.45);
-  border: 1px solid rgba(201, 163, 137, 0.35);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  padding: 9px 24px;
-  border-radius: 999px;
+  border-color: rgba(201, 163, 137, 0.35);
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  transition: all 0.25s ease;
-  display: inline-block;
 }
 
 body[data-theme="luxury"] .hero__scroll-cue:hover span,
 body[data-theme="luxury"] .hero__scroll-cue:active span {
   background: rgba(25, 20, 17, 0.7);
   border-color: rgba(201, 163, 137, 0.6);
-  transform: translateY(-2px);
   box-shadow: 0 6px 22px rgba(0, 0, 0, 0.5);
 }
 
 body[data-theme="luxury"] .hero__scroll-linha {
-  width: 2px;
-  height: 38px;
   background: linear-gradient(180deg, #c9a389, transparent);
-  animation: heroPulseLinha 2.2s infinite ease-in-out;
-}
-
-@keyframes heroPulseLinha {
-  0%, 100% {
-    transform: scaleY(0.4);
-    opacity: 0.3;
-    transform-origin: top;
-  }
-  50% {
-    transform: scaleY(1);
-    opacity: 1;
-    transform-origin: top;
-  }
 }
 
 /* ==========================================================================
