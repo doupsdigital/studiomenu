@@ -1633,9 +1633,10 @@ html[data-theme="luxury"], body[data-theme="luxury"] {
   background: #0a0807;
   color: #f3efe9;
   --etiqueta-color: #c9a389;
-  /* Luxury não precisa do halo -- o scrim já é escuro/opaco o bastante
-     pra garantir contraste do texto dourado sozinho. */
-  --hero-title-shadow: none;
+  /* Luxury não precisa de halo pra contraste (o scrim já resolve sozinho)
+     -- aqui é puro efeito visual, um glow dourado quente na própria cor
+     do tema, dando aquela sensação de "brilho luxuoso" no nome. */
+  --hero-title-shadow: 0 1px 3px rgba(0, 0, 0, 0.6), 0 2px 18px rgba(201, 163, 137, 0.55), 0 0 32px rgba(201, 163, 137, 0.4);
 }
 
 /* Sem redeclarar height aqui: era o "min-height: 100vh" antigo que causava
