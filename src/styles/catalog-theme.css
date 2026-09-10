@@ -587,8 +587,7 @@ button {
 }
 
 /* Brilho prateado deslizando pela cápsula, em loop suave -- destaque sutil,
-   não muito frequente (repete a cada ~4.5s). Cada cápsula tem um pequeno
-   atraso diferente (nth-child) pra passar como uma onda, não sincronizado. */
+   todas as cápsulas brilham juntas, ao mesmo tempo (sem atraso entre elas). */
 .hero__chip::after {
   content: '';
   position: absolute;
@@ -598,27 +597,15 @@ button {
   height: 100%;
   background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.65) 50%, transparent 100%);
   transform: skewX(-20deg);
-  animation: heroChipShine 4.5s ease-in-out infinite;
+  animation: heroChipShine 7s ease-in-out infinite;
   pointer-events: none;
-}
-
-.hero__chip:nth-child(2)::after {
-  animation-delay: 0.6s;
-}
-
-.hero__chip:nth-child(3)::after {
-  animation-delay: 1.2s;
-}
-
-.hero__chip:nth-child(4)::after {
-  animation-delay: 1.8s;
 }
 
 @keyframes heroChipShine {
   0% {
     left: -60%;
   }
-  18% {
+  30% {
     left: 130%;
   }
   100% {
