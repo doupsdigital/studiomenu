@@ -167,6 +167,21 @@ export function OnboardingForm({ withWelcome = false }: OnboardingFormProps) {
 
       setSuccessSlug(finalSlug);
       setSuccessEditToken(orderData?.edit_token || null);
+
+      // Notifica o admin no Telegram (não bloqueia o fluxo se falhar)
+      fetch('/api/notify-telegram', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientName,
+          whatsapp: whatsappNumber,
+          instagram: instagramHandle,
+          layoutModel,
+          themeVariant,
+          slug: finalSlug,
+          editToken: orderData?.edit_token,
+        }),
+      }).catch((err) => console.warn('Aviso: falha ao notificar Telegram:', err));
     } catch (err: any) {
       console.error('Erro ao salvar no Supabase:', err);
       setErrorMsg(err.message || 'Erro ao criar o catálogo. Tente novamente.');
