@@ -66,23 +66,24 @@ body.has-lm-editor #contato {
 }
 
 /* Toast discreto de feedback pra cada edição local (antes de "Salvar").
-   Fundo sólido (não translúcido) + borda/glow verde -- garante contraste
-   tanto no tema Rose (fundo claro) quanto no Luxury (fundo já escuro,
-   onde um toast translúcido escuro sumia de vista). */
+   Verde esmeralda sólido -- mesma cor de "sucesso" já usada no modal
+   "Publicar Alterações" e nos toasts do /admin. Nem Rose (rosa) nem
+   Luxury (dourado/marrom) usam essa faixa de cor em nenhum lugar do
+   design, então sempre destaca da foto de capa por trás, nos dois temas. */
 .lm-inline-toast {
   position: fixed;
   top: 64px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 999995;
-  background: #14100e;
-  border: 1.5px solid #34d399;
+  background: #10b981;
+  border: 1.5px solid #6ee7b7;
   color: #ffffff;
   font-size: 0.88rem;
   font-weight: 700;
   padding: 13px 24px;
   border-radius: 100px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55), 0 0 0 4px rgba(52, 211, 153, 0.18);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), 0 0 0 4px rgba(16, 185, 129, 0.18);
   display: flex;
   align-items: center;
   gap: 6px;
