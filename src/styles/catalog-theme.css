@@ -496,6 +496,37 @@ button {
   margin-bottom: 12px;
 }
 
+/* EXCEÇÃO DELIBERADA à regra "layout igual nos dois temas" (a única desde
+   a Fase 2 da refatoração): painel de vidro (glassmorphism) atrás do nome
+   e da frase, só no Rose. Motivo: no Luxury o scrim da foto já fica
+   escuro/opaco o bastante pra garantir contraste do texto dourado sozinho,
+   não importa a foto do cliente. No Rose o véu é claro/translúcido, então
+   o contraste do nome dependia da foto de cada cliente ser "sortuda" ou
+   não (via -> Mariana Alves ficava ótimo, Vanessa Camargo ficava difícil
+   de ler). O painel resolve isso de vez, sem depender de sorte.
+   Como agora o fundo atrás de STUDIO/nome/frase é claro (não mais a foto
+   direto), o selo "STUDIO" e o traço precisam ficar escuros pra continuar
+   legíveis -- no resto do app eles são brancos porque ficam direto sobre
+   a foto. */
+body[data-theme="rose"] .hero__titulo {
+  background: rgba(255, 246, 248, 0.55);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 20px;
+  padding: 16px 18px;
+  box-shadow: 0 10px 28px rgba(70, 25, 40, 0.14);
+}
+
+body[data-theme="rose"] .hero__studio-label {
+  color: var(--hero-accent);
+  text-shadow: none;
+}
+
+body[data-theme="rose"] .hero__studio-divider {
+  background: linear-gradient(to right, rgba(169, 50, 89, 0.55), rgba(169, 50, 89, 0));
+}
+
 .hero__titulo h1 {
   margin: 0;
   padding: 2px 0;
