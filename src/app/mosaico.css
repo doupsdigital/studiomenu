@@ -53,6 +53,38 @@
   --hero-scroll-hover-border: rgba(169, 50, 89, 0.45);
   --hero-scroll-hover-shadow: 0 6px 22px rgba(169, 50, 89, 0.2);
   --hero-scroll-linha: linear-gradient(180deg, #a93259, transparent);
+
+  /* ---- Grade de Procedimentos ---- */
+  --grid-bg: #f2cad5;
+  --grid-text: #24141a;
+  --grid-title-color: #24141a;
+  --grid-title-em-color: #a93259;
+  --grid-sub-color: #553d46;
+  --chip-color: #6e5a62;
+  --chip-bg: #ffffff;
+  --chip-border: rgba(169, 50, 89, 0.20);
+  --chip-shadow: 0 2px 8px rgba(70, 25, 40, 0.04);
+  --chip-active-color: #ffffff;
+  --chip-active-bg: #a93259;
+  --chip-active-border: #a93259;
+  --chip-active-shadow: 0 4px 14px rgba(169, 50, 89, 0.35);
+  --grid-counter-color: #a93259;
+  --tile-bg: #24141a;
+  --tile-border: rgba(255, 255, 255, 0.55);
+  --tile-shadow: 0 8px 24px rgba(70, 25, 40, 0.12);
+  --tile-shine-color: rgba(229, 130, 157, 0.25);
+  --tile-hover-border: #a93259;
+  --tile-hover-shadow: 0 16px 36px rgba(169, 50, 89, 0.28);
+  --tile-photo-filter: saturate(1.08) contrast(1.04);
+  --tile-scrim: linear-gradient(180deg,
+      transparent 35%,
+      rgba(36, 20, 26, 0.65) 65%,
+      rgba(36, 20, 26, 0.95) 100%);
+  --tile-cat-color: #f6cfdb;
+  --tile-cat-shadow: none;
+  --tile-title-color: #ffffff;
+  --tile-price-color: #f6cfdb;
+  --tile-duration-color: rgba(255, 255, 255, 0.85);
 }
 
 html,
@@ -479,8 +511,8 @@ button {
   min-height: 100vh;
   box-sizing: border-box;
   padding: 50px 0 60px;
-  background: #f2cad5;
-  color: #24141a;
+  background: var(--grid-bg);
+  color: var(--grid-text);
   scroll-snap-align: start;
   scroll-snap-stop: always;
 }
@@ -500,18 +532,18 @@ button {
   font-size: 34px;
   font-weight: 400;
   line-height: 1.1;
-  color: #24141a;
+  color: var(--grid-title-color);
 }
 
 .secao-catalogo__titulo em {
   font-style: italic;
-  color: #a93259;
+  color: var(--grid-title-em-color);
 }
 
 .secao-catalogo__sub {
   margin: 0;
   font-size: 13.5px;
-  color: #553d46;
+  color: var(--grid-sub-color);
   line-height: 1.45;
 }
 
@@ -539,20 +571,20 @@ button {
   font-weight: 600;
   letter-spacing: .06em;
   text-transform: uppercase;
-  color: #6e5a62;
-  background: #ffffff;
-  border: 1px solid rgba(169, 50, 89, 0.20);
+  color: var(--chip-color);
+  background: var(--chip-bg);
+  border: 1px solid var(--chip-border);
   border-radius: 999px;
-  box-shadow: 0 2px 8px rgba(70, 25, 40, 0.04);
+  box-shadow: var(--chip-shadow);
   transition: all 0.25s ease;
 }
 
 .filtro-chip.is-ativo,
 .filtro-chip:hover {
-  color: #ffffff;
-  background: #a93259;
-  border-color: #a93259;
-  box-shadow: 0 4px 14px rgba(169, 50, 89, 0.35);
+  color: var(--chip-active-color);
+  background: var(--chip-active-bg);
+  border-color: var(--chip-active-border);
+  box-shadow: var(--chip-active-shadow);
 }
 
 .mosaico__status {
@@ -567,7 +599,7 @@ button {
   font-size: 11px;
   letter-spacing: .1em;
   text-transform: uppercase;
-  color: #a93259;
+  color: var(--grid-counter-color);
   font-weight: 600;
 }
 
@@ -621,11 +653,11 @@ button {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  background: #24141a;
+  background: var(--tile-bg);
   border-radius: 14px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.55);
-  box-shadow: 0 8px 24px rgba(70, 25, 40, 0.12);
+  border: 1px solid var(--tile-border);
+  box-shadow: var(--tile-shadow);
   aspect-ratio: 3 / 5.2;
   cursor: pointer;
   transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1),
@@ -650,7 +682,7 @@ button {
   height: 200%;
   background: linear-gradient(60deg,
       transparent 35%,
-      rgba(229, 130, 157, 0.25) 50%,
+      var(--tile-shine-color) 50%,
       transparent 65%);
   pointer-events: none;
   z-index: 4;
@@ -663,8 +695,8 @@ button {
 
 .tile:hover {
   transform: translateY(-4px) scale(1.01);
-  border-color: #a93259;
-  box-shadow: 0 16px 36px rgba(169, 50, 89, 0.28);
+  border-color: var(--tile-hover-border);
+  box-shadow: var(--tile-hover-shadow);
 }
 
 .tile--destaque {
@@ -682,7 +714,7 @@ button {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: saturate(1.08) contrast(1.04);
+  filter: var(--tile-photo-filter);
   transition: transform 0.4s ease;
 }
 
@@ -693,10 +725,7 @@ button {
 .tile__scrim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg,
-      transparent 35%,
-      rgba(36, 20, 26, 0.65) 65%,
-      rgba(36, 20, 26, 0.95) 100%);
+  background: var(--tile-scrim);
   pointer-events: none;
 }
 
@@ -714,16 +743,18 @@ button {
   font-weight: 600;
   letter-spacing: .25em;
   text-transform: uppercase;
-  color: #f6cfdb;
+  color: var(--tile-cat-color);
+  text-shadow: var(--tile-cat-shadow);
 }
 
 .tile__titulo {
+  margin: 0;
   font-family: 'Fraunces', Georgia, serif;
   font-size: 18px;
   font-weight: 500;
   font-style: italic;
   line-height: 1.12;
-  color: #ffffff;
+  color: var(--tile-title-color);
 }
 
 .tile--destaque .tile__titulo {
@@ -740,12 +771,12 @@ button {
 
 .tile__preco {
   font-weight: 700;
-  color: #f6cfdb;
+  color: var(--tile-price-color);
 }
 
 .tile__duracao {
   font-size: 10px;
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--tile-duration-color);
   text-transform: uppercase;
   letter-spacing: .06em;
 }
@@ -1586,280 +1617,44 @@ body[data-theme="luxury"] .secao-contato__foto {
 }
 
 /* ==========================================================================
-   2. SEÇÃO CATÁLOGO MOSAICO (SNAP SCREEN 2 - ROLAGEM LIVRE DENTRO DA SEÇÃO)
+   2. SEÇÃO CATÁLOGO MOSAICO — TOKENS DO TEMA LUXURY
+   Layout/estrutura da grade e dos cards moram só na regra base (acima).
+   Aqui só redefine variáveis de cor -- os @keyframes tileRevealLuxury e
+   tileShine também já existem só uma vez na regra base (não são
+   escopados por seletor, não precisam de segunda cópia).
    ========================================================================== */
-body[data-theme="luxury"] .secao-catalogo {
-  min-height: 100vh;
-  box-sizing: border-box;
-  padding: 50px 0 60px;
-  background: #0f0c0b;
-  color: #f3efe9;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
-}
-
-body[data-theme="luxury"] .secao-catalogo__header {
-  text-align: center;
-  margin-bottom: 24px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-
-body[data-theme="luxury"] .secao-catalogo__titulo {
-  margin: 0;
-  font-family: 'Fraunces', Georgia, serif;
-  font-size: 34px;
-  font-weight: 400;
-  line-height: 1.1;
-  color: #f3efe9;
-}
-
-body[data-theme="luxury"] .secao-catalogo__titulo em {
-  font-style: italic;
-  color: #c9a389;
-}
-
-body[data-theme="luxury"] .secao-catalogo__sub {
-  margin: 0;
-  font-size: 13.5px;
-  color: rgba(243, 239, 233, 0.7);
-  line-height: 1.45;
-}
-
-/* ---------- Filtros em Chips Horizontais ---------- */
-body[data-theme="luxury"] .mosaico__filtros {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding: 4px 0 12px;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-}
-
-body[data-theme="luxury"] .mosaico__filtros::-webkit-scrollbar {
-  display: none;
-}
-
-body[data-theme="luxury"] .filtro-chip {
-  flex: none;
-  padding: 8px 16px;
-  font-size: 11.5px;
-  font-weight: 600;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  color: rgba(243, 239, 233, 0.7);
-  background: rgba(25, 20, 17, 0.85);
-  border: 1px solid rgba(201, 163, 137, 0.20);
-  border-radius: 999px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-  transition: all 0.25s ease;
-}
-
-body[data-theme="luxury"] .filtro-chip.is-ativo, body[data-theme="luxury"] .filtro-chip:hover {
-  color: #0f0c0b;
-  background: #c9a389;
-  border-color: #c9a389;
-  box-shadow: 0 4px 14px rgba(201, 163, 137, 0.35);
-}
-
-body[data-theme="luxury"] .mosaico__status {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-  padding: 0 4px;
-}
-
-body[data-theme="luxury"] .mosaico__contador {
-  font-size: 11px;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: #c9a389;
-  font-weight: 600;
-}
-
-/* ---------- Grid Mosaico Midnight ---------- */
-body[data-theme="luxury"] .mosaico__grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  grid-auto-flow: dense;
-}
-
-/* Card do Mosaico (Tile) com efeito de surgimento fluido em profundidade */
-@keyframes tileRevealLuxury {
-  0% {
-    opacity: 0;
-    transform: translateY(45px) scale(0.93);
-    filter: blur(8px);
-  }
-  50% {
-    opacity: 0.85;
-    filter: blur(2px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    filter: blur(0);
-  }
-}
-
-/* Shimmer shine effect overlay on entrance */
-@keyframes tileShine {
-  0% {
-    transform: translateX(-100%) rotate(25deg);
-    opacity: 0;
-  }
-  35% {
-    opacity: 0.45;
-  }
-  100% {
-    transform: translateX(220%) rotate(25deg);
-    opacity: 0;
-  }
-}
-
-body[data-theme="luxury"] .tile {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  background: #191411;
-  border-radius: 14px;
-  overflow: hidden;
-  border: 1px solid rgba(201, 163, 137, 0.18);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
-  aspect-ratio: 3 / 5.2;
-  cursor: pointer;
-  transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1),
-    border-color 0.4s ease,
-    box-shadow 0.5s cubic-bezier(0.19, 1, 0.22, 1);
-  text-align: left;
-  opacity: 0;
-  transform: translateY(45px) scale(0.93);
-  will-change: transform, opacity, filter;
-}
-
-body[data-theme="luxury"] .tile.is-revealed {
-  animation: tileRevealLuxury 1.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-body[data-theme="luxury"] .tile::after {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(60deg,
-      transparent 35%,
-      rgba(201, 163, 137, 0.22) 50%,
-      transparent 65%);
-  pointer-events: none;
-  z-index: 4;
-}
-
-body[data-theme="luxury"] .tile.is-revealed::after {
-  animation: tileShine 2.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  animation-delay: inherit;
-}
-
-body[data-theme="luxury"] .tile:hover {
-  transform: translateY(-4px) scale(1.01);
-  border-color: #c9a389;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.55), 0 0 20px rgba(201, 163, 137, 0.25);
-}
-
-body[data-theme="luxury"] .tile--destaque {
-  grid-column: span 1;
-  aspect-ratio: 3 / 5.2;
-}
-
-body[data-theme="luxury"] .tile--tall {
-  aspect-ratio: 3 / 5.2;
-}
-
-body[data-theme="luxury"] .tile__foto {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: saturate(0.95) contrast(1.04);
-  transition: transform 0.4s ease;
-}
-
-body[data-theme="luxury"] .tile:hover .tile__foto {
-  transform: scale(1.04);
-}
-
-body[data-theme="luxury"] .tile__scrim {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg,
+[data-theme="luxury"] {
+  --grid-bg: #0f0c0b;
+  --grid-text: #f3efe9;
+  --grid-title-color: #f3efe9;
+  --grid-title-em-color: #c9a389;
+  --grid-sub-color: rgba(243, 239, 233, 0.7);
+  --chip-color: rgba(243, 239, 233, 0.7);
+  --chip-bg: rgba(25, 20, 17, 0.85);
+  --chip-border: rgba(201, 163, 137, 0.20);
+  --chip-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  --chip-active-color: #0f0c0b;
+  --chip-active-bg: #c9a389;
+  --chip-active-border: #c9a389;
+  --chip-active-shadow: 0 4px 14px rgba(201, 163, 137, 0.35);
+  --grid-counter-color: #c9a389;
+  --tile-bg: #191411;
+  --tile-border: rgba(201, 163, 137, 0.18);
+  --tile-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+  --tile-shine-color: rgba(201, 163, 137, 0.22);
+  --tile-hover-border: #c9a389;
+  --tile-hover-shadow: 0 16px 36px rgba(0, 0, 0, 0.55), 0 0 20px rgba(201, 163, 137, 0.25);
+  --tile-photo-filter: saturate(0.95) contrast(1.04);
+  --tile-scrim: linear-gradient(180deg,
       rgba(15, 12, 11, 0.30) 0%,
       transparent 28%,
       rgba(15, 12, 11, 0.65) 65%,
       rgba(15, 12, 11, 0.96) 100%);
-  pointer-events: none;
-}
-
-body[data-theme="luxury"] .tile__conteudo {
-  position: relative;
-  z-index: 2;
-  padding: 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-body[data-theme="luxury"] .tile__cat {
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: .25em;
-  text-transform: uppercase;
-  color: #c9a389;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
-}
-
-body[data-theme="luxury"] .tile__titulo {
-  margin: 0;
-  font-family: 'Fraunces', Georgia, serif;
-  font-size: 18px;
-  font-weight: 500;
-  font-style: italic;
-  line-height: 1.12;
-  color: #f3efe9;
-}
-
-body[data-theme="luxury"] .tile--destaque .tile__titulo {
-  font-size: 18px;
-}
-
-body[data-theme="luxury"] .tile__meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 4px;
-  font-size: 11px;
-}
-
-body[data-theme="luxury"] .tile__preco {
-  font-weight: 700;
-  color: #dfa87a;
-}
-
-body[data-theme="luxury"] .tile__duracao {
-  font-size: 10px;
-  color: rgba(243, 239, 233, 0.75);
-  text-transform: uppercase;
-  letter-spacing: .06em;
-}
-
-body[data-theme="luxury"] .tile__toque-cue {
-  display: none;
+  --tile-cat-color: #c9a389;
+  --tile-cat-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+  --tile-title-color: #f3efe9;
+  --tile-price-color: #dfa87a;
+  --tile-duration-color: rgba(243, 239, 233, 0.75);
 }
 
 /* ==========================================================================
