@@ -53,6 +53,9 @@
   --hero-scroll-hover-border: rgba(169, 50, 89, 0.45);
   --hero-scroll-hover-shadow: 0 6px 22px rgba(169, 50, 89, 0.2);
   --hero-scroll-linha: linear-gradient(180deg, #a93259, transparent);
+  --hero-particle-tint: rgba(229, 169, 184, 0.9);
+  --hero-particle-glow: rgba(169, 50, 89, 0.45);
+  --hero-particle-shadow: rgba(229, 169, 184, 0.65);
   --etiqueta-color: #a93259;
 
   /* ---- Grade de Procedimentos ---- */
@@ -374,6 +377,48 @@ button {
   position: absolute;
   inset: 0;
   background: var(--hero-scrim);
+}
+
+/* Partículas flutuantes iluminadas da capa (bolhas) -- portadas do site
+   estático original. Ficam acima da foto/scrim (z-index 2) e abaixo do
+   texto (.hero__conteudo é z-index 3). Cor vem de variável de tema, só
+   a posição/tamanho/tempo de cada partícula é aleatório (gerado no
+   componente HeroParticles). */
+.hero__particles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.hero__particle {
+  position: absolute;
+  bottom: -20px;
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+  background: radial-gradient(circle, var(--hero-particle-tint) 0%, var(--hero-particle-glow) 70%, transparent 100%);
+  box-shadow: 0 0 10px var(--hero-particle-shadow);
+  animation: floatHeroParticle var(--duration, 6s) infinite ease-in-out var(--delay, 0s);
+}
+
+@keyframes floatHeroParticle {
+  0% {
+    transform: translateY(0) scale(0.6);
+    opacity: 0;
+  }
+  20% {
+    opacity: var(--max-opacity, 0.7);
+  }
+  75% {
+    opacity: var(--max-opacity, 0.7);
+  }
+  100% {
+    transform: translateY(-52vh) scale(1.15);
+    opacity: 0;
+  }
 }
 
 /* Bloco selo+nome+frase+chips+botão ancorado como UM grupo só no rodapé do
@@ -1632,6 +1677,9 @@ body[data-theme="luxury"] .mosaico-app {
   --hero-scroll-hover-border: rgba(201, 163, 137, 0.6);
   --hero-scroll-hover-shadow: 0 6px 22px rgba(0, 0, 0, 0.5);
   --hero-scroll-linha: linear-gradient(180deg, #c9a389, transparent);
+  --hero-particle-tint: rgba(226, 194, 170, 0.9);
+  --hero-particle-glow: rgba(201, 163, 137, 0.45);
+  --hero-particle-shadow: rgba(201, 163, 137, 0.65);
 }
 
 /* ==========================================================================

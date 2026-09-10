@@ -1,5 +1,6 @@
 import React from 'react';
 import { CatalogOrderData } from '@/types/catalog';
+import { HeroParticles } from './HeroParticles';
 
 interface HeaderCoverProps {
   data: CatalogOrderData;
@@ -45,6 +46,9 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
 
       {/* 2. Scrim (Gradiente Esfumaçado) */}
       <div className="hero__scrim"></div>
+
+      {/* 2.5 Partículas Flutuantes Iluminadas (bolhas rosé/douradas por tema) */}
+      <HeroParticles />
 
       {/* 3. BOTÃO FLUTUANTE SOBRE A CAPA: 📷 Alterar Foto de Capa (Absolute na Section Hero) */}
       {isEditMode && (
