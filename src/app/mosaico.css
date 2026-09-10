@@ -355,7 +355,7 @@ body[data-theme="rose"] .hero__titulo {
   font-weight: 400;
   font-style: italic;
   color: #4a0d20;
-  text-wrap: pretty;
+  text-wrap: normal;
 }
 
 .hero__frase-cilios em {
@@ -1718,7 +1718,7 @@ body[data-theme="luxury"] .hero__frase-cilios {
   font-weight: 400;
   font-style: italic;
   color: #f3efe9;
-  text-wrap: pretty;
+  text-wrap: normal;
 }
 
 body[data-theme="luxury"] .hero__frase-cilios em {
