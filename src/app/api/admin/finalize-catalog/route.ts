@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
-import { ProcedureItem } from '@/types/catalog';
+import { ProcedureItem, NicheType } from '@/types/catalog';
+import { nichePresetsMap } from '@/data/niche-presets';
 
 const MAX_COVER_SIZE = 8 * 1024 * 1024; // 8MB
 
@@ -41,6 +42,8 @@ export async function POST(request: Request) {
       .replace(/^-|-$/g, '');
     const finalSlug = `${baseSlug}-${Math.floor(100 + Math.random() * 900)}`;
 
+    const preset = nichePresetsMap[niche as NicheType] || nichePresetsMap.lash;
+
     let coverUrl = layoutModel === 'classico' ? '/modelos/classico/assets/img/Hero.png' : '/modelos/mosaico/assets/img/Hero.png';
 
     if (coverFile) {
@@ -75,12 +78,18 @@ export async function POST(request: Request) {
         client_name: clientName,
         cover_media_url: coverUrl,
         avatar_url: coverUrl,
+        instructions_bg_url: preset.instructions_bg_url || null,
+        final_screen_bg_url: preset.final_screen_bg_url || null,
+        cta_bg_url: preset.cta_bg_url || null,
         niche,
         layout_model: layoutModel,
         theme_variant: themeVariant,
         whatsapp_number: whatsappNumber.replace(/\D/g, ''),
         instagram_handle: instagramHandle,
         address: '',
+        tolerances: preset.instructions?.tolerances || 'Tolerância máxima de 15 minutos de atraso.',
+        pre_care: preset.instructions?.pre_care || [],
+        post_care: preset.instructions?.post_care || [],
         categories: [],
       })
       .select()
