@@ -597,7 +597,7 @@ button {
   height: 100%;
   background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.65) 50%, transparent 100%);
   transform: skewX(-20deg);
-  animation: heroChipShine 7s ease-in-out infinite;
+  animation: heroChipShine 3s ease-in-out infinite;
   pointer-events: none;
 }
 
