@@ -311,6 +311,7 @@ body[data-theme="rose"] .hero__selo {
    dentro do grupo e o selo ficaria colado no título. */
 body[data-theme="rose"] .hero__titulo {
   margin-top: 20px;
+  gap: 10px;
 }
 
 .hero__titulo h1 {
