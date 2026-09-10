@@ -1421,16 +1421,15 @@ html[data-theme="luxury"], body[data-theme="luxury"] {
 }
 
 /* ---------- Container Mobile App Container (Snap Wrapper) ---------- */
+/* Sem redeclarar height aqui: era o "min-height: 100vh" antigo que causava
+   os cortes de conteúdo no Luxury -- min-height sempre vence sobre a
+   height:100dvh herdada da regra base quando a barra de endereço do
+   navegador está visível (100vh estático fica maior que o 100dvh real
+   naquele momento), fazendo o app ficar fisicamente maior que a tela. */
 body[data-theme="luxury"] .mosaico-app {
-  width: 100%;
-  max-width: 480px;
-  margin: 0 auto;
-  min-height: 100vh;
   background: #0f0c0b;
   color: #f3efe9;
-  position: relative;
   box-shadow: 0 0 60px rgba(0, 0, 0, 0.8);
-  -webkit-overflow-scrolling: touch;
 }
 
 body[data-theme="luxury"] .container {
@@ -1882,11 +1881,10 @@ body[data-theme="luxury"] .tile__toque-cue {
 /* ==========================================================================
    3. SEÇÃO ORIENTAÇÕES (SNAP SCREEN 3 - TELA CHEIA PADRÃO VITRINE)
    ========================================================================== */
+/* Sem min-height/height aqui -- mesmo bug do .mosaico-app: min-height:100vh
+   (estático) vencia a height:100% herdada (= 100dvh real), cortando o
+   rodapé da seção quando a barra de endereço do navegador está visível. */
 body[data-theme="luxury"] .secao-orientacoes {
-  min-height: 100vh;
-  width: 100%;
-  position: relative;
-  overflow: hidden;
   background: #0f0c0b;
 }
 
@@ -2038,11 +2036,12 @@ body[data-theme="luxury"] .secao-orientacoes__scroll-cue span {
 /* ==========================================================================
    4. SEÇÃO CONTATO & RODAPÉ (SNAP SCREEN 4 - TELA CHEIA 100DVH)
    ========================================================================== */
+/* Sem min-height/height aqui -- era a causa exata do rodapé (nome/cidade)
+   sumindo na tela de Contato no Luxury: min-height:100vh (estático) vencia
+   a height:100% herdada (= 100dvh real) quando a barra de endereço do
+   navegador está visível, deixando a seção mais alta que a tela e cortando
+   o conteúdo do fim. */
 body[data-theme="luxury"] .secao-contato {
-  min-height: 100vh;
-  width: 100%;
-  position: relative;
-  overflow: hidden;
   background: #0f0c0b;
   color: #f3efe9;
 }
