@@ -9,7 +9,7 @@ import { CTASection } from './CTASection';
 import { VisualEditorBottomBar } from './VisualEditorBottomBar';
 import { VisualEditorModals } from './VisualEditorModals';
 
-import '@/app/visual-editor.css';
+import '@/styles/visual-editor.css';
 
 interface CatalogLayoutProps {
   data: CatalogOrderData;
