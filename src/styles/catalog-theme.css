@@ -57,6 +57,13 @@
   --hero-particle-glow: rgba(169, 50, 89, 0.45);
   --hero-particle-shadow: rgba(229, 169, 184, 0.65);
   --etiqueta-color: #a93259;
+  /* Halo claro sutil atrás do nome -- o texto é uma cor escura (rosa-berry)
+     sobre uma foto que varia de cliente pra cliente; sem isso, o contraste
+     depende de sorte (foto clara ou escura naquele ponto). O halo claro
+     "descola" o texto tanto de fundos escuros (brilha) quanto de fundos
+     claros/cheios de detalhe (cria uma leve separação), sem virar um
+     card/caixa visível. */
+  --hero-title-shadow: 0 1px 3px rgba(255, 255, 255, 0.85), 0 2px 16px rgba(255, 255, 255, 0.6), 0 0 30px rgba(255, 255, 255, 0.4);
 
   /* ---- Grade de Procedimentos ---- */
   --grid-bg: #f2cad5;
@@ -506,12 +513,14 @@ button {
   font-style: italic;
   color: var(--hero-accent);
   letter-spacing: -.01em;
+  text-shadow: var(--hero-title-shadow);
 }
 
 .hero__titulo h1 em {
   font-style: italic;
   font-weight: 400;
   color: var(--hero-accent);
+  text-shadow: var(--hero-title-shadow);
 }
 
 .hero__filete {
@@ -1624,6 +1633,9 @@ html[data-theme="luxury"], body[data-theme="luxury"] {
   background: #0a0807;
   color: #f3efe9;
   --etiqueta-color: #c9a389;
+  /* Luxury não precisa do halo -- o scrim já é escuro/opaco o bastante
+     pra garantir contraste do texto dourado sozinho. */
+  --hero-title-shadow: none;
 }
 
 /* Sem redeclarar height aqui: era o "min-height: 100vh" antigo que causava
