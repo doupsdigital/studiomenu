@@ -53,6 +53,7 @@
   --hero-scroll-hover-border: rgba(169, 50, 89, 0.45);
   --hero-scroll-hover-shadow: 0 6px 22px rgba(169, 50, 89, 0.2);
   --hero-scroll-linha: linear-gradient(180deg, #a93259, transparent);
+  --etiqueta-color: #a93259;
 
   /* ---- Grade de Procedimentos ---- */
   --grid-bg: #f2cad5;
@@ -156,6 +157,20 @@
   --contact-ig-hover-shadow: 0 6px 22px rgba(165, 40, 115, 0.35);
   --contact-info-color: #7a5c67;
   --contact-info-border: rgba(169, 50, 89, 0.20);
+
+  /* ---- Modelo Clássico (lista editorial) ---- */
+  --servico-card-bg: #ffffff;
+  --servico-card-border: rgba(169, 50, 89, 0.18);
+  --servico-card-shadow: 0 4px 16px rgba(70, 25, 40, 0.06);
+  --servico-card-hover-border: #a93259;
+  --servico-card-hover-shadow: 0 8px 22px rgba(169, 50, 89, 0.18);
+  --servico-card-photo-bg: #24141a;
+  --servico-cat-color: #a93259;
+  --servico-title-color: #24141a;
+  --servico-desc-color: #553d46;
+  --servico-price-color: #a93259;
+  --servico-duration-color: #7a5c67;
+  --servico-arrow-color: #a93259;
 }
 
 html,
@@ -216,8 +231,7 @@ button {
   font-weight: 600;
   letter-spacing: .38em;
   text-transform: uppercase;
-  color: #a93259;
-  /* Rosa Berry */
+  color: var(--etiqueta-color);
 }
 
 /* ---------- Entrance Animations & Stagger (Lento, Fluido & Sofisticado) ---------- */
@@ -257,14 +271,20 @@ button {
   transition-delay: 0.70s;
 }
 
-/* Background Photo Subtle Zoom Effect (Todas as Telas com Foto) */
+/* Background Photo Subtle Zoom Effect (Todas as Telas com Foto).
+   Havia uma segunda declaração @keyframes heroKenBurns mais abaixo no
+   arquivo (com translate3d) que sempre vencia essa por ordem (@keyframes
+   não é por especificidade, é "o último declarado leva"). Consolidada
+   aqui pra não ter duas definições divergentes do mesmo nome. */
 @keyframes heroKenBurns {
   0% {
-    transform: scale(1);
+    transform: scale(1) translate3d(0, 0, 0);
+    -webkit-transform: scale(1) translate3d(0, 0, 0);
   }
 
   100% {
-    transform: scale(1.08);
+    transform: scale(1.08) translate3d(0, 0, 0);
+    -webkit-transform: scale(1.08) translate3d(0, 0, 0);
   }
 }
 
@@ -1542,13 +1562,25 @@ button {
    ajustasse em cada componente. O reset universal do topo do arquivo
    (`*, *::before, *::after { margin:0; padding:0; }`) já cobre os dois
    temas — não precisa de uma segunda cópia aqui.
+
+   Também removidos daqui (nessa limpeza): .container e .etiqueta (sem
+   nenhuma diferença de cor real, só duplicavam layout), .anim-fade-up
+   e .delay-* (idênticos à base, a versão do Luxury até pulava a
+   animação de entrada -- agora os dois temas têm o mesmo fade-in), e
+   um bloco combinado de .hero__foto/.secao-orientacoes__foto/
+   .secao-contato__foto que aplicava o MESMO filtro de cor pras três
+   seções -- na prática sobrescrevia (com a mesma especificidade, só
+   que depois no arquivo) as variáveis --hero-photo-filter,
+   --orient-photo-filter e --contact-photo-filter definidas nos blocos
+   de cada seção mais abaixo, cada uma com o valor certo. Filtro de
+   foto agora só existe nesses três tokens, um por seção.
    Fica só cor a partir daqui. */
 html[data-theme="luxury"], body[data-theme="luxury"] {
   background: #0a0807;
   color: #f3efe9;
+  --etiqueta-color: #c9a389;
 }
 
-/* ---------- Container Mobile App Container (Snap Wrapper) ---------- */
 /* Sem redeclarar height aqui: era o "min-height: 100vh" antigo que causava
    os cortes de conteúdo no Luxury -- min-height sempre vence sobre a
    height:100dvh herdada da regra base quando a barra de endereço do
@@ -1558,83 +1590,6 @@ body[data-theme="luxury"] .mosaico-app {
   background: #0f0c0b;
   color: #f3efe9;
   box-shadow: 0 0 60px rgba(0, 0, 0, 0.8);
-}
-
-body[data-theme="luxury"] .container {
-  width: 100%;
-  padding: 0 20px;
-}
-
-body[data-theme="luxury"] .etiqueta {
-  display: block;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: .38em;
-  text-transform: uppercase;
-  color: #c9a389;
-}
-
-/* ---------- Entrance Animations & Stagger (Lento, Fluido & Sofisticado) ---------- */
-body[data-theme="luxury"] .anim-fade-up {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 1.35s cubic-bezier(0.16, 1, 0.3, 1), transform 1.35s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: opacity, transform;
-}
-
-body[data-theme="luxury"] .is-visible .anim-fade-up {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-body[data-theme="luxury"] .delay-1 { transition-delay: 0.10s; }
-
-body[data-theme="luxury"] .delay-2 { transition-delay: 0.22s; }
-
-body[data-theme="luxury"] .delay-3 { transition-delay: 0.34s; }
-
-body[data-theme="luxury"] .delay-4 { transition-delay: 0.46s; }
-
-body[data-theme="luxury"] .delay-5 { transition-delay: 0.58s; }
-
-body[data-theme="luxury"] .delay-6 { transition-delay: 0.70s; }
-
-/* Background Photo Subtle Zoom Effect (Todas as Telas com Foto) */
-@keyframes heroKenBurns {
-  0% {
-    transform: scale(1);
-  }
-  100% {
-    transform: scale(1.08);
-  }
-}
-
-body[data-theme="luxury"] .hero__foto-wrap, body[data-theme="luxury"] .secao-orientacoes__foto-wrap, body[data-theme="luxury"] .secao-contato__foto-wrap {
-  position: absolute;
-  inset: -12%;
-  overflow: hidden;
-  will-change: transform;
-}
-
-body[data-theme="luxury"] .hero__foto, body[data-theme="luxury"] .secao-orientacoes__foto, body[data-theme="luxury"] .secao-contato__foto {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: saturate(1.02) contrast(1.08) brightness(0.96);
-  animation: heroKenBurns 7s ease-in-out infinite alternate;
-  will-change: transform;
-}
-
-body[data-theme="luxury"] .hero__foto {
-  object-position: center 18%;
-}
-
-body[data-theme="luxury"] .secao-orientacoes__foto {
-  object-position: 50% 30%;
-}
-
-body[data-theme="luxury"] .secao-contato__foto {
-  object-position: center 20%;
 }
 
 /* ==========================================================================
@@ -1856,177 +1811,23 @@ body[data-theme="luxury"] .secao-contato__foto {
   }
 }
 
-/* ==========================================================================
-   EFEITO KEN BURNS — ZOOM SUAVE, body[data-theme="luxury"] CONTÍNUO E PERCEPTÍVEL (TODAS AS TELAS COM FOTO)
-   ========================================================================== */
-@keyframes heroKenBurns {
-  0% {
-    transform: scale(1) translate3d(0, 0, 0);
-    -webkit-transform: scale(1) translate3d(0, 0, 0);
-  }
+/* Bloco "EFEITO KEN BURNS" duplicado do Luxury removido daqui -- era
+   idêntico ao bloco base (mesmo @keyframes heroKenBurns já consolidado
+   lá em cima, mesma regra combinada de foto-wrap/foto, sem nenhuma
+   diferença de cor real). Cascata cobre os dois temas a partir da
+   regra base. */
 
-  100% {
-    transform: scale(1.08) translate3d(0, 0, 0);
-    -webkit-transform: scale(1.08) translate3d(0, 0, 0);
-  }
-}
-
-@-webkit-keyframes heroKenBurns {
-  0% {
-    -webkit-transform: scale(1) translate3d(0, 0, 0);
-  }
-
-  100% {
-    -webkit-transform: scale(1.08) translate3d(0, 0, 0);
-  }
-}
-
-body[data-theme="luxury"] .hero__foto-wrap, body[data-theme="luxury"] .secao-orientacoes__foto-wrap, body[data-theme="luxury"] .secao-contato__foto-wrap, body[data-theme="luxury"] .procedimentos__foto-wrap, body[data-theme="luxury"] .agendamento__foto-wrap, body[data-theme="luxury"] .cuidados__foto-wrap, body[data-theme="luxury"] .contato__foto-wrap {
-  position: absolute;
-  inset: -12%;
-  overflow: hidden;
-  will-change: transform;
-  transform: translate3d(0, 0, 0);
-  -webkit-transform: translate3d(0, 0, 0);
-}
-
-body[data-theme="luxury"] .hero__foto, body[data-theme="luxury"] .secao-orientacoes__foto, body[data-theme="luxury"] .secao-contato__foto, body[data-theme="luxury"] .procedimentos__foto, body[data-theme="luxury"] .agendamento__foto, body[data-theme="luxury"] .cuidados__foto, body[data-theme="luxury"] .contato__foto {
-  display: block !important;
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  animation: heroKenBurns 7s ease-in-out infinite alternate !important;
-  -webkit-animation: heroKenBurns 7s ease-in-out infinite alternate !important;
-  transform-origin: center center !important;
-  -webkit-transform-origin: center center !important;
-  will-change: transform !important;
-  backface-visibility: hidden !important;
-  -webkit-backface-visibility: hidden !important;
-}
-
-/* ==========================================================================
-   BOTÃO FLUTUANTE DE WHATSAPP
-   ========================================================================== */
-/* .wsp-float-btn* não muda entre temas (nem cor) — regra base já cobre. */
-
-@keyframes wspPulse {
-  0%, 100% {
-    box-shadow: 0 8px 24px rgba(37, 211, 102, 0.45);
-  }
-  50% {
-    box-shadow: 0 12px 32px rgba(37, 211, 102, 0.75), 0 0 0 8px rgba(37, 211, 102, 0.18);
-  }
-}
+/* Botão flutuante do WhatsApp e @keyframes wspPulse não mudam entre temas
+   (nem cor) -- já existem uma única vez na regra base. */
 
 
 
 
 
-/* ==========================================================================
-   WIDGET DE ALTERNÂNCIA DE TEMA ANTI-FALHAS (ALTO CONSTRASTE E MOLDURA DUPLA)
-   ========================================================================== */
-.theme-switcher-widget {
-  position: fixed !important;
-  top: 10px !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  z-index: 999999 !important;
-  display: none !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  width: calc(100% - 24px) !important;
-  max-width: 320px !important;
-  background: rgba(14, 11, 10, 0.92) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.35) !important;
-  border-radius: 20px !important;
-  padding: 8px 10px 10px !important;
-  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-}
-
-body.has-theme-switcher .theme-switcher-widget,
-html.has-theme-switcher .theme-switcher-widget,
-body.is-editor .theme-switcher-widget {
-  display: flex !important;
-}
-
-body[data-theme="luxury"] .theme-switcher-widget {
-  border-color: rgba(201, 163, 137, 0.55) !important;
-  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.85), 0 0 15px rgba(201, 163, 137, 0.2) !important;
-}
-
-body[data-theme="rose"] .theme-switcher-widget {
-  border-color: rgba(229, 169, 184, 0.55) !important;
-  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.6), 0 0 15px rgba(169, 50, 89, 0.2) !important;
-}
-
-.theme-switcher-label {
-  font-size: 9.5px !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.14em !important;
-  text-transform: uppercase !important;
-  color: #ffffff !important;
-  background: rgba(255, 255, 255, 0.12) !important;
-  padding: 3px 10px !important;
-  border-radius: 999px !important;
-  border: 1px solid rgba(255, 255, 255, 0.18) !important;
-  margin-bottom: 6px !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 5px !important;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8) !important;
-}
-
-.theme-switcher-options {
-  display: flex !important;
-  width: 100% !important;
-  background: rgba(0, 0, 0, 0.45) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  border-radius: 999px !important;
-  padding: 3px !important;
-  gap: 4px !important;
-}
-
-.theme-switcher-btn {
-  flex: 1 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 6px !important;
-  padding: 8px 12px !important;
-  border-radius: 999px !important;
-  font-size: 11.5px !important;
-  font-weight: 600 !important;
-  color: #ffffff !important;
-  background: rgba(255, 255, 255, 0.10) !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  cursor: pointer !important;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
-  outline: none !important;
-  user-select: none !important;
-}
-
-.theme-switcher-btn:hover {
-  background: rgba(255, 255, 255, 0.22) !important;
-}
-
-.theme-switcher-btn.is-active[data-theme-target="rose"] {
-  background: linear-gradient(135deg, #a93259 0%, #d85c83 100%) !important;
-  color: #ffffff !important;
-  font-weight: 700 !important;
-  border-color: transparent !important;
-  box-shadow: 0 3px 12px rgba(169, 50, 89, 0.5) !important;
-}
-
-.theme-switcher-btn.is-active[data-theme-target="luxury"] {
-  background: linear-gradient(135deg, #c9a389 0%, #dfa87a 100%) !important;
-  color: #0f0c0b !important;
-  font-weight: 700 !important;
-  border-color: transparent !important;
-  box-shadow: 0 3px 12px rgba(201, 163, 137, 0.5) !important;
-}
+/* Widget de alternância de tema do editor estático antigo (LashMenu) foi
+   removido daqui -- confirmado por grep em src/ que nenhum componente React
+   renderiza .theme-switcher-widget/.theme-switcher-btn/.has-theme-switcher.
+   O seletor de tema atual é o painel "Personalizar" (React), sem CSS. */
 
 .hero--classico .hero__foto,
 .hero--classico img.hero__foto,
@@ -2050,11 +1851,11 @@ body[data-theme="luxury"] .hero--classico .hero__foto {
   grid-template-columns: 80px 1fr auto;
   gap: 12px;
   align-items: center;
-  background: #ffffff;
-  border: 1px solid rgba(169, 50, 89, 0.18);
+  background: var(--servico-card-bg);
+  border: 1px solid var(--servico-card-border);
   border-radius: 14px;
   padding: 10px 12px;
-  box-shadow: 0 4px 16px rgba(70, 25, 40, 0.06);
+  box-shadow: var(--servico-card-shadow);
   cursor: pointer;
   transition: transform 0.35s cubic-bezier(0.19, 1, 0.22, 1),
               border-color 0.3s ease,
@@ -2071,8 +1872,8 @@ body[data-theme="luxury"] .hero--classico .hero__foto {
 
 .servico-card:hover {
   transform: translateY(-2px);
-  border-color: #a93259;
-  box-shadow: 0 8px 22px rgba(169, 50, 89, 0.18);
+  border-color: var(--servico-card-hover-border);
+  box-shadow: var(--servico-card-hover-shadow);
 }
 
 .servico-card__foto-box {
@@ -2082,7 +1883,7 @@ body[data-theme="luxury"] .hero--classico .hero__foto {
   border-radius: 10px;
   overflow: hidden;
   flex: none;
-  background: #24141a;
+  background: var(--servico-card-photo-bg);
 }
 
 .servico-card__foto {
@@ -2108,7 +1909,7 @@ body[data-theme="luxury"] .hero--classico .hero__foto {
   font-weight: 600;
   letter-spacing: .22em;
   text-transform: uppercase;
-  color: #a93259;
+  color: var(--servico-cat-color);
 }
 
 .servico-card__titulo {
@@ -2117,7 +1918,7 @@ body[data-theme="luxury"] .hero--classico .hero__foto {
   font-size: 16.5px;
   font-weight: 500;
   line-height: 1.2;
-  color: #24141a;
+  color: var(--servico-title-color);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2126,7 +1927,7 @@ body[data-theme="luxury"] .hero--classico .hero__foto {
 .servico-card__desc {
   margin: 0;
   font-size: 11.5px;
-  color: #553d46;
+  color: var(--servico-desc-color);
   line-height: 1.35;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -2146,18 +1947,18 @@ body[data-theme="luxury"] .hero--classico .hero__foto {
 .servico-card__preco {
   font-weight: 700;
   font-size: 14px;
-  color: #a93259;
+  color: var(--servico-price-color);
 }
 
 .servico-card__duracao {
   font-size: 10px;
-  color: #7a5c67;
+  color: var(--servico-duration-color);
   text-transform: uppercase;
 }
 
 .servico-card__seta {
   font-size: 14px;
-  color: #a93259;
+  color: var(--servico-arrow-color);
   margin-top: 4px;
   transition: transform 0.25s ease;
 }
@@ -2166,117 +1967,18 @@ body[data-theme="luxury"] .hero--classico .hero__foto {
   transform: translateX(3px);
 }
 
-/* ---------- Lista Clássico (Luxury Theme) ---------- */
-body[data-theme="luxury"] .servico-card {
-  position: relative;
-  display: grid;
-  grid-template-columns: 80px 1fr auto;
-  gap: 12px;
-  align-items: center;
-  background: rgba(25, 20, 17, 0.85);
-  border: 1px solid rgba(201, 163, 137, 0.22);
-  border-radius: 14px;
-  padding: 10px 12px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-  cursor: pointer;
-  text-align: left;
+/* ---------- Lista Clássico (Luxury Theme) — tokens de cor ---------- */
+[data-theme="luxury"] {
+  --servico-card-bg: rgba(25, 20, 17, 0.85);
+  --servico-card-border: rgba(201, 163, 137, 0.22);
+  --servico-card-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  --servico-card-hover-border: #c9a389;
+  --servico-card-hover-shadow: 0 10px 26px rgba(0, 0, 0, 0.5), 0 0 16px rgba(201, 163, 137, 0.2);
+  --servico-card-photo-bg: #14100e;
+  --servico-cat-color: #c9a389;
+  --servico-title-color: #f3efe9;
+  --servico-desc-color: rgba(243, 239, 233, 0.65);
+  --servico-price-color: #c9a389;
+  --servico-duration-color: rgba(243, 239, 233, 0.55);
+  --servico-arrow-color: #c9a389;
 }
-
-body[data-theme="luxury"] .servico-card:hover {
-  border-color: #c9a389;
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.5), 0 0 16px rgba(201, 163, 137, 0.2);
-}
-
-body[data-theme="luxury"] .servico-card__foto-box {
-  position: relative;
-  width: 80px;
-  height: 80px;
-  border-radius: 10px;
-  overflow: hidden;
-  flex: none;
-  background: #14100e;
-}
-
-body[data-theme="luxury"] .servico-card__foto {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.4s ease;
-}
-
-body[data-theme="luxury"] .servico-card:hover .servico-card__foto {
-  transform: scale(1.06);
-}
-
-body[data-theme="luxury"] .servico-card__conteudo {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  min-width: 0;
-}
-
-body[data-theme="luxury"] .servico-card__cat {
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: .22em;
-  text-transform: uppercase;
-  color: #c9a389;
-}
-
-body[data-theme="luxury"] .servico-card__titulo {
-  margin: 0;
-  font-family: 'Fraunces', Georgia, serif;
-  font-size: 16.5px;
-  font-weight: 500;
-  line-height: 1.2;
-  color: #f3efe9;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-body[data-theme="luxury"] .servico-card__desc {
-  margin: 0;
-  font-size: 11.5px;
-  color: rgba(243, 239, 233, 0.65);
-  line-height: 1.35;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-body[data-theme="luxury"] .servico-card__lado-dir {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
-  flex: none;
-  padding-left: 4px;
-}
-
-body[data-theme="luxury"] .servico-card__preco {
-  font-weight: 700;
-  font-size: 14px;
-  color: #c9a389;
-}
-
-body[data-theme="luxury"] .servico-card__duracao {
-  font-size: 10px;
-  color: rgba(243, 239, 233, 0.55);
-  text-transform: uppercase;
-}
-
-body[data-theme="luxury"] .servico-card__seta {
-  font-size: 14px;
-  color: #c9a389;
-  margin-top: 4px;
-  transition: transform 0.25s ease;
-}
-
-body[data-theme="luxury"] .servico-card:hover .servico-card__seta {
-  transform: translateX(3px);
-}
-
-
-
