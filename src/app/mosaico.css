@@ -110,6 +110,52 @@
   --modal-next-color: #a93259;
   --modal-next-hover-border: #a93259;
   --modal-next-hover-bg: rgba(169, 50, 89, 0.08);
+
+  /* ---- Orientações ---- */
+  --orient-bg: #f2cad5;
+  --orient-photo-filter: saturate(1.08) contrast(1.06) brightness(0.97);
+  --orient-scrim: linear-gradient(180deg,
+      rgba(242, 202, 213, 0.92) 0%,
+      rgba(242, 202, 213, 0.48) 35%,
+      rgba(242, 202, 213, 0.96) 75%,
+      #f2cad5 100%);
+  --orient-title-color: #24141a;
+  --orient-title-em-color: #a93259;
+  --orient-card-bg: rgba(255, 255, 255, 0.94);
+  --orient-card-border: rgba(169, 50, 89, 0.20);
+  --orient-card-shadow: 0 16px 40px rgba(70, 25, 40, 0.10);
+  --orient-item-border: rgba(169, 50, 89, 0.10);
+  --orient-icon-bg: linear-gradient(135deg, rgba(242, 202, 213, 0.55), rgba(255, 240, 244, 0.9));
+  --orient-icon-border: rgba(169, 50, 89, 0.18);
+  --orient-icon-color: #a93259;
+  --orient-icon-shadow: 0 4px 12px rgba(169, 50, 89, 0.08);
+  --orient-num-color: #a93259;
+  --orient-info-strong-color: #24141a;
+  --orient-info-p-color: #553d46;
+  --orient-scroll-color: #6e5a62;
+
+  /* ---- Contato & Rodapé ---- */
+  --contact-bg: #f2cad5;
+  --contact-text: #24141a;
+  --contact-photo-filter: saturate(1.08) contrast(1.06) brightness(0.97);
+  --contact-scrim: linear-gradient(180deg,
+      rgba(242, 202, 213, 0.40) 0%,
+      rgba(242, 202, 213, 0.15) 25%,
+      rgba(242, 202, 213, 0.90) 58%,
+      #f2cad5 92%);
+  --contact-title-color: #24141a;
+  --contact-title-em-color: #a93259;
+  --contact-desc-color: #553d46;
+  --contact-wsp-bg: linear-gradient(135deg, rgba(24, 125, 65, 0.68) 0%, rgba(6, 78, 68, 0.78) 100%);
+  --contact-wsp-shadow: 0 4px 18px rgba(6, 78, 68, 0.25);
+  --contact-wsp-hover-bg: linear-gradient(135deg, rgba(28, 145, 76, 0.82) 0%, rgba(7, 92, 80, 0.90) 100%);
+  --contact-wsp-hover-shadow: 0 6px 22px rgba(6, 78, 68, 0.35);
+  --contact-ig-bg: linear-gradient(135deg, rgba(120, 40, 165, 0.65) 0%, rgba(215, 30, 30, 0.60) 50%, rgba(220, 145, 45, 0.60) 100%);
+  --contact-ig-shadow: 0 4px 18px rgba(165, 40, 115, 0.25);
+  --contact-ig-hover-bg: linear-gradient(135deg, rgba(135, 45, 185, 0.78) 0%, rgba(235, 35, 35, 0.72) 50%, rgba(235, 160, 50, 0.72) 100%);
+  --contact-ig-hover-shadow: 0 6px 22px rgba(165, 40, 115, 0.35);
+  --contact-info-color: #7a5c67;
+  --contact-info-border: rgba(169, 50, 89, 0.20);
 }
 
 html,
@@ -819,7 +865,7 @@ button {
   width: 100%;
   position: relative;
   overflow: hidden;
-  background: #f2cad5;
+  background: var(--orient-bg);
   scroll-snap-align: start;
   scroll-snap-stop: always;
 }
@@ -839,17 +885,13 @@ button {
   height: 100%;
   object-fit: cover;
   object-position: 50% 30%;
-  filter: saturate(1.08) contrast(1.06) brightness(0.97);
+  filter: var(--orient-photo-filter);
 }
 
 .secao-orientacoes__scrim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg,
-      rgba(242, 202, 213, 0.92) 0%,
-      rgba(242, 202, 213, 0.48) 35%,
-      rgba(242, 202, 213, 0.96) 75%,
-      #f2cad5 100%);
+  background: var(--orient-scrim);
 }
 
 .secao-orientacoes__conteudo {
@@ -880,20 +922,20 @@ button {
   font-size: 30px;
   line-height: 1.15;
   font-weight: 400;
-  color: #24141a;
+  color: var(--orient-title-color);
 }
 
 .secao-orientacoes__titulo em {
   font-style: italic;
-  color: #a93259;
+  color: var(--orient-title-em-color);
 }
 
 .orientacoes__card {
-  background: rgba(255, 255, 255, 0.94);
-  border: 1px solid rgba(169, 50, 89, 0.20);
+  background: var(--orient-card-bg);
+  border: 1px solid var(--orient-card-border);
   border-radius: 24px;
   padding: 10px 18px;
-  box-shadow: 0 16px 40px rgba(70, 25, 40, 0.10);
+  box-shadow: var(--orient-card-shadow);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
 }
@@ -904,7 +946,7 @@ button {
   gap: 15px;
   align-items: center;
   padding: 13px 0;
-  border-bottom: 1px solid rgba(169, 50, 89, 0.10);
+  border-bottom: 1px solid var(--orient-item-border);
 }
 
 .orientacao__item--ultimo {
@@ -915,28 +957,28 @@ button {
   width: 46px;
   height: 46px;
   border-radius: 14px;
-  background: linear-gradient(135deg, rgba(242, 202, 213, 0.55), rgba(255, 240, 244, 0.9));
-  border: 1px solid rgba(169, 50, 89, 0.18);
+  background: var(--orient-icon-bg);
+  border: 1px solid var(--orient-icon-border);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #a93259;
+  color: var(--orient-icon-color);
   position: relative;
-  box-shadow: 0 4px 12px rgba(169, 50, 89, 0.08);
+  box-shadow: var(--orient-icon-shadow);
 }
 
 .orientacao__icon-box svg {
   width: 22px;
   height: 22px;
-  stroke: #a93259;
+  stroke: var(--orient-icon-color);
 }
 
 .orientacao__num {
   font-family: 'Fraunces', Georgia, serif;
   font-size: 10px;
   font-style: italic;
-  color: #a93259;
+  color: var(--orient-num-color);
   font-weight: 700;
   line-height: 1;
   margin-top: 2px;
@@ -947,7 +989,7 @@ button {
   display: block;
   font-size: 15.5px;
   font-weight: 600;
-  color: #24141a;
+  color: var(--orient-info-strong-color);
   margin-bottom: 3px;
   letter-spacing: -0.01em;
 }
@@ -955,7 +997,7 @@ button {
 .orientacao__info p {
   margin: 0;
   font-size: 13px;
-  color: #553d46;
+  color: var(--orient-info-p-color);
   line-height: 1.4;
 }
 
@@ -964,7 +1006,7 @@ button {
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  color: #6e5a62;
+  color: var(--orient-scroll-color);
 }
 
 .secao-orientacoes__scroll-cue span {
@@ -982,8 +1024,8 @@ button {
   width: 100%;
   position: relative;
   overflow: hidden;
-  background: #f2cad5;
-  color: #24141a;
+  background: var(--contact-bg);
+  color: var(--contact-text);
   scroll-snap-align: start;
   scroll-snap-stop: always;
 }
@@ -999,17 +1041,13 @@ button {
   height: 100%;
   object-fit: cover;
   object-position: center 20%;
-  filter: saturate(1.08) contrast(1.06) brightness(0.97);
+  filter: var(--contact-photo-filter);
 }
 
 .secao-contato__scrim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg,
-      rgba(242, 202, 213, 0.40) 0%,
-      rgba(242, 202, 213, 0.15) 25%,
-      rgba(242, 202, 213, 0.90) 58%,
-      #f2cad5 92%);
+  background: var(--contact-scrim);
 }
 
 .secao-contato__conteudo {
@@ -1039,18 +1077,18 @@ button {
   font-size: 38px;
   line-height: 1.08;
   font-weight: 400;
-  color: #24141a;
+  color: var(--contact-title-color);
 }
 
 .secao-contato__titulo em {
   font-style: italic;
-  color: #a93259;
+  color: var(--contact-title-em-color);
 }
 
 .secao-contato__desc {
   margin: 0;
   font-size: 14px;
-  color: #553d46;
+  color: var(--contact-desc-color);
   max-width: 320px;
   line-height: 1.45;
 }
@@ -1081,31 +1119,31 @@ button {
 }
 
 .btn-whatsapp {
-  background: linear-gradient(135deg, rgba(24, 125, 65, 0.68) 0%, rgba(6, 78, 68, 0.78) 100%) !important;
+  background: var(--contact-wsp-bg) !important;
   color: #ffffff !important;
   border: 1px solid rgba(255, 255, 255, 0.25) !important;
-  box-shadow: 0 4px 18px rgba(6, 78, 68, 0.25) !important;
+  box-shadow: var(--contact-wsp-shadow) !important;
 }
 
 .btn-whatsapp:hover {
-  background: linear-gradient(135deg, rgba(28, 145, 76, 0.82) 0%, rgba(7, 92, 80, 0.90) 100%) !important;
+  background: var(--contact-wsp-hover-bg) !important;
   color: #ffffff !important;
   transform: translateY(-2px);
-  box-shadow: 0 6px 22px rgba(6, 78, 68, 0.35) !important;
+  box-shadow: var(--contact-wsp-hover-shadow) !important;
 }
 
 .btn-instagram {
-  background: linear-gradient(135deg, rgba(120, 40, 165, 0.65) 0%, rgba(215, 30, 30, 0.60) 50%, rgba(220, 145, 45, 0.60) 100%) !important;
+  background: var(--contact-ig-bg) !important;
   color: #ffffff !important;
   border: 1px solid rgba(255, 255, 255, 0.25) !important;
-  box-shadow: 0 4px 18px rgba(165, 40, 115, 0.25) !important;
+  box-shadow: var(--contact-ig-shadow) !important;
 }
 
 .btn-instagram:hover {
-  background: linear-gradient(135deg, rgba(135, 45, 185, 0.78) 0%, rgba(235, 35, 35, 0.72) 50%, rgba(235, 160, 50, 0.72) 100%) !important;
+  background: var(--contact-ig-hover-bg) !important;
   color: #ffffff !important;
   transform: translateY(-2px);
-  box-shadow: 0 6px 22px rgba(165, 40, 115, 0.35) !important;
+  box-shadow: var(--contact-ig-hover-shadow) !important;
 }
 
 .btn__left {
@@ -1134,7 +1172,7 @@ button {
 }
 
 .secao-contato__info {
-  border-top: 1px solid rgba(169, 50, 89, 0.20);
+  border-top: 1px solid var(--contact-info-border);
   padding-top: 16px;
   display: flex;
   flex-direction: column;
@@ -1142,7 +1180,7 @@ button {
   font-size: 10.5px;
   letter-spacing: .14em;
   text-transform: uppercase;
-  color: #7a5c67;
+  color: var(--contact-info-color);
 }
 
 .secao-contato__copy,
@@ -1152,7 +1190,7 @@ button {
   font-size: 10.5px;
   letter-spacing: .14em;
   text-transform: uppercase;
-  color: #7a5c67;
+  color: var(--contact-info-color);
 }
 
 /* ==========================================================================
@@ -1683,336 +1721,56 @@ body[data-theme="luxury"] .secao-contato__foto {
 }
 
 /* ==========================================================================
-   3. SEÇÃO ORIENTAÇÕES (SNAP SCREEN 3 - TELA CHEIA PADRÃO VITRINE)
+   3. SEÇÃO ORIENTAÇÕES — TOKENS DO TEMA LUXURY
    ========================================================================== */
-/* Sem min-height/height aqui -- mesmo bug do .mosaico-app: min-height:100vh
-   (estático) vencia a height:100% herdada (= 100dvh real), cortando o
-   rodapé da seção quando a barra de endereço do navegador está visível. */
-body[data-theme="luxury"] .secao-orientacoes {
-  background: #0f0c0b;
-}
-
-body[data-theme="luxury"] .secao-orientacoes__foto-wrap {
-  position: absolute;
-  inset: -10%;
-  overflow: hidden;
-  will-change: transform;
-}
-
-body[data-theme="luxury"] .secao-orientacoes__foto {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 50% 30%;
-  filter: saturate(0.95) contrast(1.08) brightness(0.92);
-}
-
-body[data-theme="luxury"] .secao-orientacoes__scrim {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg,
+[data-theme="luxury"] {
+  --orient-bg: #0f0c0b;
+  --orient-photo-filter: saturate(0.95) contrast(1.08) brightness(0.92);
+  --orient-scrim: linear-gradient(180deg,
       rgba(12, 10, 9, 0.70) 0%,
       rgba(12, 10, 9, 0.28) 35%,
       rgba(12, 10, 9, 0.94) 100%);
-}
-
-body[data-theme="luxury"] .secao-orientacoes__conteudo {
-  position: relative;
-  z-index: 3;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 44px 24px 34px;
-}
-
-body[data-theme="luxury"] .secao-orientacoes__topo {
-  display: flex;
-  justify-content: center;
-}
-
-body[data-theme="luxury"] .secao-orientacoes__corpo {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin: auto 0;
-}
-
-body[data-theme="luxury"] .secao-orientacoes__titulo {
-  margin: 0;
-  font-family: 'Fraunces', Georgia, serif;
-  font-size: 30px;
-  line-height: 1.15;
-  font-weight: 400;
-  color: #f3efe9;
-}
-
-body[data-theme="luxury"] .secao-orientacoes__titulo em {
-  font-style: italic;
-  color: #c9a389;
-}
-
-body[data-theme="luxury"] .orientacoes__card {
-  background: rgba(25, 20, 17, 0.90);
-  border: 1px solid rgba(201, 163, 137, 0.25);
-  border-radius: 24px;
-  padding: 10px 18px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-}
-
-body[data-theme="luxury"] .orientacao__item {
-  display: grid;
-  grid-template-columns: 46px 1fr;
-  gap: 15px;
-  align-items: center;
-  padding: 13px 0;
-  border-bottom: 1px solid rgba(201, 163, 137, 0.12);
-}
-
-body[data-theme="luxury"] .orientacao__item--ultimo {
-  border-bottom: none;
-}
-
-body[data-theme="luxury"] .orientacao__icon-box {
-  width: 46px;
-  height: 46px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, rgba(45, 34, 28, 0.9), rgba(30, 22, 18, 0.95));
-  border: 1px solid rgba(201, 163, 137, 0.28);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: #c9a389;
-  position: relative;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
-}
-
-body[data-theme="luxury"] .orientacao__icon-box svg {
-  width: 22px;
-  height: 22px;
-  stroke: #c9a389;
-}
-
-body[data-theme="luxury"] .orientacao__num {
-  font-family: 'Fraunces', Georgia, serif;
-  font-size: 10px;
-  font-style: italic;
-  color: #c9a389;
-  font-weight: 700;
-  line-height: 1;
-  margin-top: 2px;
-  opacity: 0.85;
-}
-
-body[data-theme="luxury"] .orientacao__info strong {
-  display: block;
-  font-size: 15.5px;
-  font-weight: 600;
-  color: #f3efe9;
-  margin-bottom: 3px;
-  letter-spacing: -0.01em;
-}
-
-body[data-theme="luxury"] .orientacao__info p {
-  margin: 0;
-  font-size: 13px;
-  color: rgba(243, 239, 233, 0.75);
-  line-height: 1.4;
-}
-
-body[data-theme="luxury"] .secao-orientacoes__scroll-cue {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  color: rgba(243, 239, 233, 0.6);
-}
-
-body[data-theme="luxury"] .secao-orientacoes__scroll-cue span {
-  font-size: 9.5px;
-  letter-spacing: .34em;
-  text-transform: uppercase;
+  --orient-title-color: #f3efe9;
+  --orient-title-em-color: #c9a389;
+  --orient-card-bg: rgba(25, 20, 17, 0.90);
+  --orient-card-border: rgba(201, 163, 137, 0.25);
+  --orient-card-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
+  --orient-item-border: rgba(201, 163, 137, 0.12);
+  --orient-icon-bg: linear-gradient(135deg, rgba(45, 34, 28, 0.9), rgba(30, 22, 18, 0.95));
+  --orient-icon-border: rgba(201, 163, 137, 0.28);
+  --orient-icon-color: #c9a389;
+  --orient-icon-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  --orient-num-color: #c9a389;
+  --orient-info-strong-color: #f3efe9;
+  --orient-info-p-color: rgba(243, 239, 233, 0.75);
+  --orient-scroll-color: rgba(243, 239, 233, 0.6);
 }
 
 /* ==========================================================================
-   4. SEÇÃO CONTATO & RODAPÉ (SNAP SCREEN 4 - TELA CHEIA 100DVH)
+   4. SEÇÃO CONTATO & RODAPÉ — TOKENS DO TEMA LUXURY
    ========================================================================== */
-/* Sem min-height/height aqui -- era a causa exata do rodapé (nome/cidade)
-   sumindo na tela de Contato no Luxury: min-height:100vh (estático) vencia
-   a height:100% herdada (= 100dvh real) quando a barra de endereço do
-   navegador está visível, deixando a seção mais alta que a tela e cortando
-   o conteúdo do fim. */
-body[data-theme="luxury"] .secao-contato {
-  background: #0f0c0b;
-  color: #f3efe9;
-}
-
-body[data-theme="luxury"] .secao-contato__foto-wrap {
-  position: absolute;
-  inset: -6%;
-  overflow: hidden;
-}
-
-body[data-theme="luxury"] .secao-contato__foto {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center 20%;
-  filter: saturate(0.95) contrast(1.08) brightness(0.95);
-}
-
-body[data-theme="luxury"] .secao-contato__scrim {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg,
+[data-theme="luxury"] {
+  --contact-bg: #0f0c0b;
+  --contact-text: #f3efe9;
+  --contact-photo-filter: saturate(0.95) contrast(1.08) brightness(0.95);
+  --contact-scrim: linear-gradient(180deg,
       rgba(12, 10, 9, 0.15) 0%,
       rgba(12, 10, 9, 0.25) 35%,
       rgba(12, 10, 9, 0.90) 65%,
       #0d0b0a 100%);
-}
-
-body[data-theme="luxury"] .secao-contato__conteudo {
-  position: relative;
-  z-index: 2;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 44px 24px 34px;
-}
-
-body[data-theme="luxury"] .secao-contato__topo {
-  display: flex;
-  justify-content: center;
-}
-
-body[data-theme="luxury"] .secao-contato__corpo {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-body[data-theme="luxury"] .secao-contato__titulo {
-  margin: 0;
-  font-family: 'Fraunces', Georgia, serif;
-  font-size: 38px;
-  line-height: 1.08;
-  font-weight: 400;
-  color: #f3efe9;
-}
-
-body[data-theme="luxury"] .secao-contato__titulo em {
-  font-style: italic;
-  color: #c9a389;
-}
-
-body[data-theme="luxury"] .secao-contato__desc {
-  margin: 0;
-  font-size: 14px;
-  color: rgba(243, 239, 233, 0.85);
-  max-width: 320px;
-  line-height: 1.45;
-}
-
-body[data-theme="luxury"] .secao-contato__acoes {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 4px;
-}
-
-body[data-theme="luxury"] .btn-whatsapp, body[data-theme="luxury"] .btn-instagram {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 52px;
-  padding: 0 22px;
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  border-radius: 12px;
-  text-decoration: none !important;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  transition: all 0.25s ease;
-}
-
-body[data-theme="luxury"] .btn-whatsapp {
-  background: linear-gradient(135deg, rgba(24, 125, 65, 0.70) 0%, rgba(6, 78, 68, 0.80) 100%) !important;
-  color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.25) !important;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45) !important;
-}
-
-body[data-theme="luxury"] .btn-whatsapp:hover {
-  background: linear-gradient(135deg, rgba(28, 145, 76, 0.84) 0%, rgba(7, 92, 80, 0.92) 100%) !important;
-  color: #ffffff !important;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 22px rgba(24, 125, 65, 0.35) !important;
-}
-
-body[data-theme="luxury"] .btn-instagram {
-  background: linear-gradient(135deg, rgba(120, 40, 165, 0.68) 0%, rgba(215, 30, 30, 0.62) 50%, rgba(220, 145, 45, 0.62) 100%) !important;
-  color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.25) !important;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45) !important;
-}
-
-body[data-theme="luxury"] .btn-instagram:hover {
-  background: linear-gradient(135deg, rgba(135, 45, 185, 0.80) 0%, rgba(235, 35, 35, 0.75) 50%, rgba(235, 160, 50, 0.75) 100%) !important;
-  color: #ffffff !important;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 22px rgba(215, 30, 30, 0.35) !important;
-}
-
-body[data-theme="luxury"] .btn__left {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: .18em;
-}
-
-body[data-theme="luxury"] .btn__left span {
-  font-size: 11.5px;
-}
-
-body[data-theme="luxury"] .btn__icon {
-  width: 17px;
-  height: 17px;
-  flex-shrink: 0;
-  display: block;
-}
-
-body[data-theme="luxury"] .btn__arrow {
-  font-size: 16px;
-  line-height: 1;
-  opacity: .85;
-}
-
-body[data-theme="luxury"] .secao-contato__info {
-  border-top: 1px solid rgba(201, 163, 137, 0.15);
-  padding-top: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-size: 10.5px;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: rgba(243, 239, 233, 0.5);
-}
-
-body[data-theme="luxury"] .secao-contato__copy, body[data-theme="luxury"] .secao-contato__endereco, body[data-theme="luxury"] .secao-contato__info span {
-  margin: 0;
-  font-size: 10.5px;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: inherit;
+  --contact-title-color: #f3efe9;
+  --contact-title-em-color: #c9a389;
+  --contact-desc-color: rgba(243, 239, 233, 0.85);
+  --contact-wsp-bg: linear-gradient(135deg, rgba(24, 125, 65, 0.70) 0%, rgba(6, 78, 68, 0.80) 100%);
+  --contact-wsp-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+  --contact-wsp-hover-bg: linear-gradient(135deg, rgba(28, 145, 76, 0.84) 0%, rgba(7, 92, 80, 0.92) 100%);
+  --contact-wsp-hover-shadow: 0 6px 22px rgba(24, 125, 65, 0.35);
+  --contact-ig-bg: linear-gradient(135deg, rgba(120, 40, 165, 0.68) 0%, rgba(215, 30, 30, 0.62) 50%, rgba(220, 145, 45, 0.62) 100%);
+  --contact-ig-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+  --contact-ig-hover-bg: linear-gradient(135deg, rgba(135, 45, 185, 0.80) 0%, rgba(235, 35, 35, 0.75) 50%, rgba(235, 160, 50, 0.75) 100%);
+  --contact-ig-hover-shadow: 0 6px 22px rgba(215, 30, 30, 0.35);
+  --contact-info-color: rgba(243, 239, 233, 0.5);
+  --contact-info-border: rgba(201, 163, 137, 0.15);
 }
 
 /* ==========================================================================
