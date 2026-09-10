@@ -230,16 +230,16 @@ button {
   padding: 44px 24px 40px;
 }
 
-/* O bloco nome/frase/chips/botão (.hero__titulo pra baixo) é ancorado ao
-   RODAPÉ do hero via margin-top:auto (ver .hero__titulo) — isso o mantém
-   sempre colado à área mais escura do gradiente, em qualquer altura de tela.
-   Por isso ele NÃO se move com padding-top (só o selo "Seja Bem-Vinda" se
-   move com padding-top). Pra descer/subir esse bloco, o controle é o
-   padding-bottom daqui. */
-@media (max-width: 480px) {
-  .hero__conteudo {
-    padding-bottom: 16px;
-  }
+/* TEMA ROSE: o bloco selo+nome+frase+chips+botão anda junto, ancorado como
+   UM grupo só no rodapé do hero (justify-content: flex-end). Antes o selo
+   ficava preso no topo (via padding-top) e o resto era empurrado pro rodapé
+   separadamente (via margin-top:auto em .hero__titulo, ver abaixo) — dois
+   mecanismos diferentes, então a posição final dependia de quanto texto/chip
+   o cliente tinha. Agora é um grupo único: padding-bottom é o único controle
+   de "descer/subir o bloco todo". */
+body[data-theme="rose"] .hero__conteudo {
+  justify-content: flex-end;
+  padding-bottom: 16px;
 }
 
 .hero__selo {
@@ -293,6 +293,14 @@ button {
   gap: 14px;
   margin-top: auto;
   margin-bottom: 12px;
+}
+
+/* Tema Rose: espaçamento fixo entre o selo e o título, já que o grupo
+   inteiro se move junto agora (ver body[data-theme="rose"] .hero__conteudo
+   acima) — sem isso o navegador ainda usaria a regra base (margin-top:auto)
+   dentro do grupo e o selo ficaria colado no título. */
+body[data-theme="rose"] .hero__titulo {
+  margin-top: 20px;
 }
 
 .hero__titulo h1 {
