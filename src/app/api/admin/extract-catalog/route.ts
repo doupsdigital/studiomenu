@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+import { nichePresetsMap } from '@/data/niche-presets';
+import { NicheType } from '@/types/catalog';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf'];
 const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15MB
@@ -21,6 +23,11 @@ const PROCEDURES_TOOL = {
             duration: { type: 'string', description: 'Duração do procedimento, se estiver indicada (ex: "1h30"). Deixe vazio se não houver.' },
             category: { type: 'string', description: 'Categoria/agrupamento do procedimento, se a tabela indicar (ex: "Cílios", "Unhas"). Use "Geral" se não houver agrupamento claro.' },
             description: { type: 'string', description: 'Descrição curta, se houver algum detalhe extra no material. Deixe vazio se não houver.' },
+            image_url: {
+              type: 'string',
+              description:
+                'Se o nome do procedimento corresponder (mesmo com variação de escrita) a algum item da "lista de referência do catálogo modelo" fornecida, copie aqui EXATAMENTE a URL de imagem daquele item correspondente. Se não houver correspondência clara, deixe este campo como string vazia.',
+            },
           },
           required: ['title', 'price'],
         },
@@ -78,6 +85,11 @@ export async function POST(request: Request) {
       }
     }
 
+    const nichePreset = nichePresetsMap[niche as NicheType] || nichePresetsMap.lash;
+    const referenceList = nichePreset.procedures
+      .map((p) => `- "${p.title}" → ${p.image_url}`)
+      .join('\n');
+
     contentBlocks.push({
       type: 'text',
       text:
@@ -85,7 +97,11 @@ export async function POST(request: Request) {
         `Extraia TODOS os procedimentos/serviços listados, com nome, preço (mantendo o formato original do texto), ` +
         `duração quando indicada, e categoria quando a tabela deixar clara alguma divisão/agrupamento (senão use "Geral"). ` +
         `Ignore cabeçalhos decorativos, logotipo, informações de contato/endereço/redes sociais. ` +
-        `Se houver mais de um arquivo, trate-os como continuação da mesma tabela (não duplique itens repetidos entre eles).`,
+        `Se houver mais de um arquivo, trate-os como continuação da mesma tabela (não duplique itens repetidos entre eles).\n\n` +
+        `Lista de referência do catálogo modelo deste nicho (nome → imagem):\n${referenceList}\n\n` +
+        `Para cada procedimento que você extrair, se o nome for equivalente a algum item dessa lista de referência ` +
+        `(mesmo com variação de escrita, plural/singular, ou palavras a mais/a menos), preencha o campo "image_url" ` +
+        `com a URL exata daquele item. Se não houver correspondência clara, deixe "image_url" vazio.`,
     });
 
     const anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {
@@ -117,6 +133,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: 'A IA não conseguiu extrair os procedimentos desse material.' }, { status: 422 });
     }
 
+    const defaultImage = nichePreset.procedures[0]?.image_url || '';
+
     const procedures = (toolUseBlock.input?.procedures || []).map((p: any, index: number) => ({
       id: `ai-${Date.now()}-${index}`,
       title: p.title || 'Procedimento sem nome',
@@ -124,7 +142,7 @@ export async function POST(request: Request) {
       price: p.price || 'Sob Consulta',
       duration: p.duration || '',
       category: p.category || 'Geral',
-      image_url: '',
+      image_url: p.image_url || defaultImage,
       badge: '',
       is_highlight: false,
     }));
