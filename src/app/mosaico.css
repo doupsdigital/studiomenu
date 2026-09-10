@@ -230,6 +230,12 @@ button {
   padding: 44px 24px 40px;
 }
 
+@media (max-width: 480px) {
+  .hero__conteudo {
+    padding-top: 84px;
+  }
+}
+
 .hero__selo {
   display: flex;
   justify-content: center;
