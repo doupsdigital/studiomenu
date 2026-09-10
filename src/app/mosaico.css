@@ -16,6 +16,45 @@
   padding: 0;
 }
 
+/* ---------- Tokens de Tema (Hero) ----------
+   Fonte única de cor pro Hero: Rose é o padrão em :root, Luxury só
+   redefine os mesmos nomes de variável mais abaixo. Layout/espaçamento
+   das regras do Hero nunca mudam entre temas — só o que está aqui. */
+:root {
+  --hero-bg: #f2cad5;
+  --hero-scrim: linear-gradient(180deg,
+      rgba(242, 202, 213, 0.35) 0%,
+      rgba(242, 202, 213, 0.12) 25%,
+      rgba(242, 202, 213, 0.48) 55%,
+      rgba(242, 202, 213, 0.88) 82%,
+      #f2cad5 100%);
+  --hero-photo-filter: saturate(1.08) contrast(1.06) brightness(0.97);
+  --hero-selo-color: #a93259;
+  --hero-selo-bg: rgba(255, 255, 255, 0.90);
+  --hero-selo-border: rgba(169, 50, 89, 0.30);
+  --hero-selo-shadow: 0 2px 8px rgba(70, 25, 40, 0.08);
+  --hero-studio-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+  --hero-accent: #a93259;
+  --hero-text-soft: #553d46;
+  --hero-text-strong: #4a0d20;
+  --hero-chip-border: rgba(255, 255, 255, 0.40);
+  --hero-chip-color: #ffffff;
+  --hero-chip-bg: linear-gradient(135deg, #a93259 0%, #c4426e 100%);
+  --hero-chip-shadow: 0 4px 16px rgba(169, 50, 89, 0.40), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  --hero-chip-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --hero-chip-hover-bg: linear-gradient(135deg, #b83a63 0%, #d8517c 100%);
+  --hero-chip-hover-border: rgba(255, 255, 255, 0.65);
+  --hero-chip-hover-color: #ffffff;
+  --hero-scroll-span-color: #8c2545;
+  --hero-scroll-span-bg: rgba(255, 255, 255, 0.42);
+  --hero-scroll-span-border: rgba(169, 50, 89, 0.28);
+  --hero-scroll-span-shadow: 0 4px 18px rgba(169, 50, 89, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  --hero-scroll-hover-bg: rgba(255, 255, 255, 0.65);
+  --hero-scroll-hover-border: rgba(169, 50, 89, 0.45);
+  --hero-scroll-hover-shadow: 0 6px 22px rgba(169, 50, 89, 0.2);
+  --hero-scroll-linha: linear-gradient(180deg, #a93259, transparent);
+}
+
 html,
 body {
   width: 100%;
@@ -177,7 +216,7 @@ button {
   width: 100%;
   position: relative;
   overflow: hidden;
-  background: #f2cad5;
+  background: var(--hero-bg);
   scroll-snap-align: start;
   scroll-snap-stop: always;
 }
@@ -193,7 +232,7 @@ button {
   height: 100%;
   object-fit: cover;
   object-position: center 18%;
-  filter: saturate(1.08) contrast(1.06) brightness(0.97);
+  filter: var(--hero-photo-filter);
 }
 
 .hero--classico .hero__foto-wrap {
@@ -211,13 +250,7 @@ button {
 .hero__scrim {
   position: absolute;
   inset: 0;
-  /* Gradiente esfumaçado rosa nítido com fusão perfeita no rodapé (Sem Blur / Foto 100% Nítida) */
-  background: linear-gradient(180deg,
-      rgba(242, 202, 213, 0.35) 0%,
-      rgba(242, 202, 213, 0.12) 25%,
-      rgba(242, 202, 213, 0.48) 55%,
-      rgba(242, 202, 213, 0.88) 82%,
-      #f2cad5 100%);
+  background: var(--hero-scrim);
 }
 
 /* Bloco selo+nome+frase+chips+botão ancorado como UM grupo só no rodapé do
@@ -249,14 +282,14 @@ button {
   font-weight: 600;
   letter-spacing: .38em;
   text-transform: uppercase;
-  color: #a93259;
-  background: rgba(255, 255, 255, 0.90);
+  color: var(--hero-selo-color);
+  background: var(--hero-selo-bg);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   padding: 4px 14px;
   border-radius: 999px;
-  border: 1px solid rgba(169, 50, 89, 0.30);
-  box-shadow: 0 2px 8px rgba(70, 25, 40, 0.08);
+  border: 1px solid var(--hero-selo-border);
+  box-shadow: var(--hero-selo-shadow);
 }
 
 .hero__studio-line {
@@ -275,7 +308,7 @@ button {
   color: #ffffff;
   line-height: 1;
   text-transform: uppercase;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+  text-shadow: var(--hero-studio-shadow);
 }
 
 .hero__studio-divider {
@@ -303,27 +336,27 @@ button {
   line-height: 1.05;
   font-weight: 400;
   font-style: italic;
-  color: #a93259;
+  color: var(--hero-accent);
   letter-spacing: -.01em;
 }
 
 .hero__titulo h1 em {
   font-style: italic;
   font-weight: 400;
-  color: #a93259;
+  color: var(--hero-accent);
 }
 
 .hero__filete {
   width: 44px;
   height: 2px;
-  background: #a93259;
+  background: var(--hero-accent);
 }
 
 .hero__frase {
   margin: 0;
   font-size: 18px;
   line-height: 1.45;
-  color: #553d46;
+  color: var(--hero-text-soft);
   max-width: 340px;
 }
 
@@ -335,7 +368,7 @@ button {
   line-height: 1.25;
   font-weight: 400;
   font-style: italic;
-  color: #4a0d20;
+  color: var(--hero-text-strong);
   text-wrap: normal;
 }
 
@@ -357,26 +390,27 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(255, 255, 255, 0.40);
+  border: 1px solid var(--hero-chip-border);
   border-radius: 999px;
   padding: 8px 16px;
   font-size: 10.5px;
   letter-spacing: .12em;
   line-height: 1.2;
   text-transform: uppercase;
-  color: #ffffff;
-  background: linear-gradient(135deg, #a93259 0%, #c4426e 100%);
+  color: var(--hero-chip-color);
+  background: var(--hero-chip-bg);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   font-weight: 700;
-  box-shadow: 0 4px 16px rgba(169, 50, 89, 0.40), inset 0 1px 0 rgba(255, 255, 255, 0.35);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--hero-chip-shadow);
+  text-shadow: var(--hero-chip-text-shadow);
   transition: all 0.22s ease;
 }
 
 .hero__chip:hover {
-  background: linear-gradient(135deg, #b83a63 0%, #d8517c 100%);
-  border-color: rgba(255, 255, 255, 0.65);
+  background: var(--hero-chip-hover-bg);
+  border-color: var(--hero-chip-hover-border);
+  color: var(--hero-chip-hover-color);
   transform: translateY(-1px);
 }
 
@@ -385,7 +419,7 @@ button {
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  color: #a93259;
+  color: var(--hero-accent);
   text-decoration: none;
   margin-top: 8px;
 }
@@ -395,30 +429,30 @@ button {
   font-weight: 600;
   letter-spacing: .32em;
   text-transform: uppercase;
-  color: #8c2545;
-  background: rgba(255, 255, 255, 0.42);
-  border: 1px solid rgba(169, 50, 89, 0.28);
+  color: var(--hero-scroll-span-color);
+  background: var(--hero-scroll-span-bg);
+  border: 1px solid var(--hero-scroll-span-border);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   padding: 9px 24px;
   border-radius: 999px;
-  box-shadow: 0 4px 18px rgba(169, 50, 89, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  box-shadow: var(--hero-scroll-span-shadow);
   transition: all 0.25s ease;
   display: inline-block;
 }
 
 .hero__scroll-cue:hover span,
 .hero__scroll-cue:active span {
-  background: rgba(255, 255, 255, 0.65);
-  border-color: rgba(169, 50, 89, 0.45);
+  background: var(--hero-scroll-hover-bg);
+  border-color: var(--hero-scroll-hover-border);
   transform: translateY(-2px);
-  box-shadow: 0 6px 22px rgba(169, 50, 89, 0.2);
+  box-shadow: var(--hero-scroll-hover-shadow);
 }
 
 .hero__scroll-linha {
   width: 2px;
   height: 38px;
-  background: linear-gradient(180deg, #a93259, transparent);
+  background: var(--hero-scroll-linha);
   animation: heroPulseLinha 2.2s infinite ease-in-out;
 }
 
@@ -1510,95 +1544,45 @@ body[data-theme="luxury"] .secao-contato__foto {
 }
 
 /* ==========================================================================
-   1. HERO SECTION (SNAP SCREEN 1)
-   Layout/espaçamento/tamanho são os MESMOS do tema Rose (regras base acima
-   e sem seletor de tema) — aqui só entra o que é de fato cor/tom, pra nunca
-   mais os dois temas desalinharem estruturalmente.
+   1. HERO SECTION — TOKENS DO TEMA LUXURY
+   Sem nenhuma regra de seletor aqui (nada de .hero__chip, .hero__titulo
+   etc) -- só redefine as variáveis de cor do :root. As regras de
+   layout/espaçamento/cor do Hero moram todas em UM lugar só (o bloco base
+   lá em cima), então não tem como os dois temas desalinharem de novo:
+   não existe "segunda cópia" pra esquecer de atualizar.
    ========================================================================== */
-body[data-theme="luxury"] .hero {
-  background: #14100e;
-}
-
-body[data-theme="luxury"] .hero__foto {
-  filter: saturate(1.02) contrast(1.08) brightness(0.96);
-}
-
-body[data-theme="luxury"] .hero__scrim {
-  background: linear-gradient(
-    180deg,
-    rgba(12, 10, 9, 0.35) 0%,
-    rgba(12, 10, 9, 0.15) 30%,
-    rgba(12, 10, 9, 0.72) 62%,
-    rgba(12, 10, 9, 0.94) 100%
-  );
-}
-
-body[data-theme="luxury"] .hero__selo span {
-  color: #f3efe9;
-  background: rgba(25, 20, 17, 0.45);
-  border-color: rgba(201, 163, 137, 0.35);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-}
-
-body[data-theme="luxury"] .hero__studio-label {
-  color: #ffffff;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
-}
-
-body[data-theme="luxury"] .hero__chip {
-  border-color: rgba(255, 255, 255, 0.45);
-  color: #0f0c0b;
-  background: linear-gradient(135deg, #c9a389 0%, #dfa87a 100%);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(201, 163, 137, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.50);
-  text-shadow: none;
-}
-
-body[data-theme="luxury"] .hero__chip:hover {
-  background: linear-gradient(135deg, #d8b298 0%, #ebb98e 100%);
-  border-color: rgba(255, 255, 255, 0.70);
-  color: #000000;
-}
-
-body[data-theme="luxury"] .hero__titulo h1 {
-  color: #c9a389;
-}
-
-body[data-theme="luxury"] .hero__titulo h1 em {
-  color: #c9a389;
-}
-
-body[data-theme="luxury"] .hero__filete {
-  background: #c9a389;
-}
-
-body[data-theme="luxury"] .hero__frase {
-  color: rgba(243, 239, 233, 0.85);
-}
-
-body[data-theme="luxury"] .hero__frase-cilios {
-  color: #f3efe9;
-}
-
-body[data-theme="luxury"] .hero__scroll-cue {
-  color: #c9a389;
-}
-
-body[data-theme="luxury"] .hero__scroll-cue span {
-  color: #f3efe9;
-  background: rgba(25, 20, 17, 0.45);
-  border-color: rgba(201, 163, 137, 0.35);
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
-}
-
-body[data-theme="luxury"] .hero__scroll-cue:hover span,
-body[data-theme="luxury"] .hero__scroll-cue:active span {
-  background: rgba(25, 20, 17, 0.7);
-  border-color: rgba(201, 163, 137, 0.6);
-  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.5);
-}
-
-body[data-theme="luxury"] .hero__scroll-linha {
-  background: linear-gradient(180deg, #c9a389, transparent);
+[data-theme="luxury"] {
+  --hero-bg: #14100e;
+  --hero-scrim: linear-gradient(180deg,
+      rgba(12, 10, 9, 0.35) 0%,
+      rgba(12, 10, 9, 0.15) 30%,
+      rgba(12, 10, 9, 0.72) 62%,
+      rgba(12, 10, 9, 0.94) 100%);
+  --hero-photo-filter: saturate(1.02) contrast(1.08) brightness(0.96);
+  --hero-selo-color: #f3efe9;
+  --hero-selo-bg: rgba(25, 20, 17, 0.45);
+  --hero-selo-border: rgba(201, 163, 137, 0.35);
+  --hero-selo-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  --hero-studio-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
+  --hero-accent: #c9a389;
+  --hero-text-soft: rgba(243, 239, 233, 0.85);
+  --hero-text-strong: #f3efe9;
+  --hero-chip-border: rgba(255, 255, 255, 0.45);
+  --hero-chip-color: #0f0c0b;
+  --hero-chip-bg: linear-gradient(135deg, #c9a389 0%, #dfa87a 100%);
+  --hero-chip-shadow: 0 4px 16px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(201, 163, 137, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.50);
+  --hero-chip-text-shadow: none;
+  --hero-chip-hover-bg: linear-gradient(135deg, #d8b298 0%, #ebb98e 100%);
+  --hero-chip-hover-border: rgba(255, 255, 255, 0.70);
+  --hero-chip-hover-color: #000000;
+  --hero-scroll-span-color: #f3efe9;
+  --hero-scroll-span-bg: rgba(25, 20, 17, 0.45);
+  --hero-scroll-span-border: rgba(201, 163, 137, 0.35);
+  --hero-scroll-span-shadow: 0 4px 18px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  --hero-scroll-hover-bg: rgba(25, 20, 17, 0.7);
+  --hero-scroll-hover-border: rgba(201, 163, 137, 0.6);
+  --hero-scroll-hover-shadow: 0 6px 22px rgba(0, 0, 0, 0.5);
+  --hero-scroll-linha: linear-gradient(180deg, #c9a389, transparent);
 }
 
 /* ==========================================================================
