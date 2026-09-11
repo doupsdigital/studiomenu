@@ -170,7 +170,7 @@ export default function CriarComIAPage() {
     };
 
     return (
-      <div className="criar-ia-review relative min-h-screen pb-[62vh] bg-slate-950">
+      <div className="lm-preview-no-wsp-float relative min-h-screen pb-[62vh] bg-slate-950">
         <button
           type="button"
           onClick={() => setStep('form')}

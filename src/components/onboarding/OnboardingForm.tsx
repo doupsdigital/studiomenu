@@ -215,7 +215,7 @@ export function OnboardingForm({ withWelcome = false }: OnboardingFormProps) {
     };
 
     return (
-      <div className="relative min-h-screen pb-24">
+      <div className="relative min-h-screen pb-24 lm-preview-no-wsp-float">
         <button
           type="button"
           onClick={() => setCurrentStep(2)}
