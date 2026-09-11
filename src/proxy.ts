@@ -31,6 +31,11 @@ export default function middleware(request: NextRequest) {
   ) {
     const slug = parts[0].toLowerCase().trim();
 
+    // Um subdomínio de cliente serve só o catálogo dele — nunca o painel admin.
+    if (url.pathname === '/admin' || url.pathname.startsWith('/admin/')) {
+      return new NextResponse('Not Found', { status: 404 });
+    }
+
     // Se acessar a raiz do subdomínio, reencaminha internamente para /c/[slug]
     if (url.pathname === '/' || url.pathname === '') {
       url.pathname = `/c/${slug}`;
