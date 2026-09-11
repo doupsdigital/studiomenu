@@ -403,6 +403,7 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
           onConfirmDiscard={handleConfirmDiscard}
           onOpenAddCatModal={() => setActiveModal('category')}
           onConfirmSaveDatabase={handleConfirmSaveDatabase}
+          onUploadError={(msg) => showToast(`❌ ${msg}`)}
           isSaving={isSaving}
         />
       )}

@@ -42,6 +42,7 @@ interface VisualEditorModalsProps {
   onConfirmDiscard?: () => void;
   onOpenAddCatModal?: () => void;
   onConfirmSaveDatabase: () => void;
+  onUploadError?: (message: string) => void;
   isSaving: boolean;
 }
 
@@ -66,6 +67,7 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
   onConfirmDiscard,
   onOpenAddCatModal,
   onConfirmSaveDatabase,
+  onUploadError,
   isSaving,
 }) => {
   const safeCategories = React.useMemo(() => {
@@ -235,23 +237,10 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
           setProcForm((prev) => ({ ...prev, image_url: result.url }));
         }
       } else {
-        // Fallback local se upload der algum aviso
-        const localUrl = URL.createObjectURL(file);
-        if (target === 'cover') {
-          onSaveCoverUrl(localUrl);
-          onClose();
-        } else {
-          setProcForm((prev) => ({ ...prev, image_url: localUrl }));
-        }
+        onUploadError?.(result.message || 'Não foi possível enviar a imagem. Tente novamente.');
       }
     } catch (err) {
-      const localUrl = URL.createObjectURL(file);
-      if (target === 'cover') {
-        onSaveCoverUrl(localUrl);
-        onClose();
-      } else {
-        setProcForm((prev) => ({ ...prev, image_url: localUrl }));
-      }
+      onUploadError?.('Falha de conexão ao enviar a imagem. Tente novamente.');
     } finally {
       setIsUploading(false);
     }
