@@ -236,12 +236,31 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
   };
 
   const handleSaveProcedure = (proc: ProcedureItem, index: number | null) => {
+    const { maintenance, visualEffect, ...rest } = proc as ProcedureItem & {
+      maintenance?: string;
+      visualEffect?: string;
+    };
+
+    // Reconstrói os specs (Investimento/Duração/Manutenção/Efeito Visual) a partir
+    // dos campos do formulário — eram coletados na UI mas nunca chegavam a ser salvos.
+    const priceLabel = !rest.price
+      ? 'Sob Consulta'
+      : rest.price.toLowerCase().includes('r$')
+        ? rest.price
+        : `R$ ${rest.price}`;
+    const specs: [string, string][] = [['Investimento', priceLabel]];
+    if (rest.duration) specs.push(['Duração', rest.duration]);
+    if (maintenance) specs.push(['Manutenção', maintenance]);
+    if (visualEffect) specs.push(['Efeito Visual', visualEffect]);
+
+    const normalizedProc: ProcedureItem = { ...rest, specs };
+
     const newProcs = [...catalogState.procedures];
     const isNew = index === null || index < 0;
     if (!isNew) {
-      newProcs[index as number] = proc;
+      newProcs[index as number] = normalizedProc;
     } else {
-      newProcs.push({ ...proc, id: String(Date.now()) });
+      newProcs.push({ ...normalizedProc, id: String(Date.now()) });
     }
     pushState({ ...catalogState, procedures: newProcs });
     showToast(isNew ? '✨ Procedimento adicionado!' : '✅ Procedimento salvo!');

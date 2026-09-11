@@ -36,6 +36,7 @@ export async function getCatalogBySlug(slug: string): Promise<CatalogOrderData |
         image_url: s.image_url || s.img || '',
         badge: s.badge || '',
         is_highlight: Boolean(s.destaque || s.is_highlight),
+        specs: Array.isArray(s.specs) ? s.specs : [],
       }));
     } else if (Array.isArray(orderData.procedures) && orderData.procedures.length > 0) {
       procedures = orderData.procedures;

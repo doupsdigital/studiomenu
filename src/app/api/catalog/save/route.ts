@@ -100,6 +100,7 @@ export async function POST(request: Request) {
           image_url: proc.image_url || '',
           badge: proc.badge || '',
           is_highlight: Boolean(proc.is_highlight),
+          specs: proc.specs || [],
         }));
 
         const { error: insertServicesError } = await supabaseAdmin

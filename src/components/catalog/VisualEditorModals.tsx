@@ -142,7 +142,11 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
   // Proc Form State
   const [procForm, setProcForm] = useState<ProcedureItem & { maintenance?: string; visualEffect?: string }>(
     editingProc
-      ? { ...editingProc }
+      ? {
+          ...editingProc,
+          maintenance: editingProc.specs?.find(([k]) => k === 'Manutenção')?.[1] || '',
+          visualEffect: editingProc.specs?.find(([k]) => k === 'Efeito Visual')?.[1] || '',
+        }
       : {
           id: '',
           title: '',
@@ -174,7 +178,11 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
   // Sincronizar form proc se prop mudar
   React.useEffect(() => {
     if (editingProc) {
-      setProcForm({ ...editingProc });
+      setProcForm({
+        ...editingProc,
+        maintenance: editingProc.specs?.find(([k]) => k === 'Manutenção')?.[1] || '',
+        visualEffect: editingProc.specs?.find(([k]) => k === 'Efeito Visual')?.[1] || '',
+      });
     } else {
       setProcForm({
         id: '',
