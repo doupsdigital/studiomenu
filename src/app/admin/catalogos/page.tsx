@@ -1,10 +1,12 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
 import { CatalogOrderData } from '@/types/catalog';
 import Link from 'next/link';
 import { ArrowLeft, Sparkles, ExternalLink, Search, RefreshCw, Scissors, Plus, Trash2, MessageCircle, Phone, Clock } from 'lucide-react';
+
+// Mesmo valor de src/app/admin/layout.tsx — protege as rotas /api/admin/*
+const ADMIN_SECRET = '5669';
 
 export default function AdminCatalogosPage() {
   const [catalogs, setCatalogs] = useState<CatalogOrderData[]>([]);
@@ -20,13 +22,14 @@ export default function AdminCatalogosPage() {
   const fetchCatalogs = async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('orders')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (data) {
-        setCatalogs(data as CatalogOrderData[]);
+      const res = await fetch('/api/admin/catalogs-list', {
+        headers: { 'x-admin-secret': ADMIN_SECRET },
+      });
+      const result = await res.json();
+      if (result.success) {
+        setCatalogs(result.catalogs as CatalogOrderData[]);
+      } else {
+        console.error('Erro ao buscar catálogos:', result.message);
       }
     } catch (err) {
       console.error('Erro ao buscar catálogos:', err);
@@ -49,15 +52,36 @@ export default function AdminCatalogosPage() {
   const deleteCatalog = async (id?: string) => {
     if (!id || !confirm('Tem certeza que deseja excluir este catálogo?')) return;
     try {
-      await supabase.from('orders').delete().eq('id', id);
+      const res = await fetch('/api/admin/catalog-actions', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', 'x-admin-secret': ADMIN_SECRET },
+        body: JSON.stringify({ id }),
+      });
+      const result = await res.json();
+      if (!result.success) {
+        showToast('❌ Erro ao excluir catálogo.');
+        return;
+      }
       fetchCatalogs();
-    } catch (e) {}
+    } catch (e) {
+      console.error('Erro ao excluir catálogo:', e);
+      showToast('❌ Erro ao excluir catálogo.');
+    }
   };
 
   const approveAndDeliver = async (item: CatalogOrderData) => {
     if (!item.id) return;
     try {
-      await supabase.from('orders').update({ status: 'aprovado' }).eq('id', item.id);
+      const res = await fetch('/api/admin/catalog-actions', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'x-admin-secret': ADMIN_SECRET },
+        body: JSON.stringify({ id: item.id, status: 'aprovado' }),
+      });
+      const result = await res.json();
+      if (!result.success) {
+        console.error('Erro ao aprovar catálogo:', result.message);
+        return;
+      }
       fetchCatalogs();
     } catch (e) {
       console.error('Erro ao aprovar catálogo:', e);

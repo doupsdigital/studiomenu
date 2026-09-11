@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 
 export async function POST(request: Request) {
   try {
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     }
 
     // Validar token no Supabase
-    const { data: order } = await supabase
+    const { data: order } = await supabaseAdmin
       .from('orders')
       .select('id')
       .eq('slug', slug.toLowerCase().trim())
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
     const fileName = `${slug}/${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
     const buffer = Buffer.from(await file.arrayBuffer());
 
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
       .from('catalog-assets')
       .upload(fileName, buffer, {
         contentType: file.type,
@@ -53,7 +53,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: uploadError.message }, { status: 500 });
     }
 
-    const { data: publicUrlData } = supabase.storage
+    const { data: publicUrlData } = supabaseAdmin.storage
       .from('catalog-assets')
       .getPublicUrl(uploadData.path);
 

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 import { ProcedureItem, NicheType } from '@/types/catalog';
 import { nichePresetsMap } from '@/data/niche-presets';
 
@@ -58,7 +58,7 @@ export async function POST(request: Request) {
       const fileName = `${finalSlug}/${Date.now()}_cover.${fileExt}`;
       const buffer = Buffer.from(await coverFile.arrayBuffer());
 
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
         .from('catalog-assets')
         .upload(fileName, buffer, { contentType: coverFile.type, upsert: true });
 
@@ -67,11 +67,11 @@ export async function POST(request: Request) {
         return NextResponse.json({ success: false, message: 'Erro ao enviar a foto de capa.' }, { status: 500 });
       }
 
-      const { data: publicUrlData } = supabase.storage.from('catalog-assets').getPublicUrl(uploadData.path);
+      const { data: publicUrlData } = supabaseAdmin.storage.from('catalog-assets').getPublicUrl(uploadData.path);
       coverUrl = publicUrlData.publicUrl;
     }
 
-    const { data: orderData, error: orderErr } = await supabase
+    const { data: orderData, error: orderErr } = await supabaseAdmin
       .from('orders')
       .insert({
         slug: finalSlug,
@@ -114,7 +114,7 @@ export async function POST(request: Request) {
         badge: p.badge || '',
       }));
 
-      const { error: servicesErr } = await supabase.from('order_services').insert(servicesPayload);
+      const { error: servicesErr } = await supabaseAdmin.from('order_services').insert(servicesPayload);
       if (servicesErr) {
         console.error('[Finalize Catalog] Erro ao gravar procedimentos:', servicesErr);
         return NextResponse.json({ success: false, message: servicesErr.message }, { status: 500 });

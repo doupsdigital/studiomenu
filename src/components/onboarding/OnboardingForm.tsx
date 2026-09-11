@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
 import { formatPhoneBR } from '@/lib/format';
 import { NicheType, LayoutModel, ThemeVariant } from '@/types/catalog';
 import { nichePresetsMap } from '@/data/niche-presets';
@@ -82,65 +81,18 @@ export function OnboardingForm({ withWelcome = false }: OnboardingFormProps) {
     setErrorMsg('');
 
     try {
-      const baseSlug = clientName
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[̀-ͯ]/g, '')
-        .replace(/[^a-z0-9]/g, '-')
-        .replace(/-+/g, '-')
-        .replace(/^-|-$/g, '');
+      const res = await fetch('/api/onboarding/create-catalog', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientName, whatsappDigits, niche, layoutModel, themeVariant }),
+      });
+      const result = await res.json();
 
-      const finalSlug = `${baseSlug}-${Math.floor(100 + Math.random() * 900)}`;
-
-      const coverUrl =
-        layoutModel === 'classico' ? '/modelos/classico/assets/img/Hero.png' : '/modelos/mosaico/assets/img/Hero.png';
-
-      const { data: orderData, error: orderErr } = await supabase
-        .from('orders')
-        .insert({
-          slug: finalSlug,
-          client_name: clientName,
-          hero_phrase: preset.hero_phrase,
-          bio_description: preset.bio_description || '',
-          cover_media_url: coverUrl,
-          avatar_url: coverUrl,
-          instructions_bg_url: preset.instructions_bg_url || null,
-          final_screen_bg_url: preset.final_screen_bg_url || null,
-          cta_bg_url: preset.cta_bg_url || null,
-          niche: niche,
-          layout_model: layoutModel,
-          theme_variant: themeVariant,
-          whatsapp_number: whatsappDigits,
-          instagram_handle: '',
-          address: '',
-          tolerances: preset.instructions?.tolerances || 'Tolerância máxima de 15 minutos de atraso.',
-          pre_care: preset.instructions?.pre_care || [],
-          post_care: preset.instructions?.post_care || [],
-          categories: [],
-        })
-        .select()
-        .single();
-
-      if (orderErr) throw new Error(orderErr.message);
-
-      if (orderData && preset.procedures.length > 0) {
-        const servicesPayload = preset.procedures.map((p, index) => ({
-          order_id: orderData.id,
-          order_index: index,
-          title: p.title,
-          description: p.description || '',
-          price: p.price || 'Sob Consulta',
-          duration: p.duration || '',
-          category: p.category || 'Geral',
-          image_url: p.image_url || '',
-          is_highlight: Boolean(p.is_highlight),
-          badge: p.badge || '',
-          specs: p.specs || [],
-        }));
-
-        const { error: servicesErr } = await supabase.from('order_services').insert(servicesPayload);
-        if (servicesErr) throw new Error(servicesErr.message);
+      if (!result.success) {
+        throw new Error(result.message || 'Erro ao criar o catálogo. Tente novamente.');
       }
+
+      const { slug: finalSlug, editToken } = result;
 
       // Notifica o admin no Telegram (não bloqueia o fluxo se falhar)
       fetch('/api/notify-telegram', {
@@ -152,14 +104,14 @@ export function OnboardingForm({ withWelcome = false }: OnboardingFormProps) {
           layoutModel,
           themeVariant,
           slug: finalSlug,
-          editToken: orderData?.edit_token,
+          editToken,
         }),
       }).catch((err) => console.warn('Aviso: falha ao notificar Telegram:', err));
 
       // Cai direto no catálogo real, já em modo edição, com o overlay de boas-vindas
-      router.push(`/c/${finalSlug}?edit=${orderData?.edit_token}&new=1`);
+      router.push(`/c/${finalSlug}?edit=${editToken}&new=1`);
     } catch (err: any) {
-      console.error('Erro ao criar catálogo no Supabase:', err);
+      console.error('Erro ao criar catálogo:', err);
       setErrorMsg(err.message || 'Erro ao criar o catálogo. Tente novamente.');
       setIsSubmitting(false);
     }

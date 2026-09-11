@@ -56,28 +56,32 @@ CREATE TABLE IF NOT EXISTS public.order_services (
 
 CREATE INDEX IF NOT EXISTS idx_order_services_order_id ON public.order_services(order_id);
 
--- 3. HABILITAR PERMISSÕES DE LEITURA E GRAVAÇÃO (ROW LEVEL SECURITY - RLS)
+-- 3. PERMISSÕES DE LEITURA E GRAVAÇÃO (ROW LEVEL SECURITY - RLS)
+--
+-- ATUALIZADO (auditoria de segurança, item C1): `orders` e `order_services` não têm
+-- MAIS nenhuma política pública. Toda leitura e escrita passa exclusivamente pelas
+-- rotas server-side do Next.js (src/app/api/**), que usam a service_role key — nunca
+-- exposta ao navegador (ver src/lib/supabase-admin.ts). O papel "anon" (chave pública
+-- usada no front) não tem mais nenhum privilégio nessas duas tabelas.
+--
+-- Antes disso, as policies eram todas `USING (true)`/`WITH CHECK (true)`, o que permitia
+-- que qualquer pessoa com a anon key (pública, embutida no bundle) lesse, editasse ou
+-- apagasse qualquer catálogo direto pela REST API do Supabase, e lesse o `edit_token`
+-- de qualquer linha — ignorando por completo o modelo de "link mágico" de edição.
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.order_services ENABLE ROW LEVEL SECURITY;
 
--- Política de leitura pública para qualquer visitante do catálogo
-CREATE POLICY "Permitir Leitura Pública de Catálogos" ON public.orders FOR SELECT USING (true);
-CREATE POLICY "Permitir Leitura Pública de Serviços" ON public.order_services FOR SELECT USING (true);
-
--- Política de inserção e atualização anônima/pública (para criação e edição via link mágico)
-CREATE POLICY "Permitir Inserção de Catálogos" ON public.orders FOR INSERT WITH CHECK (true);
-CREATE POLICY "Permitir Atualização de Catálogos" ON public.orders FOR UPDATE USING (true);
-CREATE POLICY "Permitir Inserção de Serviços" ON public.order_services FOR INSERT WITH CHECK (true);
-CREATE POLICY "Permitir Atualização de Serviços" ON public.order_services FOR UPDATE USING (true);
-CREATE POLICY "Permitir Exclusão de Serviços" ON public.order_services FOR DELETE USING (true);
+-- Nenhuma policy pública: sem policy + RLS habilitado = acesso negado por padrão
+-- para qualquer papel sem BYPASSRLS (a service_role usada pelo backend sempre ignora RLS).
+REVOKE ALL ON public.orders FROM anon;
+REVOKE ALL ON public.order_services FROM anon;
 
 -- 4. BUCKET DE ARMAZENAMENTO PARA FOTOS DOS CATÁLOGOS (`catalog-assets`)
-INSERT INTO storage.buckets (id, name, public) 
+INSERT INTO storage.buckets (id, name, public)
 VALUES ('catalog-assets', 'catalog-assets', true)
 ON CONFLICT (id) DO NOTHING;
 
-CREATE POLICY "Permitir Upload Público no Bucket catalog-assets" ON storage.objects 
-FOR INSERT WITH CHECK (bucket_id = 'catalog-assets');
-
-CREATE POLICY "Permitir Leitura Pública no Bucket catalog-assets" ON storage.objects 
+-- Upload agora só acontece via rotas server-side (service_role) — sem policy de INSERT
+-- anônima. A leitura pública permanece (as imagens dos catálogos continuam públicas).
+CREATE POLICY "Permitir Leitura Pública no Bucket catalog-assets" ON storage.objects
 FOR SELECT USING (bucket_id = 'catalog-assets');

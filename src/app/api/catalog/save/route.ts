@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 import { CatalogOrderData } from '@/types/catalog';
 
 export async function POST(request: Request) {
@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     }
 
     // 1. Verificar se o slug e edit_token correspondem no Supabase
-    const { data: existingOrder, error: fetchError } = await supabase
+    const { data: existingOrder, error: fetchError } = await supabaseAdmin
       .from('orders')
       .select('id, edit_token')
       .eq('slug', slug.toLowerCase().trim())
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
     const orderId = existingOrder.id;
 
     // 2. Atualizar dados principais na tabela `orders`
-    const { error: updateOrderError } = await supabase
+    const { error: updateOrderError } = await supabaseAdmin
       .from('orders')
       .update({
         studio_name: catalogData.studio_name,
@@ -78,7 +78,7 @@ export async function POST(request: Request) {
     // 3. Atualizar procedimentos na tabela `order_services`
     if (Array.isArray(catalogData.procedures)) {
       // Deletar procedimentos anteriores do order_id
-      const { error: deleteErr } = await supabase
+      const { error: deleteErr } = await supabaseAdmin
         .from('order_services')
         .delete()
         .eq('order_id', orderId);
@@ -102,7 +102,7 @@ export async function POST(request: Request) {
           is_highlight: Boolean(proc.is_highlight),
         }));
 
-        const { error: insertServicesError } = await supabase
+        const { error: insertServicesError } = await supabaseAdmin
           .from('order_services')
           .insert(servicesToInsert);
 
@@ -122,7 +122,7 @@ export async function POST(request: Request) {
             is_highlight: Boolean(proc.is_highlight),
           }));
 
-          await supabase.from('order_services').insert(legacyServicesToInsert);
+          await supabaseAdmin.from('order_services').insert(legacyServicesToInsert);
         }
       }
     }

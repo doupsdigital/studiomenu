@@ -1,4 +1,4 @@
-import { supabase } from './supabase';
+import { supabaseAdmin } from './supabase-admin';
 import { CatalogOrderData, ProcedureItem } from '@/types/catalog';
 
 export async function getCatalogBySlug(slug: string): Promise<CatalogOrderData | null> {
@@ -6,7 +6,7 @@ export async function getCatalogBySlug(slug: string): Promise<CatalogOrderData |
 
   try {
     // 1. Buscar pedido na tabela `orders`
-    const { data: orderData, error: orderError } = await supabase
+    const { data: orderData, error: orderError } = await supabaseAdmin
       .from('orders')
       .select('*')
       .eq('slug', normalizedSlug)
@@ -19,7 +19,7 @@ export async function getCatalogBySlug(slug: string): Promise<CatalogOrderData |
 
     // 2. Buscar serviços da tabela `order_services` vinculada
     let procedures: ProcedureItem[] = [];
-    const { data: servicesData } = await supabase
+    const { data: servicesData } = await supabaseAdmin
       .from('order_services')
       .select('*')
       .eq('order_id', orderData.id)
