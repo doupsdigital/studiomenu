@@ -9,7 +9,7 @@ import { NicheType, LayoutModel, ThemeVariant, ProcedureItem, CatalogOrderData }
 import { nichePresetsMap } from '@/data/niche-presets';
 import { CatalogLayout } from '@/components/catalog/CatalogLayout';
 import { StylePickerPanel } from '@/components/catalog/StylePickerPanel';
-import { ArrowLeft, Upload, Sparkles, Trash2, Plus, ImageIcon, FileText } from 'lucide-react';
+import { ArrowLeft, Upload, Sparkles, Trash2, Plus, ImageIcon, FileText, Check } from 'lucide-react';
 
 // Mesmo valor de src/app/admin/layout.tsx — segredo simples compartilhado com as
 // rotas /api/admin/*, no mesmo nível de segurança já praticado no painel admin.
@@ -40,6 +40,7 @@ export default function CriarComIAPage() {
   const [errorMsg, setErrorMsg] = useState('');
 
   const whatsappDigits = whatsappDisplay.replace(/\D/g, '');
+  const instagramFull = instagramHandle ? `@${instagramHandle}` : '';
   const coverPreviewUrl = useMemo(() => (coverFile ? URL.createObjectURL(coverFile) : ''), [coverFile]);
 
   // No preview ao vivo: na capa destaca o Tema; da tela de procedimentos em
@@ -117,7 +118,7 @@ export default function CriarComIAPage() {
       const fd = new FormData();
       fd.append('clientName', clientName);
       fd.append('whatsappNumber', whatsappDigits);
-      fd.append('instagramHandle', instagramHandle);
+      fd.append('instagramHandle', instagramFull);
       fd.append('niche', niche);
       fd.append('layoutModel', layoutModel);
       fd.append('themeVariant', themeVariant);
@@ -143,7 +144,7 @@ export default function CriarComIAPage() {
         body: JSON.stringify({
           clientName,
           whatsapp: whatsappDigits,
-          instagram: instagramHandle,
+          instagram: instagramFull,
           layoutModel,
           themeVariant,
           slug: json.slug,
@@ -164,7 +165,7 @@ export default function CriarComIAPage() {
       ...preset,
       client_name: clientName || preset.client_name,
       whatsapp_number: whatsappDigits || preset.whatsapp_number,
-      instagram_handle: instagramHandle,
+      instagram_handle: instagramFull,
       layout_model: layoutModel,
       theme_variant: themeVariant,
       cover_media_url: coverPreviewUrl || preset.cover_media_url,
@@ -173,7 +174,7 @@ export default function CriarComIAPage() {
     };
 
     return (
-      <div className="relative min-h-screen pb-64 bg-slate-950">
+      <div className="criar-ia-review relative min-h-screen pb-[62vh] bg-slate-950">
         <button
           type="button"
           onClick={() => setStep('form')}
@@ -194,19 +195,22 @@ export default function CriarComIAPage() {
 
         <CatalogLayout data={previewCatalog} />
 
+        {/* Véu escuro sobre o catálogo ao fundo, pra destacar que o painel abaixo é a área ativa */}
+        <div className="fixed inset-0 z-40 bg-slate-950/45 pointer-events-none" />
+
         {/* Painel de Revisão dos Procedimentos Extraídos */}
-        <div className="fixed bottom-0 left-0 right-0 z-50 max-h-[55vh] overflow-y-auto bg-slate-950 border-t border-slate-800 rounded-t-3xl shadow-2xl p-5">
+        <div className="fixed bottom-0 left-0 right-0 z-50 max-h-[62vh] overflow-y-auto bg-slate-950 border-t border-slate-700 rounded-t-3xl shadow-[0_-20px_60px_rgba(0,0,0,0.7)] p-5">
           <div className="max-w-xl mx-auto space-y-4">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-3">
               <h2 className="font-serif text-xl font-bold text-white flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-rose-400" /> Confira o que a IA entendeu
+                <Sparkles className="w-5 h-5 text-rose-400 flex-shrink-0" /> Confira o que a IA entendeu
               </h2>
               <button
                 type="button"
                 onClick={addProcedure}
-                className="px-3 py-2 rounded-lg bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs font-bold flex items-center gap-1.5"
+                className="px-3.5 py-2.5 rounded-lg bg-rose-500/20 text-rose-400 border border-rose-500/30 text-sm font-bold flex items-center gap-1.5 flex-shrink-0"
               >
-                <Plus className="w-3.5 h-3.5" /> Item
+                <Plus className="w-4 h-4" /> Item
               </button>
             </div>
 
@@ -216,18 +220,18 @@ export default function CriarComIAPage() {
               </div>
             )}
 
-            <div className="space-y-2.5">
+            <div className="space-y-3">
               {procedures.map((proc) => (
-                <div key={proc.id} className="p-3 bg-slate-900 rounded-xl border border-slate-800 space-y-2">
+                <div key={proc.id} className="p-3.5 bg-slate-900 rounded-xl border border-slate-800 space-y-2.5">
                   <div className="flex items-center gap-2">
                     <input
                       type="text"
                       placeholder="Nome do serviço"
                       value={proc.title}
                       onChange={(e) => updateProcedure(proc.id, 'title', e.target.value)}
-                      className="flex-1 bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-sm text-white"
+                      className="flex-1 bg-slate-950 border border-slate-800 rounded-lg p-3 text-base text-white focus:border-rose-500 focus:outline-none"
                     />
-                    <button type="button" onClick={() => removeProcedure(proc.id)} className="text-slate-500 hover:text-rose-400 p-1.5 flex-shrink-0">
+                    <button type="button" onClick={() => removeProcedure(proc.id)} className="text-slate-500 hover:text-rose-400 p-2 flex-shrink-0">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -237,21 +241,21 @@ export default function CriarComIAPage() {
                       placeholder="Preço"
                       value={proc.price}
                       onChange={(e) => updateProcedure(proc.id, 'price', e.target.value)}
-                      className="bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white"
+                      className="bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-sm text-white focus:border-rose-500 focus:outline-none"
                     />
                     <input
                       type="text"
                       placeholder="Duração"
                       value={proc.duration}
                       onChange={(e) => updateProcedure(proc.id, 'duration', e.target.value)}
-                      className="bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white"
+                      className="bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-sm text-white focus:border-rose-500 focus:outline-none"
                     />
                     <input
                       type="text"
                       placeholder="Categoria"
                       value={proc.category}
                       onChange={(e) => updateProcedure(proc.id, 'category', e.target.value)}
-                      className="bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white"
+                      className="bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-sm text-white focus:border-rose-500 focus:outline-none"
                     />
                   </div>
                 </div>
@@ -323,31 +327,44 @@ export default function CriarComIAPage() {
 
           <div>
             <label className="block text-sm font-semibold text-slate-300 mb-1.5">Instagram</label>
-            <input
-              type="text"
-              value={instagramHandle}
-              onChange={(e) => setInstagramHandle(e.target.value)}
-              placeholder="@studio.dela"
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-base text-white focus:border-rose-500 focus:outline-none"
-            />
+            <div className="flex items-center bg-slate-950 border border-slate-800 rounded-xl focus-within:border-rose-500 transition-all">
+              <span className="pl-3.5 pr-1 text-base text-slate-500 select-none">@</span>
+              <input
+                type="text"
+                value={instagramHandle}
+                onChange={(e) => setInstagramHandle(e.target.value.replace(/^@+/, '').replace(/\s/g, ''))}
+                placeholder="studio.dela"
+                className="w-full bg-transparent py-3.5 pr-3.5 text-base text-white focus:outline-none"
+              />
+            </div>
           </div>
 
           <div>
             <label className="block text-sm font-semibold text-slate-300 mb-2.5">Nicho</label>
             <div className="grid grid-cols-2 gap-2.5">
-              {NICHE_OPTIONS.map((opt) => (
-                <button
-                  key={opt.value}
-                  type="button"
-                  onClick={() => handleNicheChange(opt.value)}
-                  className={`p-3.5 rounded-xl border text-left transition-all ${
-                    niche === opt.value ? 'border-rose-500 bg-rose-500/10 text-white' : 'border-slate-800 bg-slate-950 text-slate-400'
-                  }`}
-                >
-                  <div className="font-bold text-sm text-white">{opt.label}</div>
-                  <p className="text-xs leading-tight mt-0.5">{opt.sublabel}</p>
-                </button>
-              ))}
+              {NICHE_OPTIONS.map((opt) => {
+                const isSelected = niche === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => handleNicheChange(opt.value)}
+                    className={`relative p-4 rounded-xl border-2 text-left transition-all ${
+                      isSelected
+                        ? 'border-rose-500 bg-rose-500 text-white shadow-lg shadow-rose-500/25'
+                        : 'border-slate-700 bg-slate-900 text-slate-300 hover:border-slate-600'
+                    }`}
+                  >
+                    {isSelected && (
+                      <span className="absolute top-2.5 right-2.5 w-5 h-5 rounded-full bg-white/25 flex items-center justify-center">
+                        <Check className="w-3.5 h-3.5 text-white" />
+                      </span>
+                    )}
+                    <div className="font-bold text-base pr-6">{opt.label}</div>
+                    <p className={`text-sm leading-tight mt-0.5 ${isSelected ? 'text-white/85' : 'text-slate-400'}`}>{opt.sublabel}</p>
+                  </button>
+                );
+              })}
             </div>
           </div>
 

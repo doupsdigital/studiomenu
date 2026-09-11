@@ -818,4 +818,10 @@ body[data-theme="luxury"] .lm-btn-add-service {
   transform: scale(0.97) !important;
 }
 
+/* Tela de Revisão do "Criar Catálogo com IA" — esconde o botão flutuante de
+   WhatsApp do preview, que colidia visualmente com o painel de revisão fixo. */
+.criar-ia-review .wsp-float-btn {
+  display: none !important;
+}
+
 
