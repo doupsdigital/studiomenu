@@ -76,6 +76,8 @@ export async function POST(request: Request) {
       .insert({
         slug: finalSlug,
         client_name: clientName,
+        hero_phrase: preset.hero_phrase,
+        bio_description: preset.bio_description || '',
         cover_media_url: coverUrl,
         avatar_url: coverUrl,
         instructions_bg_url: preset.instructions_bg_url || null,
