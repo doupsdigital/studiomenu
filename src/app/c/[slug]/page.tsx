@@ -86,9 +86,14 @@ export default async function CatalogPage({ params, searchParams }: CatalogPageP
 
   const isEditAuthorized = Boolean(edit && catalog.edit_token && edit === catalog.edit_token);
 
+  // Nunca repassar o edit_token real pro client component — ele nunca é lido no
+  // client (que usa o token vindo da própria URL), e enviá-lo exporia a credencial
+  // de edição de todo catálogo a qualquer visitante, não só a quem tem o link mágico.
+  const { edit_token: _editToken, ...publicCatalog } = catalog;
+
   return (
     <CatalogLayout
-      data={catalog}
+      data={publicCatalog}
       isEditMode={isEditAuthorized}
       editToken={edit || ''}
       isNewCatalog={isEditAuthorized && isNew === '1'}
