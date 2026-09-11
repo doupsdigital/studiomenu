@@ -62,28 +62,28 @@ export const LeadCard: React.FC<LeadCardProps> = ({
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') onToggleExpand();
         }}
-        className="w-full p-4 flex items-center justify-between gap-3 text-left cursor-pointer"
+        className="w-full p-5 flex items-center justify-between gap-3 text-left cursor-pointer"
       >
-        <div className="flex items-center gap-3 min-w-0 flex-1">
-          <span className="px-2 py-1 rounded-lg bg-white/5 text-amber-400 font-bold text-xs flex-shrink-0">#{lead.Rank}</span>
+        <div className="flex items-center gap-3.5 min-w-0 flex-1">
+          <span className="px-2.5 py-1.5 rounded-lg bg-white/5 text-amber-400 font-bold text-sm flex-shrink-0">#{lead.Rank}</span>
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-semibold text-sm truncate">{lead.Nome_Estudio}</span>
-              <span className="px-1.5 py-0.5 rounded-full bg-rose-500/15 text-rose-400 border border-rose-500/30 text-[9px] font-bold flex-shrink-0">
+              <span className="font-semibold text-base truncate">{lead.Nome_Estudio}</span>
+              <span className="px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-400 border border-rose-500/30 text-xs font-bold flex-shrink-0">
                 ⭐ {lead.Score_Potencial} pts
               </span>
             </div>
-            <div className="flex items-center gap-3 text-[11px] text-slate-400 mt-0.5 flex-wrap">
-              <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{lead.Bairro}</span>
-              <span className="flex items-center gap-1"><Star className="w-3 h-3" />{lead.Avaliação_Google} ({lead.Total_Avaliações})</span>
-              <span className="flex items-center gap-1"><Phone className="w-3 h-3" />{lead.Telefone || 'Sem tel'}</span>
+            <div className="flex items-center gap-3 text-xs text-slate-400 mt-1 flex-wrap">
+              <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{lead.Bairro}</span>
+              <span className="flex items-center gap-1"><Star className="w-3.5 h-3.5" />{lead.Avaliação_Google} ({lead.Total_Avaliações})</span>
+              <span className="flex items-center gap-1"><Phone className="w-3.5 h-3.5" />{lead.Telefone || 'Sem tel'}</span>
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-2.5 flex-shrink-0">
           <span
             onClick={(e) => e.stopPropagation()}
-            className={`text-[10px] font-bold px-2 py-1 rounded-lg border ${STATUS_COLORS[status]}`}
+            className={`text-xs font-bold px-2.5 py-1.5 rounded-lg border ${STATUS_COLORS[status]}`}
           >
             <select
               value={status}
@@ -97,13 +97,13 @@ export const LeadCard: React.FC<LeadCardProps> = ({
               ))}
             </select>
           </span>
-          <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+          <ChevronDown className={`w-5 h-5 text-slate-500 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
         </div>
       </div>
 
       {isExpanded && (
-        <div className="px-4 pb-4 border-t border-slate-800 pt-4 space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-400">
+        <div className="px-5 pb-5 border-t border-slate-800 pt-5 space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-sm text-slate-400">
             <div><strong className="text-slate-300">Endereço:</strong> {lead.Endereço || 'N/A'}</div>
             <div>
               <strong className="text-slate-300">Instagram:</strong>{' '}
@@ -126,13 +126,13 @@ export const LeadCard: React.FC<LeadCardProps> = ({
           </div>
 
           <div>
-            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">📝 Anotações Rápidas</label>
+            <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1.5">📝 Anotações Rápidas</label>
             <textarea
               defaultValue={notes}
               onBlur={(e) => onNotesBlur(e.target.value)}
               placeholder="Ex: Pediu para ligar amanhã às 14h..."
               rows={2}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:border-rose-500 focus:outline-none resize-y"
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:border-rose-500 focus:outline-none resize-y"
             />
           </div>
 
@@ -141,23 +141,23 @@ export const LeadCard: React.FC<LeadCardProps> = ({
             const varIdx = getVariation(step);
             const text = getStepText(lead, step as 1 | 2 | 3, varIdx + 1);
             return (
-              <div key={step} className="bg-slate-950/60 border border-slate-800 rounded-xl p-3.5 space-y-2">
+              <div key={step} className="bg-slate-950/60 border border-slate-800 rounded-xl p-4 space-y-2.5">
                 <div className="flex items-center justify-between gap-2 flex-wrap">
-                  <span className="text-xs font-bold text-amber-400">{titles[step - 1]}</span>
+                  <span className="text-sm font-bold text-amber-400">{titles[step - 1]}</span>
                   <button
                     onClick={() => onCopy(text)}
-                    className="px-2 py-1 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-[10px] font-bold flex items-center gap-1"
+                    className="px-2.5 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-xs font-bold flex items-center gap-1.5"
                   >
-                    <Copy className="w-3 h-3" />
+                    <Copy className="w-3.5 h-3.5" />
                     Copiar
                   </button>
                 </div>
-                <div className="flex gap-1">
+                <div className="flex gap-1.5">
                   {[0, 1, 2].map((i) => (
                     <button
                       key={i}
                       onClick={() => onSetVariation(step, i)}
-                      className={`px-2 py-0.5 rounded-md text-[9px] font-semibold border transition-all ${
+                      className={`px-2.5 py-1 rounded-md text-xs font-semibold border transition-all ${
                         varIdx === i ? 'bg-rose-500/20 border-rose-500/60 text-rose-200' : 'bg-white/5 border-slate-700 text-slate-500'
                       }`}
                     >
@@ -165,7 +165,7 @@ export const LeadCard: React.FC<LeadCardProps> = ({
                     </button>
                   ))}
                 </div>
-                <div className="text-[11px] font-mono text-slate-300 whitespace-pre-wrap leading-relaxed bg-black/30 rounded-lg p-2.5">
+                <div className="text-xs font-mono text-slate-300 whitespace-pre-wrap leading-relaxed bg-black/30 rounded-lg p-3">
                   {text}
                 </div>
                 {step === 1 && lead.Link_WhatsApp && (
@@ -173,9 +173,9 @@ export const LeadCard: React.FC<LeadCardProps> = ({
                     href={lead.Link_WhatsApp}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#25D366] text-black text-[10px] font-bold"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#25D366] text-black text-xs font-bold"
                   >
-                    <MessageCircle className="w-3 h-3" />
+                    <MessageCircle className="w-3.5 h-3.5" />
                     Abrir no WhatsApp Direct
                   </a>
                 )}

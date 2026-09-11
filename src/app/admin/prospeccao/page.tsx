@@ -202,48 +202,48 @@ export default function AdminProspeccaoPage() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white p-4 md:p-8">
-      <div className="max-w-5xl mx-auto space-y-6">
+    <main className="min-h-screen bg-slate-950 text-white p-5 md:p-10">
+      <div className="max-w-5xl mx-auto space-y-7">
         {/* Header */}
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-800">
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-7 border-b border-slate-800">
           <div>
             <Link
               href="/admin"
-              className="inline-flex items-center gap-1 text-[10px] font-semibold text-slate-500 hover:text-slate-300 mb-2 transition-all"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-300 mb-2.5 transition-all"
             >
-              <ArrowLeft className="w-3 h-3" />
+              <ArrowLeft className="w-3.5 h-3.5" />
               <span>Voltar ao Painel</span>
             </Link>
-            <div className="flex items-center gap-2">
-              <span className="p-2 rounded-xl bg-rose-500/10 text-rose-400">
-                <Gem className="w-5 h-5" />
+            <div className="flex items-center gap-2.5">
+              <span className="p-2.5 rounded-xl bg-rose-500/10 text-rose-400">
+                <Gem className="w-6 h-6" />
               </span>
-              <h1 className="font-serif text-2xl md:text-3xl font-bold">Painel de Prospecção & CRM</h1>
+              <h1 className="font-serif text-3xl md:text-4xl font-bold">Painel de Prospecção & CRM</h1>
             </div>
-            <p className="text-xs text-slate-400 mt-1">Gestão de abordagens, 1-clique copy e controle de leads.</p>
+            <p className="text-sm text-slate-400 mt-1.5">Gestão de abordagens, 1-clique copy e controle de leads.</p>
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2.5 flex-wrap">
             <input type="file" accept="application/json" ref={fileInputRef} onChange={handleImportFile} className="hidden" />
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 transition-all text-xs font-semibold flex items-center gap-1.5"
+              className="p-3 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 transition-all text-sm font-semibold flex items-center gap-2"
             >
-              <Upload className="w-3.5 h-3.5" />
+              <Upload className="w-4 h-4" />
               <span>Importar Leads</span>
             </button>
             <button
               onClick={exportReport}
-              className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 transition-all text-xs font-semibold flex items-center gap-1.5"
+              className="p-3 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 transition-all text-sm font-semibold flex items-center gap-2"
             >
-              <Download className="w-3.5 h-3.5" />
+              <Download className="w-4 h-4" />
               <span>Exportar</span>
             </button>
             <button
               onClick={() => setConfirmResetOpen(true)}
-              className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-red-500/50 text-slate-300 hover:text-red-400 transition-all text-xs font-semibold flex items-center gap-1.5"
+              className="p-3 rounded-xl bg-slate-900 border border-slate-800 hover:border-red-500/50 text-slate-300 hover:text-red-400 transition-all text-sm font-semibold flex items-center gap-2"
             >
-              <RotateCcw className="w-3.5 h-3.5" />
+              <RotateCcw className="w-4 h-4" />
               <span>Resetar</span>
             </button>
           </div>
@@ -260,23 +260,23 @@ export default function AdminProspeccaoPage() {
         />
 
         {/* Busca e Filtros */}
-        <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+        <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3.5">
           <div className="relative">
-            <Search className="w-4 h-4 absolute left-3.5 top-3.5 text-slate-500" />
+            <Search className="w-5 h-5 absolute left-4 top-3.5 text-slate-500" />
             <input
               type="text"
               placeholder="Buscar por estúdio, nome ou bairro..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:border-rose-500 focus:outline-none"
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-12 pr-4 py-3 text-sm text-white placeholder-slate-500 focus:border-rose-500 focus:outline-none"
             />
           </div>
-          <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1">
+          <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
             {FILTERS.map((f) => (
               <button
                 key={f.key}
                 onClick={() => setActiveFilter(f.key)}
-                className={`flex-shrink-0 px-3 py-1.5 rounded-full text-[10px] font-bold whitespace-nowrap transition-all ${
+                className={`flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
                   activeFilter === f.key
                     ? 'bg-rose-500 text-white'
                     : 'bg-slate-950 border border-slate-800 text-slate-400 hover:border-slate-700'
@@ -290,13 +290,13 @@ export default function AdminProspeccaoPage() {
 
         {/* Lista de Leads */}
         {isLoading ? (
-          <div className="text-center py-16 text-slate-500 text-xs animate-pulse">Carregando leads...</div>
+          <div className="text-center py-16 text-slate-500 text-sm animate-pulse">Carregando leads...</div>
         ) : filteredLeads.length === 0 ? (
           <div className="text-center py-16 bg-slate-900/50 rounded-3xl border border-slate-800 p-8">
-            <p className="text-sm font-semibold text-slate-300">Nenhum lead encontrado.</p>
+            <p className="text-base font-semibold text-slate-300">Nenhum lead encontrado.</p>
           </div>
         ) : (
-          <div className="space-y-2.5">
+          <div className="space-y-3">
             {filteredLeads.map((lead) => (
               <LeadCard
                 key={lead.Rank}
@@ -321,7 +321,7 @@ export default function AdminProspeccaoPage() {
       )}
 
       {toastMessage && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-3 rounded-2xl bg-slate-800 border border-slate-700 text-white text-xs font-semibold shadow-2xl z-50">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-3 rounded-2xl bg-slate-800 border border-slate-700 text-white text-sm font-semibold shadow-2xl z-50">
           {toastMessage}
         </div>
       )}
