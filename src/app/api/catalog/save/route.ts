@@ -117,7 +117,7 @@ export async function POST(request: Request) {
             desc: proc.description || '',
             preco: proc.price || 'Sob Consulta',
             duracao: proc.duration || '',
-            cat_label: proc.category || 'Geral',
+            category: proc.category || 'Geral',
             img: proc.image_url || '',
             badge: proc.badge || '',
             is_highlight: Boolean(proc.is_highlight),
