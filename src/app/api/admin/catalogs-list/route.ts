@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
+import { isAdminRequestAuthorized } from '@/lib/admin-session';
 
-export async function GET(request: Request) {
-  const adminSecret = request.headers.get('x-admin-secret');
-  if (!adminSecret || adminSecret !== process.env.ADMIN_API_SECRET) {
+export async function GET() {
+  if (!(await isAdminRequestAuthorized())) {
     return NextResponse.json({ success: false, message: 'Não autorizado.' }, { status: 403 });
   }
 

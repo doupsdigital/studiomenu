@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { nichePresetsMap } from '@/data/niche-presets';
 import { NicheType } from '@/types/catalog';
+import { isAdminRequestAuthorized } from '@/lib/admin-session';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf'];
 const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15MB
@@ -39,8 +40,7 @@ const PROCEDURES_TOOL = {
 
 export async function POST(request: Request) {
   try {
-    const adminSecret = request.headers.get('x-admin-secret');
-    if (!adminSecret || adminSecret !== process.env.ADMIN_API_SECRET) {
+    if (!(await isAdminRequestAuthorized())) {
       return NextResponse.json({ success: false, message: 'Não autorizado.' }, { status: 403 });
     }
 

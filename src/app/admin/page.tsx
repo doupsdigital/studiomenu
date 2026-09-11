@@ -1,19 +1,36 @@
 'use client';
 
 import Link from 'next/link';
-import { LayoutGrid, ArrowRight, Palette, MessageCircle, ClipboardList, Gem, Target, Clapperboard, Sparkles } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { LayoutGrid, ArrowRight, Palette, MessageCircle, ClipboardList, Gem, Target, Clapperboard, Sparkles, LogOut } from 'lucide-react';
 
 export default function AdminHubPage() {
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await fetch('/api/admin/logout', { method: 'POST', credentials: 'same-origin' });
+    router.refresh();
+  };
+
   return (
     <main className="min-h-screen bg-slate-950 text-white p-5 md:p-10">
       <div className="max-w-4xl mx-auto space-y-7">
         {/* Header */}
-        <header className="pb-7 border-b border-slate-800">
-          <h1 className="font-serif text-3xl md:text-4xl font-bold tracking-tight">
-            Studio<span className="text-rose-400 font-normal italic">Menu</span>{' '}
-            <span className="text-slate-500 font-sans font-normal text-xl">· Admin</span>
-          </h1>
-          <p className="text-sm text-slate-400 mt-1.5">Painel central de operação.</p>
+        <header className="pb-7 border-b border-slate-800 flex items-start justify-between gap-4">
+          <div>
+            <h1 className="font-serif text-3xl md:text-4xl font-bold tracking-tight">
+              Studio<span className="text-rose-400 font-normal italic">Menu</span>{' '}
+              <span className="text-slate-500 font-sans font-normal text-xl">· Admin</span>
+            </h1>
+            <p className="text-sm text-slate-400 mt-1.5">Painel central de operação.</p>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-rose-400 transition-all px-3 py-2 rounded-lg hover:bg-slate-900"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Sair</span>
+          </button>
         </header>
 
         {/* Grid de Ferramentas */}

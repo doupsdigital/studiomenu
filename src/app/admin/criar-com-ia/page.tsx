@@ -11,10 +11,6 @@ import { CatalogLayout } from '@/components/catalog/CatalogLayout';
 import { StylePickerPanel } from '@/components/catalog/StylePickerPanel';
 import { ArrowLeft, Upload, Sparkles, Trash2, Plus, ImageIcon, FileText, Check } from 'lucide-react';
 
-// Mesmo valor de src/app/admin/layout.tsx — segredo simples compartilhado com as
-// rotas /api/admin/*, no mesmo nível de segurança já praticado no painel admin.
-const ADMIN_SECRET = '5669';
-
 type Step = 'form' | 'reviewing';
 
 export default function CriarComIAPage() {
@@ -76,7 +72,7 @@ export default function CriarComIAPage() {
 
       const res = await fetch('/api/admin/extract-catalog', {
         method: 'POST',
-        headers: { 'x-admin-secret': ADMIN_SECRET },
+        credentials: 'same-origin',
         body: fd,
       });
       const json = await res.json();
@@ -127,7 +123,7 @@ export default function CriarComIAPage() {
 
       const res = await fetch('/api/admin/finalize-catalog', {
         method: 'POST',
-        headers: { 'x-admin-secret': ADMIN_SECRET },
+        credentials: 'same-origin',
         body: fd,
       });
       const json = await res.json();

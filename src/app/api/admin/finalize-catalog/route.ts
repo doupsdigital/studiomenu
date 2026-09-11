@@ -2,13 +2,13 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { ProcedureItem, NicheType } from '@/types/catalog';
 import { nichePresetsMap } from '@/data/niche-presets';
+import { isAdminRequestAuthorized } from '@/lib/admin-session';
 
 const MAX_COVER_SIZE = 8 * 1024 * 1024; // 8MB
 
 export async function POST(request: Request) {
   try {
-    const adminSecret = request.headers.get('x-admin-secret');
-    if (!adminSecret || adminSecret !== process.env.ADMIN_API_SECRET) {
+    if (!(await isAdminRequestAuthorized())) {
       return NextResponse.json({ success: false, message: 'Não autorizado.' }, { status: 403 });
     }
 

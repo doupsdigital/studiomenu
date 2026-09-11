@@ -1,13 +1,9 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
-
-function checkAdminSecret(request: Request) {
-  const adminSecret = request.headers.get('x-admin-secret');
-  return !!adminSecret && adminSecret === process.env.ADMIN_API_SECRET;
-}
+import { isAdminRequestAuthorized } from '@/lib/admin-session';
 
 export async function PATCH(request: Request) {
-  if (!checkAdminSecret(request)) {
+  if (!(await isAdminRequestAuthorized())) {
     return NextResponse.json({ success: false, message: 'Não autorizado.' }, { status: 403 });
   }
 
@@ -31,7 +27,7 @@ export async function PATCH(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  if (!checkAdminSecret(request)) {
+  if (!(await isAdminRequestAuthorized())) {
     return NextResponse.json({ success: false, message: 'Não autorizado.' }, { status: 403 });
   }
 

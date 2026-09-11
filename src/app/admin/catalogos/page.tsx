@@ -5,9 +5,6 @@ import { CatalogOrderData } from '@/types/catalog';
 import Link from 'next/link';
 import { ArrowLeft, Sparkles, ExternalLink, Search, RefreshCw, Scissors, Plus, Trash2, MessageCircle, Phone, Clock } from 'lucide-react';
 
-// Mesmo valor de src/app/admin/layout.tsx — protege as rotas /api/admin/*
-const ADMIN_SECRET = '5669';
-
 export default function AdminCatalogosPage() {
   const [catalogs, setCatalogs] = useState<CatalogOrderData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -23,7 +20,7 @@ export default function AdminCatalogosPage() {
     setIsLoading(true);
     try {
       const res = await fetch('/api/admin/catalogs-list', {
-        headers: { 'x-admin-secret': ADMIN_SECRET },
+        credentials: 'same-origin',
       });
       const result = await res.json();
       if (result.success) {
@@ -54,7 +51,8 @@ export default function AdminCatalogosPage() {
     try {
       const res = await fetch('/api/admin/catalog-actions', {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json', 'x-admin-secret': ADMIN_SECRET },
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
         body: JSON.stringify({ id }),
       });
       const result = await res.json();
@@ -74,7 +72,8 @@ export default function AdminCatalogosPage() {
     try {
       const res = await fetch('/api/admin/catalog-actions', {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'x-admin-secret': ADMIN_SECRET },
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
         body: JSON.stringify({ id: item.id, status: 'aprovado' }),
       });
       const result = await res.json();
