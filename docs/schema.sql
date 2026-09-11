@@ -30,7 +30,16 @@ CREATE TABLE IF NOT EXISTS public.orders (
     post_care JSONB DEFAULT '[]'::jsonb,
     procedures JSONB DEFAULT '[]'::jsonb,
     edit_token TEXT UNIQUE DEFAULT encode(gen_random_bytes(16), 'hex'),
-    status TEXT DEFAULT 'active'
+    status TEXT DEFAULT 'active',
+    -- Agendamento + StudioMenu+ (docs/PLANO_AGENDAMENTO_STUDIOMENU_PLUS.md, Fase 0)
+    booking_enabled BOOLEAN DEFAULT false,
+    plan_tier TEXT DEFAULT 'catalog' CHECK (plan_tier IN ('catalog', 'plus')),
+    subscription_status TEXT DEFAULT 'none' CHECK (subscription_status IN ('none', 'ativo', 'suspenso', 'cancelado')),
+    asaas_customer_id TEXT,
+    asaas_subscription_id TEXT,
+    billing_email TEXT,
+    billing_cpf_cnpj TEXT,
+    cancellation_notice_hours INTEGER DEFAULT 24
 );
 
 -- Index para buscas ultrarrápidas por slug e edit_token
@@ -51,10 +60,86 @@ CREATE TABLE IF NOT EXISTS public.order_services (
     image_url TEXT,
     badge TEXT,
     is_highlight BOOLEAN DEFAULT false,
-    specs JSONB DEFAULT '[]'::jsonb
+    specs JSONB DEFAULT '[]'::jsonb,
+    -- Agendamento (docs/PLANO_AGENDAMENTO_STUDIOMENU_PLUS.md, Fase 0): duração
+    -- estruturada em minutos, usada pelo motor de disponibilidade. O campo
+    -- `duration` (texto livre, ex. "1h30min") continua existindo só pra exibição.
+    duration_minutes INTEGER,
+    bookable BOOLEAN DEFAULT true
 );
 
 CREATE INDEX IF NOT EXISTS idx_order_services_order_id ON public.order_services(order_id);
+
+-- 2.1 TABELAS DE AGENDAMENTO (docs/PLANO_AGENDAMENTO_STUDIOMENU_PLUS.md, Fase 0)
+--
+-- Mesma postura de segurança das tabelas acima: RLS ligado, zero policies
+-- pra `anon`, acesso só via supabaseAdmin (service_role) nas rotas de servidor.
+
+-- Grade semanal de horário de atendimento (uma linha por dia da semana ativo).
+CREATE TABLE IF NOT EXISTS public.business_hours (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    order_id UUID REFERENCES public.orders(id) ON DELETE CASCADE,
+    weekday INT NOT NULL CHECK (weekday BETWEEN 0 AND 6),
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    UNIQUE (order_id, weekday)
+);
+ALTER TABLE public.business_hours ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON public.business_hours FROM anon;
+
+-- Bloqueios de agenda: folga/férias (intervalo de dias) ou bloqueio parcial
+-- num dia específico (ex. almoço), via a mesma tabela com `all_day`.
+CREATE TABLE IF NOT EXISTS public.schedule_blocks (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    order_id UUID REFERENCES public.orders(id) ON DELETE CASCADE,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    all_day BOOLEAN DEFAULT true,
+    start_time TIME,
+    end_time TIME,
+    reason TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_schedule_blocks_order_id ON public.schedule_blocks(order_id);
+ALTER TABLE public.schedule_blocks ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON public.schedule_blocks FROM anon;
+
+-- Agendamentos em si. Guarda uma cópia (snapshot) do serviço no momento da
+-- marcação (`service_title`/`duration_minutes`/`price_snapshot`) pra que
+-- renomear/apagar um serviço depois não corrompa o histórico de agendamentos.
+CREATE EXTENSION IF NOT EXISTS btree_gist;
+
+CREATE TABLE IF NOT EXISTS public.appointments (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    order_id UUID REFERENCES public.orders(id) ON DELETE CASCADE,
+    service_id UUID REFERENCES public.order_services(id) ON DELETE SET NULL,
+    service_title TEXT NOT NULL,
+    duration_minutes INTEGER NOT NULL,
+    price_snapshot TEXT,
+    client_name TEXT NOT NULL,
+    client_whatsapp TEXT NOT NULL,
+    client_notes TEXT,
+    starts_at TIMESTAMPTZ NOT NULL,
+    -- Calculado e gravado pela aplicação no momento do insert (starts_at +
+    -- duration_minutes), não pelo banco: `timestamptz + interval` não é
+    -- IMMUTABLE no Postgres (por causa de DST em geral), então não pode
+    -- aparecer dentro da expressão de um índice/exclusion constraint.
+    ends_at TIMESTAMPTZ NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending'
+        CHECK (status IN ('pending', 'confirmed', 'cancelled', 'completed', 'no_show')),
+    origin TEXT NOT NULL DEFAULT 'catalog' CHECK (origin IN ('catalog', 'professional')),
+    created_at TIMESTAMPTZ DEFAULT now(),
+    updated_at TIMESTAMPTZ DEFAULT now(),
+    -- Trava de banco (não só checagem de aplicação) contra choque de horário:
+    -- dois agendamentos não-cancelados do mesmo catálogo não podem se sobrepor.
+    EXCLUDE USING gist (
+        order_id WITH =,
+        tstzrange(starts_at, ends_at) WITH &&
+    ) WHERE (status <> 'cancelled')
+);
+CREATE INDEX IF NOT EXISTS idx_appointments_order_id ON public.appointments(order_id);
+CREATE INDEX IF NOT EXISTS idx_appointments_starts_at ON public.appointments(starts_at);
+ALTER TABLE public.appointments ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON public.appointments FROM anon;
 
 -- 3. PERMISSÕES DE LEITURA E GRAVAÇÃO (ROW LEVEL SECURITY - RLS)
 --

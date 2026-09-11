@@ -2,7 +2,7 @@
 
 > **Documento vivo.** Esse arquivo é a fonte de verdade do progresso dessa funcionalidade. Cada tarefa concluída E testada deve ser marcada aqui (`- [x]`) ao final da fase correspondente, não só no começo. Se você está retomando esse trabalho em outra sessão/estação: basta referenciar este arquivo e pedir pra continuar de onde parou — a IA deve ler este documento inteiro antes de seguir.
 
-**Status geral:** 🟡 Planejado, implementação ainda não iniciada (última atualização: 2026-09-11).
+**Status geral:** 🟢 Fase 0 concluída e testada. Próxima: Fase 1 (última atualização: 2026-09-11).
 
 **Legenda:** `[ ]` pendente · `[x]` feito e testado · `[~]` feito mas testado só parcialmente / com ressalva (explicada ao lado)
 
@@ -57,16 +57,16 @@ O app (PWA) é gerado **automaticamente pra todo catálogo**, não só pra quem 
 
 Todas as tabelas novas seguem a mesma postura de RLS já em uso no projeto: RLS ligado, zero policies pra `anon`, acesso só via `supabaseAdmin` no servidor.
 
-- [ ] **`orders`** — colunas novas: `booking_enabled BOOLEAN DEFAULT false`, `plan_tier TEXT DEFAULT 'catalog' CHECK (plan_tier IN ('catalog','plus'))`, `subscription_status TEXT DEFAULT 'none' CHECK (subscription_status IN ('none','ativo','suspenso','cancelado'))`, `asaas_customer_id TEXT`, `asaas_subscription_id TEXT`, `billing_email TEXT`, `billing_cpf_cnpj TEXT`, `cancellation_notice_hours INTEGER DEFAULT 24`.
-- [ ] **`order_services`** — colunas novas: `duration_minutes INTEGER`, `bookable BOOLEAN DEFAULT true`.
-- [ ] **`business_hours`** (nova tabela) — `id, order_id FK orders ON DELETE CASCADE, weekday INTEGER CHECK (0-6), start_time TIME, end_time TIME`, único por `(order_id, weekday)`.
-- [ ] **`schedule_blocks`** (nova tabela) — `id, order_id FK ON DELETE CASCADE, start_date DATE, end_date DATE, all_day BOOLEAN DEFAULT true, start_time TIME, end_time TIME, reason TEXT`.
-- [ ] **`appointments`** (nova tabela) — `id, order_id FK ON DELETE CASCADE, service_id FK order_services ON DELETE SET NULL, service_title TEXT, duration_minutes INTEGER NOT NULL, price_snapshot TEXT, client_name TEXT NOT NULL, client_whatsapp TEXT NOT NULL, client_notes TEXT, starts_at TIMESTAMPTZ NOT NULL, status TEXT CHECK (status IN ('pending','confirmed','cancelled','completed','no_show')) DEFAULT 'pending', origin TEXT CHECK (origin IN ('catalog','professional')) DEFAULT 'catalog', created_at, updated_at`.
-- [ ] Extensão `CREATE EXTENSION IF NOT EXISTS btree_gist;` + `EXCLUDE USING gist (order_id WITH =, tsrange(starts_at, starts_at + duration_minutes * interval '1 minute') WITH &&) WHERE (status <> 'cancelled')` na tabela `appointments` — trava de banco contra choque de horário, não só checagem de aplicação.
-- [ ] RLS habilitado em `business_hours`, `schedule_blocks`, `appointments`, zero policies pra `anon`.
-- [ ] `rate_limits` — sem mudança de schema, só novos usos: `book-appointment:${ip}`, `professional-login:${ip}`, `billing-checkout:${orderId}`.
-- [ ] Aplicar tudo no Supabase real (não há staging separado — mesma prática já usada no projeto).
-- [ ] Atualizar `docs/schema.sql` com tudo isso.
+- [x] **`orders`** — colunas novas: `booking_enabled BOOLEAN DEFAULT false`, `plan_tier TEXT DEFAULT 'catalog' CHECK (plan_tier IN ('catalog','plus'))`, `subscription_status TEXT DEFAULT 'none' CHECK (subscription_status IN ('none','ativo','suspenso','cancelado'))`, `asaas_customer_id TEXT`, `asaas_subscription_id TEXT`, `billing_email TEXT`, `billing_cpf_cnpj TEXT`, `cancellation_notice_hours INTEGER DEFAULT 24`.
+- [x] **`order_services`** — colunas novas: `duration_minutes INTEGER`, `bookable BOOLEAN DEFAULT true`.
+- [x] **`business_hours`** (nova tabela) — `id, order_id FK orders ON DELETE CASCADE, weekday INTEGER CHECK (0-6), start_time TIME, end_time TIME`, único por `(order_id, weekday)`.
+- [x] **`schedule_blocks`** (nova tabela) — `id, order_id FK ON DELETE CASCADE, start_date DATE, end_date DATE, all_day BOOLEAN DEFAULT true, start_time TIME, end_time TIME, reason TEXT`.
+- [x] **`appointments`** (nova tabela) — `id, order_id FK ON DELETE CASCADE, service_id FK order_services ON DELETE SET NULL, service_title TEXT, duration_minutes INTEGER NOT NULL, price_snapshot TEXT, client_name TEXT NOT NULL, client_whatsapp TEXT NOT NULL, client_notes TEXT, starts_at TIMESTAMPTZ NOT NULL, ends_at TIMESTAMPTZ NOT NULL, status TEXT CHECK (status IN ('pending','confirmed','cancelled','completed','no_show')) DEFAULT 'pending', origin TEXT CHECK (origin IN ('catalog','professional')) DEFAULT 'catalog', created_at, updated_at`. **Ajuste feito durante a aplicação**: `ends_at` virou uma coluna normal (calculada pela aplicação no insert), não uma expressão dentro do índice — `timestamptz + interval` não é `IMMUTABLE` no Postgres, então não pode aparecer na expressão de uma exclusion constraint. A Fase 1 (rota de booking) precisa gravar `ends_at = starts_at + duration_minutes` explicitamente.
+- [x] Extensão `CREATE EXTENSION IF NOT EXISTS btree_gist;` + `EXCLUDE USING gist (order_id WITH =, tstzrange(starts_at, ends_at) WITH &&) WHERE (status <> 'cancelled')` na tabela `appointments` — trava de banco contra choque de horário, não só checagem de aplicação. (Nota: `tstzrange`, não `tsrange` — `starts_at`/`ends_at` são `TIMESTAMPTZ`.)
+- [x] RLS habilitado em `business_hours`, `schedule_blocks`, `appointments`, zero policies pra `anon`.
+- [ ] `rate_limits` — sem mudança de schema, só novos usos: `book-appointment:${ip}`, `professional-login:${ip}`, `billing-checkout:${orderId}` (usos específicos ficam pras fases que criam essas rotas).
+- [x] Aplicar tudo no Supabase real — rodado em `docs/migrations/2026-09-11_fase0_agendamento.sql`, verificado via REST API (colunas/tabelas novas respondendo corretamente).
+- [x] Atualizar `docs/schema.sql` com tudo isso.
 
 ### Variáveis de ambiente novas (`.env` local + depois Vercel)
 
@@ -81,15 +81,16 @@ Todas as tabelas novas seguem a mesma postura de RLS já em uso no projeto: RLS 
 
 Cada fase termina em algo testável de verdade (curl e/ou navegador com catálogo de teste descartável, sempre limpo depois) e só avança pra próxima com confirmação explícita do usuário — mesmo ritmo usado na auditoria de segurança (`docs/AUDITORIA_SEGURANCA_QUALIDADE_2026-09.md`). Commit só acontece com aprovação explícita a cada vez, nunca em lote silencioso.
 
-### Fase 0 — Schema + correção do save instável
+### Fase 0 — Schema + correção do save instável ✅ CONCLUÍDA (2026-09-11)
 
-- [ ] Escrever e aplicar a migração SQL (tabelas/colunas da seção 3).
-- [ ] Corrigir `src/app/api/catalog/save/route.ts`: trocar delete-and-reinsert de `order_services` por upsert (update quem já tem id, insert quem é novo, delete só quem foi removido no editor).
-- [ ] Adicionar `duration_minutes` ao formulário de procedimento (`src/components/catalog/VisualEditorModals.tsx` / `modals/ProcedureModal.tsx`), mantendo o campo de texto livre `duration` existente.
-- [ ] Atualizar `src/types/catalog.ts` (`ProcedureItem`) e `src/lib/order-payload.ts` (`buildServicesPayload`) pra incluir `duration_minutes`/`bookable`.
-- [ ] Teste: editar e salvar um catálogo de teste 3x seguidas, confirmar (via curl/SQL direto) que os ids de `order_services` não mudam entre saves.
-- [ ] `npx tsc --noEmit` + `npx next build` limpos.
-- [ ] Commit (aprovação explícita).
+- [x] Escrever e aplicar a migração SQL (tabelas/colunas da seção 3) — `docs/migrations/2026-09-11_fase0_agendamento.sql` (rodado manualmente pelo usuário no SQL Editor do Supabase, já que não há credencial de conexão direta ao Postgres neste projeto, só a service_role key via REST).
+- [x] Corrigir `src/app/api/catalog/save/route.ts`: trocar delete-and-reinsert de `order_services` por upsert (update quem já tem id, insert quem é novo, delete só quem foi removido no editor). Removido de quebra o fallback de "esquema legado" (nomes de coluna `desc`/`preco`/`duracao`/`img`) que não fazia mais sentido com o schema V2 atual.
+- [x] Adicionar `duration_minutes` ao formulário de procedimento (`src/components/catalog/modals/ProcedureModal.tsx`), mantendo o campo de texto livre `duration` existente. Campo `bookable` só no schema/tipos por enquanto (default `true`), sem UI ainda — não há o que configurar até o agendamento estar ativo de verdade.
+- [x] Atualizar `src/types/catalog.ts` (`ProcedureItem`) e `src/lib/order-payload.ts` (`buildServicesPayload`, mais a nova `isValidServiceId`) pra incluir `duration_minutes`/`bookable` e a lógica de upsert.
+- [x] Teste: editar e salvar um catálogo de teste 3x seguidas (curl direto na rota local) — confirmado que ids de itens mantidos ficam estáveis, itens novos recebem id novo, itens removidos são apagados e só eles. Catálogo de teste limpo depois (`DELETE` em `orders`, cascade cuidou de `order_services`).
+- [x] `npx tsc --noEmit` + `npx next build` limpos.
+- [x] Ajuste extra descoberto durante o teste: `tsconfig.json` e `scripts/check-integrity.js` precisaram excluir `docs/lashmenu-vendas-feature-lashmenu-agendamento/` (pasta de referência colada no repo), que não é parte do app e travava o `tsc`/hook de commit.
+- [ ] Commit (aguardando aprovação).
 
 ### Fase 1 — Motor de disponibilidade + API de agendamento
 

@@ -114,19 +114,43 @@ export function buildOrderUpdatePayload(data: CatalogOrderData) {
   };
 }
 
-/** Monta as linhas de `order_services` a partir de uma lista de procedimentos. */
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Um `ProcedureItem.id` só é um id de verdade do banco quando é um UUID.
+ *  Procedimentos ainda não salvos carregam um id provisório gerado no
+ *  cliente (`String(Date.now())`, ver CatalogLayout.handleSaveProcedure) —
+ *  esses precisam de um INSERT novo, nunca de um UPDATE por esse id. */
+export function isValidServiceId(id: string | null | undefined): id is string {
+  return typeof id === 'string' && UUID_RE.test(id);
+}
+
+/** Monta as linhas de `order_services` a partir de uma lista de procedimentos.
+ *  Quando o procedimento já tem um id de banco válido, o `id` vai incluído no
+ *  payload — usado pelo save do editor (`/api/catalog/save`) pra fazer upsert
+ *  em vez de apagar-e-reinserir tudo, mantendo os ids estáveis entre saves
+ *  (necessário pro agendamento, que referencia `order_services.id`). Rotas de
+ *  criação (onboarding/finalize-catalog) nunca têm ids de banco ainda, então
+ *  o campo simplesmente não aparece e o Supabase gera um id novo no insert. */
 export function buildServicesPayload(procedures: ProcedureItem[], orderId: string) {
-  return procedures.map((p, index) => ({
-    order_id: orderId,
-    order_index: index,
-    title: p.title,
-    description: p.description || '',
-    price: p.price || 'Sob Consulta',
-    duration: p.duration || '',
-    category: p.category || 'Geral',
-    image_url: p.image_url || '',
-    badge: p.badge || '',
-    is_highlight: Boolean(p.is_highlight),
-    specs: p.specs || [],
-  }));
+  return procedures.map((p, index) => {
+    const row: Record<string, unknown> = {
+      order_id: orderId,
+      order_index: index,
+      title: p.title,
+      description: p.description || '',
+      price: p.price || 'Sob Consulta',
+      duration: p.duration || '',
+      duration_minutes: typeof p.duration_minutes === 'number' ? p.duration_minutes : null,
+      bookable: p.bookable !== false,
+      category: p.category || 'Geral',
+      image_url: p.image_url || '',
+      badge: p.badge || '',
+      is_highlight: Boolean(p.is_highlight),
+      specs: p.specs || [],
+    };
+    if (isValidServiceId(p.id)) {
+      row.id = p.id;
+    }
+    return row;
+  });
 }

@@ -68,6 +68,26 @@ export const ProcedureModal: React.FC<ProcedureModalProps> = ({
       </div>
 
       <div className="lm-form-group">
+        <label>DURAÇÃO EM MINUTOS (PARA AGENDAMENTO AUTOMÁTICO)</label>
+        <input
+          type="number"
+          min={5}
+          step={5}
+          value={procForm.duration_minutes ?? ''}
+          onChange={(e) =>
+            setProcForm({
+              ...procForm,
+              duration_minutes: e.target.value === '' ? null : Number(e.target.value),
+            })
+          }
+          placeholder="Ex: 90"
+        />
+        <span style={{ fontSize: '0.75rem', opacity: 0.65, marginTop: '4px', display: 'block' }}>
+          Opcional por enquanto. Vai ser usado pra calcular os horários disponíveis quando o agendamento automático estiver ativo.
+        </span>
+      </div>
+
+      <div className="lm-form-group">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
           <label style={{ marginBottom: 0 }}>CATEGORIA *</label>
           <button

@@ -8,6 +8,13 @@ export interface ProcedureItem {
   description?: string;
   price: string;
   duration?: string;
+  /** Duração em minutos, usada pelo motor de disponibilidade do agendamento
+   *  automático. `duration` (texto livre acima) continua existindo só pra
+   *  exibição — este campo é o que a régua de horários realmente usa. */
+  duration_minutes?: number | null;
+  /** Se false, o procedimento fica de fora do agendamento automático (ex:
+   *  "sob consulta"), mesmo com o catálogo tendo `booking_enabled = true`. */
+  bookable?: boolean;
   category?: string;
   image_url?: string;
   badge?: string;
