@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { RESERVED_SLUGS } from '@/lib/reserved-slugs';
 
 export const config = {
   matcher: [
@@ -20,14 +21,19 @@ export default function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
   const parts = host.split('.');
 
+  // Checagem pelo host inteiro (não pelo primeiro label) — evita falso
+  // positivo com slug de cliente que contenha "vercel"/"localhost" no nome
+  // (ex: "vercelli-studio"), que antes era incorretamente tratado como se
+  // fosse o próprio domínio da Vercel/ambiente local.
+  const isVercelHost = host.endsWith('.vercel.app') || host === 'vercel.app';
+  const isLocalHost = host.includes('localhost');
+
   // Roteamento de Subdomínio (ex: jessica.studiomenu.art -> /c/jessica)
   if (
     parts.length >= 3 &&
-    parts[0] !== 'www' &&
-    parts[0] !== 'studiomenu' &&
-    parts[0] !== 'lashmenu-vendas' &&
-    !parts[0].includes('localhost') &&
-    !parts[0].includes('vercel')
+    !RESERVED_SLUGS.includes(parts[0]) &&
+    !isLocalHost &&
+    !isVercelHost
   ) {
     const slug = parts[0].toLowerCase().trim();
 

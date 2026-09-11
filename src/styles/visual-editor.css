@@ -167,6 +167,35 @@ html[data-theme="luxury"] .lm-mb-btn-save {
   transform: scale(0.95) !important;
 }
 
+/* Telas muito estreitas (iPhone SE, Android compacto ~320-375px): 6 botões
+   de ícone + o botão Salvar não cabiam nos ~280px úteis da barra, com risco
+   de cortar/espremer o botão mais importante (Salvar). */
+@media (max-width: 380px) {
+  #lm-editor-bottom-bar {
+    left: 8px;
+    right: 8px;
+    padding: 0 6px;
+  }
+
+  .lm-mb-btn-group {
+    gap: 2px !important;
+  }
+
+  .lm-mb-btn {
+    width: 29px !important;
+    height: 29px !important;
+    min-width: 29px !important;
+    min-height: 29px !important;
+    font-size: 0.8rem !important;
+  }
+
+  .lm-mb-btn-save {
+    padding: 0 10px !important;
+    font-size: 0.68rem !important;
+    gap: 4px !important;
+  }
+}
+
 /* ── ESTILOS E OVERLAYS EDITÁVEIS DENTRO DO CATÁLOGO ── */
 [data-lm-editable] {
   position: relative;
