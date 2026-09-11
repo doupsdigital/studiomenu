@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { CatalogOrderData } from '@/types/catalog';
+import { buildOrderUpdatePayload, buildServicesPayload } from '@/lib/order-payload';
 
 export async function POST(request: Request) {
   try {
@@ -44,27 +45,7 @@ export async function POST(request: Request) {
     // 2. Atualizar dados principais na tabela `orders`
     const { error: updateOrderError } = await supabaseAdmin
       .from('orders')
-      .update({
-        studio_name: catalogData.studio_name,
-        client_name: catalogData.client_name,
-        bio_description: catalogData.bio_description,
-        hero_phrase: catalogData.hero_phrase,
-        whatsapp_number: catalogData.whatsapp_number,
-        instagram_handle: catalogData.instagram_handle,
-        address: catalogData.address,
-        maps_url: catalogData.maps_url,
-        avatar_url: catalogData.avatar_url,
-        cover_media_url: catalogData.cover_media_url,
-        niche: catalogData.niche,
-        layout_model: catalogData.layout_model,
-        theme_variant: catalogData.theme_variant,
-        pre_care: catalogData.instructions?.pre_care || [],
-        post_care: catalogData.instructions?.post_care || [],
-        tolerances: catalogData.instructions?.tolerances || '',
-        procedures: catalogData.procedures || [],
-        categories: catalogData.categories || [],
-        updated_at: new Date().toISOString(),
-      })
+      .update(buildOrderUpdatePayload(catalogData))
       .eq('id', orderId);
 
     if (updateOrderError) {
@@ -89,19 +70,7 @@ export async function POST(request: Request) {
 
       // Inserir novos procedimentos com os nomes corretos da tabela
       if (catalogData.procedures.length > 0) {
-        const servicesToInsert = catalogData.procedures.map((proc, index) => ({
-          order_id: orderId,
-          order_index: index,
-          title: proc.title,
-          description: proc.description || '',
-          price: proc.price || 'Sob Consulta',
-          duration: proc.duration || '',
-          category: proc.category || 'Geral',
-          image_url: proc.image_url || '',
-          badge: proc.badge || '',
-          is_highlight: Boolean(proc.is_highlight),
-          specs: proc.specs || [],
-        }));
+        const servicesToInsert = buildServicesPayload(catalogData.procedures, orderId);
 
         const { error: insertServicesError } = await supabaseAdmin
           .from('order_services')

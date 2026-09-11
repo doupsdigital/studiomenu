@@ -3,6 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin';
 import { NicheType, LayoutModel, ThemeVariant } from '@/types/catalog';
 import { nichePresetsMap } from '@/data/niche-presets';
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
+import { buildOrderInsertPayload, buildServicesPayload } from '@/lib/order-payload';
 
 export async function POST(request: Request) {
   try {
@@ -45,27 +46,17 @@ export async function POST(request: Request) {
 
     const { data: orderData, error: orderErr } = await supabaseAdmin
       .from('orders')
-      .insert({
-        slug: finalSlug,
-        client_name: clientName,
-        hero_phrase: preset.hero_phrase,
-        bio_description: preset.bio_description || '',
-        cover_media_url: coverUrl,
-        avatar_url: coverUrl,
-        instructions_bg_url: preset.instructions_bg_url || null,
-        final_screen_bg_url: preset.final_screen_bg_url || null,
-        cta_bg_url: preset.cta_bg_url || null,
-        niche,
-        layout_model: layoutModel,
-        theme_variant: themeVariant,
-        whatsapp_number: whatsappDigits,
-        instagram_handle: '',
-        address: '',
-        tolerances: preset.instructions?.tolerances || 'Tolerância máxima de 15 minutos de atraso.',
-        pre_care: preset.instructions?.pre_care || [],
-        post_care: preset.instructions?.post_care || [],
-        categories: [],
-      })
+      .insert(
+        buildOrderInsertPayload({
+          slug: finalSlug,
+          clientName,
+          whatsappNumber: whatsappDigits,
+          niche,
+          layoutModel,
+          themeVariant,
+          coverUrl,
+        })
+      )
       .select()
       .single();
 
@@ -75,19 +66,7 @@ export async function POST(request: Request) {
     }
 
     if (preset.procedures.length > 0) {
-      const servicesPayload = preset.procedures.map((p, index) => ({
-        order_id: orderData.id,
-        order_index: index,
-        title: p.title,
-        description: p.description || '',
-        price: p.price || 'Sob Consulta',
-        duration: p.duration || '',
-        category: p.category || 'Geral',
-        image_url: p.image_url || '',
-        is_highlight: Boolean(p.is_highlight),
-        badge: p.badge || '',
-        specs: p.specs || [],
-      }));
+      const servicesPayload = buildServicesPayload(preset.procedures, orderData.id);
 
       const { error: servicesErr } = await supabaseAdmin.from('order_services').insert(servicesPayload);
       if (servicesErr) {
