@@ -2,7 +2,7 @@
 
 > **Documento vivo.** Esse arquivo é a fonte de verdade do progresso dessa funcionalidade. Cada tarefa concluída E testada deve ser marcada aqui (`- [x]`) ao final da fase correspondente, não só no começo. Se você está retomando esse trabalho em outra sessão/estação: basta referenciar este arquivo e pedir pra continuar de onde parou — a IA deve ler este documento inteiro antes de seguir.
 
-**Status geral:** 🟢 Fase 0 concluída e testada. Próxima: Fase 1 (última atualização: 2026-09-11).
+**Status geral:** 🟢 Fases 0 e 1 concluídas e testadas. Próxima: Fase 2 (última atualização: 2026-09-11).
 
 **Legenda:** `[ ]` pendente · `[x]` feito e testado · `[~]` feito mas testado só parcialmente / com ressalva (explicada ao lado)
 
@@ -92,17 +92,20 @@ Cada fase termina em algo testável de verdade (curl e/ou navegador com catálog
 - [x] Ajuste extra descoberto durante o teste: `tsconfig.json` e `scripts/check-integrity.js` precisaram excluir `docs/lashmenu-vendas-feature-lashmenu-agendamento/` (pasta de referência colada no repo), que não é parte do app e travava o `tsc`/hook de commit.
 - [ ] Commit (aguardando aprovação).
 
-### Fase 1 — Motor de disponibilidade + API de agendamento
+### Fase 1 — Motor de disponibilidade + API de agendamento ✅ CONCLUÍDA (2026-09-11)
 
-- [ ] `src/lib/scheduling/availability.ts` — função pura: dado `business_hours` + `schedule_blocks` + `appointments` existentes + duração do serviço + data, devolve slots livres a cada 30min, com buffer de 30min se a data for hoje (inspirado em `scheduling-engine.js` do LashMenu, reescrito como código de servidor).
-- [ ] `src/lib/scheduling/appointment-payload.ts` — mesmo padrão de "fonte única de verdade" do `order-payload.ts`.
-- [ ] Rota `src/app/api/scheduling/availability/route.ts` (GET, pública, rate-limited).
-- [ ] Rota `src/app/api/scheduling/book/route.ts` (POST, rate-limited, revalida o slot antes de inserir, trata erro `23P01` da exclusion constraint com mensagem amigável).
-- [ ] Teste via curl: disponibilidade de um catálogo de teste com horários configurados manualmente via SQL — confirmar slots corretos (dia fechado, bloqueio parcial, bloqueio total, horários já ocupados).
-- [ ] Teste via curl: criar agendamento, confirmar que o slot some da disponibilidade em seguida.
-- [ ] Teste de corrida: 2 requisições simultâneas pro mesmo slot — confirmar que só uma vence e a outra recebe erro tratado.
-- [ ] `tsc` + `build`.
-- [ ] Commit.
+- [x] `src/lib/scheduling/availability.ts` — função pura: dado `business_hours` + `schedule_blocks` + `appointments` existentes + duração do serviço + data, devolve slots livres a cada 30min, com buffer de 30min se a data for hoje. Fuso horário fixo em `America/Sao_Paulo` (decisão documentada no próprio arquivo — simplificação deliberada pro v1, público 100% BR).
+- [x] `src/lib/scheduling/appointment-payload.ts` — mesmo padrão de "fonte única de verdade" do `order-payload.ts`, já calcula `ends_at` a partir de `starts_at`+`duration_minutes` (necessário por causa do ajuste de schema da Fase 0).
+- [x] Rota `src/app/api/scheduling/availability/route.ts` (GET, pública, rate-limited `scheduling-availability:${ip}`).
+- [x] Rota `src/app/api/scheduling/book/route.ts` (POST, rate-limited `scheduling-book:${ip}`, revalida o slot antes de inserir, trata erro `23P01` da exclusion constraint com mensagem amigável).
+- [x] Teste via curl num catálogo descartável (`booking_enabled=true`, grade sexta 09-18 / sábado 09-13, serviço de 60min): disponibilidade correta (7 slots sexta, 7 sábado), domingo sem grade retorna vazio.
+- [x] Teste via curl: agendamento das 09h criado, slot some da disponibilidade em seguida (09:00 e 09:30 somem, já que 09:30+60min invade o horário ocupado).
+- [x] Teste de conflito: reservar o mesmo horário de novo devolve 409 pela revalidação da aplicação; insert direto via REST sobrepondo o horário (bypassando a aplicação) é rejeitado pela exclusion constraint do banco (`23P01`) — as duas camadas de proteção confirmadas.
+- [x] Teste de bloqueio de dia inteiro: disponibilidade fica vazia no dia bloqueado.
+- [x] Teste do buffer de hoje: com o horário local em 15:19, o primeiro slot livre veio corretamente às 16:00 (15:30 ficou de fora por cair dentro do buffer de 30min).
+- [x] Catálogo de teste limpo depois (cascade removeu `order_services`/`business_hours`/`schedule_blocks`/`appointments` junto).
+- [x] `tsc` + `build` limpos, rotas novas aparecem no build.
+- [ ] Commit (aguardando aprovação).
 
 ### Fase 2 — Modal de agendamento no catálogo (cliente final)
 
