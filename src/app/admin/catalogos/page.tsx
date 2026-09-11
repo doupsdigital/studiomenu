@@ -10,6 +10,7 @@ export default function AdminCatalogosPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [catalogToDelete, setCatalogToDelete] = useState<CatalogOrderData | null>(null);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -47,7 +48,7 @@ export default function AdminCatalogosPage() {
   );
 
   const deleteCatalog = async (id?: string) => {
-    if (!id || !confirm('Tem certeza que deseja excluir este catálogo?')) return;
+    if (!id) return;
     try {
       const res = await fetch('/api/admin/catalog-actions', {
         method: 'DELETE',
@@ -64,6 +65,8 @@ export default function AdminCatalogosPage() {
     } catch (e) {
       console.error('Erro ao excluir catálogo:', e);
       showToast('❌ Erro ao excluir catálogo.');
+    } finally {
+      setCatalogToDelete(null);
     }
   };
 
@@ -274,7 +277,7 @@ export default function AdminCatalogosPage() {
 
                     <div className="pt-2 border-t border-slate-800/80 flex items-center justify-end">
                       <button
-                        onClick={() => deleteCatalog(item.id)}
+                        onClick={() => setCatalogToDelete(item)}
                         className="p-2 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-all flex items-center gap-1.5 text-xs font-semibold"
                         title="Excluir Catálogo"
                       >
@@ -293,6 +296,35 @@ export default function AdminCatalogosPage() {
       {toastMessage && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-3 rounded-2xl bg-slate-800 border border-slate-700 text-white text-sm font-semibold shadow-2xl z-50">
           {toastMessage}
+        </div>
+      )}
+
+      {catalogToDelete && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-[60]">
+          <div className="max-w-sm w-full bg-slate-900 border border-slate-800 rounded-2xl p-7 space-y-5 text-center">
+            <h3 className="font-bold text-white text-lg">Excluir este catálogo?</h3>
+            <p className="text-sm text-slate-400">
+              Isso vai apagar permanentemente o catálogo de{' '}
+              <span className="text-white font-semibold">
+                {catalogToDelete.studio_name || catalogToDelete.client_name}
+              </span>
+              . Essa ação não pode ser desfeita.
+            </p>
+            <div className="flex gap-2.5">
+              <button
+                onClick={() => setCatalogToDelete(null)}
+                className="flex-1 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm font-semibold text-slate-300"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => deleteCatalog(catalogToDelete.id)}
+                className="flex-1 py-3 rounded-xl bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-400 text-sm font-bold"
+              >
+                Sim, Excluir
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </main>
