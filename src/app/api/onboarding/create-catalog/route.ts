@@ -3,7 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin';
 import { NicheType, LayoutModel, ThemeVariant } from '@/types/catalog';
 import { nichePresetsMap } from '@/data/niche-presets';
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
-import { buildOrderInsertPayload, buildServicesPayload } from '@/lib/order-payload';
+import { buildOrderInsertPayload, buildServicesPayload, generateUniqueSlug } from '@/lib/order-payload';
 
 export async function POST(request: Request) {
   try {
@@ -31,15 +31,7 @@ export async function POST(request: Request) {
 
     const preset = nichePresetsMap[niche] || nichePresetsMap.lash;
 
-    const baseSlug = clientName
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[̀-ͯ]/g, '')
-      .replace(/[^a-z0-9]/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '');
-
-    const finalSlug = `${baseSlug}-${Math.floor(100 + Math.random() * 900)}`;
+    const finalSlug = await generateUniqueSlug(clientName);
 
     const coverUrl =
       layoutModel === 'classico' ? '/modelos/classico/assets/img/Hero.png' : '/modelos/mosaico/assets/img/Hero.png';
@@ -82,6 +74,6 @@ export async function POST(request: Request) {
     });
   } catch (error: any) {
     console.error('[Onboarding Create Catalog Exception]:', error);
-    return NextResponse.json({ success: false, message: error?.message || 'Erro interno ao criar o catálogo.' }, { status: 500 });
+    return NextResponse.json({ success: false, message: 'Erro interno ao criar o catálogo.' }, { status: 500 });
   }
 }

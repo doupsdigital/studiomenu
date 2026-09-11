@@ -4,15 +4,20 @@ import { CatalogInstructions } from '@/types/catalog';
 interface InstructionsSectionProps {
   instructions?: CatalogInstructions;
   bgUrl?: string;
+  coverUrl?: string;
 }
 
 export const InstructionsSection: React.FC<InstructionsSectionProps> = ({
   instructions,
   bgUrl,
+  coverUrl,
 }) => {
   const defaultBg = '/modelos/mosaico/assets/img/hero.jpg';
-  const isHeroPng = bgUrl?.toLowerCase().endsWith('hero.png');
-  const bgImage = bgUrl && !isHeroPng ? bgUrl : defaultBg;
+  // Evita repetir a mesma foto da capa na tela de orientações — comparação
+  // direta de URL, não por nome de arquivo (que já causou falso positivo
+  // com qualquer fundo cujo caminho terminasse em "hero.png").
+  const isSameAsCover = Boolean(bgUrl && coverUrl && bgUrl === coverUrl);
+  const bgImage = bgUrl && !isSameAsCover ? bgUrl : defaultBg;
 
   const defaultItems = [
     {

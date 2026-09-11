@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { CatalogOrderData } from '@/types/catalog';
+import { normalizeWhatsappBR } from '@/lib/format';
 import Link from 'next/link';
 import { ArrowLeft, Sparkles, ExternalLink, Search, RefreshCw, Scissors, Plus, Trash2, MessageCircle, Phone, Clock } from 'lucide-react';
 
@@ -95,7 +96,7 @@ export default function AdminCatalogosPage() {
   };
 
   const buildDeliveryWhatsappUrl = (item: CatalogOrderData) => {
-    const cleanPhone = (item.whatsapp_number || '').replace(/\D/g, '');
+    const cleanPhone = normalizeWhatsappBR(item.whatsapp_number);
     const firstName = (item.client_name || '').split(' ')[0];
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
     const catalogUrl = `${origin}/c/${item.slug}`;

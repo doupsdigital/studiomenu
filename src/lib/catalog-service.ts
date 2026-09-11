@@ -1,5 +1,6 @@
 import { supabaseAdmin } from './supabase-admin';
 import { CatalogOrderData, ProcedureItem } from '@/types/catalog';
+import { normalizeWhatsappBR } from './format';
 
 export async function getCatalogBySlug(slug: string): Promise<CatalogOrderData | null> {
   const normalizedSlug = slug.toLowerCase().trim();
@@ -106,7 +107,7 @@ export async function getCatalogBySlug(slug: string): Promise<CatalogOrderData |
       niche: orderData.niche || 'lash',
       layout_model: (orderData.layout_model || orderData.modelo || 'mosaico').toLowerCase() === 'classico' ? 'classico' : 'mosaico',
       theme_variant: (orderData.theme_variant || orderData.theme || 'rose').toLowerCase().includes('luxury') ? 'luxury' : 'rose',
-      whatsapp_number: orderData.whatsapp_number || orderData.whatsapp || '5511999999999',
+      whatsapp_number: normalizeWhatsappBR(orderData.whatsapp_number || orderData.whatsapp) || '5511999999999',
       instagram_handle: orderData.instagram_handle || orderData.instagram || '',
       address: orderData.address || orderData.cidade || '',
       maps_url: orderData.maps_url || '',

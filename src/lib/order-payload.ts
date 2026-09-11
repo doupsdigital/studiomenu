@@ -1,5 +1,34 @@
 import { CatalogOrderData, NicheType, LayoutModel, ThemeVariant, ProcedureItem } from '@/types/catalog';
 import { nichePresetsMap } from '@/data/niche-presets';
+import { normalizeWhatsappBR } from './format';
+import { supabaseAdmin } from './supabase-admin';
+
+function slugifyName(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+/** Gera um slug único a partir do nome da cliente, checando colisão no banco
+ *  antes de devolver (em vez de confiar cegamente no sufixo aleatório, que
+ *  tinha ~900 combinações por nome-base e podia colidir sem aviso). */
+export async function generateUniqueSlug(clientName: string): Promise<string> {
+  const base = slugifyName(clientName) || 'catalogo';
+
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const suffix = Math.floor(100 + Math.random() * 900);
+    const candidate = `${base}-${suffix}`;
+    const { data } = await supabaseAdmin.from('orders').select('id').eq('slug', candidate).maybeSingle();
+    if (!data) return candidate;
+  }
+
+  // Último recurso, praticamente impossível de colidir.
+  return `${base}-${Date.now()}`;
+}
 
 /**
  * Fonte única pra "quais campos um catálogo precisa" — usada por todo ponto
@@ -42,7 +71,7 @@ export function buildOrderInsertPayload(input: OrderInsertInput) {
     niche: input.niche,
     layout_model: input.layoutModel,
     theme_variant: input.themeVariant,
-    whatsapp_number: input.whatsappNumber,
+    whatsapp_number: normalizeWhatsappBR(input.whatsappNumber),
     instagram_handle: input.instagramHandle || '',
     address: '',
     tolerances: preset.instructions?.tolerances || 'Tolerância máxima de 15 minutos de atraso.',
@@ -65,7 +94,7 @@ export function buildOrderUpdatePayload(data: CatalogOrderData) {
     client_name: data.client_name,
     bio_description: data.bio_description,
     hero_phrase: data.hero_phrase,
-    whatsapp_number: data.whatsapp_number,
+    whatsapp_number: normalizeWhatsappBR(data.whatsapp_number),
     instagram_handle: data.instagram_handle,
     address: data.address,
     maps_url: data.maps_url,

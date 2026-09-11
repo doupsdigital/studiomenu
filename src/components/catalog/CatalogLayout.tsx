@@ -446,7 +446,11 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
         />
 
         {/* Seção Orientações */}
-        <InstructionsSection instructions={catalogState.instructions} bgUrl={catalogState.instructions_bg_url} />
+        <InstructionsSection
+          instructions={catalogState.instructions}
+          bgUrl={catalogState.instructions_bg_url}
+          coverUrl={catalogState.cover_media_url}
+        />
 
         {/* Seção Contato & Localização */}
         <CTASection
