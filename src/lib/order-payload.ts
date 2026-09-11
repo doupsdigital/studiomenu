@@ -54,7 +54,11 @@ export function buildOrderInsertPayload(input: OrderInsertInput) {
 
 /** Monta o payload de UPDATE em `orders` a partir do estado completo do
  *  editor — mesma lista de colunas editáveis do catálogo, pra nenhum campo
- *  novo do editor ficar "preso" fora do salvamento por esquecimento. */
+ *  novo do editor ficar "preso" fora do salvamento por esquecimento.
+ *  Não inclui `procedures`: os procedimentos vivem só em `order_services`
+ *  (ver buildServicesPayload) — a coluna JSONB `orders.procedures` é legado
+ *  e não é mais escrita por nenhum fluxo, pra não manter duas fontes de
+ *  verdade fora de sincronia. */
 export function buildOrderUpdatePayload(data: CatalogOrderData) {
   return {
     studio_name: data.studio_name,
@@ -76,7 +80,6 @@ export function buildOrderUpdatePayload(data: CatalogOrderData) {
     pre_care: data.instructions?.pre_care || [],
     post_care: data.instructions?.post_care || [],
     tolerances: data.instructions?.tolerances || '',
-    procedures: data.procedures || [],
     categories: data.categories || [],
     updated_at: new Date().toISOString(),
   };
