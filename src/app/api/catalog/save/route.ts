@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     if (fetchError || !existingOrder) {
       return NextResponse.json(
         { success: false, message: 'Catálogo não encontrado.' },
-        { status: 44 }
+        { status: 404 }
       );
     }
 
