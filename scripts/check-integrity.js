@@ -29,6 +29,8 @@ function walkFiles(dir, ext) {
     fs.readdirSync(dir).forEach(f => {
       let full = path.join(dir, f);
       if (f === 'node_modules' || f === '.git' || f === '.next' || f === 'scratch') return;
+      // Pastas de referência (projetos legados colados em docs/ só pra consulta, fora do app)
+      if (full.replace(/\\/g, '/').includes('/docs/lashmenu-vendas-feature-lashmenu-agendamento')) return;
 
       if (fs.statSync(full).isDirectory()) {
         files = files.concat(walkFiles(full, ext));

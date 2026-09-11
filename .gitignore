@@ -1,5 +1,7 @@
 .claude/
 .DS_Store
+# Material de referência (projetos legados colados pra consulta, não fazem parte do app)
+docs/lashmenu-vendas-feature-lashmenu-agendamento/
 .env
 .env*.local
 *.env
