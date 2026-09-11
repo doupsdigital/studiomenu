@@ -1,7 +1,14 @@
 import { NextResponse } from 'next/server';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function POST(request: Request) {
   try {
+    const ip = getClientIp(request);
+    const allowed = await checkRateLimit(`notify-telegram:${ip}`, 10, 10 * 60);
+    if (!allowed) {
+      return NextResponse.json({ success: false, message: 'Muitas notificações em pouco tempo.' }, { status: 429 });
+    }
+
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
 

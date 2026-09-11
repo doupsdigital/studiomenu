@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { nichePresetsMap } from '@/data/niche-presets';
 import { NicheType } from '@/types/catalog';
 import { isAdminRequestAuthorized } from '@/lib/admin-session';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf'];
 const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15MB
@@ -42,6 +43,15 @@ export async function POST(request: Request) {
   try {
     if (!(await isAdminRequestAuthorized())) {
       return NextResponse.json({ success: false, message: 'Não autorizado.' }, { status: 403 });
+    }
+
+    const ip = getClientIp(request);
+    const allowed = await checkRateLimit(`extract-catalog:${ip}`, 20, 60 * 60);
+    if (!allowed) {
+      return NextResponse.json(
+        { success: false, message: 'Limite de extrações por hora atingido. Tente novamente mais tarde.' },
+        { status: 429 }
+      );
     }
 
     const apiKey = process.env.ANTHROPIC_API_KEY;

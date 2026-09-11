@@ -1,8 +1,18 @@
 import { NextResponse } from 'next/server';
 import { checkAdminPassword, createAdminSessionValue, ADMIN_SESSION_COOKIE } from '@/lib/admin-session';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function POST(request: Request) {
   try {
+    const ip = getClientIp(request);
+    const allowed = await checkRateLimit(`admin-login:${ip}`, 10, 15 * 60);
+    if (!allowed) {
+      return NextResponse.json(
+        { success: false, message: 'Muitas tentativas. Aguarde alguns minutos e tente novamente.' },
+        { status: 429 }
+      );
+    }
+
     const { password } = (await request.json()) as { password?: string };
 
     if (!password || !checkAdminPassword(password)) {

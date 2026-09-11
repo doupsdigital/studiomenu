@@ -2,9 +2,19 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { NicheType, LayoutModel, ThemeVariant } from '@/types/catalog';
 import { nichePresetsMap } from '@/data/niche-presets';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function POST(request: Request) {
   try {
+    const ip = getClientIp(request);
+    const allowed = await checkRateLimit(`onboarding-create:${ip}`, 5, 60 * 60);
+    if (!allowed) {
+      return NextResponse.json(
+        { success: false, message: 'Muitos catálogos criados em pouco tempo. Tente novamente mais tarde.' },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { clientName, whatsappDigits, niche, layoutModel, themeVariant } = body as {
       clientName: string;
