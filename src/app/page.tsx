@@ -1,6 +1,5 @@
-import React from 'react';
 import Link from 'next/link';
-import { Sparkles, ArrowRight, CheckCircle2, Scissors, ShieldCheck, Zap, Smartphone, Layers } from 'lucide-react';
+import { Sparkles, ArrowRight, CheckCircle2, ShieldCheck, Zap, Smartphone, Layers } from 'lucide-react';
 
 export default function StudioMenuLandingPage() {
   return (

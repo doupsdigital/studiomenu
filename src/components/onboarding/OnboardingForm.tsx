@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { formatPhoneBR } from '@/lib/format';
 import { NicheType, LayoutModel, ThemeVariant } from '@/types/catalog';

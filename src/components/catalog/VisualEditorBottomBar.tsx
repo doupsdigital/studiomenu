@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { CatalogOrderData, ThemeVariant } from '@/types/catalog';
+import { CatalogOrderData } from '@/types/catalog';
 
 interface VisualEditorBottomBarProps {
   catalogData: CatalogOrderData;

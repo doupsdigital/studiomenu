@@ -16,7 +16,7 @@ export async function PATCH(request: Request) {
     const { error } = await supabaseAdmin.from('orders').update({ status }).eq('id', id);
     if (error) {
       console.error('[Admin Catalog Actions] Erro ao atualizar status:', error);
-      return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+      return NextResponse.json({ success: false, message: 'Erro ao atualizar o catálogo.' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
@@ -40,7 +40,7 @@ export async function DELETE(request: Request) {
     const { error } = await supabaseAdmin.from('orders').delete().eq('id', id);
     if (error) {
       console.error('[Admin Catalog Actions] Erro ao excluir catálogo:', error);
-      return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+      return NextResponse.json({ success: false, message: 'Erro ao excluir o catálogo.' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });

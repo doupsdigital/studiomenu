@@ -3,6 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin';
 import { ProcedureItem, NicheType, LayoutModel, ThemeVariant } from '@/types/catalog';
 import { isAdminRequestAuthorized } from '@/lib/admin-session';
 import { buildOrderInsertPayload, buildServicesPayload } from '@/lib/order-payload';
+import { isAllowedImageType } from '@/lib/file-validation';
 
 const MAX_COVER_SIZE = 8 * 1024 * 1024; // 8MB
 
@@ -45,8 +46,8 @@ export async function POST(request: Request) {
     let coverUrl = layoutModel === 'classico' ? '/modelos/classico/assets/img/Hero.png' : '/modelos/mosaico/assets/img/Hero.png';
 
     if (coverFile) {
-      if (!coverFile.type.startsWith('image/')) {
-        return NextResponse.json({ success: false, message: 'A foto de capa precisa ser uma imagem.' }, { status: 400 });
+      if (!isAllowedImageType(coverFile.type)) {
+        return NextResponse.json({ success: false, message: 'Formato de imagem não suportado. Use JPG, PNG, WEBP ou GIF.' }, { status: 400 });
       }
       if (coverFile.size > MAX_COVER_SIZE) {
         return NextResponse.json({ success: false, message: 'Foto de capa muito grande. O limite é 8MB.' }, { status: 400 });
@@ -88,7 +89,7 @@ export async function POST(request: Request) {
 
     if (orderErr) {
       console.error('[Finalize Catalog] Erro ao criar pedido:', orderErr);
-      return NextResponse.json({ success: false, message: orderErr.message }, { status: 500 });
+      return NextResponse.json({ success: false, message: 'Erro ao criar o catálogo. Tente novamente.' }, { status: 500 });
     }
 
     if (procedures.length > 0) {
@@ -97,7 +98,7 @@ export async function POST(request: Request) {
       const { error: servicesErr } = await supabaseAdmin.from('order_services').insert(servicesPayload);
       if (servicesErr) {
         console.error('[Finalize Catalog] Erro ao gravar procedimentos:', servicesErr);
-        return NextResponse.json({ success: false, message: servicesErr.message }, { status: 500 });
+        return NextResponse.json({ success: false, message: 'Erro ao gravar os procedimentos do catálogo.' }, { status: 500 });
       }
     }
 

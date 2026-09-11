@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { ProcedureItem, LayoutModel } from '@/types/catalog';
 import { ProcedureCard } from './ProcedureCard';
-import { ProcedureModal } from './ProcedureModal';
+import { ProcedureDetailModal } from './ProcedureDetailModal';
 
 interface ProcedureGridProps {
   procedures: ProcedureItem[];
@@ -257,7 +257,7 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
 
       {/* Modal de Detalhes do Procedimento */}
       {selectedProcedure && !isEditMode && (
-        <ProcedureModal
+        <ProcedureDetailModal
           item={selectedProcedure}
           clientName={clientName}
           whatsappNumber={whatsappNumber}

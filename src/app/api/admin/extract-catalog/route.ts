@@ -3,8 +3,9 @@ import { nichePresetsMap } from '@/data/niche-presets';
 import { NicheType } from '@/types/catalog';
 import { isAdminRequestAuthorized } from '@/lib/admin-session';
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
+import { ALLOWED_IMAGE_TYPES } from '@/lib/file-validation';
 
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf'];
+const ALLOWED_TYPES = [...ALLOWED_IMAGE_TYPES, 'application/pdf'];
 const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15MB
 const MAX_FILES = 5;
 

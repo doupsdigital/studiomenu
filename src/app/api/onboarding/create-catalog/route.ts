@@ -62,7 +62,7 @@ export async function POST(request: Request) {
 
     if (orderErr) {
       console.error('[Onboarding Create Catalog] Erro ao criar pedido:', orderErr);
-      return NextResponse.json({ success: false, message: orderErr.message }, { status: 500 });
+      return NextResponse.json({ success: false, message: 'Erro ao criar o catálogo. Tente novamente.' }, { status: 500 });
     }
 
     if (preset.procedures.length > 0) {
@@ -71,7 +71,7 @@ export async function POST(request: Request) {
       const { error: servicesErr } = await supabaseAdmin.from('order_services').insert(servicesPayload);
       if (servicesErr) {
         console.error('[Onboarding Create Catalog] Erro ao gravar procedimentos:', servicesErr);
-        return NextResponse.json({ success: false, message: servicesErr.message }, { status: 500 });
+        return NextResponse.json({ success: false, message: 'Erro ao gravar os procedimentos do catálogo.' }, { status: 500 });
       }
     }
 

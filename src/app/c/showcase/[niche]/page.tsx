@@ -1,6 +1,6 @@
 'use client';
 
-import React, { use, useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { LayoutModel, ThemeVariant, NicheType } from '@/types/catalog';
 import { CatalogLayout } from '@/components/catalog/CatalogLayout';
 import { StylePickerPanel } from '@/components/catalog/StylePickerPanel';

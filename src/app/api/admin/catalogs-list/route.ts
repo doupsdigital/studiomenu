@@ -15,7 +15,7 @@ export async function GET() {
 
     if (error) {
       console.error('[Admin Catalogs List] Erro ao buscar catálogos:', error);
-      return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+      return NextResponse.json({ success: false, message: 'Erro ao buscar catálogos.' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, catalogs: data || [] });

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
+import { isAllowedImageType } from '@/lib/file-validation';
 
 export async function POST(request: Request) {
   try {
@@ -16,8 +17,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: 'Token de edição necessário para upload.' }, { status: 403 });
     }
 
-    if (!file.type.startsWith('image/')) {
-      return NextResponse.json({ success: false, message: 'Apenas arquivos de imagem são permitidos.' }, { status: 400 });
+    if (!isAllowedImageType(file.type)) {
+      return NextResponse.json({ success: false, message: 'Formato de imagem não suportado. Use JPG, PNG, WEBP ou GIF.' }, { status: 400 });
     }
 
     const MAX_FILE_SIZE = 8 * 1024 * 1024; // 8MB
@@ -50,7 +51,7 @@ export async function POST(request: Request) {
 
     if (uploadError) {
       console.error('[API Catalog Upload Error]:', uploadError);
-      return NextResponse.json({ success: false, message: uploadError.message }, { status: 500 });
+      return NextResponse.json({ success: false, message: 'Erro ao enviar a imagem. Tente novamente.' }, { status: 500 });
     }
 
     const { data: publicUrlData } = supabaseAdmin.storage
@@ -63,6 +64,6 @@ export async function POST(request: Request) {
     });
   } catch (err: any) {
     console.error('[API Upload Exception]:', err);
-    return NextResponse.json({ success: false, message: err?.message || 'Erro no servidor.' }, { status: 500 });
+    return NextResponse.json({ success: false, message: 'Erro no servidor ao enviar a imagem.' }, { status: 500 });
   }
 }

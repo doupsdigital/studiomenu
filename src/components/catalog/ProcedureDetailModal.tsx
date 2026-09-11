@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react';
 import { ProcedureItem } from '@/types/catalog';
 
-interface ProcedureModalProps {
+interface ProcedureDetailModalProps {
   item: ProcedureItem;
   clientName?: string;
   whatsappNumber: string;
@@ -11,7 +11,7 @@ interface ProcedureModalProps {
   onNext?: () => void;
 }
 
-export const ProcedureModal: React.FC<ProcedureModalProps> = ({
+export const ProcedureDetailModal: React.FC<ProcedureDetailModalProps> = ({
   item,
   clientName = 'Mariana',
   whatsappNumber,

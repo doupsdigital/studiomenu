@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { LayoutModel, ThemeVariant, NicheType } from '@/types/catalog';
 import { CatalogLayout } from '@/components/catalog/CatalogLayout';
 import { nichePresetsMap } from '@/data/niche-presets';
-import { Sparkles, Palette, Layers, Scissors } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
 export default function DemoPage() {
   const [selectedNiche, setSelectedNiche] = useState<NicheType>('lash');

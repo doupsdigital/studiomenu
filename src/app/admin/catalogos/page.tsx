@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CatalogOrderData } from '@/types/catalog';
 import Link from 'next/link';
 import { ArrowLeft, Sparkles, ExternalLink, Search, RefreshCw, Scissors, Plus, Trash2, MessageCircle, Phone, Clock } from 'lucide-react';
@@ -28,9 +28,11 @@ export default function AdminCatalogosPage() {
         setCatalogs(result.catalogs as CatalogOrderData[]);
       } else {
         console.error('Erro ao buscar catálogos:', result.message);
+        showToast('❌ Erro ao buscar catálogos.');
       }
     } catch (err) {
       console.error('Erro ao buscar catálogos:', err);
+      showToast('❌ Erro ao buscar catálogos.');
     } finally {
       setIsLoading(false);
     }
@@ -82,11 +84,13 @@ export default function AdminCatalogosPage() {
       const result = await res.json();
       if (!result.success) {
         console.error('Erro ao aprovar catálogo:', result.message);
+        showToast('❌ Erro ao aprovar catálogo.');
         return;
       }
       fetchCatalogs();
     } catch (e) {
       console.error('Erro ao aprovar catálogo:', e);
+      showToast('❌ Erro ao aprovar catálogo.');
     }
   };
 

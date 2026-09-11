@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Clapperboard, Video, X } from 'lucide-react';
+import { ArrowLeft, Video, X } from 'lucide-react';
 import { NicheType } from '@/types/catalog';
 
 const NICHE_TABS: { key: NicheType; label: string; emoji: string }[] = [
