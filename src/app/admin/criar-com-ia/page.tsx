@@ -4,8 +4,9 @@ import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { formatPhoneBR } from '@/lib/format';
+import { useNicheSelection } from '@/lib/use-niche-selection';
 import { NICHE_OPTIONS } from '@/data/niche-options';
-import { NicheType, LayoutModel, ThemeVariant, ProcedureItem, CatalogOrderData } from '@/types/catalog';
+import { ProcedureItem, CatalogOrderData } from '@/types/catalog';
 import { nichePresetsMap } from '@/data/niche-presets';
 import { CatalogLayout } from '@/components/catalog/CatalogLayout';
 import { StylePickerPanel } from '@/components/catalog/StylePickerPanel';
@@ -20,11 +21,9 @@ export default function CriarComIAPage() {
   const [clientName, setClientName] = useState('');
   const [whatsappDisplay, setWhatsappDisplay] = useState('');
   const [instagramHandle, setInstagramHandle] = useState('');
-  const [niche, setNiche] = useState<NicheType>('lash');
+  const { niche, layoutModel, themeVariant, setLayoutModel, setThemeVariant, handleNicheChange } = useNicheSelection();
 
   const preset = nichePresetsMap[niche];
-  const [layoutModel, setLayoutModel] = useState<LayoutModel>(preset.layout_model);
-  const [themeVariant, setThemeVariant] = useState<ThemeVariant>(preset.theme_variant);
   const [onCoverScreen, setOnCoverScreen] = useState(true);
 
   const [coverFile, setCoverFile] = useState<File | null>(null);
@@ -50,12 +49,6 @@ export default function CriarComIAPage() {
     observer.observe(heroEl);
     return () => observer.disconnect();
   }, [step, layoutModel, themeVariant]);
-
-  const handleNicheChange = (newNiche: NicheType) => {
-    setNiche(newNiche);
-    setLayoutModel(nichePresetsMap[newNiche].layout_model);
-    setThemeVariant(nichePresetsMap[newNiche].theme_variant);
-  };
 
   const handleExtract = async () => {
     if (!menuFiles.length) {

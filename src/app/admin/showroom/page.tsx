@@ -4,13 +4,20 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Palette, ExternalLink, Link2, Scissors, Sparkles as SparklesIcon, Flower2, Building2 } from 'lucide-react';
 import { NicheType } from '@/types/catalog';
+import { NICHE_OPTIONS } from '@/data/niche-options';
 
-const NICHE_CARDS: { niche: NicheType; label: string; icon: React.ReactNode }[] = [
-  { niche: 'lash', label: 'Lash Designer', icon: <Scissors className="w-5 h-5" /> },
-  { niche: 'nail', label: 'Nail Designer', icon: <SparklesIcon className="w-5 h-5" /> },
-  { niche: 'estetica', label: 'Estética', icon: <Flower2 className="w-5 h-5" /> },
-  { niche: 'studio', label: 'Studio de Beleza', icon: <Building2 className="w-5 h-5" /> },
-];
+const NICHE_ICONS: Record<NicheType, React.ReactNode> = {
+  lash: <Scissors className="w-5 h-5" />,
+  nail: <SparklesIcon className="w-5 h-5" />,
+  estetica: <Flower2 className="w-5 h-5" />,
+  studio: <Building2 className="w-5 h-5" />,
+};
+
+const NICHE_CARDS: { niche: NicheType; label: string; icon: React.ReactNode }[] = NICHE_OPTIONS.map((o) => ({
+  niche: o.value,
+  label: o.label,
+  icon: NICHE_ICONS[o.value],
+}));
 
 export default function AdminShowroomPage() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);

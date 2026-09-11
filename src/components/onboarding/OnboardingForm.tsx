@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { formatPhoneBR } from '@/lib/format';
-import { NicheType, LayoutModel, ThemeVariant } from '@/types/catalog';
+import { useNicheSelection } from '@/lib/use-niche-selection';
 import { nichePresetsMap } from '@/data/niche-presets';
 import { NICHE_OPTIONS } from '@/data/niche-options';
 import { CatalogLayout } from '@/components/catalog/CatalogLayout';
@@ -40,11 +40,9 @@ export function OnboardingForm({ withWelcome = false }: OnboardingFormProps) {
 
   const [clientName, setClientName] = useState('');
   const [whatsappDisplay, setWhatsappDisplay] = useState('');
-  const [niche, setNiche] = useState<NicheType>('lash');
+  const { niche, layoutModel, themeVariant, setLayoutModel, setThemeVariant, handleNicheChange } = useNicheSelection();
 
   const preset = nichePresetsMap[niche];
-  const [layoutModel, setLayoutModel] = useState<LayoutModel>(preset.layout_model);
-  const [themeVariant, setThemeVariant] = useState<ThemeVariant>(preset.theme_variant);
   const [onCoverScreen, setOnCoverScreen] = useState(true);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -66,13 +64,6 @@ export function OnboardingForm({ withWelcome = false }: OnboardingFormProps) {
     observer.observe(heroEl);
     return () => observer.disconnect();
   }, [currentStep, niche, layoutModel, themeVariant]);
-
-  // Ao trocar o nicho, reseta modelo/tema pro padrão do preset correspondente
-  const handleNicheChange = (newNiche: NicheType) => {
-    setNiche(newNiche);
-    setLayoutModel(nichePresetsMap[newNiche].layout_model);
-    setThemeVariant(nichePresetsMap[newNiche].theme_variant);
-  };
 
   // Publicação Final no Supabase — cria o pedido e já redireciona pro catálogo real,
   // em modo edição, com os dados do preset do nicho + estilo escolhidos ao vivo

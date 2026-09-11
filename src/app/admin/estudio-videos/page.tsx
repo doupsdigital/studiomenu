@@ -4,13 +4,15 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Video, X } from 'lucide-react';
 import { NicheType } from '@/types/catalog';
+import { NICHE_OPTIONS } from '@/data/niche-options';
 
-const NICHE_TABS: { key: NicheType; label: string; emoji: string }[] = [
-  { key: 'lash', label: 'Lash Designer', emoji: '💕' },
-  { key: 'nail', label: 'Nail Designer', emoji: '💅' },
-  { key: 'estetica', label: 'Estética', emoji: '🌿' },
-  { key: 'studio', label: 'Studio de Beleza', emoji: '👑' },
-];
+const NICHE_EMOJI: Record<NicheType, string> = { lash: '💕', nail: '💅', estetica: '🌿', studio: '👑' };
+
+const NICHE_TABS: { key: NicheType; label: string; emoji: string }[] = NICHE_OPTIONS.map((o) => ({
+  key: o.value,
+  label: o.label,
+  emoji: NICHE_EMOJI[o.value],
+}));
 
 type BgMode = 'light' | 'dark' | 'black' | 'green';
 
