@@ -2,7 +2,7 @@
 
 > **Documento vivo.** Esse arquivo é a fonte de verdade do progresso dessa funcionalidade. Cada tarefa concluída E testada deve ser marcada aqui (`- [x]`) ao final da fase correspondente, não só no começo. Se você está retomando esse trabalho em outra sessão/estação: basta referenciar este arquivo e pedir pra continuar de onde parou — a IA deve ler este documento inteiro antes de seguir.
 
-**Status geral:** 🟢 Fases 0-4 completas e commitadas. 🟡 Fase 5 (Asaas) implementada e testada no que não depende da API externa, aguardando aprovação pra commit — falta a chave de sandbox do usuário pra teste de ponta a ponta de verdade. Última fase do plano original; falta só a Fase 6 (integração no admin) e a Fase 7 (notificações) (última atualização: 2026-09-13).
+**Status geral:** 🟢 Fases 0-5 completas e commitadas (`8e49fc1`, `3ed15f4`, `f30ebd1`, `24aed90`, `eb85f29`, `2e038a5`, `38a680b`, `580cfc9`). Fase 5 com um pendente: teste de ponta a ponta contra a API real do Asaas, falta a chave de sandbox do usuário. Faltam a Fase 6 (integração no admin) e a Fase 7 (notificações) (última atualização: 2026-09-13).
 
 **Legenda:** `[ ]` pendente · `[x]` feito e testado · `[~]` feito mas testado só parcialmente / com ressalva (explicada ao lado)
 
@@ -199,7 +199,7 @@ Cada fase termina em algo testável de verdade (curl e/ou navegador com catálog
 - [x] Testado sem a chave real (usuário optou por seguir assim por enquanto): autorização de todas as rotas (`401` sem sessão), guard de configuração ausente (`503` com mensagem amigável, detalhe técnico só no log do servidor), validação do webhook (`401` sem token/token errado), e o fluxo completo de ativação/suspensão via webhook fabricado manualmente (`PAYMENT_CONFIRMED`/`PAYMENT_OVERDUE` apontando pro `asaas_subscription_id` de um catálogo de teste) — confirmado que `plan_tier`/`subscription_status` mudam corretamente. Navegador headless: upsell do Início e da Agenda levam pra Config, formulário de assinatura mostra o erro amigável ao tentar assinar sem chave configurada.
 - [ ] **Pendente**: teste de ponta a ponta contra a API real do Asaas (checkout gerando Pix de verdade, webhook recebido de verdade, cancelamento de verdade) — falta a chave de sandbox. Assim que o usuário trouxer, é só rodar o fluxo completo.
 - [x] `npx tsc --noEmit` + `npx next build` limpos (4 rotas novas de billing).
-- [ ] Commit (aguardando aprovação).
+- [x] Commit — `580cfc9`.
 
 ### Fase 6 — Integração no admin
 
