@@ -2,7 +2,7 @@
 
 > **Documento vivo.** Esse arquivo é a fonte de verdade do progresso dessa funcionalidade. Cada tarefa concluída E testada deve ser marcada aqui (`- [x]`) ao final da fase correspondente, não só no começo. Se você está retomando esse trabalho em outra sessão/estação: basta referenciar este arquivo e pedir pra continuar de onde parou — a IA deve ler este documento inteiro antes de seguir.
 
-**Status geral:** 🟢 Fases 0-3 concluídas, testadas e commitadas (`8e49fc1`, `3ed15f4`, `f30ebd1`, `24aed90`). Fase 4a concluída e testada, aguardando aprovação pra commit. Próxima: Fase 4b (última atualização: 2026-09-13).
+**Status geral:** 🟢 Fases 0-3 e 4a concluídas, testadas e commitadas (`8e49fc1`, `3ed15f4`, `f30ebd1`, `24aed90`, `eb85f29`). Próxima: Fase 4b (última atualização: 2026-09-13).
 
 **Legenda:** `[ ]` pendente · `[x]` feito e testado · `[~]` feito mas testado só parcialmente / com ressalva (explicada ao lado)
 
@@ -154,7 +154,7 @@ Cada fase termina em algo testável de verdade (curl e/ou navegador com catálog
 - [x] Regressão: `/c/[slug]` com e sem `?edit=` continua respondendo `200` normalmente.
 - [x] Catálogos de teste removidos depois.
 - [x] `npx tsc --noEmit` + `npx next build` limpos (32 rotas, incluindo as 5 novas de `/app/[slug]` e `/manifest.webmanifest`).
-- [ ] Commit (aguardando aprovação).
+- [x] Commit — `eb85f29`.
 - [ ] Teste de instalação como PWA de verdade num celular (Android e, se possível, iOS) — não verificável em navegador headless; fica pendente de teste manual do usuário.
 
 #### Fase 4b — Aba Agenda (conteúdo real)
