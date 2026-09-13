@@ -3,6 +3,7 @@ import { getOrderForProfessionalApp } from '@/lib/professional-app-service';
 import { getBusinessHours, getScheduleBlocks } from '@/lib/scheduling/config-service';
 import { BusinessHoursEditor } from '@/components/config/BusinessHoursEditor';
 import { ScheduleBlocksManager } from '@/components/config/ScheduleBlocksManager';
+import { SubscriptionSection } from '@/components/config/SubscriptionSection';
 
 interface ConfigPageProps {
   params: Promise<{ slug: string }>;
@@ -28,6 +29,16 @@ export default async function ConfigPage({ params }: ConfigPageProps) {
 
       <BusinessHoursEditor slug={slug} initialHours={businessHours} />
       <ScheduleBlocksManager slug={slug} blocks={scheduleBlocks} />
+
+      <div id="assinatura">
+        <SubscriptionSection
+          slug={slug}
+          planTier={order.plan_tier}
+          subscriptionStatus={order.subscription_status}
+          billingEmail={order.billing_email}
+          billingCpfCnpj={order.billing_cpf_cnpj}
+        />
+      </div>
     </main>
   );
 }

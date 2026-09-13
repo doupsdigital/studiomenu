@@ -1,15 +1,18 @@
 import React from 'react';
+import Link from 'next/link';
 import { Sparkles } from 'lucide-react';
+import { PLUS_PRICE_LABEL } from '@/lib/pricing';
 
 interface PlusUpsellCardProps {
   variant: 'card' | 'full';
+  slug: string;
 }
 
 /** Conteúdo de upsell do StudioMenu+ — mesma peça usada bloqueada no Início
  *  (`variant="card"`) e como tela cheia na aba Agenda pra quem ainda não
- *  assina (`variant="full"`), duas portas de entrada pro mesmo fluxo. Sem
- *  checkout de verdade ainda — isso é Fase 5 (Asaas). */
-export const PlusUpsellCard: React.FC<PlusUpsellCardProps> = ({ variant }) => {
+ *  assina (`variant="full"`), duas portas de entrada pro mesmo fluxo, ambas
+ *  levando pra "Minha Assinatura" na aba Config (Fase 5). */
+export const PlusUpsellCard: React.FC<PlusUpsellCardProps> = ({ variant, slug }) => {
   const isFull = variant === 'full';
 
   return (
@@ -29,14 +32,12 @@ export const PlusUpsellCard: React.FC<PlusUpsellCardProps> = ({ variant }) => {
       <p className={isFull ? 'text-sm text-slate-400 max-w-xs mb-6 leading-relaxed' : 'text-xs text-slate-400 mb-4 leading-relaxed'}>
         Agendamento automático com horários reais, agenda organizada e menos ida e volta no WhatsApp.
       </p>
-      <button
-        type="button"
-        disabled
-        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-rose-500/40 text-white text-xs font-bold cursor-not-allowed opacity-70"
-        title="Assinatura chega em breve"
+      <Link
+        href={`/app/${slug}/config#assinatura`}
+        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold transition-colors"
       >
-        Assinar (em breve)
-      </button>
+        Assinar por {PLUS_PRICE_LABEL}
+      </Link>
     </div>
   );
 };

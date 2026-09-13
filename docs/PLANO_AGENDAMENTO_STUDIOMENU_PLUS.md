@@ -2,7 +2,7 @@
 
 > **Documento vivo.** Esse arquivo é a fonte de verdade do progresso dessa funcionalidade. Cada tarefa concluída E testada deve ser marcada aqui (`- [x]`) ao final da fase correspondente, não só no começo. Se você está retomando esse trabalho em outra sessão/estação: basta referenciar este arquivo e pedir pra continuar de onde parou — a IA deve ler este documento inteiro antes de seguir.
 
-**Status geral:** 🟢 Fases 0-4 completas, testadas e commitadas (`8e49fc1`, `3ed15f4`, `f30ebd1`, `24aed90`, `eb85f29`, `2e038a5`, `38a680b`). Próxima: Fase 5 (Asaas) (última atualização: 2026-09-13).
+**Status geral:** 🟢 Fases 0-4 completas e commitadas. 🟡 Fase 5 (Asaas) implementada e testada no que não depende da API externa, aguardando aprovação pra commit — falta a chave de sandbox do usuário pra teste de ponta a ponta de verdade. Última fase do plano original; falta só a Fase 6 (integração no admin) e a Fase 7 (notificações) (última atualização: 2026-09-13).
 
 **Legenda:** `[ ]` pendente · `[x]` feito e testado · `[~]` feito mas testado só parcialmente / com ressalva (explicada ao lado)
 
@@ -71,9 +71,9 @@ Todas as tabelas novas seguem a mesma postura de RLS já em uso no projeto: RLS 
 ### Variáveis de ambiente novas (`.env` local + depois Vercel)
 
 - [x] `PROFESSIONAL_SESSION_SECRET` — HMAC do cookie de sessão do app da profissional (Fase 3). Gerado localmente no `.env`; falta gerar um valor de produção separado quando for pra Vercel.
-- [ ] `ASAAS_API_KEY` — chave da API do Asaas (sandbox primeiro, produção depois).
-- [ ] `ASAAS_BASE_URL` — endpoint sandbox vs. produção do Asaas.
-- [ ] `ASAAS_WEBHOOK_SECRET` — segredo compartilhado pra validar o webhook (o LashAgenda não tinha essa proteção; aqui terá desde o início).
+- [ ] `ASAAS_API_KEY` — **ainda vazia**, pendente da chave de sandbox do usuário.
+- [x] `ASAAS_BASE_URL` — setada no `.env` local pra sandbox (`https://api-sandbox.asaas.com/v3`).
+- [x] `ASAAS_WEBHOOK_SECRET` — gerado localmente no `.env` (o LashAgenda não tinha essa proteção implementada de verdade, apesar de documentada; aqui já está implementada e testada desde o início).
 
 ---
 
@@ -184,19 +184,22 @@ Cada fase termina em algo testável de verdade (curl e/ou navegador com catálog
 
 **Fase 4 completa** (4a + 4b + 4c) — as 4 abas do app da profissional (Início, Catálogo, Agenda, Config) têm conteúdo real, exceto a seção "Minha Assinatura" (Config), que depende do Asaas (Fase 5).
 
-### Fase 5 — Asaas + paywall do Plus
+### Fase 5 — Asaas + paywall do Plus ✅ IMPLEMENTADA (2026-09-13) — ⚠️ pendente de teste real (sem chave de sandbox ainda)
 
-- [ ] `src/lib/asaas.ts` — wrapper server-only (criar/achar customer, criar assinatura mensal, checar pagamento, gerar QR Pix, cancelar).
-- [ ] `src/lib/pricing.ts` — constante única do preço do Plus.
-- [ ] Rota `src/app/api/billing/checkout/route.ts` — não escreve `plan_tier`/`subscription_status` até confirmação real de pagamento (mesma prevenção antifraude do LashAgenda).
-- [ ] Rota `src/app/api/billing/webhook/route.ts` — validada por `ASAAS_WEBHOOK_SECRET`; ao confirmar pagamento, seta `subscription_status='ativo'` e `plan_tier='plus'`.
-- [ ] Rota `src/app/api/billing/check-payment/route.ts` — polling de fallback (mesma lógica do webhook, resiliência dupla como no LashAgenda).
-- [ ] Rota `src/app/api/billing/cancel/route.ts`.
-- [ ] Tela "Minha Assinatura" na aba Config — coleta email+CPF/CNPJ uma vez, mostra Pix/cartão, status atual, botão de cancelar.
-- [ ] Paywall na aba Agenda (bloqueada até `subscription_status='ativo'`) e cartão no Início, ambos levando pra essa tela.
-- [ ] Teste com a sandbox do Asaas — **pedir a chave de sandbox ao usuário nesse ponto, não antes**.
-- [ ] `tsc` + `build`.
-- [ ] Commit.
+- [x] `src/lib/asaas.ts` — wrapper server-only (criar/achar customer, criar assinatura mensal, buscar primeiro pagamento com retry, gerar QR Pix, consultar pagamento, cancelar). Contrato conferido agora direto na documentação oficial do Asaas (não só de memória): auth via header `access_token`, `POST /customers`, `POST /subscriptions`, `GET /payments?subscription=`, `GET /payments/{id}/pixQrCode`, `GET /payments/{id}`, `DELETE /subscriptions/{id}`. Lança `AsaasConfigError` (mensagem genérica ao cliente, detalhe técnico só no log) se `ASAAS_API_KEY`/`ASAAS_BASE_URL` não estiverem definidas.
+- [x] `src/lib/pricing.ts` — `PLUS_PRICE = 69.9` (R$69,90/mês, confirmado com o usuário).
+- [x] `src/lib/billing-service.ts` (novo, não previsto originalmente por nome mas necessário pra cumprir o requisito de "mesma lógica" webhook+polling de verdade) — `activateSubscription`/`setSubscriptionStatus`, únicas funções que tocam `plan_tier`/`subscription_status`, chamadas tanto pelo webhook quanto pelo check-payment.
+- [x] `src/app/api/billing/checkout/route.ts` — autenticada, não escreve `plan_tier`/`subscription_status` até confirmação real (mesma prevenção antifraude do LashAgenda); reaproveita assinatura já criada em vez de duplicar se a profissional recarregar a página no meio do Pix.
+- [x] `src/app/api/billing/webhook/route.ts` — validada pelo header `asaas-access-token` contra `ASAAS_WEBHOOK_SECRET` (`timingSafeEqual`). **Achado durante o levantamento do LashAgenda**: essa validação existe na doc oficial do Asaas mas o LashAgenda (a referência que o plano manda seguir) nunca chegou a implementá-la de verdade — aqui foi implementada desde o início, como o plano principal já exigia.
+- [x] `src/app/api/billing/check-payment/route.ts` — polling de fallback, reusa `activateSubscription` de verdade (função compartilhada, não duplicada como no LashAgenda) e confere que o pagamento pertence ao catálogo autenticado antes de ativar.
+- [x] `src/app/api/billing/cancel/route.ts`.
+- [x] `src/components/config/SubscriptionSection.tsx` — tela "Minha Assinatura" na aba Config: coleta email+CPF/CNPJ (pré-preenchido se já salvo), mostra QR Pix + código copia-e-cola com polling automático após gerar, status atual (ativo/suspenso/cancelado), botão de cancelar.
+- [x] `PlusUpsellCard.tsx` atualizado — os cartões do Início e da Agenda (Fase 4a) agora linkam de verdade pra `/app/[slug]/config#assinatura` em vez do botão "em breve" desabilitado.
+- [x] **Decisão de design registrada**: sem trigger de banco anti-escalação de privilégio (o LashAgenda tem um porque expõe Supabase direto pro browser do cliente final; este projeto nunca faz isso — toda escrita passa por rota Next.js com `supabaseAdmin` e autorização própria, então o vetor que o trigger resolve não existe aqui).
+- [x] Testado sem a chave real (usuário optou por seguir assim por enquanto): autorização de todas as rotas (`401` sem sessão), guard de configuração ausente (`503` com mensagem amigável, detalhe técnico só no log do servidor), validação do webhook (`401` sem token/token errado), e o fluxo completo de ativação/suspensão via webhook fabricado manualmente (`PAYMENT_CONFIRMED`/`PAYMENT_OVERDUE` apontando pro `asaas_subscription_id` de um catálogo de teste) — confirmado que `plan_tier`/`subscription_status` mudam corretamente. Navegador headless: upsell do Início e da Agenda levam pra Config, formulário de assinatura mostra o erro amigável ao tentar assinar sem chave configurada.
+- [ ] **Pendente**: teste de ponta a ponta contra a API real do Asaas (checkout gerando Pix de verdade, webhook recebido de verdade, cancelamento de verdade) — falta a chave de sandbox. Assim que o usuário trouxer, é só rodar o fluxo completo.
+- [x] `npx tsc --noEmit` + `npx next build` limpos (4 rotas novas de billing).
+- [ ] Commit (aguardando aprovação).
 
 ### Fase 6 — Integração no admin
 

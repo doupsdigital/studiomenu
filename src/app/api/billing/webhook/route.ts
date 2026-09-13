@@ -1,0 +1,68 @@
+import { NextResponse } from 'next/server';
+import { timingSafeEqual } from 'crypto';
+import { activateSubscription, setSubscriptionStatus, findOrderIdByAsaasIds } from '@/lib/billing-service';
+
+const ACTIVATE_EVENTS = new Set(['PAYMENT_CONFIRMED', 'PAYMENT_RECEIVED']);
+const SUSPEND_EVENTS = new Set(['PAYMENT_OVERDUE']);
+const CANCEL_EVENTS = new Set(['PAYMENT_DELETED', 'SUBSCRIPTION_DELETED', 'SUBSCRIPTION_INACTIVATED']);
+
+function isValidWebhookToken(received: string | null): boolean {
+  const expected = process.env.ASAAS_WEBHOOK_SECRET;
+  if (!expected || !received) return false;
+  const a = Buffer.from(received);
+  const b = Buffer.from(expected);
+  if (a.length !== b.length) return false;
+  return timingSafeEqual(a, b);
+}
+
+interface AsaasWebhookPayload {
+  event: string;
+  payment?: {
+    customer?: string;
+    subscription?: string;
+  };
+}
+
+/** POST /api/billing/webhook
+ *  A Asaas manda o header `asaas-access-token` com o valor configurado na
+ *  criação do webhook (painel/API do Asaas) — validado aqui contra
+ *  `ASAAS_WEBHOOK_SECRET`. Essa validação existe na doc oficial mas o
+ *  LashAgenda (referência deste plano) nunca chegou a implementá-la de
+ *  verdade; aqui ela é obrigatória desde o início. */
+export async function POST(request: Request) {
+  try {
+    if (!isValidWebhookToken(request.headers.get('asaas-access-token'))) {
+      return NextResponse.json({ success: false, message: 'Token inválido.' }, { status: 401 });
+    }
+
+    const body = (await request.json()) as AsaasWebhookPayload;
+    const { event, payment } = body;
+
+    if (!event || !payment) {
+      return NextResponse.json({ success: true }); // evento sem payment (ex: teste) — nada a fazer
+    }
+
+    const orderId = await findOrderIdByAsaasIds({
+      subscriptionId: payment.subscription,
+      customerId: payment.customer,
+    });
+
+    if (!orderId) {
+      console.warn('[API Billing Webhook] Nenhum pedido encontrado pra', payment.subscription || payment.customer);
+      return NextResponse.json({ success: true }); // 200 mesmo assim — evita a Asaas insistir num evento que não é nosso
+    }
+
+    if (ACTIVATE_EVENTS.has(event)) {
+      await activateSubscription(orderId);
+    } else if (SUSPEND_EVENTS.has(event)) {
+      await setSubscriptionStatus(orderId, 'suspenso');
+    } else if (CANCEL_EVENTS.has(event)) {
+      await setSubscriptionStatus(orderId, 'cancelado');
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('[API Billing Webhook Exception]:', error);
+    return NextResponse.json({ success: false, message: 'Erro interno.' }, { status: 500 });
+  }
+}

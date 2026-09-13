@@ -9,6 +9,8 @@ export interface ProfessionalOrderSummary {
   whatsapp_number: string;
   plan_tier: 'catalog' | 'plus';
   subscription_status: 'none' | 'ativo' | 'suspenso' | 'cancelado';
+  billing_email?: string;
+  billing_cpf_cnpj?: string;
 }
 
 /** Busca os dados que o app da profissional (`/app/[slug]`) precisa — um
@@ -19,7 +21,7 @@ export async function getOrderForProfessionalApp(slug: string): Promise<Professi
 
   const { data, error } = await supabaseAdmin
     .from('orders')
-    .select('id, slug, edit_token, client_name, studio_name, whatsapp_number, plan_tier, subscription_status')
+    .select('id, slug, edit_token, client_name, studio_name, whatsapp_number, plan_tier, subscription_status, billing_email, billing_cpf_cnpj')
     .eq('slug', normalizedSlug)
     .single();
 
@@ -36,5 +38,7 @@ export async function getOrderForProfessionalApp(slug: string): Promise<Professi
     subscription_status: ['ativo', 'suspenso', 'cancelado'].includes(data.subscription_status)
       ? data.subscription_status
       : 'none',
+    billing_email: data.billing_email || undefined,
+    billing_cpf_cnpj: data.billing_cpf_cnpj || undefined,
   };
 }

@@ -45,7 +45,7 @@ export default async function AgendaPage({ params, searchParams }: AgendaPagePro
   if (!isPlusAtivo) {
     return (
       <main className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
-        <PlusUpsellCard variant="full" />
+        <PlusUpsellCard variant="full" slug={slug} />
       </main>
     );
   }

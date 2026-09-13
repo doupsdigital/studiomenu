@@ -35,7 +35,7 @@ export default async function InicioPage({ params }: InicioPageProps) {
           </p>
         </div>
       ) : (
-        <PlusUpsellCard variant="card" />
+        <PlusUpsellCard variant="card" slug={slug} />
       )}
     </main>
   );
