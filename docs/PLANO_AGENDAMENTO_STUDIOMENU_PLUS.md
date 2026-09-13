@@ -2,7 +2,7 @@
 
 > **Documento vivo.** Esse arquivo é a fonte de verdade do progresso dessa funcionalidade. Cada tarefa concluída E testada deve ser marcada aqui (`- [x]`) ao final da fase correspondente, não só no começo. Se você está retomando esse trabalho em outra sessão/estação: basta referenciar este arquivo e pedir pra continuar de onde parou — a IA deve ler este documento inteiro antes de seguir.
 
-**Status geral:** 🟢 Fases 0-3, 4a e 4b concluídas e testadas. Fase 4b aguardando aprovação pra commit. Próxima: Fase 4c (última atualização: 2026-09-13).
+**Status geral:** 🟢 Fases 0-3, 4a e 4b concluídas, testadas e commitadas (`8e49fc1`, `3ed15f4`, `f30ebd1`, `24aed90`, `eb85f29`, `2e038a5`). Próxima: Fase 4c (última atualização: 2026-09-13).
 
 **Legenda:** `[ ]` pendente · `[x]` feito e testado · `[~]` feito mas testado só parcialmente / com ressalva (explicada ao lado)
 
@@ -168,7 +168,7 @@ Cada fase termina em algo testável de verdade (curl e/ou navegador com catálog
 - [x] Teste com dois catálogos de teste Plus-ativos descartáveis (pra testar isolamento entre catálogos) + um catálogo não-Plus: via curl, confirmado que uma sessão só mexe no próprio catálogo (tentativa cross-catálogo em ambas as rotas de mutação devolve `401`), conflito de horário devolve `409`, bloqueio criado via API reduz a disponibilidade pública de verdade (`/api/scheduling/availability`, conferido antes/depois). Via navegador headless (Playwright): fila de pendentes aparece e some ao confirmar, agendamento manual criado pelo formulário aparece na lista do dia, zero erros de console. Catálogo não-Plus continua vendo o upsell na Agenda (regressão).
 - [x] Catálogos de teste removidos depois.
 - [x] `npx tsc --noEmit` + `npx next build` limpos (3 rotas novas de API).
-- [ ] Commit (aguardando aprovação).
+- [x] Commit — `2e038a5`.
 
 #### Fase 4c — Aba Config (conteúdo real)
 
