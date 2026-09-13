@@ -2,7 +2,7 @@
 
 > **Documento vivo.** Esse arquivo é a fonte de verdade do progresso dessa funcionalidade. Cada tarefa concluída E testada deve ser marcada aqui (`- [x]`) ao final da fase correspondente, não só no começo. Se você está retomando esse trabalho em outra sessão/estação: basta referenciar este arquivo e pedir pra continuar de onde parou — a IA deve ler este documento inteiro antes de seguir.
 
-**Status geral:** 🟢 Fases 0, 1 e 2 concluídas e testadas. Fases 0/1 commitadas (`8e49fc1`, `3ed15f4`); Fase 2 aguardando aprovação pra commit. Próxima: Fase 3 (última atualização: 2026-09-13).
+**Status geral:** 🟢 Fases 0, 1 e 2 concluídas, testadas e commitadas (`8e49fc1`, `3ed15f4`, `f30ebd1`). Próxima: Fase 3 (última atualização: 2026-09-13).
 
 **Legenda:** `[ ]` pendente · `[x]` feito e testado · `[~]` feito mas testado só parcialmente / com ressalva (explicada ao lado)
 
@@ -119,7 +119,7 @@ Cada fase termina em algo testável de verdade (curl e/ou navegador com catálog
 - [x] `ProcedureGrid.tsx`/`CatalogLayout.tsx`: novo estado `bookingItem` em `CatalogLayout` (independente do `activeModal` do editor, que é exclusivo de `isEditMode`), repassado como `onRequestBooking` só quando `!isEditMode && booking_enabled` — em modo edição ou catálogo sem agendamento, a prop nem existe, então o comportamento antigo fica intocado por construção.
 - [x] Teste ponta a ponta num catálogo de teste descartável (`fase2-teste-booking`, criado/limpo via Supabase REST com service role key): navegador headless (Playwright, instalado só no scratchpad da sessão) — fluxo completo (dia → horário → nome/whats → confirmação → link de WhatsApp correto), nos dois temas (rose e luxury). Regressão confirmada: serviço com `bookable=false` manteve o CTA como link direto pro WhatsApp (não abriu o wizard). Teste de conflito via curl: reservar o mesmo horário duas vezes devolve `200` na 1ª e `409` na 2ª ("Esse horário não está mais disponível"). Página com `?edit=token` carrega normalmente (200) — wizard não tem como abrir em modo edição por construção. Zero erros no console do navegador. Catálogo de teste removido depois (cascade cuidou do resto).
 - [x] `npx tsc --noEmit` + `npx next build` limpos (30 rotas geradas, incluindo `/c/[slug]` e as duas rotas de scheduling).
-- [ ] Commit (aguardando aprovação).
+- [x] Commit — `f30ebd1`.
 
 ### Fase 3 — Login da profissional (`/app/[slug]`)
 
