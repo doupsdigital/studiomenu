@@ -8,12 +8,20 @@ export async function PATCH(request: Request) {
   }
 
   try {
-    const { id, status } = (await request.json()) as { id: string; status: string };
-    if (!id || !status) {
-      return NextResponse.json({ success: false, message: 'id e status são obrigatórios.' }, { status: 400 });
+    const { id, status, booking_enabled } = (await request.json()) as {
+      id: string;
+      status?: string;
+      booking_enabled?: boolean;
+    };
+    if (!id || (status === undefined && booking_enabled === undefined)) {
+      return NextResponse.json({ success: false, message: 'id e status/booking_enabled são obrigatórios.' }, { status: 400 });
     }
 
-    const { error } = await supabaseAdmin.from('orders').update({ status }).eq('id', id);
+    const updates: { status?: string; booking_enabled?: boolean } = {};
+    if (status !== undefined) updates.status = status;
+    if (booking_enabled !== undefined) updates.booking_enabled = booking_enabled;
+
+    const { error } = await supabaseAdmin.from('orders').update(updates).eq('id', id);
     if (error) {
       console.error('[Admin Catalog Actions] Erro ao atualizar status:', error);
       return NextResponse.json({ success: false, message: 'Erro ao atualizar o catálogo.' }, { status: 500 });

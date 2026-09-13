@@ -4,14 +4,21 @@ import { useEffect, useState } from 'react';
 import { CatalogOrderData } from '@/types/catalog';
 import { normalizeWhatsappBR } from '@/lib/format';
 import Link from 'next/link';
-import { ArrowLeft, Sparkles, ExternalLink, Search, RefreshCw, Scissors, Plus, Trash2, MessageCircle, Phone, Clock } from 'lucide-react';
+import { ArrowLeft, Sparkles, ExternalLink, Search, RefreshCw, Scissors, Plus, Trash2, MessageCircle, Phone, Clock, Smartphone, CalendarClock } from 'lucide-react';
+
+/** Campos de billing/agendamento não fazem parte do shape público do
+ *  catálogo (`CatalogOrderData`) — extensão só local, pro admin. */
+type AdminCatalog = CatalogOrderData & {
+  plan_tier?: 'catalog' | 'plus';
+  subscription_status?: 'none' | 'ativo' | 'suspenso' | 'cancelado';
+};
 
 export default function AdminCatalogosPage() {
-  const [catalogs, setCatalogs] = useState<CatalogOrderData[]>([]);
+  const [catalogs, setCatalogs] = useState<AdminCatalog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [catalogToDelete, setCatalogToDelete] = useState<CatalogOrderData | null>(null);
+  const [catalogToDelete, setCatalogToDelete] = useState<AdminCatalog | null>(null);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -26,7 +33,7 @@ export default function AdminCatalogosPage() {
       });
       const result = await res.json();
       if (result.success) {
-        setCatalogs(result.catalogs as CatalogOrderData[]);
+        setCatalogs(result.catalogs as AdminCatalog[]);
       } else {
         console.error('Erro ao buscar catálogos:', result.message);
         showToast('❌ Erro ao buscar catálogos.');
@@ -73,7 +80,7 @@ export default function AdminCatalogosPage() {
     }
   };
 
-  const approveAndDeliver = async (item: CatalogOrderData) => {
+  const approveAndDeliver = async (item: AdminCatalog) => {
     if (!item.id) return;
     try {
       const res = await fetch('/api/admin/catalog-actions', {
@@ -95,13 +102,52 @@ export default function AdminCatalogosPage() {
     }
   };
 
-  const buildDeliveryWhatsappUrl = (item: CatalogOrderData) => {
+  const buildDeliveryWhatsappUrl = (item: AdminCatalog) => {
     const cleanPhone = normalizeWhatsappBR(item.whatsapp_number);
     const firstName = (item.client_name || '').split(' ')[0];
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
     const catalogUrl = `${origin}/c/${item.slug}`;
     const message = `Olá, ${firstName}! ✨\n\nSeu catálogo digital oficial StudioMenu está pronto, calibrado e no ar! 🚀\n\n🔗 *Seu Link Exclusivo:*\n👉 ${catalogUrl}\n\n📌 *O que fazer agora:*\n1. Abra o link no seu celular e confira seu catálogo completo.\n2. Coloque este link na bio do seu Instagram e no seu perfil do WhatsApp Business.\n3. Comece a enviar para suas clientes no momento do agendamento!\n\nQualquer dúvida ou ajuste que precisar, nossa equipe está à sua inteira disposição. Parabéns pelo seu novo posicionamento! 💖✨`;
     return `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(message)}`;
+  };
+
+  const buildAppLoginUrl = (item: AdminCatalog) => {
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    return `${origin}/api/professional/login?slug=${item.slug}&token=${item.edit_token}`;
+  };
+
+  const toggleBookingEnabled = async (item: AdminCatalog) => {
+    if (!item.id) return;
+    try {
+      const res = await fetch('/api/admin/catalog-actions', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ id: item.id, booking_enabled: !item.booking_enabled }),
+      });
+      const result = await res.json();
+      if (!result.success) {
+        showToast('❌ Erro ao atualizar agendamento automático.');
+        return;
+      }
+      showToast(item.booking_enabled ? '🔒 Agendamento automático desligado.' : '📅 Agendamento automático ligado!');
+      fetchCatalogs();
+    } catch (e) {
+      console.error('Erro ao atualizar booking_enabled:', e);
+      showToast('❌ Erro ao atualizar agendamento automático.');
+    }
+  };
+
+  const PLAN_BADGE: Record<string, { label: string; className: string }> = {
+    catalog: { label: 'Catálogo', className: 'bg-slate-800 text-slate-400 border-slate-700' },
+    'plus-ativo': { label: 'Plus Ativo', className: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' },
+    'plus-suspenso': { label: 'Plus Suspenso', className: 'bg-amber-500/10 text-amber-400 border-amber-500/30' },
+    'plus-cancelado': { label: 'Plus Cancelado', className: 'bg-slate-800 text-slate-500 border-slate-700' },
+  };
+
+  const getPlanBadge = (item: AdminCatalog) => {
+    if (item.plan_tier !== 'plus') return PLAN_BADGE.catalog;
+    return PLAN_BADGE[`plus-${item.subscription_status || 'none'}`] || PLAN_BADGE['plus-cancelado'];
   };
 
   return (
@@ -187,20 +233,27 @@ export default function AdminCatalogosPage() {
                   className="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between space-y-4 hover:border-slate-700 transition-all shadow-xl"
                 >
                   <div>
-                    <div className="flex items-center justify-between gap-2 mb-2.5">
+                    <div className="flex items-center justify-between gap-2 mb-2.5 flex-wrap">
                       <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-rose-500/10 text-rose-400 border border-rose-500/20 flex items-center gap-1.5">
                         <Scissors className="w-3.5 h-3.5" />
                         <span>{item.niche || 'Lash'}</span>
                       </span>
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ${
-                          isPending
-                            ? 'bg-amber-500/10 text-amber-400 border-amber-500/30'
-                            : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-                        }`}
-                      >
-                        {isPending ? 'Pendente' : 'Aprovado'}
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ${getPlanBadge(item).className}`}
+                        >
+                          {getPlanBadge(item).label}
+                        </span>
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ${
+                            isPending
+                              ? 'bg-amber-500/10 text-amber-400 border-amber-500/30'
+                              : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                          }`}
+                        >
+                          {isPending ? 'Pendente' : 'Aprovado'}
+                        </span>
+                      </div>
                     </div>
 
                     <h2 className="font-serif text-2xl font-bold text-white leading-tight">
@@ -245,6 +298,41 @@ export default function AdminCatalogosPage() {
                         /c/{item.slug}{item.edit_token ? `?edit=${item.edit_token.substring(0, 8)}...` : ''}
                       </p>
                     </div>
+
+                    {item.edit_token && (
+                      <div className="mt-2 p-3 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                            <Smartphone className="w-3.5 h-3.5" />
+                            Link do App
+                          </span>
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(buildAppLoginUrl(item));
+                              showToast('📱 Link do App copiado!');
+                            }}
+                            className="text-xs text-rose-400 hover:text-rose-300 font-bold underline flex items-center gap-1"
+                          >
+                            Copiar Link
+                          </button>
+                        </div>
+                        <p className="text-xs font-mono text-slate-400 truncate">
+                          /api/professional/login?slug={item.slug}&token={item.edit_token.substring(0, 8)}...
+                        </p>
+                      </div>
+                    )}
+
+                    <button
+                      onClick={() => toggleBookingEnabled(item)}
+                      className={`mt-2 w-full px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 border transition-all ${
+                        item.booking_enabled
+                          ? 'bg-rose-500/20 border-rose-500/60 text-rose-300'
+                          : 'bg-white/5 border-slate-700 text-slate-400'
+                      }`}
+                    >
+                      <CalendarClock className="w-3.5 h-3.5" />
+                      Agendamento automático: {item.booking_enabled ? 'Ligado' : 'Desligado'}
+                    </button>
                   </div>
 
                   <div className="space-y-2">
