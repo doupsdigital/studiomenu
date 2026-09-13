@@ -1,0 +1,229 @@
+/* ==========================================================================
+   WIZARD DE AGENDAMENTO (BookingModal) — Fase 2
+   Reaproveita a moldura (.modal-detalhe*, .modal__*) de catalog-theme.css.
+   Variáveis novas seguem o mesmo padrão de tema do projeto: valores rose
+   aqui em :root, mesmos nomes redeclarados em [data-theme="luxury"] — a
+   estrutura (layout/padding/radius) mora só nas regras base, nunca duplicada
+   por tema.
+   ========================================================================== */
+
+:root {
+  --wizard-input-bg: rgba(255, 255, 255, 0.55);
+  --wizard-input-border: var(--modal-spec-border);
+  --wizard-input-color: var(--modal-title-color);
+  --wizard-input-placeholder: var(--modal-desc-color);
+  --wizard-input-focus-border: var(--modal-cta-bg);
+  --wizard-label-color: var(--modal-spec-k-color);
+  --wizard-step-dot-bg: var(--modal-spec-border);
+  --wizard-step-dot-active-bg: var(--modal-cta-bg);
+  --wizard-back-color: var(--modal-desc-color);
+  --wizard-error-color: #c0392b;
+  --wizard-error-bg: rgba(192, 57, 43, 0.08);
+  --wizard-summary-border: var(--modal-spec-border);
+}
+
+[data-theme="luxury"] {
+  --wizard-input-bg: rgba(255, 255, 255, 0.04);
+  --wizard-input-border: var(--modal-spec-border);
+  --wizard-input-color: var(--modal-title-color);
+  --wizard-input-placeholder: var(--modal-desc-color);
+  --wizard-input-focus-border: var(--modal-cta-bg);
+  --wizard-label-color: var(--modal-spec-k-color);
+  --wizard-step-dot-bg: var(--modal-spec-border);
+  --wizard-step-dot-active-bg: var(--modal-cta-bg);
+  --wizard-back-color: var(--modal-desc-color);
+  --wizard-error-color: #e07a68;
+  --wizard-error-bg: rgba(224, 122, 104, 0.12);
+  --wizard-summary-border: var(--modal-spec-border);
+}
+
+/* Indicador de passo (1/2/3) */
+.wizard__steps {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+.wizard__step-dot {
+  flex: 1;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--wizard-step-dot-bg);
+  transition: background-color 0.25s ease;
+}
+.wizard__step-dot.is-active,
+.wizard__step-dot.is-done {
+  background: var(--wizard-step-dot-active-bg);
+}
+
+.wizard__voltar {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: none;
+  padding: 0 0 14px;
+  font-size: 11.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--wizard-back-color);
+  cursor: pointer;
+}
+
+.wizard__label {
+  display: block;
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--wizard-label-color);
+  margin-bottom: 10px;
+}
+
+/* Passo 1: dias + horários */
+.wizard__dias {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 2px 2px 14px;
+  margin-bottom: 6px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.wizard__dias::-webkit-scrollbar { display: none; }
+
+.wizard__dia-chip {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 54px;
+  padding: 10px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--chip-color);
+  background: var(--chip-bg);
+  border: 1px solid var(--chip-border);
+  border-radius: 14px;
+  box-shadow: var(--chip-shadow);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.wizard__dia-chip strong {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 16px;
+  font-weight: 500;
+}
+.wizard__dia-chip.is-ativo {
+  color: var(--chip-active-color);
+  background: var(--chip-active-bg);
+  border-color: var(--chip-active-border);
+  box-shadow: var(--chip-active-shadow);
+}
+
+.wizard__slots {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+  gap: 8px;
+  min-height: 44px;
+}
+
+.wizard__slot {
+  padding: 11px 6px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--chip-color);
+  background: var(--chip-bg);
+  border: 1px solid var(--chip-border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.wizard__slot.is-ativo {
+  color: var(--chip-active-color);
+  background: var(--chip-active-bg);
+  border-color: var(--chip-active-border);
+  box-shadow: var(--chip-active-shadow);
+}
+
+.wizard__vazio {
+  font-size: 13px;
+  color: var(--modal-desc-color);
+  padding: 18px 4px;
+  text-align: center;
+}
+
+/* Passo 2: formulário */
+.wizard__campo { margin-bottom: 16px; }
+
+.wizard__input {
+  width: 100%;
+  height: 48px;
+  padding: 0 14px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--wizard-input-color);
+  background: var(--wizard-input-bg);
+  border: 1.5px solid var(--wizard-input-border);
+  border-radius: 12px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+.wizard__input::placeholder { color: var(--wizard-input-placeholder); opacity: 0.7; }
+.wizard__input:focus { border-color: var(--wizard-input-focus-border); }
+
+textarea.wizard__input {
+  height: auto;
+  min-height: 72px;
+  padding: 12px 14px;
+  resize: vertical;
+}
+
+/* Resumo (passo 3) */
+.wizard__resumo {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 22px;
+}
+.wizard__resumo-linha {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 11px 0;
+  border-top: 1px solid var(--wizard-summary-border);
+}
+.wizard__resumo-k {
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--wizard-label-color);
+}
+.wizard__resumo-v {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 17px;
+  color: var(--modal-spec-v-color);
+  text-align: right;
+}
+
+.wizard__erro {
+  font-size: 12.5px;
+  color: var(--wizard-error-color);
+  background: var(--wizard-error-bg);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.wizard__cta[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+  .wizard__dia-chip { min-width: 48px; padding: 8px 4px; }
+  .wizard__slots { grid-template-columns: repeat(auto-fill, minmax(68px, 1fr)); }
+}

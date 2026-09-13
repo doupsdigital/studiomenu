@@ -9,6 +9,7 @@ import { CTASection } from './CTASection';
 import { VisualEditorBottomBar } from './VisualEditorBottomBar';
 import { VisualEditorModals } from './VisualEditorModals';
 import { NewCatalogWelcomeOverlay } from './NewCatalogWelcomeOverlay';
+import { BookingModal } from './modals/BookingModal';
 
 import '@/styles/visual-editor.css';
 
@@ -67,6 +68,11 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
   const [categoryToDelete, setCategoryToDelete] = useState<{ name: string; count: number } | null>(null);
   const [procToDelete, setProcToDelete] = useState<ProcedureItem | null>(null);
   const [saveErrorMessage, setSaveErrorMessage] = useState<string>('');
+
+  // Item em processo de agendamento (wizard do cliente final) — estado
+  // independente do `activeModal` acima, que é exclusivo dos modais do
+  // editor visual e nunca renderiza fora de isEditMode.
+  const [bookingItem, setBookingItem] = useState<ProcedureItem | null>(null);
 
   // Toast discreto pra cada edição local (feedback imediato antes de "Salvar")
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -443,6 +449,8 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
             setActiveModal('procedure');
           }}
           onOpenAddCatModal={() => setActiveModal('category')}
+          bookingEnabled={!isEditMode && Boolean(catalogState.booking_enabled)}
+          onRequestBooking={!isEditMode && catalogState.booking_enabled ? setBookingItem : undefined}
         />
 
         {/* Seção Orientações */}
@@ -463,6 +471,17 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
           onUpdateAddress={handleUpdateAddress}
         />
       </div>
+
+      {/* Wizard de Agendamento (cliente final, só quando booking_enabled) */}
+      {bookingItem && !isEditMode && (
+        <BookingModal
+          service={bookingItem}
+          slug={catalogState.slug}
+          whatsappNumber={catalogState.whatsapp_number}
+          professionalName={catalogState.client_name}
+          onClose={() => setBookingItem(null)}
+        />
+      )}
     </div>
   );
 };

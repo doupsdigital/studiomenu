@@ -9,6 +9,8 @@ interface ProcedureDetailModalProps {
   whatsappNumber: string;
   onClose: () => void;
   onNext?: () => void;
+  bookingEnabled?: boolean;
+  onBook?: (item: ProcedureItem) => void;
 }
 
 export const ProcedureDetailModal: React.FC<ProcedureDetailModalProps> = ({
@@ -17,6 +19,8 @@ export const ProcedureDetailModal: React.FC<ProcedureDetailModalProps> = ({
   whatsappNumber,
   onClose,
   onNext,
+  bookingEnabled = false,
+  onBook,
 }) => {
   // Lock body scroll when modal is active
   useEffect(() => {
@@ -61,6 +65,8 @@ export const ProcedureDetailModal: React.FC<ProcedureDetailModalProps> = ({
   );
   const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${messageText}`;
 
+  const canBook = bookingEnabled && item.bookable !== false && !!item.duration_minutes && item.duration_minutes > 0;
+
   const fallbackImage = 'https://images.unsplash.com/photo-1583001809873-a1284d563391?auto=format&fit=crop&w=400&q=80';
 
   return (
@@ -99,14 +105,24 @@ export const ProcedureDetailModal: React.FC<ProcedureDetailModalProps> = ({
           </div>
 
           <div className="modal__acoes">
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="modal__cta"
-            >
-              Agendar {item.title} →
-            </a>
+            {canBook ? (
+              <button
+                type="button"
+                className="modal__cta"
+                onClick={() => onBook?.(item)}
+              >
+                Agendar {item.title} →
+              </button>
+            ) : (
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="modal__cta"
+              >
+                Agendar {item.title} →
+              </a>
+            )}
             {onNext && (
               <button
                 type="button"

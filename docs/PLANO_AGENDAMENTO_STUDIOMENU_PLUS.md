@@ -2,7 +2,7 @@
 
 > **Documento vivo.** Esse arquivo é a fonte de verdade do progresso dessa funcionalidade. Cada tarefa concluída E testada deve ser marcada aqui (`- [x]`) ao final da fase correspondente, não só no começo. Se você está retomando esse trabalho em outra sessão/estação: basta referenciar este arquivo e pedir pra continuar de onde parou — a IA deve ler este documento inteiro antes de seguir.
 
-**Status geral:** 🟢 Fases 0 e 1 concluídas e testadas. Próxima: Fase 2 (última atualização: 2026-09-11).
+**Status geral:** 🟢 Fases 0, 1 e 2 concluídas e testadas. Fases 0/1 commitadas (`8e49fc1`, `3ed15f4`); Fase 2 aguardando aprovação pra commit. Próxima: Fase 3 (última atualização: 2026-09-13).
 
 **Legenda:** `[ ]` pendente · `[x]` feito e testado · `[~]` feito mas testado só parcialmente / com ressalva (explicada ao lado)
 
@@ -90,7 +90,7 @@ Cada fase termina em algo testável de verdade (curl e/ou navegador com catálog
 - [x] Teste: editar e salvar um catálogo de teste 3x seguidas (curl direto na rota local) — confirmado que ids de itens mantidos ficam estáveis, itens novos recebem id novo, itens removidos são apagados e só eles. Catálogo de teste limpo depois (`DELETE` em `orders`, cascade cuidou de `order_services`).
 - [x] `npx tsc --noEmit` + `npx next build` limpos.
 - [x] Ajuste extra descoberto durante o teste: `tsconfig.json` e `scripts/check-integrity.js` precisaram excluir `docs/lashmenu-vendas-feature-lashmenu-agendamento/` (pasta de referência colada no repo), que não é parte do app e travava o `tsc`/hook de commit.
-- [ ] Commit (aguardando aprovação).
+- [x] Commit — `8e49fc1`.
 
 ### Fase 1 — Motor de disponibilidade + API de agendamento ✅ CONCLUÍDA (2026-09-11)
 
@@ -105,19 +105,21 @@ Cada fase termina em algo testável de verdade (curl e/ou navegador com catálog
 - [x] Teste do buffer de hoje: com o horário local em 15:19, o primeiro slot livre veio corretamente às 16:00 (15:30 ficou de fora por cair dentro do buffer de 30min).
 - [x] Catálogo de teste limpo depois (cascade removeu `order_services`/`business_hours`/`schedule_blocks`/`appointments` junto).
 - [x] `tsc` + `build` limpos, rotas novas aparecem no build.
+- [x] Commit — `3ed15f4`.
+
+### Fase 2 — Modal de agendamento no catálogo (cliente final) ✅ CONCLUÍDA (2026-09-13)
+
+- [x] Novo componente `src/components/catalog/modals/BookingModal.tsx`, reaproveitando o esqueleto visual de `ProcedureDetailModal.tsx` (classes `.modal-detalhe*`/`.modal__*` do `catalog-theme.css`) + `src/styles/scheduling-wizard.css` novo (variáveis de tema próprias, rose em `:root` e luxury em `[data-theme="luxury"]`, seguindo o precedente de `visual-editor.css` de CSS separado por feature).
+- [x] Passo 1: seleção de dia (próximos 14 dias, chips) + grade de horários (`GET /api/scheduling/availability`).
+- [x] Passo 2: nome + WhatsApp (sem conta, sem senha), com máscara de telefone.
+- [x] Passo 3: confirmação com resumo (serviço, dia/hora, preço) + botão de avisar por WhatsApp (padrão híbrido: `POST /api/scheduling/book` registra o agendamento no banco antes desse passo; o WhatsApp é só o aviso informal em cima do registro já estruturado).
+- [x] **Ajuste de escopo decidido com o usuário durante o design** (documentado no plano de implementação da sessão): o wizard segue os 3 passos exatos, sem passo de "escolher serviço" — por isso só é plugado em `ProcedureDetailModal.tsx` (que já tem o item/serviço específico no contexto). `CTASection.tsx` (botão genérico "Agendar pelo WhatsApp", sem serviço associado) e `HeaderCover.tsx` (botão flutuante de suporte/dúvida, não é uma ação de agendar) **não foram alterados** — continuam sempre indo pro WhatsApp, independente de `booking_enabled`. `ProcedureCard.tsx` também não foi tocado: seu fallback `wa.me` interno já era código morto (o `onSelect` sempre é passado por `ProcedureGrid`), então o ponto real de entrada continua sendo o CTA "Agendar" dentro do modal de detalhe. Fica pra um incremento futuro adicionar um passo de escolha de serviço, se um dia quiserem plugar o CTASection também.
+- [x] Corrigido de quebra um gap de dados encontrado durante o levantamento (não estava listado originalmente nesta fase): `src/lib/catalog-service.ts` fazia `select('*')` em `orders`/`order_services` mas não repassava `booking_enabled`, `duration_minutes` nem `bookable` pro componente client. Adicionado o mapeamento desses três campos + `booking_enabled?: boolean` em `CatalogOrderData` (`src/types/catalog.ts`).
+- [x] `ProcedureDetailModal.tsx`: CTA principal vira `<button>` que abre o wizard quando `bookingEnabled && item.bookable !== false && duration_minutes > 0`; nos demais casos (booking desligado, serviço não-bookable, ou sem duração configurada) continua sendo o link `<a>` direto pro WhatsApp, idêntico ao comportamento anterior.
+- [x] `ProcedureGrid.tsx`/`CatalogLayout.tsx`: novo estado `bookingItem` em `CatalogLayout` (independente do `activeModal` do editor, que é exclusivo de `isEditMode`), repassado como `onRequestBooking` só quando `!isEditMode && booking_enabled` — em modo edição ou catálogo sem agendamento, a prop nem existe, então o comportamento antigo fica intocado por construção.
+- [x] Teste ponta a ponta num catálogo de teste descartável (`fase2-teste-booking`, criado/limpo via Supabase REST com service role key): navegador headless (Playwright, instalado só no scratchpad da sessão) — fluxo completo (dia → horário → nome/whats → confirmação → link de WhatsApp correto), nos dois temas (rose e luxury). Regressão confirmada: serviço com `bookable=false` manteve o CTA como link direto pro WhatsApp (não abriu o wizard). Teste de conflito via curl: reservar o mesmo horário duas vezes devolve `200` na 1ª e `409` na 2ª ("Esse horário não está mais disponível"). Página com `?edit=token` carrega normalmente (200) — wizard não tem como abrir em modo edição por construção. Zero erros no console do navegador. Catálogo de teste removido depois (cascade cuidou do resto).
+- [x] `npx tsc --noEmit` + `npx next build` limpos (30 rotas geradas, incluindo `/c/[slug]` e as duas rotas de scheduling).
 - [ ] Commit (aguardando aprovação).
-
-### Fase 2 — Modal de agendamento no catálogo (cliente final)
-
-- [ ] Novo componente de modal reaproveitando o padrão visual dos modais existentes (`ProcedureDetailModal.tsx` como referência de estilo).
-- [ ] Passo 1: seleção de dia (próximos 14 dias) + horário.
-- [ ] Passo 2: nome + WhatsApp (sem conta, sem senha).
-- [ ] Passo 3: confirmação com resumo + botão de avisar por WhatsApp (padrão híbrido: registro estruturado no banco + aviso informal por WhatsApp, como no LashAgenda).
-- [ ] Trocar a ação dos botões "agendar" (`CTASection.tsx`, `HeaderCover.tsx`, `ProcedureCard.tsx`, `ProcedureDetailModal.tsx`) pra abrir esse modal quando `orders.booking_enabled = true`.
-- [ ] Manter o comportamento atual (redirecionar pro WhatsApp) idêntico quando `booking_enabled = false` — zero regressão pros catálogos que não usam agendamento.
-- [ ] Teste num catálogo de teste com `booking_enabled` ligado manualmente no banco, fluxo completo ponta a ponta no navegador.
-- [ ] `tsc` + `build`.
-- [ ] Commit.
 
 ### Fase 3 — Login da profissional (`/app/[slug]`)
 

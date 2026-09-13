@@ -38,6 +38,8 @@ export async function getCatalogBySlug(slug: string): Promise<CatalogOrderData |
         badge: s.badge || '',
         is_highlight: Boolean(s.destaque || s.is_highlight),
         specs: Array.isArray(s.specs) ? s.specs : [],
+        duration_minutes: s.duration_minutes ?? null,
+        bookable: s.bookable !== false,
       }));
     } else if (Array.isArray(orderData.procedures) && orderData.procedures.length > 0) {
       procedures = orderData.procedures;
@@ -98,6 +100,7 @@ export async function getCatalogBySlug(slug: string): Promise<CatalogOrderData |
       id: orderData.id,
       slug: orderData.slug || normalizedSlug,
       edit_token: orderData.edit_token,
+      booking_enabled: Boolean(orderData.booking_enabled),
       client_name: orderData.client_name || orderData.name || normalizedSlug,
       studio_name: orderData.studio_name || `Studio ${orderData.client_name || normalizedSlug}`,
       hero_phrase: orderData.hero_phrase || 'A arte de transformar a sua beleza com leveza e precisão.',

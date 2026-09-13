@@ -50,6 +50,9 @@ export interface CatalogOrderData {
   final_screen_bg_url?: string;
   cta_bg_url?: string;
   edit_token?: string;
+  /** Se true, o botão "agendar" do catálogo abre o wizard de horários reais
+   *  em vez de redirecionar direto pro WhatsApp (agendamento automático). */
+  booking_enabled?: boolean;
   categories?: string[];
   procedures: ProcedureItem[];
   instructions?: CatalogInstructions;

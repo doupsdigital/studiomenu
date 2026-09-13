@@ -20,6 +20,8 @@ interface ProcedureGridProps {
   onOpenAddCatModal?: () => void;
   onDeleteCategory?: (categoryName: string, count: number) => void;
   onMoveCategory?: (categoryName: string, direction: 'left' | 'right') => void;
+  bookingEnabled?: boolean;
+  onRequestBooking?: (item: ProcedureItem) => void;
 }
 
 export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
@@ -35,6 +37,8 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
   onOpenAddCatModal,
   onDeleteCategory,
   onMoveCategory,
+  bookingEnabled = false,
+  onRequestBooking,
 }) => {
   const [selectedProcedure, setSelectedProcedure] = useState<ProcedureItem | null>(null);
 
@@ -263,6 +267,15 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
           whatsappNumber={whatsappNumber}
           onClose={() => setSelectedProcedure(null)}
           onNext={handleNextProcedure}
+          bookingEnabled={bookingEnabled}
+          onBook={
+            onRequestBooking
+              ? (proc) => {
+                  setSelectedProcedure(null);
+                  onRequestBooking(proc);
+                }
+              : undefined
+          }
         />
       )}
     </section>
