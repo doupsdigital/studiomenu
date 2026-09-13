@@ -2,7 +2,7 @@
 
 > **Documento vivo.** Esse arquivo é a fonte de verdade do progresso dessa funcionalidade. Cada tarefa concluída E testada deve ser marcada aqui (`- [x]`) ao final da fase correspondente, não só no começo. Se você está retomando esse trabalho em outra sessão/estação: basta referenciar este arquivo e pedir pra continuar de onde parou — a IA deve ler este documento inteiro antes de seguir.
 
-**Status geral:** 🟢 Fases 0, 1 e 2 concluídas, testadas e commitadas (`8e49fc1`, `3ed15f4`, `f30ebd1`). Próxima: Fase 3 (última atualização: 2026-09-13).
+**Status geral:** 🟢 Fases 0, 1, 2 e 3 concluídas e testadas. Fase 3 aguardando aprovação pra commit. Próxima: Fase 4 (última atualização: 2026-09-13).
 
 **Legenda:** `[ ]` pendente · `[x]` feito e testado · `[~]` feito mas testado só parcialmente / com ressalva (explicada ao lado)
 
@@ -70,7 +70,7 @@ Todas as tabelas novas seguem a mesma postura de RLS já em uso no projeto: RLS 
 
 ### Variáveis de ambiente novas (`.env` local + depois Vercel)
 
-- [ ] `PROFESSIONAL_SESSION_SECRET` — HMAC do cookie de sessão do app da profissional (Fase 3).
+- [x] `PROFESSIONAL_SESSION_SECRET` — HMAC do cookie de sessão do app da profissional (Fase 3). Gerado localmente no `.env`; falta gerar um valor de produção separado quando for pra Vercel.
 - [ ] `ASAAS_API_KEY` — chave da API do Asaas (sandbox primeiro, produção depois).
 - [ ] `ASAAS_BASE_URL` — endpoint sandbox vs. produção do Asaas.
 - [ ] `ASAAS_WEBHOOK_SECRET` — segredo compartilhado pra validar o webhook (o LashAgenda não tinha essa proteção; aqui terá desde o início).
@@ -121,14 +121,17 @@ Cada fase termina em algo testável de verdade (curl e/ou navegador com catálog
 - [x] `npx tsc --noEmit` + `npx next build` limpos (30 rotas geradas, incluindo `/c/[slug]` e as duas rotas de scheduling).
 - [x] Commit — `f30ebd1`.
 
-### Fase 3 — Login da profissional (`/app/[slug]`)
+### Fase 3 — Login da profissional (`/app/[slug]`) ✅ CONCLUÍDA (2026-09-13)
 
-- [ ] `src/lib/professional-session.ts` — mesmo padrão HMAC do `admin-session.ts` (cookie assinado, TTL, `timingSafeEqual`), secret novo `PROFESSIONAL_SESSION_SECRET`, cookie `sm_pro_session`.
-- [ ] Rota que valida `?token=` contra `orders.edit_token` (o mesmo token de qualquer catálogo, com ou sem Plus) e grava o cookie, redirecionando pra URL limpa.
-- [ ] Rate limit no endpoint de validação de token (`professional-login:${ip}`).
-- [ ] Teste via curl (token válido/inválido/expirado) + navegador (persistência do cookie entre visitas).
-- [ ] `tsc` + `build`.
-- [ ] Commit.
+- [x] `src/lib/professional-session.ts` — mesmo padrão HMAC do `admin-session.ts` (cookie assinado, TTL de 90 dias, `timingSafeEqual`), secret novo `PROFESSIONAL_SESSION_SECRET`, cookie `sm_pro_session`. **Diferença deliberada em relação ao admin**: como o recurso aqui é por catálogo (não único/global), a assinatura cobre `slug + expiresAt`, não só `expiresAt` — o cookie vira `${slug}.${expiresAt}.${assinatura}` e a validação exige o `slug` esperado como parâmetro. Sem isso, um cookie válido de um catálogo poderia ser reaproveitado manualmente (requisição forjada, não pelo navegador) pra autenticar em `/app/[outro-slug]`. O cookie também é gravado com `path: /app/${slug}`, então navegadores reais nem chegam a enviá-lo entre catálogos diferentes — a amarração no payload é a segunda camada, contra requisições forjadas.
+- [x] `src/app/api/professional/login/route.ts` (GET `?slug=&token=`) — valida o `edit_token` do catálogo via `timingSafeEqual` (era `===` simples em `/c/[slug]/page.tsx`; mesmo padrão que `checkAdminPassword` já usa), grava o cookie e redireciona pra `/app/[slug]` (a página em si só existe na Fase 4 — por ora dá 404 depois do redirect, esperado). Slug inexistente e token errado devolvem a mesma resposta genérica (401, "Link inválido ou expirado.") pra não vazar se o catálogo existe.
+- [x] Rate limit `professional-login:${ip}` (10 tentativas / 15 min, mesmo limite do `admin-login`).
+- [x] `PROFESSIONAL_SESSION_SECRET` gerado e adicionado ao `.env` local.
+- [x] Teste via curl num catálogo de teste descartável (`fase3-teste-login`): token correto → `307` + `Set-Cookie` (`Path=/app/<slug>`, `HttpOnly`, `SameSite=lax`, `Max-Age=90 dias`) + `Location` correto; token errado e slug inexistente → `401` com corpo idêntico; faltando `slug`/`token` → `400`; mais de 10 tentativas → `429`. Assinatura do cookie gerado pela rota real conferida byte a byte contra o HMAC esperado.
+- [x] Teste direto da função pura `isValidProfessionalSession` (script isolado, mesma lógica do arquivo real): cookie válido → `true`; expirado → `false`; assinado pra outro slug e validado contra este → `false` (confirma a amarração slug↔cookie); assinatura adulterada → `false`; cookie ausente → `false`.
+- [x] Catálogo de teste removido depois.
+- [x] `npx tsc --noEmit` + `npx next build` limpos (`/api/professional/login` aparece nas rotas geradas).
+- [ ] Commit (aguardando aprovação).
 
 ### Fase 4 — Shell do app (4 seções) + PWA
 
