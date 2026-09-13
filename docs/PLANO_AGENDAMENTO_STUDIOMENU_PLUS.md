@@ -2,7 +2,7 @@
 
 > **Documento vivo.** Esse arquivo é a fonte de verdade do progresso dessa funcionalidade. Cada tarefa concluída E testada deve ser marcada aqui (`- [x]`) ao final da fase correspondente, não só no começo. Se você está retomando esse trabalho em outra sessão/estação: basta referenciar este arquivo e pedir pra continuar de onde parou — a IA deve ler este documento inteiro antes de seguir.
 
-**Status geral:** 🟢 Fases 0, 1, 2 e 3 concluídas e testadas. Fase 3 aguardando aprovação pra commit. Próxima: Fase 4 (última atualização: 2026-09-13).
+**Status geral:** 🟢 Fases 0, 1, 2 e 3 concluídas, testadas e commitadas (`8e49fc1`, `3ed15f4`, `f30ebd1`, `24aed90`). Próxima: Fase 4 (última atualização: 2026-09-13).
 
 **Legenda:** `[ ]` pendente · `[x]` feito e testado · `[~]` feito mas testado só parcialmente / com ressalva (explicada ao lado)
 
@@ -131,7 +131,7 @@ Cada fase termina em algo testável de verdade (curl e/ou navegador com catálog
 - [x] Teste direto da função pura `isValidProfessionalSession` (script isolado, mesma lógica do arquivo real): cookie válido → `true`; expirado → `false`; assinado pra outro slug e validado contra este → `false` (confirma a amarração slug↔cookie); assinatura adulterada → `false`; cookie ausente → `false`.
 - [x] Catálogo de teste removido depois.
 - [x] `npx tsc --noEmit` + `npx next build` limpos (`/api/professional/login` aparece nas rotas geradas).
-- [ ] Commit (aguardando aprovação).
+- [x] Commit — `24aed90`.
 
 ### Fase 4 — Shell do app (4 seções) + PWA
 
