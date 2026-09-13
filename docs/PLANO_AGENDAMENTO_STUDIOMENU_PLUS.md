@@ -2,7 +2,7 @@
 
 > **Documento vivo.** Esse arquivo é a fonte de verdade do progresso dessa funcionalidade. Cada tarefa concluída E testada deve ser marcada aqui (`- [x]`) ao final da fase correspondente, não só no começo. Se você está retomando esse trabalho em outra sessão/estação: basta referenciar este arquivo e pedir pra continuar de onde parou — a IA deve ler este documento inteiro antes de seguir.
 
-**Status geral:** 🟢 Fases 0-3, 4a e 4b concluídas, testadas e commitadas (`8e49fc1`, `3ed15f4`, `f30ebd1`, `24aed90`, `eb85f29`, `2e038a5`). Próxima: Fase 4c (última atualização: 2026-09-13).
+**Status geral:** 🟢 Fases 0-4 completas e testadas (4a+4b+4c). Fase 4c aguardando aprovação pra commit. Próxima: Fase 5 (Asaas) (última atualização: 2026-09-13).
 
 **Legenda:** `[ ]` pendente · `[x]` feito e testado · `[~]` feito mas testado só parcialmente / com ressalva (explicada ao lado)
 
@@ -170,9 +170,19 @@ Cada fase termina em algo testável de verdade (curl e/ou navegador com catálog
 - [x] `npx tsc --noEmit` + `npx next build` limpos (3 rotas novas de API).
 - [x] Commit — `2e038a5`.
 
-#### Fase 4c — Aba Config (conteúdo real)
+#### Fase 4c — Aba Config (conteúdo real) ✅ CONCLUÍDA (2026-09-13)
 
-- [ ] Grade semanal de horários (`business_hours`), bloqueios/folgas (`schedule_blocks`). A seção "Minha Assinatura" fica pra Fase 5 (depende do Asaas).
+- [x] `src/lib/scheduling/config-service.ts` (novo) — `getBusinessHours`/`getScheduleBlocks`.
+- [x] `src/app/api/professional/business-hours/route.ts` (PUT) — substitui a grade semanal inteira (delete-all + insert); valida `weekday` 0-6 sem duplicata e `start_time < end_time` por linha antes de tocar o banco (uma tentativa inválida não corrompe a grade já salva — testado).
+- [x] `src/app/api/professional/schedule-blocks/[id]/route.ts` (DELETE) — reaproveita o `POST` já existente da Fase 4b pra criar (já aceitava `start_date`/`end_date` distintos); mesmo padrão de autorização da Fase 4b (resolve o dono real do bloqueio no banco antes de checar a sessão).
+- [x] `src/components/config/BusinessHoursEditor.tsx` + `ScheduleBlocksManager.tsx` (novos) + `src/app/app/[slug]/config/page.tsx` reescrito. Sem gate de plano (config é do catálogo, não é feature paga).
+- [x] Teste com dois catálogos de teste Plus-ativos: via curl — grade salva com sucesso, tentativa inválida (`start_time >= end_time`) rejeitada sem alterar o que já estava salvo, tentativa cross-catálogo em ambas as rotas novas devolve `401`, bloqueio de 2 dias criado reduz a disponibilidade pública a zero slots naquele dia e apagar o bloqueio devolve os slots. Via navegador headless: horário marcado como aberto persiste depois de recarregar a página, bloqueio criado pela UI aparece na lista e some ao apagar, zero erros de console.
+- [x] Regressão: `/c/[slug]` continua respondendo `200` normalmente.
+- [x] Catálogos de teste removidos depois.
+- [x] `npx tsc --noEmit` + `npx next build` limpos (2 rotas novas de API).
+- [ ] Commit (aguardando aprovação).
+
+**Fase 4 completa** (4a + 4b + 4c) — as 4 abas do app da profissional (Início, Catálogo, Agenda, Config) têm conteúdo real, exceto a seção "Minha Assinatura" (Config), que depende do Asaas (Fase 5).
 
 ### Fase 5 — Asaas + paywall do Plus
 
