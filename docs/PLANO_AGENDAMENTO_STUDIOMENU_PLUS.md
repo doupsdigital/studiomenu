@@ -223,7 +223,7 @@ Cada fase termina em algo testável de verdade (curl e/ou navegador com catálog
 - [x] Teste no navegador headless: confirmar/recusar um agendamento pendente mostra o link de aviso certo pra cliente (número e mensagem corretos pra cada caso), dispensável. Teste de deduplicação: webhook do Asaas disparado duas vezes seguidas pro mesmo pedido só tenta notificar o Telegram uma vez. Regressão: rota `notify-telegram` e catálogo público continuam respondendo normalmente.
 - [x] Catálogo de teste removido depois.
 - [x] `npx tsc --noEmit` + `npx next build` limpos.
-- [ ] Commit (aguardando aprovação).
+- [x] Commit — `412f396`.
 
 ---
 
