@@ -2,7 +2,7 @@
 
 > **Documento vivo.** Esse arquivo é a fonte de verdade do progresso dessa funcionalidade. Cada tarefa concluída E testada deve ser marcada aqui (`- [x]`) ao final da fase correspondente, não só no começo. Se você está retomando esse trabalho em outra sessão/estação: basta referenciar este arquivo e pedir pra continuar de onde parou — a IA deve ler este documento inteiro antes de seguir.
 
-**Status geral:** 🟢 Fases 0-6 completas, testadas e commitadas (`8e49fc1`, `3ed15f4`, `f30ebd1`, `24aed90`, `eb85f29`, `2e038a5`, `38a680b`, `580cfc9`, `248ee3d`). Fase 5 com um pendente: teste de ponta a ponta contra a API real do Asaas, falta a chave de sandbox do usuário. Falta só a Fase 7 (notificações) (última atualização: 2026-09-13).
+**Status geral:** 🟢 Todas as fases do plano original (0-7) implementadas e testadas. Fase 7 aguardando aprovação pra commit. Duas pendências registradas: teste de ponta a ponta contra a API real do Asaas (falta a chave de sandbox do usuário, Fase 5) e push web/VAPID (adiado por decisão do usuário, Fase 7) (última atualização: 2026-09-13).
 
 **Legenda:** `[ ]` pendente · `[x]` feito e testado · `[~]` feito mas testado só parcialmente / com ressalva (explicada ao lado)
 
@@ -214,14 +214,16 @@ Cada fase termina em algo testável de verdade (curl e/ou navegador com catálog
 
 **Nota de ambiente**: `ADMIN_PASSWORD`/`ADMIN_SESSION_SECRET` estavam vazios no `.env` local (o login do admin não funcionava de jeito nenhum sem eles) — defini valores de teste locais pra conseguir testar esta fase. Value atual: `ADMIN_PASSWORD=teste-admin-local`. Troque se quiser outra senha.
 
-### Fase 7 — Notificações
+### Fase 7 — Notificações ✅ CONCLUÍDA (2026-09-13, sem push web — adiado)
 
-- [ ] Aviso por WhatsApp (link `wa.me`, mesmo padrão de `CTASection.tsx`) pra profissional quando um agendamento é criado.
-- [ ] Aviso por WhatsApp pra cliente quando confirmado/recusado.
-- [ ] Extensão do `notify-telegram` existente pra avisar o dono do produto de novas assinaturas Plus.
-- [ ] Push web (VAPID) — melhoria opcional, não bloqueia as fases anteriores.
-- [ ] `tsc` + `build`.
-- [ ] Commit.
+- [x] **Aviso por WhatsApp pra profissional quando um agendamento é criado — já entregue na Fase 2**, achado ao revisitar esta fase: o passo de confirmação do wizard (`BookingModal.tsx`, Fase 2) já monta um link `wa.me` endereçado ao número da profissional com o resumo do agendamento, botão "Avisar no WhatsApp →". Nada novo a fazer aqui, só corrigindo a numeração retroativamente.
+- [x] Aviso por WhatsApp pra cliente quando confirmado/recusado — `src/components/agenda/AgendaClient.tsx` (Fase 4b) agora monta um link `wa.me` (mensagem diferente pra confirmado/recusado) pro número da cliente depois que a profissional confirma/recusa na Agenda, com uma notificação inline dispensável "Avise {nome} pelo WhatsApp". `AppointmentRow.tsx` passou a repassar o agendamento inteiro (não só o id) pro callback, pra ter os dados da mensagem disponíveis.
+- [x] Extensão do Telegram pra avisar de novas assinaturas Plus — `src/lib/telegram.ts` (novo, `sendTelegramMessage`, nunca lança) + `activateSubscription` (`billing-service.ts`) passa a ler o estado anterior do pedido e só notifica na transição de verdade pra `ativo` — evita aviso duplicado quando webhook e `check-payment` confirmam o mesmo pagamento quase ao mesmo tempo (testado: dois disparos seguidos do webhook geraram só uma tentativa de notificação). A rota `notify-telegram` existente (usada na criação de catálogo) não foi tocada.
+- [ ] **Push web (VAPID) — adiado por decisão do usuário**, fica pendente pro futuro (item já era marcado como opcional no plano original).
+- [x] Teste no navegador headless: confirmar/recusar um agendamento pendente mostra o link de aviso certo pra cliente (número e mensagem corretos pra cada caso), dispensável. Teste de deduplicação: webhook do Asaas disparado duas vezes seguidas pro mesmo pedido só tenta notificar o Telegram uma vez. Regressão: rota `notify-telegram` e catálogo público continuam respondendo normalmente.
+- [x] Catálogo de teste removido depois.
+- [x] `npx tsc --noEmit` + `npx next build` limpos.
+- [ ] Commit (aguardando aprovação).
 
 ---
 

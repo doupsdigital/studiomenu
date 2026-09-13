@@ -6,7 +6,7 @@ import type { AgendaAppointment } from '@/lib/scheduling/agenda-service';
 
 interface AppointmentRowProps {
   appointment: AgendaAppointment;
-  onUpdateStatus: (id: string, status: 'confirmed' | 'cancelled') => void;
+  onUpdateStatus: (appointment: AgendaAppointment, status: 'confirmed' | 'cancelled') => void;
   busy: boolean;
 }
 
@@ -55,7 +55,7 @@ export const AppointmentRow: React.FC<AppointmentRowProps> = ({ appointment, onU
           <button
             type="button"
             disabled={busy}
-            onClick={() => onUpdateStatus(appointment.id, 'confirmed')}
+            onClick={() => onUpdateStatus(appointment, 'confirmed')}
             className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-emerald-500/15 text-emerald-400 text-xs font-bold hover:bg-emerald-500/25 disabled:opacity-50"
           >
             <Check className="w-3.5 h-3.5" /> Confirmar
@@ -63,7 +63,7 @@ export const AppointmentRow: React.FC<AppointmentRowProps> = ({ appointment, onU
           <button
             type="button"
             disabled={busy}
-            onClick={() => onUpdateStatus(appointment.id, 'cancelled')}
+            onClick={() => onUpdateStatus(appointment, 'cancelled')}
             className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-rose-500/15 text-rose-400 text-xs font-bold hover:bg-rose-500/25 disabled:opacity-50"
           >
             <X className="w-3.5 h-3.5" /> Recusar
@@ -76,7 +76,7 @@ export const AppointmentRow: React.FC<AppointmentRowProps> = ({ appointment, onU
           <button
             type="button"
             disabled={busy}
-            onClick={() => onUpdateStatus(appointment.id, 'cancelled')}
+            onClick={() => onUpdateStatus(appointment, 'cancelled')}
             className="w-full flex items-center justify-center gap-1.5 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold hover:bg-slate-700 disabled:opacity-50"
           >
             <X className="w-3.5 h-3.5" /> Cancelar agendamento
