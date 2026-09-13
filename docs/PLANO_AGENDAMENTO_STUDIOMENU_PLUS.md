@@ -2,7 +2,7 @@
 
 > **Documento vivo.** Esse arquivo é a fonte de verdade do progresso dessa funcionalidade. Cada tarefa concluída E testada deve ser marcada aqui (`- [x]`) ao final da fase correspondente, não só no começo. Se você está retomando esse trabalho em outra sessão/estação: basta referenciar este arquivo e pedir pra continuar de onde parou — a IA deve ler este documento inteiro antes de seguir.
 
-**Status geral:** 🟢 Todas as fases do plano original (0-7) implementadas e testadas. Fase 7 aguardando aprovação pra commit. Duas pendências registradas: teste de ponta a ponta contra a API real do Asaas (falta a chave de sandbox do usuário, Fase 5) e push web/VAPID (adiado por decisão do usuário, Fase 7) (última atualização: 2026-09-13).
+**Status geral:** 🟢 Todas as fases do plano original (0-7) implementadas, testadas e commitadas/pushadas pro GitHub (`main`). O app funciona de ponta a ponta em ambiente local. **Nada foi feito em produção/Vercel ainda** — isso é o próximo passo real, detalhado na seção 6. Duas pendências técnicas registradas: teste de ponta a ponta contra a API real do Asaas (falta a chave de sandbox, Fase 5) e push web/VAPID (adiado por decisão do usuário, Fase 7). Leia a **seção 6 (Próximos passos)** antes de continuar numa sessão nova (última atualização: 2026-09-13).
 
 **Legenda:** `[ ]` pendente · `[x]` feito e testado · `[~]` feito mas testado só parcialmente / com ressalva (explicada ao lado)
 
@@ -236,10 +236,67 @@ Cada fase termina em algo testável de verdade (curl e/ou navegador com catálog
 
 ---
 
-## 6. Como retomar este trabalho em outra sessão
+## 6. Próximos passos e checklist de produção
 
-1. Leia este arquivo inteiro antes de qualquer coisa.
-2. Confira o "Status geral" no topo e quais checkboxes já estão marcados — isso diz exatamente onde parou.
-3. Se a fase atual estiver parcialmente marcada (`[~]`), leia a ressalva antes de continuar.
-4. Continue a partir da primeira tarefa não marcada, seguindo a mesma disciplina de teste + confirmação + commit por etapa descrita na seção 4.
-5. Ao concluir e testar algo, marque aqui (`[x]`) antes de seguir — não deixe pra atualizar depois.
+Todas as fases do plano original (0-7) estão prontas, testadas localmente, commitadas e já enviadas (`git push`) pro repositório remoto (`github.com/doupsdigital/studiomenu`, branch `main`). **O que falta agora não é mais "escrever código do plano" — é colocar no ar e fechar duas pendências técnicas.** Lista completa, em ordem sugerida:
+
+### 6.1. Pendência técnica — Fase 5 (Asaas): testar contra a API real
+
+Tudo em `src/lib/asaas.ts` e nas rotas `src/app/api/billing/**` foi escrito seguindo o contrato oficial (conferido na documentação do Asaas em 2026-09) e testado no que não depende da API externa (autorização, guard de configuração ausente, validação do webhook, lógica de ativação/suspensão via evento fabricado manualmente). **O que nunca foi exercitado de verdade**: criar um customer/subscription reais no Asaas, gerar um Pix de verdade, escanear/pagar, o webhook chegando de verdade, e cancelar uma assinatura de verdade.
+
+Pra fechar isso:
+1. Criar (se ainda não tiver) uma conta em `sandbox.asaas.com` e gerar uma API key de sandbox (formato `$aact_hmlg_...`).
+2. Colar essa chave em `ASAAS_API_KEY` no `.env` local (`ASAAS_BASE_URL` já está setada pra sandbox: `https://api-sandbox.asaas.com/v3`).
+3. Criar um catálogo de teste descartável com `plan_tier='catalog'` (o script `setup-fase5-test.js` usado durante o desenvolvimento não existe mais — era só um arquivo temporário de scratchpad — mas o padrão está documentado nas fases 2-7 deste arquivo: insert direto via REST na tabela `orders` com `edit_token` conhecido).
+4. Logar no app (`/api/professional/login?slug=&token=`), ir em Config → Minha Assinatura, preencher email/CPF de teste, clicar em assinar.
+5. Confirmar que o QR code aparece de verdade e que o Pix é pagável no ambiente sandbox do Asaas (o sandbox tem um jeito de simular pagamento — checar a documentação de "Simular pagamento" do Asaas).
+6. Registrar o webhook no painel/API do Asaas apontando pra `<seu-ngrok-ou-tunnel>/api/billing/webhook` (em local, precisa de um túnel tipo `ngrok`/`cloudflared` pra o Asaas conseguir alcançar sua máquina), com o token do webhook configurado igual ao `ASAAS_WEBHOOK_SECRET` do `.env`.
+7. Confirmar que pagar de verdade ativa a assinatura (`plan_tier='plus'`, `subscription_status='ativo'`) e dispara a notificação no Telegram (se `TELEGRAM_BOT_TOKEN`/`TELEGRAM_CHAT_ID` estiverem configurados).
+8. Testar o cancelamento de verdade (botão "Cancelar assinatura" em Config).
+
+### 6.2. Pendência opcional — Push web (VAPID)
+
+Adiado por decisão explícita do usuário durante a Fase 7. Se um dia quiser retomar: gerar um par de chaves VAPID, guardar a inscrição de push por navegador (nova tabela ou reaproveitar alguma existente), endpoint de inscrição, e disparar push nos mesmos eventos que hoje só geram link `wa.me`/Telegram (novo agendamento pendente, agendamento confirmado/recusado). Não é urgente — os avisos por WhatsApp/Telegram já cobrem o essencial.
+
+### 6.3. Checklist de deploy em produção (Vercel) — **nada disso foi feito ainda**
+
+Todo o trabalho até aqui rodou só localmente (`npx next dev` + `.env` local). Pra ir pro ar, falta configurar as env vars de produção na Vercel (Project Settings → Environment Variables). **Nenhuma delas deve reaproveitar os valores de teste que ficaram no `.env` local** — gere segredos novos pra produção:
+
+| Variável | Situação atual (local) | O que fazer em produção |
+|---|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` | já configuradas, produção real do Supabase (não é um projeto de teste separado) | reaproveitar os mesmos valores — já é o banco de produção |
+| `ADMIN_PASSWORD` | `teste-admin-local` (gerado nesta sessão só pra eu conseguir testar a Fase 6) | trocar por uma senha forte de verdade antes de expor publicamente |
+| `ADMIN_SESSION_SECRET` | valor aleatório gerado nesta sessão pra teste local | gerar um novo valor aleatório só pra produção (`node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`) |
+| `PROFESSIONAL_SESSION_SECRET` | valor aleatório gerado na Fase 3 pra teste local | gerar um novo valor pra produção (mesma forma acima) — **trocar esse valor invalida todas as sessões de app ativas**, então depois de configurado em produção não trocar de novo sem necessidade |
+| `ASAAS_API_KEY` | vazia | chave de **produção** do Asaas (`$aact_prod_...`), só depois que o fluxo de sandbox (6.1) estiver validado |
+| `ASAAS_BASE_URL` | `https://api-sandbox.asaas.com/v3` | trocar pra `https://api.asaas.com/v3` em produção |
+| `ASAAS_WEBHOOK_SECRET` | valor de teste local | gerar um novo valor, e configurar esse MESMO valor no painel do Asaas ao criar o webhook de produção apontando pra `https://<seu-domínio>/api/billing/webhook` |
+| `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` | vazias | preencher pra notificações de catálogo novo e assinatura nova funcionarem (hoje ficam silenciosamente puladas sem elas, não quebram nada, só não avisam) |
+| `ANTHROPIC_API_KEY` | vazia | preencher se a extração por IA (`/api/admin/extract-catalog`) for usada em produção |
+
+Depois de configurar tudo, redeployar e testar o fluxo completo (catálogo → agendamento → app da profissional → Plus) num ambiente de produção de verdade, idealmente com um catálogo de teste descartável (apagado depois).
+
+### 6.4. Teste manual pendente — instalação como PWA num celular de verdade
+
+Todo teste de PWA feito até agora foi via navegador headless (Playwright) — nunca foi confirmado no navegador real de um celular (Android/Chrome, e se possível iOS/Safari) que o app de fato oferece "Adicionar à Tela Inicial" e abre em modo standalone. Fazer esse teste depois do deploy (PWA exige HTTPS de verdade pra instalar, `localhost` não é suficiente pra testar em celular físico).
+
+### 6.5. Ícone/branding do PWA
+
+`public/icon-192.png` e `public/icon-512.png` são um placeholder gerado nesta sessão (monograma "SM" na cor rose do tema). Trocar por um ícone de verdade quando a marca estiver definida — é só substituir os dois arquivos PNG, o `manifest.ts` já referencia esses caminhos.
+
+### 6.6. Decisões/limitações já conhecidas (não são bugs, são escolhas registradas)
+
+- O cookie de sessão da profissional (`sm_pro_session`) é único por navegador (path `/`, corrigido na Fase 4b) — se a mesma pessoa administrar dois catálogos diferentes no mesmo navegador, o segundo login sobrescreve a sessão do primeiro. Não é falha de segurança (a amarração real é o payload assinado por slug), só uma limitação de UX pra um caso de uso raro.
+- O manifest do PWA é único e global pro site inteiro (convenção do Next não permite manifest por rota) — o ícone instalado abre a raiz do site, não a página específica de onde a profissional instalou.
+- Só existe um plano pago (Plus, R$69,90/mês) — sem a segmentação de dois planos que o LashAgenda (referência) tinha.
+- `business_hours` é salvo como substituição completa da semana a cada save (delete-all + insert), não upsert por linha — decisão deliberada da Fase 4c, sem risco porque nada referencia o id de `business_hours`.
+
+---
+
+## 7. Como retomar este trabalho em outra sessão
+
+1. Leia este arquivo inteiro antes de qualquer coisa — principalmente a seção 6 (Próximos passos), que é o estado real de "o que falta" agora que todas as fases do plano original estão prontas.
+2. Confira o "Status geral" no topo — hoje ele diz que o código está todo pronto/testado/commitado/pushado, e que o que falta é fora do escopo de "mais fases": é a chave de sandbox do Asaas (6.1) e o deploy em produção (6.3).
+3. Se voltar pra continuar o trabalho de agendamento em si (não deploy), comece perguntando ao usuário se ele já tem a chave de sandbox do Asaas — sem ela, o máximo que dá pra fazer é revisar/ajustar código, não testar o fluxo de pagamento de verdade.
+4. Se for fazer o deploy, siga o checklist da seção 6.3 à risca — não reaproveitar segredos de teste local em produção.
+5. Ao concluir e testar algo novo, marque aqui (`[x]`) antes de seguir — não deixe pra atualizar depois. Segue a mesma disciplina de teste + confirmação + commit + push usada em todas as fases anteriores.
