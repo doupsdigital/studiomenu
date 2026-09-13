@@ -2,7 +2,7 @@
 
 > **Documento vivo.** Esse arquivo é a fonte de verdade do progresso dessa funcionalidade. Cada tarefa concluída E testada deve ser marcada aqui (`- [x]`) ao final da fase correspondente, não só no começo. Se você está retomando esse trabalho em outra sessão/estação: basta referenciar este arquivo e pedir pra continuar de onde parou — a IA deve ler este documento inteiro antes de seguir.
 
-**Status geral:** 🟢 Fases 0-6 completas e testadas. Fase 6 aguardando aprovação pra commit. Fase 5 com um pendente: teste de ponta a ponta contra a API real do Asaas, falta a chave de sandbox do usuário. Falta só a Fase 7 (notificações) (última atualização: 2026-09-13).
+**Status geral:** 🟢 Fases 0-6 completas, testadas e commitadas (`8e49fc1`, `3ed15f4`, `f30ebd1`, `24aed90`, `eb85f29`, `2e038a5`, `38a680b`, `580cfc9`, `248ee3d`). Fase 5 com um pendente: teste de ponta a ponta contra a API real do Asaas, falta a chave de sandbox do usuário. Falta só a Fase 7 (notificações) (última atualização: 2026-09-13).
 
 **Legenda:** `[ ]` pendente · `[x]` feito e testado · `[~]` feito mas testado só parcialmente / com ressalva (explicada ao lado)
 
@@ -210,7 +210,7 @@ Cada fase termina em algo testável de verdade (curl e/ou navegador com catálog
 - [x] Teste no navegador (login real no `/admin` com senha, headless): os 3 links aparecem em todo catálogo (inclusive nos catálogos reais já existentes, que não têm `plan_tier` ainda — mostram "Catálogo"/"Desligado" por padrão, sem quebrar), badges corretos pro catálogo de teste (`Plus Suspenso`), toggle liga/desliga de verdade e atualiza a tela, botão de copiar do link do app copia a URL certa. Zero erros de console.
 - [x] Catálogo de teste removido depois.
 - [x] `npx tsc --noEmit` + `npx next build` limpos.
-- [ ] Commit (aguardando aprovação).
+- [x] Commit — `248ee3d`.
 
 **Nota de ambiente**: `ADMIN_PASSWORD`/`ADMIN_SESSION_SECRET` estavam vazios no `.env` local (o login do admin não funcionava de jeito nenhum sem eles) — defini valores de teste locais pra conseguir testar esta fase. Value atual: `ADMIN_PASSWORD=teste-admin-local`. Troque se quiser outra senha.
 
