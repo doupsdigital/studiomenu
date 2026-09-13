@@ -2,7 +2,7 @@
 
 > **Documento vivo.** Esse arquivo é a fonte de verdade do progresso dessa funcionalidade. Cada tarefa concluída E testada deve ser marcada aqui (`- [x]`) ao final da fase correspondente, não só no começo. Se você está retomando esse trabalho em outra sessão/estação: basta referenciar este arquivo e pedir pra continuar de onde parou — a IA deve ler este documento inteiro antes de seguir.
 
-**Status geral:** 🟢 Fases 0-3 e 4a concluídas, testadas e commitadas (`8e49fc1`, `3ed15f4`, `f30ebd1`, `24aed90`, `eb85f29`). Próxima: Fase 4b (última atualização: 2026-09-13).
+**Status geral:** 🟢 Fases 0-3, 4a e 4b concluídas e testadas. Fase 4b aguardando aprovação pra commit. Próxima: Fase 4c (última atualização: 2026-09-13).
 
 **Legenda:** `[ ]` pendente · `[x]` feito e testado · `[~]` feito mas testado só parcialmente / com ressalva (explicada ao lado)
 
@@ -157,9 +157,18 @@ Cada fase termina em algo testável de verdade (curl e/ou navegador com catálog
 - [x] Commit — `eb85f29`.
 - [ ] Teste de instalação como PWA de verdade num celular (Android e, se possível, iOS) — não verificável em navegador headless; fica pendente de teste manual do usuário.
 
-#### Fase 4b — Aba Agenda (conteúdo real)
+#### Fase 4b — Aba Agenda (conteúdo real) ✅ CONCLUÍDA (2026-09-13)
 
-- [ ] Timeline do dia, fila "aguardando confirmação", criar agendamento manual, trancar horário (inspirado na aba Agenda do protótipo do LashMenu).
+- [x] **Bug corrigido, herdado da Fase 3**: o cookie de sessão da profissional era gravado com `path: /app/[slug]`, o que impedia o navegador de enviá-lo pras rotas de API em `/api/professional/**` (prefixo de path diferente) — quebrava silenciosamente qualquer ação autenticada chamada via fetch de dentro do app. Corrigido em `src/app/api/professional/login/route.ts`: o cookie agora usa `path: '/'`; a amarração ao catálogo continua garantida pelo payload assinado (`${slug}.${expiresAt}.${assinatura}`), conferido a cada request contra o slug real do recurso — o path nunca foi a camada de segurança de verdade. **Efeito colateral aceito**: se a mesma profissional logar em dois catálogos diferentes no mesmo navegador, o segundo login sobrescreve o cookie do primeiro (mesmo nome+path agora) — cenário raro (uma profissional normalmente só tem um catálogo) e não é um problema de segurança, só de conveniência.
+- [x] `src/lib/scheduling/agenda-service.ts` (novo) — `getAppointmentsForDay`, `getPendingAppointments`, `getManualBookingServices`, reaproveitando `localDateTimeToUTC` (Fase 1) pros limites do dia no fuso certo.
+- [x] `src/app/api/professional/appointments/route.ts` (POST, agendamento manual) — reaproveita `buildAppointmentInsertPayload` (Fase 1) com `origin: 'professional', status: 'confirmed'`; mesma trava de conflito de horário (`23P01`) da rota pública.
+- [x] `src/app/api/professional/appointments/[id]/route.ts` (PATCH, confirmar/cancelar) — a autorização nunca confia no `slug` do cliente: resolve o `order_id`/slug a partir do próprio agendamento no banco antes de checar a sessão.
+- [x] `src/app/api/professional/schedule-blocks/route.ts` (POST, bloqueio rápido) — cria um `schedule_blocks` pontual (dia inteiro ou horário parcial); gestão completa (listar/editar/apagar) continua sendo a Fase 4c.
+- [x] `src/components/agenda/` (novo: `AppointmentRow`, `AgendaClient`, `ManualBookingForm`, `BlockSlotForm`) + `src/app/app/[slug]/agenda/page.tsx` reescrito — fila de pendentes, navegação de dia por `?date=`, lista do dia, os dois formulários inline.
+- [x] Teste com dois catálogos de teste Plus-ativos descartáveis (pra testar isolamento entre catálogos) + um catálogo não-Plus: via curl, confirmado que uma sessão só mexe no próprio catálogo (tentativa cross-catálogo em ambas as rotas de mutação devolve `401`), conflito de horário devolve `409`, bloqueio criado via API reduz a disponibilidade pública de verdade (`/api/scheduling/availability`, conferido antes/depois). Via navegador headless (Playwright): fila de pendentes aparece e some ao confirmar, agendamento manual criado pelo formulário aparece na lista do dia, zero erros de console. Catálogo não-Plus continua vendo o upsell na Agenda (regressão).
+- [x] Catálogos de teste removidos depois.
+- [x] `npx tsc --noEmit` + `npx next build` limpos (3 rotas novas de API).
+- [ ] Commit (aguardando aprovação).
 
 #### Fase 4c — Aba Config (conteúdo real)
 

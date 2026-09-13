@@ -53,7 +53,16 @@ export async function GET(request: Request) {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      path: `/app/${slug}`,
+      // `path: /app/${slug}` (versão original, Fase 3) parecia uma camada a
+      // mais de isolamento por catálogo, mas na prática impedia o navegador
+      // de enviar o cookie pras rotas de API em `/api/professional/**`
+      // (prefixo de path diferente) — quebrando toda ação autenticada da
+      // Fase 4b (confirmar/cancelar agendamento, criar bloqueio etc). A
+      // amarração ao slug já é garantida pelo payload assinado
+      // (`${slug}.${expiresAt}.${assinatura}`, conferido a cada request
+      // contra o slug real do recurso) — o path só precisava não vazar o
+      // cookie pra fora do domínio, não isolar por catálogo.
+      path: '/',
       maxAge: 60 * 60 * 24 * 90, // 90 dias
     });
 
