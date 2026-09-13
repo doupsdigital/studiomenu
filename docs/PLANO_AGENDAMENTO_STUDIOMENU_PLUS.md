@@ -2,7 +2,7 @@
 
 > **Documento vivo.** Esse arquivo é a fonte de verdade do progresso dessa funcionalidade. Cada tarefa concluída E testada deve ser marcada aqui (`- [x]`) ao final da fase correspondente, não só no começo. Se você está retomando esse trabalho em outra sessão/estação: basta referenciar este arquivo e pedir pra continuar de onde parou — a IA deve ler este documento inteiro antes de seguir.
 
-**Status geral:** 🟢 Fases 0, 1, 2 e 3 concluídas, testadas e commitadas (`8e49fc1`, `3ed15f4`, `f30ebd1`, `24aed90`). Próxima: Fase 4 (última atualização: 2026-09-13).
+**Status geral:** 🟢 Fases 0-3 concluídas, testadas e commitadas (`8e49fc1`, `3ed15f4`, `f30ebd1`, `24aed90`). Fase 4a concluída e testada, aguardando aprovação pra commit. Próxima: Fase 4b (última atualização: 2026-09-13).
 
 **Legenda:** `[ ]` pendente · `[x]` feito e testado · `[~]` feito mas testado só parcialmente / com ressalva (explicada ao lado)
 
@@ -135,18 +135,35 @@ Cada fase termina em algo testável de verdade (curl e/ou navegador com catálog
 
 ### Fase 4 — Shell do app (4 seções) + PWA
 
-- [ ] `src/app/app/[slug]/layout.tsx` — valida sessão (redireciona pra tela de "peça o link de novo" se inválida), barra de navegação inferior.
-- [ ] Rota `inicio` — os 2 links de produção/edição prontos pra copiar + cartão do StudioMenu+ (desbloqueado ou bloqueado conforme `plan_tier`/`subscription_status`).
-- [ ] Rota `catalogo` — reaproveita `CatalogLayout` em modo edição, sem duplicar o editor.
-- [ ] Rota `agenda` — visão do dia com timeline, fila "aguardando confirmação", criar agendamento manual, trancar horário (inspirado na aba Agenda do protótipo do LashMenu). Mostra tela de upsell em vez da agenda real se o plano não for Plus ativo.
-- [ ] Rota `config` — grade semanal de horários (`business_hours`), bloqueios/folgas (`schedule_blocks`), e a seção "Minha Assinatura" (preenchida na Fase 5).
-- [ ] `src/app/manifest.ts` (convenção nativa do Next 16, confirmada em `node_modules/next/dist/docs/01-app/03-api-reference/03-file-conventions/01-metadata/manifest.md`).
-- [ ] `public/sw.js` — service worker básico (registro manual, sem `next-pwa`, seguindo o guia oficial em `node_modules/next/dist/docs/01-app/02-guides/progressive-web-apps.md`).
-- [ ] Ícones do manifest (192x192, 512x512).
-- [ ] Teste no navegador com um catálogo de teste catalog-only e outro plus, conferindo os dois estados da aba Agenda e do cartão do Início.
-- [ ] Teste de instalação como PWA no celular (Android e, se possível, iOS).
-- [ ] `tsc` + `build`.
-- [ ] Commit.
+**Dividida em sub-etapas com o usuário, por ser a fase maior do plano.**
+
+#### Fase 4a — Layout autenticado + navegação + PWA + abas Início/Catálogo ✅ CONCLUÍDA (2026-09-13)
+
+- [x] `src/app/app/[slug]/layout.tsx` — valida sessão via `isProfessionalRequestAuthorized(slug)` (Fase 3); sem sessão válida, mostra tela "Link inválido ou expirado — peça um novo link de acesso". Com sessão, monta `<ServiceWorkerRegister />` + filhos + `<BottomNav>`.
+- [x] `src/components/app-shell/BottomNav.tsx` — navegação inferior fixa (Início/Catálogo/Agenda/Config, `lucide-react`, aba ativa via `usePathname`). **Ajuste encontrado durante o teste**: a aba Catálogo reaproveita `CatalogLayout` em modo edição, que já tem sua própria barra flutuante fixa na base (`#lm-editor-bottom-bar`) — as duas barras fixas colidiam visualmente, então `BottomNav` fica escondida especificamente na rota `catalogo`, e essa página ganhou um botão simples de voltar (topo esquerdo) como única forma de navegação enquanto o editor está aberto.
+- [x] `src/lib/professional-app-service.ts` (novo) — `getOrderForProfessionalApp(slug)`, recorte de `orders` com `edit_token`, `plan_tier`, `subscription_status` pro app (diferente do shape público de `getCatalogBySlug`).
+- [x] Rota `inicio` — os 2 links de produção/edição com botão de copiar (`src/components/app-shell/CopyLinkRow.tsx`) + cartão do StudioMenu+ (`src/components/app-shell/PlusUpsellCard.tsx`, desbloqueado com atalho pra Agenda se `plan_tier==='plus' && subscription_status==='ativo'`, bloqueado com CTA "Assinar (em breve)" senão — checkout de verdade é Fase 5).
+- [x] Rota `catalogo` — reaproveita `CatalogLayout` em modo edição, buscando `edit_token` no servidor (`getCatalogBySlug`, já traz o campo) em vez de vir da URL como em `/c/[slug]?edit=`; confirmado que `/api/catalog/save` só valida o token do **body**, então nenhuma mudança foi necessária na rota de save nem no `CatalogLayout`.
+- [x] Rota `agenda` (placeholder por enquanto) — mostra `PlusUpsellCard` (tela cheia) se não for Plus ativo; se for, "Agenda chega na próxima etapa" — o conteúdo real (timeline do dia, fila de pendentes, agendamento manual, bloqueio de horário) é a Fase 4b.
+- [x] Rota `config` (placeholder por enquanto) — "Configurações chegam na próxima etapa"; grade de `business_hours`/`schedule_blocks` é a Fase 4c.
+- [x] `src/app/manifest.ts` (convenção nativa do Next 16, confirmada em `node_modules/next/dist/docs/.../manifest.md` — arquivo único na raiz de `app`, sem suporte a manifest por rota).
+- [x] `public/sw.js` — service worker básico (`install`/`activate`/`fetch` passthrough, sem cache offline — o guia oficial do Next 16 não cobre isso nesta versão, só cita a lib de terceiros Serwist, fora do escopo de "básico"). Registrado só dentro do layout de `/app/[slug]` (`ServiceWorkerRegister.tsx`), então só essas páginas ficam de fato instaláveis. Headers dedicados (`Content-Type`, `Cache-Control`, CSP) adicionados em `next.config.ts`.
+- [x] Ícones do manifest (192x192, 512x512) — gerados como placeholder (monograma "SM" na cor rose do tema); fácil de trocar quando houver uma marca definitiva.
+- [x] Teste com dois catálogos de teste descartáveis (`fase4-teste-catalog` e `fase4-teste-plus`, via Supabase REST): navegador headless (Playwright) — login via `/api/professional/login`, depois as 4 abas em cada catálogo. Confirmado: Início mostra o cartão certo em cada caso (bloqueado vs. "ativo"); Catálogo abre o editor de verdade sem a barra de navegação (evitando a colisão); Agenda mostra upsell no catálogo `catalog` e o placeholder no `plus`; Config mostra o placeholder nos dois. Sem sessão, cai na tela de link inválido. Zero erros de console/página.
+- [x] `manifest.webmanifest` e `sw.js` testados via curl — JSON correto e headers de cache/CSP corretos.
+- [x] Regressão: `/c/[slug]` com e sem `?edit=` continua respondendo `200` normalmente.
+- [x] Catálogos de teste removidos depois.
+- [x] `npx tsc --noEmit` + `npx next build` limpos (32 rotas, incluindo as 5 novas de `/app/[slug]` e `/manifest.webmanifest`).
+- [ ] Commit (aguardando aprovação).
+- [ ] Teste de instalação como PWA de verdade num celular (Android e, se possível, iOS) — não verificável em navegador headless; fica pendente de teste manual do usuário.
+
+#### Fase 4b — Aba Agenda (conteúdo real)
+
+- [ ] Timeline do dia, fila "aguardando confirmação", criar agendamento manual, trancar horário (inspirado na aba Agenda do protótipo do LashMenu).
+
+#### Fase 4c — Aba Config (conteúdo real)
+
+- [ ] Grade semanal de horários (`business_hours`), bloqueios/folgas (`schedule_blocks`). A seção "Minha Assinatura" fica pra Fase 5 (depende do Asaas).
 
 ### Fase 5 — Asaas + paywall do Plus
 
