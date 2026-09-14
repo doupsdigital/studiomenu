@@ -8,7 +8,11 @@ interface AppointmentDetailSheetProps {
   appointment: AgendaAppointment;
   busy: boolean;
   onClose: () => void;
-  onUpdateStatus: (appointment: AgendaAppointment, status: 'confirmed' | 'cancelled') => void;
+  /** Pendente → abre o modal de aprovar/recusar (não age direto). */
+  onApprove: (appointment: AgendaAppointment) => void;
+  onReject: (appointment: AgendaAppointment) => void;
+  /** Já confirmado → cancelamento direto, sem o fluxo de aprovação. */
+  onCancelConfirmed: (appointment: AgendaAppointment) => void;
 }
 
 const STATUS_LABEL: Record<AgendaAppointment['status'], string> = {
@@ -20,23 +24,22 @@ const STATUS_LABEL: Record<AgendaAppointment['status'], string> = {
 };
 
 const STATUS_BADGE: Record<AgendaAppointment['status'], string> = {
-  pending: 'bg-amber-100 text-amber-800',
-  confirmed: 'bg-emerald-100 text-emerald-800',
-  cancelled: 'bg-linen text-ink-faint',
-  completed: 'bg-sky-100 text-sky-800',
-  no_show: 'bg-rose-100 text-rose-700',
+  pending: 'bg-amber-200 text-amber-900',
+  confirmed: 'bg-green-200 text-green-900',
+  cancelled: 'bg-gray-200 text-gray-600',
+  completed: 'bg-blue-200 text-blue-950',
+  no_show: 'bg-red-200 text-red-900',
 };
 
 /** Painel de detalhe (bottom sheet) aberto ao clicar num agendamento na
- *  grade de horário da Agenda — mesmos dados que o `AppointmentRow` já
- *  mostrava na fila de pendentes, mesmas ações (`onUpdateStatus`, já
- *  existente em `AgendaClient`), só num formato de tela cheia em vez de
- *  linha de lista. */
+ *  grade de horário da Agenda. */
 export const AppointmentDetailSheet: React.FC<AppointmentDetailSheetProps> = ({
   appointment,
   busy,
   onClose,
-  onUpdateStatus,
+  onApprove,
+  onReject,
+  onCancelConfirmed,
 }) => {
   const time = new Date(appointment.starts_at).toLocaleTimeString('pt-BR', {
     hour: '2-digit',
@@ -86,16 +89,16 @@ export const AppointmentDetailSheet: React.FC<AppointmentDetailSheetProps> = ({
             <button
               type="button"
               disabled={busy}
-              onClick={() => onUpdateStatus(appointment, 'confirmed')}
+              onClick={() => onApprove(appointment)}
               className="flex-1 h-11 rounded-xl bg-emerald-600 text-white text-sm font-bold disabled:opacity-50 flex items-center justify-center gap-1.5"
             >
-              <Check className="w-4 h-4" /> Confirmar
+              <Check className="w-4 h-4" /> Aprovar
             </button>
             <button
               type="button"
               disabled={busy}
-              onClick={() => onUpdateStatus(appointment, 'cancelled')}
-              className="flex-1 h-11 rounded-xl bg-rose-100 text-rose-700 text-sm font-bold disabled:opacity-50"
+              onClick={() => onReject(appointment)}
+              className="flex-1 h-11 rounded-xl border border-red-300 text-red-600 text-sm font-bold disabled:opacity-50"
             >
               Recusar
             </button>
@@ -106,7 +109,7 @@ export const AppointmentDetailSheet: React.FC<AppointmentDetailSheetProps> = ({
           <button
             type="button"
             disabled={busy}
-            onClick={() => onUpdateStatus(appointment, 'cancelled')}
+            onClick={() => onCancelConfirmed(appointment)}
             className="w-full h-11 rounded-xl bg-linen text-ink-soft text-sm font-bold disabled:opacity-50"
           >
             Cancelar agendamento

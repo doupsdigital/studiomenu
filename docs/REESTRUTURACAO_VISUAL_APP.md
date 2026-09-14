@@ -69,6 +69,41 @@ Referência visual: LashAgenda (`legacy/lashmenu-vendas-feature-lashmenu-agendam
 
 Todas as 5 fases prontas, testadas e commitadas localmente (push pendente, a pedido do usuário). Início, Config e Agenda com o visual novo; Catálogo e `/c/[slug]` intocados; nenhuma rota de API ou lógica de negócio mudou em nenhuma fase.
 
+### Fase 6 — Fidelidade exata à Agenda do LashAgenda ✅ CONCLUÍDA (2026-09-14)
+
+O usuário mandou o print real da tela de Agendamentos do LashAgenda e pediu fidelidade exata pra essa tela específica (a principal do sistema). Decisões confirmadas antes de mexer:
+- Botão "Dia ⌄" fica só visual (sem dropdown funcional) — mantém a decisão de só visualização diária já tomada antes.
+- Sem botão flutuante de "Ajuda" (funcionalidade nova, fora de escopo).
+- Barra branca de título aplicada nas 3 telas (Início/Agenda/Config), sem o ícone de hambúrguer (não há menu lateral pra ele abrir).
+
+Implementado:
+- [x] `src/components/app-shell/PageTitleBar.tsx` (novo) — barra branca com título serifado centralizado + ícone da seção à direita, aplicada no topo de `inicio/page.tsx`, `agenda/page.tsx` e `config/page.tsx`.
+- [x] Banner gradiente da Agenda reescrito: título "Agenda" + subtítulo de data curto (sem dia da semana, senão estourava a largura) na esquerda, navegação ◀ Hoje ▶ como um único pill segmentado na direita — mesma estrutura do original, não mais empilhado/centralizado como antes.
+- [x] Barra de ações acima da fila de pendentes (antes só existia junto da grade): "+ Novo" e "🔒 Trancar" como pills sólidos rose, "Dia ⌄" alinhado à direita.
+- [x] Fila "Aguardando confirmação" virou acordeão recolhido por padrão (cabeçalho com ícone de relógio + contagem + seta), expande ao tocar — antes ficava sempre aberta.
+- [x] `DayTimeGrid` ganhou sua própria linha de cabeçalho (ícone de calendário + "SEGUNDA-FEIRA, 14 DE SETEMBRO"), dentro do mesmo cartão da grade — tinha ficado de fora na Fase 4.
+- [x] `tsc` + `build` limpos.
+- [x] Teste visual comparando print a print com a referência — resultado muito próximo. Reteste funcional do acordeão de pendentes (recolhe/expande, confirmar continua funcionando de ponta a ponta — fila esvazia, aviso de WhatsApp aparece, bloco muda de cor na grade).
+- [x] Commit — `<preenchido no commit>`
+
+### Fase 7 — Fluxo de confirmação idêntico ao LashAgenda (modais de aprovar/recusar/sucesso) ✅ CONCLUÍDA (2026-09-14)
+
+O usuário mandou mais prints (linha da fila expandida, modal "Confirmar agendamento" com 2 formas de confirmar, modal de sucesso) e apontou que a Fase 6 tinha ficado só parecida, não idêntica — pediu pra eu ir direto no código do LashAgenda pra essa parte específica em vez de trabalhar de memória. Fui em `Agendamentos.tsx` (arquivo de origem) ler exatamente: o toolbar (3 botões `flex-1` iguais), a linha da fila pendente, `getStatusColorStyles` (as cores exatas por status), e os 2 modais que não existiam ainda aqui (aprovar com WhatsApp/sem, recusar com motivo, e o modal de sucesso).
+
+**Isso não era só visual — era funcionalidade nova de verdade** (um fluxo de 2 passos que não existia): confirmar/recusar deixou de ser uma ação direta e virou abrir um modal de confirmação com a opção de avisar a cliente pelo WhatsApp automaticamente (abre o WhatsApp com a mensagem pronta) ou só confirmar/recusar sem avisar, seguido por um modal de sucesso com o resumo. A rota de API (`PATCH /api/professional/appointments/[id]`) não mudou — só a camada de apresentação em cima dela ficou mais rica.
+
+- [x] `src/components/agenda/ApproveModal.tsx` (novo) — "Confirmar agendamento", cabeçalho gradiente, cartão cliente/serviço, 2 formas de confirmar + voltar
+- [x] `src/components/agenda/RejectModal.tsx` (novo) — "Recusar agendamento", mesmo padrão + campo de motivo opcional (só usado na mensagem do WhatsApp, nunca salvo no banco — mesmo comportamento do LashAgenda)
+- [x] `src/components/agenda/SuccessModal.tsx` (novo) — resumo do agendamento confirmado/recusado, reaproveitado pros dois casos com título diferente
+- [x] `src/components/agenda/AppointmentRow.tsx` reescrito — linha compacta da fila (nome+hora à esquerda, Aprovar/Recusar à direita), abre os modais em vez de agir direto
+- [x] `src/components/agenda/AppointmentDetailSheet.tsx` — Confirmar/Recusar (pendente) agora também abrem os mesmos modais; Cancelar (já confirmado) continua ação direta, sem modal — a referência não mostrou um fluxo diferente pra esse caso
+- [x] `src/components/agenda/DayTimeGrid.tsx` — cores dos blocos trocadas pras exatas do `getStatusColorStyles` (amber/green/blue/red/gray, não mais o âmbar/emerald/sky/rose que eu tinha usado de memória), com o badge de status e "X min" no rodapé do bloco
+- [x] `src/components/agenda/AgendaClient.tsx` — reescrito pra orquestrar os modais novos; removida a barra dispensável "Avise pelo WhatsApp" (virou redundante, o aviso agora é automático dentro do fluxo de confirmação); toolbar com os 3 botões `flex-1` idênticos ao original
+- [x] `window.open()` do link do WhatsApp chamado **antes** do `await` da chamada de API, mesmo cuidado do LashAgenda (necessário pro Safari iOS não bloquear o popup)
+- [x] `tsc` + `build` limpos
+- [x] Teste visual + funcional completo (Playwright): toolbar e linha da fila comparados print a print — idênticos. Fluxo de aprovar testado de ponta a ponta (abre modal → "Confirmar sem enviar" → modal de sucesso "Agendamento Confirmado!" → fecha → bloco vira verde "Confirmado" na grade). Fluxo de recusar testado separadamente (abre modal → preenche motivo → "Recusar sem notificar" → modal de sucesso "Agendamento Recusado"). Dados de teste removidos depois de cada teste.
+- [ ] Commit (aguardando aprovação)
+
 ## Como retomar em outra sessão
 
 Leia este arquivo + a seção "Resumo do plano" acima antes de continuar. Siga a mesma disciplina de teste + commit por fase usada no resto do projeto.

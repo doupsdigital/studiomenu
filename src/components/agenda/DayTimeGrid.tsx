@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
+import { CalendarDays } from 'lucide-react';
 import type { AgendaAppointment } from '@/lib/scheduling/agenda-service';
 import type { BusinessHoursConfigRow, ScheduleBlockConfigRow } from '@/lib/scheduling/config-service';
 import { localDateTimeToUTC } from '@/lib/scheduling/availability';
@@ -17,13 +18,34 @@ interface DayTimeGridProps {
   onAppointmentClick: (appointment: AgendaAppointment) => void;
 }
 
-const STATUS_STYLES: Record<AgendaAppointment['status'], { bg: string; border: string; text: string }> = {
-  pending: { bg: 'bg-amber-50', border: 'border-amber-200 border-l-amber-500', text: 'text-amber-800' },
-  confirmed: { bg: 'bg-emerald-50', border: 'border-emerald-200 border-l-emerald-500', text: 'text-emerald-800' },
-  completed: { bg: 'bg-sky-50', border: 'border-sky-200 border-l-sky-500', text: 'text-sky-800' },
-  no_show: { bg: 'bg-rose-50', border: 'border-rose-200 border-l-rose-400', text: 'text-rose-700' },
-  cancelled: { bg: 'bg-linen', border: 'border-linen border-l-ink-faint', text: 'text-ink-faint' },
+/** Mesmas cores exatas do `getStatusColorStyles` do LashAgenda (nomes de
+ *  status em inglês aqui, mas o mapeamento de cor é o mesmo: pendente=amber,
+ *  confirmado=green, concluído=blue, falta=red, cancelado=gray). */
+const STATUS_STYLES: Record<AgendaAppointment['status'], { bg: string; border: string; badge: string; text: string; accent: string }> = {
+  pending: { bg: 'bg-amber-50 hover:bg-amber-100', border: 'border-amber-300', badge: 'bg-amber-200 text-amber-900', text: 'text-amber-800', accent: 'border-l-amber-500' },
+  confirmed: { bg: 'bg-green-50 hover:bg-green-100', border: 'border-green-300', badge: 'bg-green-200 text-green-900', text: 'text-green-800', accent: 'border-l-green-500' },
+  completed: { bg: 'bg-blue-50 hover:bg-blue-100', border: 'border-blue-300', badge: 'bg-blue-200 text-blue-950', text: 'text-blue-800', accent: 'border-l-blue-500' },
+  no_show: { bg: 'bg-red-50 hover:bg-red-100 opacity-70', border: 'border-red-400', badge: 'bg-red-200 text-red-900', text: 'text-red-800', accent: 'border-l-red-500' },
+  cancelled: { bg: 'bg-gray-100 hover:bg-gray-200 opacity-50', border: 'border-gray-200', badge: 'bg-gray-200 text-gray-600', text: 'text-gray-400', accent: 'border-l-gray-400' },
 };
+
+const STATUS_LABEL: Record<AgendaAppointment['status'], string> = {
+  pending: 'Pendente',
+  confirmed: 'Confirmado',
+  completed: 'Concluído',
+  no_show: 'Falta',
+  cancelled: 'Cancelado',
+};
+
+function formatGridDateLabel(dateStr: string): string {
+  const label = new Date(`${dateStr}T12:00:00Z`).toLocaleDateString('pt-BR', {
+    weekday: 'long',
+    day: '2-digit',
+    month: 'long',
+    timeZone: 'America/Sao_Paulo',
+  });
+  return label.toUpperCase();
+}
 
 function toMinutes(hhmmss: string): number {
   const [h, m] = hhmmss.split(':').map(Number);
@@ -100,6 +122,14 @@ export const DayTimeGrid: React.FC<DayTimeGridProps> = ({
 
   return (
     <div className="bg-surface border border-linen rounded-2xl overflow-hidden shadow-sm">
+      <div className="grid grid-cols-[52px_1fr] border-b border-linen bg-rose-50/40 text-center">
+        <div className="border-r border-linen" />
+        <div className="py-3 flex items-center justify-center gap-1.5 font-serif-pro font-semibold text-sm text-ink">
+          <CalendarDays className="w-4 h-4 text-rose-600" />
+          {formatGridDateLabel(dateStr)}
+        </div>
+      </div>
+
       <div className="grid grid-cols-[52px_1fr] max-h-[560px] overflow-y-auto relative">
         {/* Coluna de rótulos de hora */}
         <div className="border-r border-linen bg-cream/60 text-right select-none">
@@ -145,13 +175,32 @@ export const DayTimeGrid: React.FC<DayTimeGridProps> = ({
                 type="button"
                 onClick={() => onAppointmentClick(appt)}
                 style={{ top: `${top}px`, height: `${height}px` }}
-                className={`absolute left-1 right-1 rounded-lg border border-l-[3px] overflow-hidden text-left px-2 py-1 shadow-sm z-10 ${style.bg} ${style.border}`}
+                className={`absolute left-2 right-2 rounded-lg border border-l-[4px] overflow-hidden flex flex-col shadow-sm z-10 text-left transition-all ${style.border} ${style.accent} ${style.bg} ${
+                  height < 40 ? 'px-2 py-0.5' : height < 70 ? 'px-2.5 py-1' : 'px-3 py-1.5'
+                }`}
               >
-                <p className={`text-[11px] font-bold truncate leading-tight ${style.text}`}>
-                  {hour.toString().padStart(2, '0')}:{minute.toString().padStart(2, '0')} · {appt.client_name}
-                </p>
-                {height >= 38 && (
-                  <p className={`text-[10px] truncate opacity-80 leading-tight ${style.text}`}>{appt.service_title}</p>
+                <div className="flex items-center justify-between gap-2">
+                  <p className={`font-bold truncate flex-1 leading-tight ${height < 40 ? 'text-[10px]' : 'text-xs'} ${style.text}`}>
+                    {appt.client_name}
+                  </p>
+                  <span className={`font-bold opacity-90 whitespace-nowrap shrink-0 leading-none ${height < 40 ? 'text-[10px]' : 'text-xs'} ${style.text}`}>
+                    {hour.toString().padStart(2, '0')}:{minute.toString().padStart(2, '0')}
+                  </span>
+                </div>
+                {height >= 40 && (
+                  <p className={`opacity-75 truncate leading-none text-[10px] mt-0.5 ${style.text}`}>{appt.service_title}</p>
+                )}
+                {height >= 60 && (
+                  <div className="flex items-center justify-between mt-auto w-full">
+                    {height >= 70 ? (
+                      <p className={`text-[10px] opacity-50 font-medium leading-none ${style.text}`}>{appt.duration_minutes} min</p>
+                    ) : (
+                      <span />
+                    )}
+                    <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-semibold leading-none ${style.badge}`}>
+                      {STATUS_LABEL[appt.status]}
+                    </span>
+                  </div>
                 )}
               </button>
             );

@@ -7,7 +7,8 @@ import { StatCard } from '@/components/app-shell/StatCard';
 import { CopyLinkRow } from '@/components/app-shell/CopyLinkRow';
 import { PlusUpsellCard } from '@/components/app-shell/PlusUpsellCard';
 import { ShareLinkButton } from '@/components/app-shell/ShareLinkButton';
-import { CalendarDays, Clock, Check, CalendarCheck, Crown } from 'lucide-react';
+import { PageTitleBar } from '@/components/app-shell/PageTitleBar';
+import { CalendarDays, Clock, Check, CalendarCheck, Crown, Home } from 'lucide-react';
 
 interface InicioPageProps {
   params: Promise<{ slug: string }>;
@@ -67,7 +68,9 @@ export default async function InicioPage({ params }: InicioPageProps) {
   const firstName = order.client_name.split(' ')[0];
 
   return (
-    <main className="max-w-md mx-auto px-5 pt-6 pb-6 flex flex-col gap-4">
+    <>
+      <PageTitleBar title="Início" icon={Home} />
+      <main className="max-w-md mx-auto px-5 pt-6 pb-6 flex flex-col gap-4">
       <GradientHeader>
         <h1 className="font-serif-pro font-bold text-3xl">
           {greeting}, {firstName}!
@@ -112,6 +115,7 @@ export default async function InicioPage({ params }: InicioPageProps) {
       ) : (
         <PlusUpsellCard variant="card" slug={slug} />
       )}
-    </main>
+      </main>
+    </>
   );
 }

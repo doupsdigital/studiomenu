@@ -1,88 +1,50 @@
 'use client';
 
 import React from 'react';
-import { Check, X } from 'lucide-react';
+import { CheckCircle, XCircle } from 'lucide-react';
 import type { AgendaAppointment } from '@/lib/scheduling/agenda-service';
 
 interface AppointmentRowProps {
   appointment: AgendaAppointment;
-  onUpdateStatus: (appointment: AgendaAppointment, status: 'confirmed' | 'cancelled') => void;
-  busy: boolean;
+  onApprove: (appointment: AgendaAppointment) => void;
+  onReject: (appointment: AgendaAppointment) => void;
 }
 
-const STATUS_LABEL: Record<AgendaAppointment['status'], string> = {
-  pending: 'Aguardando',
-  confirmed: 'Confirmado',
-  cancelled: 'Cancelado',
-  completed: 'Concluído',
-  no_show: 'Não compareceu',
-};
+/** Linha compacta de um agendamento pendente na fila "Aguardando
+ *  confirmação" — mesma estrutura exata do LashAgenda: nome + dia/hora à
+ *  esquerda, botões Aprovar/Recusar à direita, que abrem os modais de
+ *  confirmação (não agem direto). */
+export const AppointmentRow: React.FC<AppointmentRowProps> = ({ appointment, onApprove, onReject }) => {
+  const dateLabel = new Date(appointment.starts_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', timeZone: 'America/Sao_Paulo' });
+  const timeLabel = new Date(appointment.starts_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
 
-const STATUS_CLASS: Record<AgendaAppointment['status'], string> = {
-  pending: 'bg-amber-100 text-amber-800',
-  confirmed: 'bg-emerald-100 text-emerald-800',
-  cancelled: 'bg-linen text-ink-faint',
-  completed: 'bg-sky-100 text-sky-800',
-  no_show: 'bg-linen text-ink-faint',
-};
-
-function formatTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
-}
-
-export const AppointmentRow: React.FC<AppointmentRowProps> = ({ appointment, onUpdateStatus, busy }) => {
   return (
-    <div className="rounded-2xl bg-surface border border-linen p-4">
-      <div className="flex items-start justify-between gap-3">
+    <div className="flex items-center justify-between gap-4 px-5 py-3.5 hover:bg-amber-50/40 transition-colors">
+      <div className="flex items-center gap-4 min-w-0">
         <div className="min-w-0">
-          <p className="text-sm font-bold text-ink">
-            {formatTime(appointment.starts_at)} — {appointment.service_title}
-          </p>
-          <p className="text-xs text-ink-soft truncate mt-0.5">
-            {appointment.client_name} · {appointment.client_whatsapp}
-          </p>
-          {appointment.client_notes && (
-            <p className="text-[11px] text-ink-faint mt-1 leading-relaxed">{appointment.client_notes}</p>
-          )}
+          <p className="font-semibold text-sm text-ink truncate">{appointment.client_name}</p>
+          <p className="text-xs text-ink-soft mt-0.5">{dateLabel} às {timeLabel}</p>
         </div>
-        <span className={`shrink-0 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide ${STATUS_CLASS[appointment.status]}`}>
-          {STATUS_LABEL[appointment.status]}
-        </span>
+        <p className="text-xs text-ink-faint truncate hidden sm:block">{appointment.service_title}</p>
       </div>
-
-      {appointment.status === 'pending' && (
-        <div className="flex gap-2 mt-3">
-          <button
-            type="button"
-            disabled={busy}
-            onClick={() => onUpdateStatus(appointment, 'confirmed')}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-emerald-100 text-emerald-700 text-xs font-bold hover:bg-emerald-200 disabled:opacity-50"
-          >
-            <Check className="w-3.5 h-3.5" /> Confirmar
-          </button>
-          <button
-            type="button"
-            disabled={busy}
-            onClick={() => onUpdateStatus(appointment, 'cancelled')}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-rose-100 text-rose-700 text-xs font-bold hover:bg-rose-200 disabled:opacity-50"
-          >
-            <X className="w-3.5 h-3.5" /> Recusar
-          </button>
-        </div>
-      )}
-
-      {appointment.status === 'confirmed' && (
-        <div className="mt-3">
-          <button
-            type="button"
-            disabled={busy}
-            onClick={() => onUpdateStatus(appointment, 'cancelled')}
-            className="w-full flex items-center justify-center gap-1.5 py-2 rounded-xl bg-linen text-ink-soft text-xs font-bold hover:bg-linen/70 disabled:opacity-50"
-          >
-            <X className="w-3.5 h-3.5" /> Cancelar agendamento
-          </button>
-        </div>
-      )}
+      <div className="flex items-center gap-2 shrink-0">
+        <button
+          type="button"
+          onClick={() => onApprove(appointment)}
+          className="flex items-center gap-1 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg transition-colors"
+        >
+          <CheckCircle className="w-3.5 h-3.5" />
+          Aprovar
+        </button>
+        <button
+          type="button"
+          onClick={() => onReject(appointment)}
+          className="flex items-center gap-1 px-3 py-1.5 border border-red-300 text-red-600 hover:bg-red-50 text-xs font-semibold rounded-lg transition-colors"
+        >
+          <XCircle className="w-3.5 h-3.5" />
+          Recusar
+        </button>
+      </div>
     </div>
   );
 };

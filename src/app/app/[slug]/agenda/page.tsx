@@ -1,11 +1,12 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import { getOrderForProfessionalApp } from '@/lib/professional-app-service';
 import { getAppointmentsForDay, getPendingAppointments, getManualBookingServices } from '@/lib/scheduling/agenda-service';
 import { getBusinessHours, getScheduleBlocks } from '@/lib/scheduling/config-service';
 import { PlusUpsellCard } from '@/components/app-shell/PlusUpsellCard';
 import { GradientHeader } from '@/components/app-shell/GradientHeader';
+import { PageTitleBar } from '@/components/app-shell/PageTitleBar';
 import { AgendaClient } from '@/components/agenda/AgendaClient';
 
 interface AgendaPageProps {
@@ -25,14 +26,16 @@ function shiftDate(dateStr: string, days: number): string {
   return anchor.toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
 }
 
-function formatDateLabel(dateStr: string): string {
-  const label = new Date(`${dateStr}T12:00:00Z`).toLocaleDateString('pt-BR', {
-    weekday: 'long',
+/** Versão curta (sem dia da semana) pro subtítulo do banner gradiente —
+ *  "14 de setembro de 2026", igual ao layout de referência. O dia da semana
+ *  por extenso já aparece no cabeçalho da própria grade, logo abaixo. */
+function formatShortDateLabel(dateStr: string): string {
+  return new Date(`${dateStr}T12:00:00Z`).toLocaleDateString('pt-BR', {
     day: '2-digit',
     month: 'long',
+    year: 'numeric',
     timeZone: 'America/Sao_Paulo',
   });
-  return label.charAt(0).toUpperCase() + label.slice(1);
 }
 
 export default async function AgendaPage({ params, searchParams }: AgendaPageProps) {
@@ -50,9 +53,12 @@ export default async function AgendaPage({ params, searchParams }: AgendaPagePro
   // os agendamentos reais que os clientes estão criando, mesmo sem assinar.
   if (!order.booking_enabled) {
     return (
-      <main className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
-        <PlusUpsellCard variant="full" slug={slug} />
-      </main>
+      <>
+        <PageTitleBar title="Agenda" icon={Calendar} />
+        <main className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
+          <PlusUpsellCard variant="full" slug={slug} />
+        </main>
+      </>
     );
   }
 
@@ -67,34 +73,35 @@ export default async function AgendaPage({ params, searchParams }: AgendaPagePro
   ]);
 
   return (
-    <main className="max-w-md mx-auto px-5 pt-6 pb-6 flex flex-col gap-5">
+    <>
+      <PageTitleBar title="Agenda" icon={Calendar} />
+      <main className="max-w-md mx-auto px-5 pt-6 pb-6 flex flex-col gap-5">
       <GradientHeader>
-        <p className="font-serif-pro text-lg font-bold capitalize text-center leading-snug">{formatDateLabel(selectedDate)}</p>
-        <div className="flex items-center justify-center gap-3 mt-2">
-          <Link
-            href={`/app/${slug}/agenda?date=${shiftDate(selectedDate, -1)}`}
-            className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center text-white shrink-0"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </Link>
-          {selectedDate !== todayInSaoPaulo() ? (
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="font-serif-pro font-bold text-2xl leading-tight">Agenda</h1>
+            <p className="text-sm text-white/80 mt-0.5 truncate">{formatShortDateLabel(selectedDate)}</p>
+          </div>
+          <div className="flex items-center bg-white/15 backdrop-blur-sm rounded-lg p-0.5 border border-white/20 shrink-0">
+            <Link
+              href={`/app/${slug}/agenda?date=${shiftDate(selectedDate, -1)}`}
+              className="p-2 hover:bg-white/20 rounded-md transition-colors text-white/80 hover:text-white"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </Link>
             <Link
               href={`/app/${slug}/agenda`}
-              className="px-3 py-1.5 rounded-full bg-white/15 text-[11px] text-white font-bold uppercase tracking-wide"
+              className="px-3 py-1.5 text-xs font-semibold hover:bg-white/20 rounded-md transition-colors text-white/80 hover:text-white"
             >
-              Voltar pra hoje
-            </Link>
-          ) : (
-            <span className="px-3 py-1.5 rounded-full bg-white/10 text-[11px] text-white/70 font-bold uppercase tracking-wide">
               Hoje
-            </span>
-          )}
-          <Link
-            href={`/app/${slug}/agenda?date=${shiftDate(selectedDate, 1)}`}
-            className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center text-white shrink-0"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </Link>
+            </Link>
+            <Link
+              href={`/app/${slug}/agenda?date=${shiftDate(selectedDate, 1)}`}
+              className="p-2 hover:bg-white/20 rounded-md transition-colors text-white/80 hover:text-white"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </Link>
+          </div>
         </div>
       </GradientHeader>
 
@@ -107,6 +114,7 @@ export default async function AgendaPage({ params, searchParams }: AgendaPagePro
         businessHours={businessHours}
         scheduleBlocks={scheduleBlocks}
       />
-    </main>
+      </main>
+    </>
   );
 }
