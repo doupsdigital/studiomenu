@@ -69,53 +69,50 @@ export const BusinessHoursEditor: React.FC<BusinessHoursEditorProps> = ({ slug, 
   };
 
   return (
-    <section>
-      <h2 className="text-[10px] font-semibold tracking-widest uppercase text-slate-500 mb-2">Horários de atendimento</h2>
-      <div className="rounded-2xl bg-slate-900 border border-slate-800 p-4 flex flex-col gap-3">
-        {days.map((day, weekday) => (
-          <div key={weekday} className="flex items-center gap-3">
-            <label className="flex items-center gap-2 w-28 shrink-0 text-xs text-slate-300">
+    <div className="flex flex-col gap-3">
+      {days.map((day, weekday) => (
+        <div key={weekday} className="flex items-center gap-3">
+          <label className="flex items-center gap-2 w-28 shrink-0 text-xs text-ink-soft">
+            <input
+              type="checkbox"
+              checked={day.open}
+              onChange={(e) => updateDay(weekday, { open: e.target.checked })}
+              className="w-4 h-4 accent-rose-600"
+            />
+            {WEEKDAY_LABELS[weekday]}
+          </label>
+          {day.open ? (
+            <div className="flex items-center gap-2 flex-1">
               <input
-                type="checkbox"
-                checked={day.open}
-                onChange={(e) => updateDay(weekday, { open: e.target.checked })}
-                className="w-4 h-4"
+                type="time"
+                value={day.start_time}
+                onChange={(e) => updateDay(weekday, { start_time: e.target.value })}
+                className="flex-1 h-9 rounded-lg bg-cream border border-linen px-2 text-xs text-ink"
               />
-              {WEEKDAY_LABELS[weekday]}
-            </label>
-            {day.open ? (
-              <div className="flex items-center gap-2 flex-1">
-                <input
-                  type="time"
-                  value={day.start_time}
-                  onChange={(e) => updateDay(weekday, { start_time: e.target.value })}
-                  className="flex-1 h-9 rounded-lg bg-slate-950 border border-slate-800 px-2 text-xs text-white"
-                />
-                <span className="text-slate-600 text-xs">até</span>
-                <input
-                  type="time"
-                  value={day.end_time}
-                  onChange={(e) => updateDay(weekday, { end_time: e.target.value })}
-                  className="flex-1 h-9 rounded-lg bg-slate-950 border border-slate-800 px-2 text-xs text-white"
-                />
-              </div>
-            ) : (
-              <span className="flex-1 text-xs text-slate-600">Fechado</span>
-            )}
-          </div>
-        ))}
+              <span className="text-ink-faint text-xs">até</span>
+              <input
+                type="time"
+                value={day.end_time}
+                onChange={(e) => updateDay(weekday, { end_time: e.target.value })}
+                className="flex-1 h-9 rounded-lg bg-cream border border-linen px-2 text-xs text-ink"
+              />
+            </div>
+          ) : (
+            <span className="flex-1 text-xs text-ink-faint">Fechado</span>
+          )}
+        </div>
+      ))}
 
-        {error && <p className="text-xs text-rose-400">{error}</p>}
+      {error && <p className="text-xs text-rose-600">{error}</p>}
 
-        <button
-          type="button"
-          onClick={handleSave}
-          disabled={saving}
-          className="mt-1 h-10 rounded-xl bg-rose-500 text-white text-xs font-bold disabled:opacity-50"
-        >
-          {saving ? 'Salvando...' : saved ? 'Salvo ✓' : 'Salvar horários'}
-        </button>
-      </div>
-    </section>
+      <button
+        type="button"
+        onClick={handleSave}
+        disabled={saving}
+        className="mt-1 h-10 rounded-xl bg-rose-600 text-white text-xs font-bold disabled:opacity-50"
+      >
+        {saving ? 'Salvando...' : saved ? 'Salvo ✓' : 'Salvar horários'}
+      </button>
+    </div>
   );
 };

@@ -38,10 +38,13 @@ Referência visual: LashAgenda (`legacy/lashmenu-vendas-feature-lashmenu-agendam
 - [x] Teste visual (Playwright, catálogo de teste): saudação/data corretas, contagens batendo com os dados reais (2 agendamentos hoje, 0 aguardando), badge PLUS aparecendo.
 - [ ] Commit (aguardando aprovação)
 
-### Fase 3 — Config
-- [ ] `SectionCard` envolvendo as 3 seções existentes (`BusinessHoursEditor`, `ScheduleBlocksManager`, `SubscriptionSection`)
-- [ ] `tsc` + `build` limpos, teste visual + funcional (salvar horário, criar/apagar bloqueio, assinar/cancelar continuam funcionando)
-- [ ] Commit
+### Fase 3 — Config ✅ CONCLUÍDA (2026-09-14)
+- [x] Novo `src/components/config/ConfigAccordion.tsx` — envolve as 3 seções existentes em `SectionCard`, controla abrir/fechar, e abre "Minha assinatura" sozinho quando a URL chega com `#assinatura` (link do cartão de upsell)
+- [x] `BusinessHoursEditor`/`ScheduleBlocksManager`/`SubscriptionSection` restyled pro tema claro, sem o cabeçalho próprio (o `SectionCard` já cobre isso) — nenhum comportamento/chamada de API mudou
+- [x] `config/page.tsx` simplificado pra só buscar dado e passar pro `ConfigAccordion`
+- [x] `tsc` + `build` limpos
+- [x] Teste visual (Playwright): acordeão fechado por padrão, abre/fecha ao clicar, formulário de horários com o visual novo. Testado o link `#assinatura` numa navegação nova de verdade — abre a seção certa sozinho, mostrando "StudioMenu+ ativo" (bate com o estado real do catálogo de teste).
+- [ ] Commit (aguardando aprovação)
 
 ### Fase 4 — Agenda (a maior)
 - [ ] `agenda/page.tsx` busca `business_hours`+`schedule_blocks` também

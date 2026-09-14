@@ -86,39 +86,38 @@ export const ScheduleBlocksManager: React.FC<ScheduleBlocksManagerProps> = ({ sl
   };
 
   return (
-    <section>
-      <div className="flex items-center justify-between mb-2">
-        <h2 className="text-[10px] font-semibold tracking-widest uppercase text-slate-500">Bloqueios e folgas</h2>
+    <div>
+      <div className="flex items-center justify-end mb-3">
         <button
           type="button"
           onClick={() => setShowForm((v) => !v)}
-          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-rose-500/15 text-rose-400 text-[11px] font-bold"
+          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-rose-100 text-rose-600 text-[11px] font-bold"
         >
           <Plus className="w-3.5 h-3.5" /> Novo bloqueio
         </button>
       </div>
 
       {showForm && (
-        <form onSubmit={handleCreate} className="rounded-2xl bg-slate-900 border border-slate-800 p-4 flex flex-col gap-3 mb-3">
+        <form onSubmit={handleCreate} className="rounded-2xl bg-cream border border-linen p-4 flex flex-col gap-3 mb-3">
           <div className="flex gap-2">
             <input
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
               placeholder="Início"
-              className="flex-1 h-11 rounded-xl bg-slate-950 border border-slate-800 px-3 text-sm text-white"
+              className="flex-1 h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink"
             />
             <input
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
               placeholder="Fim"
-              className="flex-1 h-11 rounded-xl bg-slate-950 border border-slate-800 px-3 text-sm text-white"
+              className="flex-1 h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink"
             />
           </div>
 
-          <label className="flex items-center gap-2 text-xs text-slate-300">
-            <input type="checkbox" checked={allDay} onChange={(e) => setAllDay(e.target.checked)} className="w-4 h-4" />
+          <label className="flex items-center gap-2 text-xs text-ink-soft">
+            <input type="checkbox" checked={allDay} onChange={(e) => setAllDay(e.target.checked)} className="w-4 h-4 accent-rose-600" />
             Dia(s) inteiro(s)
           </label>
 
@@ -128,13 +127,13 @@ export const ScheduleBlocksManager: React.FC<ScheduleBlocksManagerProps> = ({ sl
                 type="time"
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
-                className="flex-1 h-11 rounded-xl bg-slate-950 border border-slate-800 px-3 text-sm text-white"
+                className="flex-1 h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink"
               />
               <input
                 type="time"
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
-                className="flex-1 h-11 rounded-xl bg-slate-950 border border-slate-800 px-3 text-sm text-white"
+                className="flex-1 h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink"
               />
             </div>
           )}
@@ -144,17 +143,17 @@ export const ScheduleBlocksManager: React.FC<ScheduleBlocksManagerProps> = ({ sl
             placeholder="Motivo (opcional)"
             value={reason}
             onChange={(e) => setReason(e.target.value)}
-            className="h-11 rounded-xl bg-slate-950 border border-slate-800 px-3 text-sm text-white placeholder:text-slate-600"
+            className="h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink placeholder:text-ink-faint"
           />
 
           <div className="flex gap-2">
-            <button type="button" onClick={() => setShowForm(false)} className="flex-1 h-10 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold">
+            <button type="button" onClick={() => setShowForm(false)} className="flex-1 h-10 rounded-xl bg-linen text-ink-soft text-xs font-bold">
               Cancelar
             </button>
             <button
               type="submit"
               disabled={submitting || !startDate || !endDate}
-              className="flex-1 h-10 rounded-xl bg-rose-500 text-white text-xs font-bold disabled:opacity-50"
+              className="flex-1 h-10 rounded-xl bg-rose-600 text-white text-xs font-bold disabled:opacity-50"
             >
               {submitting ? 'Criando...' : 'Criar bloqueio'}
             </button>
@@ -162,23 +161,23 @@ export const ScheduleBlocksManager: React.FC<ScheduleBlocksManagerProps> = ({ sl
         </form>
       )}
 
-      {error && <p className="text-xs text-rose-400 mb-2">{error}</p>}
+      {error && <p className="text-xs text-rose-600 mb-2">{error}</p>}
 
       {blocks.length === 0 ? (
-        <p className="text-xs text-slate-500 py-4 text-center">Nenhum bloqueio cadastrado.</p>
+        <p className="text-xs text-ink-faint py-4 text-center">Nenhum bloqueio cadastrado.</p>
       ) : (
         <div className="flex flex-col gap-2">
           {blocks.map((b) => (
-            <div key={b.id} className="rounded-2xl bg-slate-900 border border-slate-800 p-3 flex items-center justify-between gap-3">
+            <div key={b.id} className="rounded-2xl bg-cream border border-linen p-3 flex items-center justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-xs font-bold text-white">{formatBlockLabel(b)}</p>
-                {b.reason && <p className="text-[11px] text-slate-500 truncate mt-0.5">{b.reason}</p>}
+                <p className="text-xs font-bold text-ink">{formatBlockLabel(b)}</p>
+                {b.reason && <p className="text-[11px] text-ink-faint truncate mt-0.5">{b.reason}</p>}
               </div>
               <button
                 type="button"
                 disabled={deletingId === b.id}
                 onClick={() => handleDelete(b.id)}
-                className="shrink-0 w-8 h-8 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center disabled:opacity-50"
+                className="shrink-0 w-8 h-8 rounded-full bg-linen text-ink-soft flex items-center justify-center disabled:opacity-50"
                 aria-label="Apagar bloqueio"
               >
                 <Trash2 className="w-3.5 h-3.5" />
@@ -187,6 +186,6 @@ export const ScheduleBlocksManager: React.FC<ScheduleBlocksManagerProps> = ({ sl
           ))}
         </div>
       )}
-    </section>
+    </div>
   );
 };

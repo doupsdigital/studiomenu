@@ -1,0 +1,74 @@
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import { Clock, CalendarX, CreditCard } from 'lucide-react';
+import { SectionCard } from '@/components/app-shell/SectionCard';
+import { BusinessHoursEditor } from './BusinessHoursEditor';
+import { ScheduleBlocksManager } from './ScheduleBlocksManager';
+import { SubscriptionSection } from './SubscriptionSection';
+import type { BusinessHoursConfigRow, ScheduleBlockConfigRow } from '@/lib/scheduling/config-service';
+
+interface ConfigAccordionProps {
+  slug: string;
+  businessHours: BusinessHoursConfigRow[];
+  scheduleBlocks: ScheduleBlockConfigRow[];
+  planTier: 'catalog' | 'plus';
+  subscriptionStatus: 'none' | 'ativo' | 'suspenso' | 'cancelado';
+  billingEmail?: string;
+  billingCpfCnpj?: string;
+}
+
+type SectionKey = 'horarios' | 'bloqueios' | 'assinatura';
+
+/** Acordeão da aba Config — 3 seções que já existiam (`BusinessHoursEditor`,
+ *  `ScheduleBlocksManager`, `SubscriptionSection`), agora dentro de
+ *  `SectionCard`. Só controla abrir/fechar; nenhum dos formulários internos
+ *  mudou de comportamento. Abre "Minha assinatura" sozinho quando a URL
+ *  chega com `#assinatura` (link do cartão de upsell do StudioMenu+). */
+export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
+  slug,
+  businessHours,
+  scheduleBlocks,
+  planTier,
+  subscriptionStatus,
+  billingEmail,
+  billingCpfCnpj,
+}) => {
+  const [open, setOpen] = useState<Record<SectionKey, boolean>>({
+    horarios: false,
+    bloqueios: false,
+    assinatura: false,
+  });
+
+  useEffect(() => {
+    if (window.location.hash === '#assinatura') {
+      setOpen((prev) => ({ ...prev, assinatura: true }));
+    }
+  }, []);
+
+  const toggle = (key: SectionKey) => setOpen((prev) => ({ ...prev, [key]: !prev[key] }));
+
+  return (
+    <div className="flex flex-col gap-4">
+      <SectionCard icon={Clock} title="Horários de atendimento" isOpen={open.horarios} onToggle={() => toggle('horarios')}>
+        <BusinessHoursEditor slug={slug} initialHours={businessHours} />
+      </SectionCard>
+
+      <SectionCard icon={CalendarX} title="Bloqueios e folgas" isOpen={open.bloqueios} onToggle={() => toggle('bloqueios')}>
+        <ScheduleBlocksManager slug={slug} blocks={scheduleBlocks} />
+      </SectionCard>
+
+      <div id="assinatura">
+        <SectionCard icon={CreditCard} title="Minha assinatura" isOpen={open.assinatura} onToggle={() => toggle('assinatura')}>
+          <SubscriptionSection
+            slug={slug}
+            planTier={planTier}
+            subscriptionStatus={subscriptionStatus}
+            billingEmail={billingEmail}
+            billingCpfCnpj={billingCpfCnpj}
+          />
+        </SectionCard>
+      </div>
+    </div>
+  );
+};
