@@ -32,10 +32,11 @@ Referência visual: LashAgenda (`legacy/lashmenu-vendas-feature-lashmenu-agendam
 - [x] Teste visual no navegador (Playwright): tela de "link inválido" com o novo visual claro confirmada; barra de navegação com botão central elevado confirmada. Conteúdo do Início ainda no visual antigo (esperado — é a Fase 2).
 - [ ] Commit (aguardando aprovação)
 
-### Fase 2 — Início
-- [ ] Redesign completo de `src/app/app/[slug]/inicio/page.tsx`
-- [ ] `tsc` + `build` limpos, teste visual
-- [ ] Commit
+### Fase 2 — Início ✅ CONCLUÍDA (2026-09-14)
+- [x] Redesign completo de `src/app/app/[slug]/inicio/page.tsx`: `GradientHeader` com saudação (Bom dia/Boa tarde/Boa noite calculado no fuso America/Sao_Paulo, não no fuso do servidor) + badge PLUS, 2 `StatCard`s (Agendamentos hoje / Aguardando confirmação, contagens reais via `getAppointmentsForDay`/`getPendingAppointments`, já existentes), cartão gradiente "Compartilhe sua Agenda" (novo `ShareLinkButton.tsx`), `CopyLinkRow`/`PlusUpsellCard` restyled pro tema claro.
+- [x] `tsc` + `build` limpos
+- [x] Teste visual (Playwright, catálogo de teste): saudação/data corretas, contagens batendo com os dados reais (2 agendamentos hoje, 0 aguardando), badge PLUS aparecendo.
+- [ ] Commit (aguardando aprovação)
 
 ### Fase 3 — Config
 - [ ] `SectionCard` envolvendo as 3 seções existentes (`BusinessHoursEditor`, `ScheduleBlocksManager`, `SubscriptionSection`)
