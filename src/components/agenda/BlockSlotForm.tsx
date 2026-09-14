@@ -50,18 +50,18 @@ export const BlockSlotForm: React.FC<BlockSlotFormProps> = ({ slug, defaultDate,
   };
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-2xl bg-slate-900 border border-slate-800 p-4 flex flex-col gap-3">
-      <p className="text-sm font-bold text-white">Bloquear horário</p>
+    <form onSubmit={handleSubmit} className="rounded-2xl bg-cream border border-linen p-4 flex flex-col gap-3">
+      <p className="text-sm font-bold text-ink">Bloquear horário</p>
 
       <input
         type="date"
         value={date}
         onChange={(e) => setDate(e.target.value)}
-        className="h-11 rounded-xl bg-slate-950 border border-slate-800 px-3 text-sm text-white"
+        className="h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink"
       />
 
-      <label className="flex items-center gap-2 text-xs text-slate-300">
-        <input type="checkbox" checked={allDay} onChange={(e) => setAllDay(e.target.checked)} className="w-4 h-4" />
+      <label className="flex items-center gap-2 text-xs text-ink-soft">
+        <input type="checkbox" checked={allDay} onChange={(e) => setAllDay(e.target.checked)} className="w-4 h-4 accent-rose-600" />
         Bloquear o dia inteiro
       </label>
 
@@ -71,13 +71,13 @@ export const BlockSlotForm: React.FC<BlockSlotFormProps> = ({ slug, defaultDate,
             type="time"
             value={startTime}
             onChange={(e) => setStartTime(e.target.value)}
-            className="flex-1 h-11 rounded-xl bg-slate-950 border border-slate-800 px-3 text-sm text-white"
+            className="flex-1 h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink"
           />
           <input
             type="time"
             value={endTime}
             onChange={(e) => setEndTime(e.target.value)}
-            className="flex-1 h-11 rounded-xl bg-slate-950 border border-slate-800 px-3 text-sm text-white"
+            className="flex-1 h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink"
           />
         </div>
       )}
@@ -87,19 +87,19 @@ export const BlockSlotForm: React.FC<BlockSlotFormProps> = ({ slug, defaultDate,
         placeholder="Motivo (opcional)"
         value={reason}
         onChange={(e) => setReason(e.target.value)}
-        className="h-11 rounded-xl bg-slate-950 border border-slate-800 px-3 text-sm text-white placeholder:text-slate-600"
+        className="h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink placeholder:text-ink-faint"
       />
 
-      {error && <p className="text-xs text-rose-400">{error}</p>}
+      {error && <p className="text-xs text-rose-600">{error}</p>}
 
       <div className="flex gap-2">
-        <button type="button" onClick={onClose} className="flex-1 h-10 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold">
+        <button type="button" onClick={onClose} className="flex-1 h-10 rounded-xl bg-linen text-ink-soft text-xs font-bold">
           Cancelar
         </button>
         <button
           type="submit"
           disabled={submitting || (!allDay && (!startTime || !endTime))}
-          className="flex-1 h-10 rounded-xl bg-rose-500 text-white text-xs font-bold disabled:opacity-50"
+          className="flex-1 h-10 rounded-xl bg-rose-600 text-white text-xs font-bold disabled:opacity-50"
         >
           {submitting ? 'Bloqueando...' : 'Bloquear'}
         </button>

@@ -3,7 +3,9 @@ import { notFound } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { getOrderForProfessionalApp } from '@/lib/professional-app-service';
 import { getAppointmentsForDay, getPendingAppointments, getManualBookingServices } from '@/lib/scheduling/agenda-service';
+import { getBusinessHours, getScheduleBlocks } from '@/lib/scheduling/config-service';
 import { PlusUpsellCard } from '@/components/app-shell/PlusUpsellCard';
+import { GradientHeader } from '@/components/app-shell/GradientHeader';
 import { AgendaClient } from '@/components/agenda/AgendaClient';
 
 interface AgendaPageProps {
@@ -56,45 +58,45 @@ export default async function AgendaPage({ params, searchParams }: AgendaPagePro
 
   const selectedDate = date && DATE_RE.test(date) ? date : todayInSaoPaulo();
 
-  const [pendingAppointments, dayAppointmentsRaw, services] = await Promise.all([
+  const [pendingAppointments, dayAppointments, services, businessHours, scheduleBlocks] = await Promise.all([
     getPendingAppointments(order.id),
     getAppointmentsForDay(order.id, selectedDate),
     getManualBookingServices(order.id),
+    getBusinessHours(order.id),
+    getScheduleBlocks(order.id),
   ]);
 
-  // "Aguardando confirmação" já mostra os pendentes (de qualquer dia) no topo
-  // da tela — se um deles cair no dia visualizado, `getAppointmentsForDay`
-  // também o devolve (só exclui cancelados), e ele apareceria duplicado.
-  // Tira da lista do dia qualquer item que já esteja na fila de pendentes.
-  const pendingIds = new Set(pendingAppointments.map((a) => a.id));
-  const dayAppointments = dayAppointmentsRaw.filter((a) => !pendingIds.has(a.id));
-
   return (
-    <main className="max-w-md mx-auto px-5 pt-8 pb-6">
-      <p className="text-[10px] font-semibold tracking-widest uppercase text-rose-400 mb-1">Agenda</p>
-
-      <div className="flex items-center justify-between mb-6">
-        <Link
-          href={`/app/${slug}/agenda?date=${shiftDate(selectedDate, -1)}`}
-          className="w-8 h-8 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400"
-        >
-          <ChevronLeft className="w-4 h-4" />
-        </Link>
-        <div className="text-center">
-          <h1 className="font-serif text-lg font-bold">{formatDateLabel(selectedDate)}</h1>
-          {selectedDate !== todayInSaoPaulo() && (
-            <Link href={`/app/${slug}/agenda`} className="text-[10px] text-rose-400 font-bold uppercase tracking-wide">
+    <main className="max-w-md mx-auto px-5 pt-6 pb-6 flex flex-col gap-5">
+      <GradientHeader>
+        <p className="font-serif-pro text-lg font-bold capitalize text-center leading-snug">{formatDateLabel(selectedDate)}</p>
+        <div className="flex items-center justify-center gap-3 mt-2">
+          <Link
+            href={`/app/${slug}/agenda?date=${shiftDate(selectedDate, -1)}`}
+            className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center text-white shrink-0"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </Link>
+          {selectedDate !== todayInSaoPaulo() ? (
+            <Link
+              href={`/app/${slug}/agenda`}
+              className="px-3 py-1.5 rounded-full bg-white/15 text-[11px] text-white font-bold uppercase tracking-wide"
+            >
               Voltar pra hoje
             </Link>
+          ) : (
+            <span className="px-3 py-1.5 rounded-full bg-white/10 text-[11px] text-white/70 font-bold uppercase tracking-wide">
+              Hoje
+            </span>
           )}
+          <Link
+            href={`/app/${slug}/agenda?date=${shiftDate(selectedDate, 1)}`}
+            className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center text-white shrink-0"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </Link>
         </div>
-        <Link
-          href={`/app/${slug}/agenda?date=${shiftDate(selectedDate, 1)}`}
-          className="w-8 h-8 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400"
-        >
-          <ChevronRight className="w-4 h-4" />
-        </Link>
-      </div>
+      </GradientHeader>
 
       <AgendaClient
         slug={slug}
@@ -102,6 +104,8 @@ export default async function AgendaPage({ params, searchParams }: AgendaPagePro
         pendingAppointments={pendingAppointments}
         dayAppointments={dayAppointments}
         services={services}
+        businessHours={businessHours}
+        scheduleBlocks={scheduleBlocks}
       />
     </main>
   );

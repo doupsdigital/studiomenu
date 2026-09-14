@@ -9,14 +9,24 @@ interface ManualBookingFormProps {
   slug: string;
   services: ManualBookingService[];
   defaultDate: string;
+  /** Horário pré-preenchido quando o formulário é aberto a partir de um
+   *  clique numa célula livre da grade de horário (Fase 4). */
+  defaultTime?: string;
   onClose: () => void;
   onCreated: () => void;
 }
 
-export const ManualBookingForm: React.FC<ManualBookingFormProps> = ({ slug, services, defaultDate, onClose, onCreated }) => {
+export const ManualBookingForm: React.FC<ManualBookingFormProps> = ({
+  slug,
+  services,
+  defaultDate,
+  defaultTime,
+  onClose,
+  onCreated,
+}) => {
   const [serviceId, setServiceId] = useState(services[0]?.id || '');
   const [date, setDate] = useState(defaultDate);
-  const [time, setTime] = useState('09:00');
+  const [time, setTime] = useState(defaultTime || '09:00');
   const [clientName, setClientName] = useState('');
   const [clientWhatsapp, setClientWhatsapp] = useState('');
   const [clientNotes, setClientNotes] = useState('');
@@ -57,11 +67,11 @@ export const ManualBookingForm: React.FC<ManualBookingFormProps> = ({ slug, serv
   };
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-2xl bg-slate-900 border border-slate-800 p-4 flex flex-col gap-3">
-      <p className="text-sm font-bold text-white">Novo agendamento manual</p>
+    <form onSubmit={handleSubmit} className="rounded-2xl bg-cream border border-linen p-4 flex flex-col gap-3">
+      <p className="text-sm font-bold text-ink">Novo agendamento manual</p>
 
       {services.length === 0 ? (
-        <p className="text-xs text-amber-400">
+        <p className="text-xs text-amber-700">
           Nenhum serviço com duração configurada ainda. Adicione a duração no editor do catálogo primeiro.
         </p>
       ) : (
@@ -69,7 +79,7 @@ export const ManualBookingForm: React.FC<ManualBookingFormProps> = ({ slug, serv
           <select
             value={serviceId}
             onChange={(e) => setServiceId(e.target.value)}
-            className="h-11 rounded-xl bg-slate-950 border border-slate-800 px-3 text-sm text-white"
+            className="h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink"
           >
             {services.map((s) => (
               <option key={s.id} value={s.id}>
@@ -83,13 +93,13 @@ export const ManualBookingForm: React.FC<ManualBookingFormProps> = ({ slug, serv
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="flex-1 h-11 rounded-xl bg-slate-950 border border-slate-800 px-3 text-sm text-white"
+              className="flex-1 h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink"
             />
             <input
               type="time"
               value={time}
               onChange={(e) => setTime(e.target.value)}
-              className="w-28 h-11 rounded-xl bg-slate-950 border border-slate-800 px-3 text-sm text-white"
+              className="w-28 h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink"
             />
           </div>
 
@@ -98,38 +108,38 @@ export const ManualBookingForm: React.FC<ManualBookingFormProps> = ({ slug, serv
             placeholder="Nome da cliente"
             value={clientName}
             onChange={(e) => setClientName(e.target.value)}
-            className="h-11 rounded-xl bg-slate-950 border border-slate-800 px-3 text-sm text-white placeholder:text-slate-600"
+            className="h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink placeholder:text-ink-faint"
           />
           <input
             type="tel"
             placeholder="(11) 99999-9999"
             value={clientWhatsapp}
             onChange={(e) => setClientWhatsapp(formatPhoneBR(e.target.value))}
-            className="h-11 rounded-xl bg-slate-950 border border-slate-800 px-3 text-sm text-white placeholder:text-slate-600"
+            className="h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink placeholder:text-ink-faint"
           />
           <textarea
             placeholder="Observação (opcional)"
             value={clientNotes}
             onChange={(e) => setClientNotes(e.target.value)}
-            className="rounded-xl bg-slate-950 border border-slate-800 px-3 py-2 text-sm text-white placeholder:text-slate-600 min-h-[60px]"
+            className="rounded-xl bg-surface border border-linen px-3 py-2 text-sm text-ink placeholder:text-ink-faint min-h-[60px]"
           />
         </>
       )}
 
-      {error && <p className="text-xs text-rose-400">{error}</p>}
+      {error && <p className="text-xs text-rose-600">{error}</p>}
 
       <div className="flex gap-2">
         <button
           type="button"
           onClick={onClose}
-          className="flex-1 h-10 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold"
+          className="flex-1 h-10 rounded-xl bg-linen text-ink-soft text-xs font-bold"
         >
           Cancelar
         </button>
         <button
           type="submit"
           disabled={submitting || services.length === 0}
-          className="flex-1 h-10 rounded-xl bg-rose-500 text-white text-xs font-bold disabled:opacity-50"
+          className="flex-1 h-10 rounded-xl bg-rose-600 text-white text-xs font-bold disabled:opacity-50"
         >
           {submitting ? 'Criando...' : 'Criar agendamento'}
         </button>

@@ -6,7 +6,10 @@ import { CalendarPlus, Lock, MessageCircle, X as XIcon } from 'lucide-react';
 import { AppointmentRow } from './AppointmentRow';
 import { ManualBookingForm } from './ManualBookingForm';
 import { BlockSlotForm } from './BlockSlotForm';
+import { DayTimeGrid } from './DayTimeGrid';
+import { AppointmentDetailSheet } from './AppointmentDetailSheet';
 import type { AgendaAppointment, ManualBookingService } from '@/lib/scheduling/agenda-service';
+import type { BusinessHoursConfigRow, ScheduleBlockConfigRow } from '@/lib/scheduling/config-service';
 
 /** Aviso pra cliente quando a profissional confirma/recusa — mesmo padrão de
  *  link `wa.me` clicável já usado em `BookingModal.tsx` (Fase 2), só que
@@ -28,6 +31,8 @@ interface AgendaClientProps {
   pendingAppointments: AgendaAppointment[];
   dayAppointments: AgendaAppointment[];
   services: ManualBookingService[];
+  businessHours: BusinessHoursConfigRow[];
+  scheduleBlocks: ScheduleBlockConfigRow[];
 }
 
 export const AgendaClient: React.FC<AgendaClientProps> = ({
@@ -36,13 +41,17 @@ export const AgendaClient: React.FC<AgendaClientProps> = ({
   pendingAppointments,
   dayAppointments,
   services,
+  businessHours,
+  scheduleBlocks,
 }) => {
   const router = useRouter();
   const [busyId, setBusyId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [showManualForm, setShowManualForm] = useState(false);
+  const [manualPrefillTime, setManualPrefillTime] = useState<string | undefined>(undefined);
   const [showBlockForm, setShowBlockForm] = useState(false);
   const [clientNotice, setClientNotice] = useState<{ name: string; url: string } | null>(null);
+  const [detailAppointment, setDetailAppointment] = useState<AgendaAppointment | null>(null);
 
   const handleUpdateStatus = async (appointment: AgendaAppointment, status: 'confirmed' | 'cancelled') => {
     setBusyId(appointment.id);
@@ -60,6 +69,7 @@ export const AgendaClient: React.FC<AgendaClientProps> = ({
         return;
       }
       setClientNotice(buildClientWhatsappNotice(appointment, status));
+      setDetailAppointment(null);
       router.refresh();
     } catch {
       setActionError('Falha na conexão.');
@@ -68,11 +78,17 @@ export const AgendaClient: React.FC<AgendaClientProps> = ({
     }
   };
 
+  const handleSlotClick = (time: string) => {
+    setManualPrefillTime(time);
+    setShowManualForm(true);
+    setShowBlockForm(false);
+  };
+
   return (
     <div className="flex flex-col gap-6">
       {pendingAppointments.length > 0 && (
         <section>
-          <h2 className="text-[10px] font-semibold tracking-widest uppercase text-amber-400 mb-2">
+          <h2 className="text-[10px] font-semibold tracking-widest uppercase text-amber-700 mb-2">
             Aguardando confirmação ({pendingAppointments.length})
           </h2>
           <div className="flex flex-col gap-2">
@@ -83,21 +99,21 @@ export const AgendaClient: React.FC<AgendaClientProps> = ({
         </section>
       )}
 
-      {actionError && <p className="text-xs text-rose-400">{actionError}</p>}
+      {actionError && <p className="text-xs text-rose-600">{actionError}</p>}
 
       {clientNotice && (
-        <div className="rounded-xl bg-sky-500/10 border border-sky-500/30 p-3 flex items-center justify-between gap-3">
-          <p className="text-xs text-sky-300">Avise {clientNotice.name} pelo WhatsApp</p>
+        <div className="rounded-xl bg-sky-50 border border-sky-200 p-3 flex items-center justify-between gap-3">
+          <p className="text-xs text-sky-800">Avise {clientNotice.name} pelo WhatsApp</p>
           <div className="flex items-center gap-3 shrink-0">
             <a
               href={clientNotice.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-xs font-bold text-sky-300"
+              className="flex items-center gap-1.5 text-xs font-bold text-sky-700"
             >
               <MessageCircle className="w-3.5 h-3.5" /> Abrir WhatsApp
             </a>
-            <button type="button" onClick={() => setClientNotice(null)} className="text-slate-500" aria-label="Dispensar">
+            <button type="button" onClick={() => setClientNotice(null)} className="text-ink-faint" aria-label="Dispensar">
               <XIcon className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -106,15 +122,16 @@ export const AgendaClient: React.FC<AgendaClientProps> = ({
 
       <section>
         <div className="flex items-center justify-between mb-2">
-          <h2 className="text-[10px] font-semibold tracking-widest uppercase text-slate-500">Agendamentos do dia</h2>
+          <h2 className="text-[10px] font-semibold tracking-widest uppercase text-ink-faint">Agendamentos do dia</h2>
           <div className="flex gap-2">
             <button
               type="button"
               onClick={() => {
+                setManualPrefillTime(undefined);
                 setShowManualForm((v) => !v);
                 setShowBlockForm(false);
               }}
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-rose-500/15 text-rose-400 text-[11px] font-bold"
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-rose-100 text-rose-600 text-[11px] font-bold"
             >
               <CalendarPlus className="w-3.5 h-3.5" /> Agendamento
             </button>
@@ -124,7 +141,7 @@ export const AgendaClient: React.FC<AgendaClientProps> = ({
                 setShowBlockForm((v) => !v);
                 setShowManualForm(false);
               }}
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-800 text-slate-300 text-[11px] font-bold"
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-linen text-ink-soft text-[11px] font-bold"
             >
               <Lock className="w-3.5 h-3.5" /> Bloquear
             </button>
@@ -137,6 +154,7 @@ export const AgendaClient: React.FC<AgendaClientProps> = ({
               slug={slug}
               services={services}
               defaultDate={selectedDate}
+              defaultTime={manualPrefillTime}
               onClose={() => setShowManualForm(false)}
               onCreated={() => {
                 setShowManualForm(false);
@@ -160,16 +178,24 @@ export const AgendaClient: React.FC<AgendaClientProps> = ({
           </div>
         )}
 
-        {dayAppointments.length === 0 ? (
-          <p className="text-xs text-slate-500 py-6 text-center">Nenhum agendamento nesse dia.</p>
-        ) : (
-          <div className="flex flex-col gap-2">
-            {dayAppointments.map((a) => (
-              <AppointmentRow key={a.id} appointment={a} onUpdateStatus={handleUpdateStatus} busy={busyId === a.id} />
-            ))}
-          </div>
-        )}
+        <DayTimeGrid
+          dateStr={selectedDate}
+          appointments={dayAppointments}
+          businessHours={businessHours}
+          scheduleBlocks={scheduleBlocks}
+          onSlotClick={handleSlotClick}
+          onAppointmentClick={setDetailAppointment}
+        />
       </section>
+
+      {detailAppointment && (
+        <AppointmentDetailSheet
+          appointment={detailAppointment}
+          busy={busyId === detailAppointment.id}
+          onClose={() => setDetailAppointment(null)}
+          onUpdateStatus={handleUpdateStatus}
+        />
+      )}
     </div>
   );
 };

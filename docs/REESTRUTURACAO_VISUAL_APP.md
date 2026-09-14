@@ -46,14 +46,16 @@ Referência visual: LashAgenda (`legacy/lashmenu-vendas-feature-lashmenu-agendam
 - [x] Teste visual (Playwright): acordeão fechado por padrão, abre/fecha ao clicar, formulário de horários com o visual novo. Testado o link `#assinatura` numa navegação nova de verdade — abre a seção certa sozinho, mostrando "StudioMenu+ ativo" (bate com o estado real do catálogo de teste).
 - [ ] Commit (aguardando aprovação)
 
-### Fase 4 — Agenda (a maior)
-- [ ] `agenda/page.tsx` busca `business_hours`+`schedule_blocks` também
-- [ ] `src/components/agenda/DayTimeGrid.tsx` (novo, grade real)
-- [ ] `src/components/agenda/AppointmentDetailSheet.tsx` (novo)
-- [ ] `ManualBookingForm` ganha prop `defaultTime`
-- [ ] `tsc` + `build` limpos
-- [ ] Reteste manual de **todo o Bloco 9** de `docs/TESTES_AGENDAMENTO_LOCAL.md` (confirmar, recusar, criar manual, bloquear horário) com a grade nova
-- [ ] Commit
+### Fase 4 — Agenda (a maior) ✅ CONCLUÍDA (2026-09-14)
+- [x] `agenda/page.tsx` busca `business_hours`+`schedule_blocks` também, cabeçalho vira `GradientHeader` (título em cima, navegação ◀ HOJE ▶ como pill embaixo — o layout original com tudo numa linha só cortava a data, corrigido)
+- [x] `src/components/agenda/DayTimeGrid.tsx` (novo) — grade real: coluna de hora + slots de 30min clicáveis (abre agendamento manual pré-preenchido) + agendamentos como blocos posicionados por cima, coloridos por status. Célula livre = dentro do expediente do dia da semana e sem bloqueio — não confere agendamentos (isso os blocos cobrem visualmente, mesma mecânica do LashAgenda). **Ajuste em relação ao plano original**: não reaproveitei `isInstantAvailable` pra isso — essa função também exige que a duração inteira do serviço caiba antes do fechamento, o que não faz sentido pra "esse meia-hora está dentro do expediente?". Escrita uma checagem local mais simples, só expediente+bloqueio.
+- [x] `src/components/agenda/AppointmentDetailSheet.tsx` (novo) — bottom sheet aberto ao clicar num agendamento na grade, mesmos dados/ações que a fila de pendentes já tinha
+- [x] `ManualBookingForm` ganha prop `defaultTime` (preenchido pelo clique na grade)
+- [x] `AppointmentRow`, `ManualBookingForm`, `BlockSlotForm` restyled pro tema claro
+- [x] Pendentes voltaram a aparecer também na grade (bloco âmbar), não só na fila — decisão revista em relação à correção anterior: antes era duplicação de exibição real (2 listas idênticas lado a lado); agora fila (lista de ação) e grade (visão do dia) são representações diferentes do mesmo agendamento, como o próprio LashAgenda faz — não é mais confuso, é informação útil nos dois lugares.
+- [x] `tsc` + `build` limpos
+- [x] Reteste manual (Playwright) de tudo do Bloco 9 com a grade nova: clique em horário livre abre o formulário com a hora certa pré-preenchida; clique num agendamento abre o painel de detalhe com os dados corretos; confirmar um pendente funciona de ponta a ponta (fila esvazia, aviso de WhatsApp aparece, bloco muda de âmbar pra verde na grade automaticamente). Dados de teste criados especificamente pra esse reteste foram removidos depois.
+- [ ] Commit (aguardando aprovação)
 
 ### Fase 5 — Polish
 - [ ] Botão de voltar da aba Catálogo
