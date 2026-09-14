@@ -22,7 +22,7 @@ export default async function CatalogoPage({ params }: CatalogoPageProps) {
       <Link
         href={`/app/${slug}/inicio`}
         aria-label="Voltar pro app"
-        className="fixed top-3 left-3 z-[999995] w-9 h-9 rounded-full bg-black/60 backdrop-blur border border-white/15 text-white flex items-center justify-center"
+        className="fixed top-3 left-3 z-[999995] w-9 h-9 rounded-full bg-rose-950/70 backdrop-blur border border-white/15 text-white flex items-center justify-center"
       >
         <ArrowLeft className="w-4 h-4" />
       </Link>

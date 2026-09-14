@@ -57,10 +57,17 @@ Referência visual: LashAgenda (`legacy/lashmenu-vendas-feature-lashmenu-agendam
 - [x] Reteste manual (Playwright) de tudo do Bloco 9 com a grade nova: clique em horário livre abre o formulário com a hora certa pré-preenchida; clique num agendamento abre o painel de detalhe com os dados corretos; confirmar um pendente funciona de ponta a ponta (fila esvazia, aviso de WhatsApp aparece, bloco muda de âmbar pra verde na grade automaticamente). Dados de teste criados especificamente pra esse reteste foram removidos depois.
 - [ ] Commit (aguardando aprovação)
 
-### Fase 5 — Polish
-- [ ] Botão de voltar da aba Catálogo
-- [ ] Ajustes soltos
-- [ ] Commit
+### Fase 5 — Polish ✅ CONCLUÍDA (2026-09-14)
+- [x] Botão de voltar da aba Catálogo (`catalogo/page.tsx`) — tom rose escuro translúcido em vez de preto, continua legível sobre qualquer tema de catálogo (Rose ou Luxury)
+- [x] Cores do `manifest.ts` (splash screen do PWA) atualizadas pro fundo creme, condizente com o app agora sendo claro (antes ainda apontava pro slate escuro antigo)
+- [x] Varredura final por qualquer classe `slate-*`/`bg-black` esquecida em toda a árvore `/app/[slug]` — nada encontrado além de usos intencionais (ícone branco sobre botão rose, scrim de modal)
+- [x] `tsc` + `build` limpos
+- [x] Teste visual: editor do catálogo (aba Catálogo) continua 100% intocado, botão de voltar com a nova identidade, sem regressão
+- [ ] Commit (aguardando aprovação)
+
+## Reestruturação concluída (2026-09-14)
+
+Todas as 5 fases prontas, testadas e commitadas localmente (push pendente, a pedido do usuário). Início, Config e Agenda com o visual novo; Catálogo e `/c/[slug]` intocados; nenhuma rota de API ou lógica de negócio mudou em nenhuma fase.
 
 ## Como retomar em outra sessão
 
