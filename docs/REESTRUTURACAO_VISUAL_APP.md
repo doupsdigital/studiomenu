@@ -115,7 +115,7 @@ O usuário apontou que a tabbar com 4 itens (Início/Catálogo/Agenda/Config) ti
 - [x] **Ajuste após feedback**: as estrelinhas decorativas "✦" do `GradientHeader` (usadas no banner do Início) ficavam coladas na pill de navegação "◀ Hoje ▶" no cabeçalho da Agenda — `GradientHeader` ganhou a prop `showSparkles` (default `true`), desligada só na Agenda.
 - [x] `tsc` + `build` limpos
 - [x] Teste visual (Playwright): tabbar de 3 itens bem proporcionada e balanceada no Início/Config; clique no card novo abre o editor do catálogo com o botão de voltar funcionando; cabeçalho da Agenda sem as estrelinhas, Início mantém elas; nenhuma regressão na barra flutuante própria do editor (continua escondendo a tabbar, como antes).
-- [x] Commit — `<preenchido no commit>`
+- [x] Commit — `54caf01`
 
 ## Como retomar em outra sessão
 
