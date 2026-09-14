@@ -11,6 +11,12 @@ export interface ProfessionalOrderSummary {
   subscription_status: 'none' | 'ativo' | 'suspenso' | 'cancelado';
   billing_email?: string;
   billing_cpf_cnpj?: string;
+  /** Se o agendamento automático está de fato ligado pro cliente final — via
+   *  assinatura Plus ativa OU via toggle manual do admin (Fase 6). É essa
+   *  flag, não o plano, que decide se a Agenda mostra conteúdo real ou o
+   *  upsell (ver docs/PLANO_AGENDAMENTO_STUDIOMENU_PLUS.md, achado da
+   *  revisão pós-Fase 7). */
+  booking_enabled: boolean;
 }
 
 /** Busca os dados que o app da profissional (`/app/[slug]`) precisa — um
@@ -21,7 +27,7 @@ export async function getOrderForProfessionalApp(slug: string): Promise<Professi
 
   const { data, error } = await supabaseAdmin
     .from('orders')
-    .select('id, slug, edit_token, client_name, studio_name, whatsapp_number, plan_tier, subscription_status, billing_email, billing_cpf_cnpj')
+    .select('id, slug, edit_token, client_name, studio_name, whatsapp_number, plan_tier, subscription_status, billing_email, billing_cpf_cnpj, booking_enabled')
     .eq('slug', normalizedSlug)
     .single();
 
@@ -40,5 +46,6 @@ export async function getOrderForProfessionalApp(slug: string): Promise<Professi
       : 'none',
     billing_email: data.billing_email || undefined,
     billing_cpf_cnpj: data.billing_cpf_cnpj || undefined,
+    booking_enabled: Boolean(data.booking_enabled),
   };
 }

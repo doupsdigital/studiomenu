@@ -3,6 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin';
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 import { isProfessionalRequestAuthorized } from '@/lib/professional-session';
 import { buildAppointmentInsertPayload } from '@/lib/scheduling/appointment-payload';
+import { isSlotAvailableForBooking } from '@/lib/scheduling/slot-lookup';
 
 /** POST /api/professional/appointments
  *  Agendamento manual criado pela própria profissional (walk-in, telefone,
@@ -62,6 +63,25 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { success: false, message: 'Esse serviço ainda não tem duração configurada.' },
         { status: 400 }
+      );
+    }
+
+    // Respeita o horário de atendimento e os bloqueios configurados — a
+    // profissional pode marcar um horário manual pra qualquer cliente, mas
+    // não deve conseguir se auto-conflitar com a própria grade/folga sem
+    // perceber. Checa o instante exato (não a grade de 30min do wizard
+    // público, já que ela pode digitar qualquer horário) e sem buffer de
+    // "hoje" — ela pode estar com a cliente na frente agora mesmo.
+    const dateStr = startsAtDate.toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+    const isAvailable = await isSlotAvailableForBooking(order.id, startsAtDate, dateStr, service.duration_minutes);
+
+    if (!isAvailable) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Esse horário está fora do expediente ou bloqueado. Ajuste em Config se precisar liberar.',
+        },
+        { status: 409 }
       );
     }
 

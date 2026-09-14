@@ -78,15 +78,20 @@ export interface ComputeAvailableSlotsParams {
   busyAppointments: BusyInterval[];
   /** Injetável pra teste; default `new Date()`. */
   now?: Date;
+  /** Buffer de 30min a partir de agora quando a data é hoje — faz sentido
+   *  pro cliente final (não pode agendar pro minuto seguinte), mas não pro
+   *  agendamento manual da profissional (ela pode estar com a cliente na
+   *  frente agora mesmo). Default `true`. */
+  applyTodayBuffer?: boolean;
 }
 
 /** Calcula os horários livres pra uma data, considerando grade semanal,
  *  bloqueios (integrais ou parciais) e agendamentos já existentes. Gera
  *  candidatos a cada 30min, só oferece um horário se o serviço inteiro
  *  couber antes do fechamento, e aplica um buffer de 30min a partir de agora
- *  quando a data pedida é hoje. */
+ *  quando a data pedida é hoje (a menos que `applyTodayBuffer: false`). */
 export function computeAvailableSlots(params: ComputeAvailableSlotsParams): AvailabilitySlot[] {
-  const { dateStr, durationMinutes, businessHours, blocks, busyAppointments } = params;
+  const { dateStr, durationMinutes, businessHours, blocks, busyAppointments, applyTodayBuffer = true } = params;
   const now = params.now ?? new Date();
 
   if (!durationMinutes || durationMinutes <= 0) return [];
@@ -112,7 +117,7 @@ export function computeAvailableSlots(params: ComputeAvailableSlotsParams): Avai
     }));
 
   const busyIntervals = [...busyAppointments, ...partialBlockIntervals];
-  const earliestAllowed = addMinutes(now, TODAY_BUFFER_MINUTES);
+  const earliestAllowed = applyTodayBuffer ? addMinutes(now, TODAY_BUFFER_MINUTES) : new Date(0);
 
   const slots: AvailabilitySlot[] = [];
   let cursor = dayStart;
@@ -137,4 +142,50 @@ export function computeAvailableSlots(params: ComputeAvailableSlotsParams): Avai
   }
 
   return slots;
+}
+
+export interface IsInstantAvailableParams {
+  /** Instante exato pretendido (não precisa estar na grade de 30min). */
+  startsAt: Date;
+  durationMinutes: number;
+  /** Data local (fuso do catálogo) correspondente a `startsAt`. */
+  dateStr: string;
+  businessHours: BusinessHoursRow[];
+  blocks: ScheduleBlockRow[];
+  busyAppointments: BusyInterval[];
+}
+
+/** Mesmas regras de `computeAvailableSlots` (expediente, bloqueios,
+ *  choque com agendamentos existentes), mas pra um instante exato em vez de
+ *  varrer a grade de 30min — usado pelo agendamento manual da profissional,
+ *  que pode digitar qualquer horário (ex: 14:15), não só os múltiplos de 30
+ *  que o wizard do cliente final oferece. Sem buffer de "hoje": quem chama
+ *  decide se aplica isso ou não pro próprio caso de uso. */
+export function isInstantAvailable(params: IsInstantAvailableParams): boolean {
+  const { startsAt, durationMinutes, dateStr, businessHours, blocks, busyAppointments } = params;
+  if (!durationMinutes || durationMinutes <= 0) return false;
+
+  const weekday = getWeekdayForDate(dateStr);
+  const hoursRow = businessHours.find((h) => h.weekday === weekday);
+  if (!hoursRow) return false; // fechado nesse dia da semana
+
+  const hasFullDayBlock = blocks.some(
+    (b) => b.all_day && dateStr >= b.start_date && dateStr <= b.end_date
+  );
+  if (hasFullDayBlock) return false;
+
+  const dayStart = localDateTimeToUTC(dateStr, hoursRow.start_time);
+  const dayEnd = localDateTimeToUTC(dateStr, hoursRow.end_time);
+  const endsAt = addMinutes(startsAt, durationMinutes);
+  if (startsAt < dayStart || endsAt > dayEnd) return false;
+
+  const partialBlockIntervals: BusyInterval[] = blocks
+    .filter((b) => !b.all_day && dateStr >= b.start_date && dateStr <= b.end_date && b.start_time && b.end_time)
+    .map((b) => ({
+      startsAt: localDateTimeToUTC(dateStr, b.start_time as string),
+      endsAt: localDateTimeToUTC(dateStr, b.end_time as string),
+    }));
+
+  const busyIntervals = [...busyAppointments, ...partialBlockIntervals];
+  return !busyIntervals.some((b) => intervalsOverlap(startsAt, endsAt, b.startsAt, b.endsAt));
 }

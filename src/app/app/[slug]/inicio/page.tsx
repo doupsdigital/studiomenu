@@ -16,6 +16,10 @@ export default async function InicioPage({ params }: InicioPageProps) {
   if (!order) notFound();
 
   const isPlusAtivo = order.plan_tier === 'plus' && order.subscription_status === 'ativo';
+  // Mesmo gate da Agenda: `booking_enabled` decide se mostra o card de
+  // sucesso ou o upsell, não o plano diretamente (pode estar ligado via
+  // toggle manual do admin sem ela ser Plus — Fase 6).
+  const schedulingLive = order.booking_enabled;
 
   return (
     <main className="max-w-md mx-auto px-5 pt-8 pb-6">
@@ -27,11 +31,12 @@ export default async function InicioPage({ params }: InicioPageProps) {
         <CopyLinkRow label="Link de edição (só pra você)" path={`/c/${order.slug}?edit=${order.edit_token}`} />
       </div>
 
-      {isPlusAtivo ? (
+      {schedulingLive ? (
         <div className="rounded-2xl bg-emerald-500/10 border border-emerald-500/30 p-4 flex items-center gap-3">
           <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
           <p className="text-xs text-emerald-300">
-            StudioMenu+ ativo — sua agenda com horários reais está na aba <strong>Agenda</strong>.
+            {isPlusAtivo ? 'StudioMenu+ ativo' : 'Agendamento automático ativo'} — sua agenda com horários reais está
+            na aba <strong>Agenda</strong>.
           </p>
         </div>
       ) : (

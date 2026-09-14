@@ -40,9 +40,13 @@ export default async function AgendaPage({ params, searchParams }: AgendaPagePro
 
   if (!order) notFound();
 
-  const isPlusAtivo = order.plan_tier === 'plus' && order.subscription_status === 'ativo';
-
-  if (!isPlusAtivo) {
+  // A Agenda é liberada por `booking_enabled` (o que de fato diz se o
+  // agendamento automático está ligado pro cliente final), não pelo status
+  // do Plus diretamente — o admin pode ligar `booking_enabled` manualmente
+  // num catálogo que não é Plus (Fase 6, via de escape pra teste/período
+  // promocional), e nesse caso a profissional precisa conseguir gerenciar
+  // os agendamentos reais que os clientes estão criando, mesmo sem assinar.
+  if (!order.booking_enabled) {
     return (
       <main className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
         <PlusUpsellCard variant="full" slug={slug} />
@@ -52,11 +56,18 @@ export default async function AgendaPage({ params, searchParams }: AgendaPagePro
 
   const selectedDate = date && DATE_RE.test(date) ? date : todayInSaoPaulo();
 
-  const [pendingAppointments, dayAppointments, services] = await Promise.all([
+  const [pendingAppointments, dayAppointmentsRaw, services] = await Promise.all([
     getPendingAppointments(order.id),
     getAppointmentsForDay(order.id, selectedDate),
     getManualBookingServices(order.id),
   ]);
+
+  // "Aguardando confirmação" já mostra os pendentes (de qualquer dia) no topo
+  // da tela — se um deles cair no dia visualizado, `getAppointmentsForDay`
+  // também o devolve (só exclui cancelados), e ele apareceria duplicado.
+  // Tira da lista do dia qualquer item que já esteja na fila de pendentes.
+  const pendingIds = new Set(pendingAppointments.map((a) => a.id));
+  const dayAppointments = dayAppointmentsRaw.filter((a) => !pendingIds.has(a.id));
 
   return (
     <main className="max-w-md mx-auto px-5 pt-8 pb-6">

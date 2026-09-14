@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
-import { computeAvailableSlots, localDateTimeToUTC, BusinessHoursRow, ScheduleBlockRow } from '@/lib/scheduling/availability';
+import { getAvailableSlotsForDate } from '@/lib/scheduling/slot-lookup';
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -59,40 +59,7 @@ export async function GET(request: Request) {
       );
     }
 
-    const [{ data: businessHours }, { data: blocks }] = await Promise.all([
-      supabaseAdmin.from('business_hours').select('weekday, start_time, end_time').eq('order_id', order.id),
-      supabaseAdmin
-        .from('schedule_blocks')
-        .select('start_date, end_date, all_day, start_time, end_time')
-        .eq('order_id', order.id)
-        .lte('start_date', dateStr)
-        .gte('end_date', dateStr),
-    ]);
-
-    // Janela de busca de agendamentos existentes com folga de 1 dia pra cada
-    // lado (evita perder agendamentos que cruzam meia-noite no fuso local).
-    const windowStart = localDateTimeToUTC(dateStr, '00:00:00');
-    const windowStartMinus1 = new Date(windowStart.getTime() - 24 * 60 * 60000);
-    const windowEndPlus1 = new Date(windowStart.getTime() + 2 * 24 * 60 * 60000);
-
-    const { data: appointments } = await supabaseAdmin
-      .from('appointments')
-      .select('starts_at, ends_at')
-      .eq('order_id', order.id)
-      .neq('status', 'cancelled')
-      .gte('starts_at', windowStartMinus1.toISOString())
-      .lte('starts_at', windowEndPlus1.toISOString());
-
-    const slots = computeAvailableSlots({
-      dateStr,
-      durationMinutes: service.duration_minutes,
-      businessHours: (businessHours || []) as BusinessHoursRow[],
-      blocks: (blocks || []) as ScheduleBlockRow[],
-      busyAppointments: (appointments || []).map((a) => ({
-        startsAt: new Date(a.starts_at as string),
-        endsAt: new Date(a.ends_at as string),
-      })),
-    });
+    const slots = await getAvailableSlotsForDate(order.id, dateStr, service.duration_minutes);
 
     return NextResponse.json({ success: true, slots, service: { id: service.id, title: service.title, price: service.price } });
   } catch (error) {

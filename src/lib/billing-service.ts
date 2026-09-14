@@ -17,7 +17,14 @@ export async function activateSubscription(orderId: string): Promise<void> {
     .eq('id', orderId)
     .single();
 
-  await supabaseAdmin.from('orders').update({ plan_tier: 'plus', subscription_status: 'ativo' }).eq('id', orderId);
+  // `booking_enabled` liga junto — sem isso, pagar o Plus não fazia o
+  // agendamento automático funcionar de verdade pro cliente final até o
+  // admin lembrar de ligar manualmente o toggle no painel (achado da
+  // revisão pós-Fase 7, ver docs/PLANO_AGENDAMENTO_STUDIOMENU_PLUS.md).
+  await supabaseAdmin
+    .from('orders')
+    .update({ plan_tier: 'plus', subscription_status: 'ativo', booking_enabled: true })
+    .eq('id', orderId);
 
   if (before && before.subscription_status !== 'ativo') {
     const nowStr = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
@@ -31,7 +38,17 @@ export async function setSubscriptionStatus(
   orderId: string,
   status: 'suspenso' | 'cancelado'
 ): Promise<void> {
-  await supabaseAdmin.from('orders').update({ subscription_status: status }).eq('id', orderId);
+  // Cancelamento definitivo desliga `booking_enabled` junto — ela parou de
+  // pagar, o agendamento pro cliente final para de funcionar. Suspensão
+  // (pagamento atrasado, pode ser passageiro) não mexe em `booking_enabled`
+  // de propósito — evita cortar o agendamento de clientes já em andamento
+  // por um atraso pontual; o toggle manual do admin continua disponível
+  // como via de escape se for preciso agir antes disso.
+  const updates: { subscription_status: string; booking_enabled?: boolean } = { subscription_status: status };
+  if (status === 'cancelado') {
+    updates.booking_enabled = false;
+  }
+  await supabaseAdmin.from('orders').update(updates).eq('id', orderId);
 }
 
 /** Resolve o `order_id` a partir de um evento do Asaas — por

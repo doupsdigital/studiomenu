@@ -39,6 +39,7 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
   const [qr, setQr] = useState<QrState | null>(null);
   const [polling, setPolling] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [confirmingCancel, setConfirmingCancel] = useState(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -103,7 +104,6 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
   };
 
   const handleCancel = async () => {
-    if (!confirm('Cancelar sua assinatura do StudioMenu+? Você perde acesso à agenda automática.')) return;
     setLoading(true);
     setError(null);
     try {
@@ -122,6 +122,7 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
       setError('Falha na conexão.');
     } finally {
       setLoading(false);
+      setConfirmingCancel(false);
     }
   };
 
@@ -148,14 +149,41 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
           </div>
           <p className="text-xs text-slate-400 mb-3">{PLUS_PRICE_LABEL} · cobrança recorrente via Pix</p>
           {error && <p className="text-xs text-rose-400 mb-2">{error}</p>}
-          <button
-            type="button"
-            onClick={handleCancel}
-            disabled={loading}
-            className="w-full h-10 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold disabled:opacity-50"
-          >
-            {loading ? 'Cancelando...' : 'Cancelar assinatura'}
-          </button>
+
+          {confirmingCancel ? (
+            <div className="rounded-xl bg-rose-500/10 border border-rose-500/30 p-3">
+              <p className="text-xs text-rose-300 mb-3">
+                Cancelar sua assinatura do StudioMenu+? Você perde acesso à agenda automática.
+              </p>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setConfirmingCancel(false)}
+                  disabled={loading}
+                  className="flex-1 h-10 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold disabled:opacity-50"
+                >
+                  Voltar
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  disabled={loading}
+                  className="flex-1 h-10 rounded-xl bg-rose-500 text-white text-xs font-bold disabled:opacity-50"
+                >
+                  {loading ? 'Cancelando...' : 'Sim, cancelar'}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setConfirmingCancel(true)}
+              disabled={loading}
+              className="w-full h-10 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold disabled:opacity-50"
+            >
+              Cancelar assinatura
+            </button>
+          )}
         </div>
       ) : (
         <div className="rounded-2xl bg-slate-900 border border-slate-800 p-4">
