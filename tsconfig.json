@@ -37,6 +37,6 @@
   ],
   "exclude": [
     "node_modules",
-    "docs/lashmenu-vendas-feature-lashmenu-agendamento"
+    "**/lashmenu-vendas-feature-lashmenu-agendamento/**"
   ]
 }

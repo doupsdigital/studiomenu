@@ -26,6 +26,18 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Tipografia do app da profissional (/app/[slug], docs/REESTRUTURACAO_VISUAL_APP.md)
+   — usa as fontes que o projeto já carrega (linha 1 deste arquivo), não as
+   classes `font-serif`/`font-sans` do Tailwind (essas apontam pra Playfair
+   Display/Inter, que não estão carregadas em lugar nenhum do projeto). */
+.font-serif-pro {
+  font-family: 'Fraunces', Georgia, serif;
+}
+
+.font-body-pro {
+  font-family: 'Jost', system-ui, -apple-system, sans-serif;
+}
+
 .glass-panel-rose {
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(12px);

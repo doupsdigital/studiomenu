@@ -29,7 +29,19 @@ module.exports = {
           dark: '#0d0d0d',
           card: '#161618',
           border: '#2a2a2e',
-        }
+        },
+        // Paleta neutra clara do app da profissional (/app/[slug]) — extensão
+        // aditiva, não mexe em nada existente. Inspirada no fundo creme/cards
+        // brancos do LashAgenda (docs/REESTRUTURACAO_VISUAL_APP.md), mas com
+        // a cor de destaque continuando a ser `rose` (já definida acima).
+        cream: '#F7F3EE',
+        surface: '#FFFFFF',
+        linen: '#EFE4DA',
+        ink: {
+          DEFAULT: '#2C1810',
+          soft: '#6B5D53',
+          faint: '#A8998C',
+        },
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
