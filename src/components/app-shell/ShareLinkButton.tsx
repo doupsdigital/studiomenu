@@ -10,8 +10,7 @@ interface ShareLinkButtonProps {
 }
 
 /** Botão pill "Copiar Link Público" do cartão "Compartilhe sua Agenda" do
- *  Início — mesma lógica de cópia do `CopyLinkRow`, só com o visual de
- *  botão em destaque (branco/rose) em vez do card neutro. */
+ *  Início. */
 export const ShareLinkButton: React.FC<ShareLinkButtonProps> = ({ path }) => {
   const [copied, setCopied] = useState(false);
   const [url, setUrl] = useState(path);

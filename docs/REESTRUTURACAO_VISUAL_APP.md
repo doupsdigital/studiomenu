@@ -84,7 +84,7 @@ Implementado:
 - [x] `DayTimeGrid` ganhou sua própria linha de cabeçalho (ícone de calendário + "SEGUNDA-FEIRA, 14 DE SETEMBRO"), dentro do mesmo cartão da grade — tinha ficado de fora na Fase 4.
 - [x] `tsc` + `build` limpos.
 - [x] Teste visual comparando print a print com a referência — resultado muito próximo. Reteste funcional do acordeão de pendentes (recolhe/expande, confirmar continua funcionando de ponta a ponta — fila esvazia, aviso de WhatsApp aparece, bloco muda de cor na grade).
-- [x] Commit — `<preenchido no commit>`
+- [x] Commit — `45282c7` (commitado junto com a Fase 7)
 
 ### Fase 7 — Fluxo de confirmação idêntico ao LashAgenda (modais de aprovar/recusar/sucesso) ✅ CONCLUÍDA (2026-09-14)
 
@@ -102,7 +102,20 @@ O usuário mandou mais prints (linha da fila expandida, modal "Confirmar agendam
 - [x] `window.open()` do link do WhatsApp chamado **antes** do `await` da chamada de API, mesmo cuidado do LashAgenda (necessário pro Safari iOS não bloquear o popup)
 - [x] `tsc` + `build` limpos
 - [x] Teste visual + funcional completo (Playwright): toolbar e linha da fila comparados print a print — idênticos. Fluxo de aprovar testado de ponta a ponta (abre modal → "Confirmar sem enviar" → modal de sucesso "Agendamento Confirmado!" → fecha → bloco vira verde "Confirmado" na grade). Fluxo de recusar testado separadamente (abre modal → preenche motivo → "Recusar sem notificar" → modal de sucesso "Agendamento Recusado"). Dados de teste removidos depois de cada teste.
-- [ ] Commit (aguardando aprovação)
+- [x] Commit — `45282c7`
+
+### Fase 8 — Tabbar de 3 itens + card de destaque pro catálogo ✅ CONCLUÍDA (2026-09-14)
+
+O usuário apontou que a tabbar com 4 itens (Início/Catálogo/Agenda/Config) tinha ficado apertada, com tamanhos desproporcionais. Decisão: tirar "Catálogo" da tabbar; o acesso ao editor passa a ser por um card de destaque na tela de Início (que antes só mostrava o link de edição pra copiar — essa função de copiar sai daqui, o usuário vai deixar isso disponível no painel admin).
+
+- [x] `src/components/app-shell/EditCatalogCard.tsx` (novo) — card cheio, gradiente rose-600→rose-700, ícone + título "Editar meu catálogo" + subtítulo + chevron, link direto pra `/app/[slug]/catalogo`. Substitui o antigo `CopyLinkRow` na tela de Início (arquivo removido, só era usado ali).
+- [x] `src/components/app-shell/BottomNav.tsx` — tabbar volta a 3 posições (Início | espaço do botão central | Config), cada uma com `flex-1` — como sobrou mais espaço por item, ícones e texto ficaram um pouco maiores (`w-5 h-5`→`w-6 h-6`, `text-[11px]`→`text-xs`) pra preencher bem o espaço.
+- [x] Botão de voltar da aba Catálogo (`catalogo/page.tsx`) já apontava pra `/app/[slug]/inicio` desde a Fase 5 — não precisou mudar nada aí.
+- [x] **Ajuste após feedback**: a primeira versão da tabbar reservava uma 3ª coluna vazia só pro espaço do botão central (Início/espaço/Config em 3 partes iguais), o que empurrava os 2 ícones pras bordas e deixava um vão vazio grande — ficou desproporcional. Corrigido tirando essa coluna (o botão central já é posicionado de forma absoluta por cima, não precisa de espaço reservado); agora Início/Config dividem a largura em metades, ficando bem mais perto do botão.
+- [x] **Ajuste após feedback**: as estrelinhas decorativas "✦" do `GradientHeader` (usadas no banner do Início) ficavam coladas na pill de navegação "◀ Hoje ▶" no cabeçalho da Agenda — `GradientHeader` ganhou a prop `showSparkles` (default `true`), desligada só na Agenda.
+- [x] `tsc` + `build` limpos
+- [x] Teste visual (Playwright): tabbar de 3 itens bem proporcionada e balanceada no Início/Config; clique no card novo abre o editor do catálogo com o botão de voltar funcionando; cabeçalho da Agenda sem as estrelinhas, Início mantém elas; nenhuma regressão na barra flutuante própria do editor (continua escondendo a tabbar, como antes).
+- [x] Commit — `<preenchido no commit>`
 
 ## Como retomar em outra sessão
 

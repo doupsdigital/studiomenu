@@ -4,7 +4,7 @@ import { getOrderForProfessionalApp } from '@/lib/professional-app-service';
 import { getAppointmentsForDay, getPendingAppointments } from '@/lib/scheduling/agenda-service';
 import { GradientHeader } from '@/components/app-shell/GradientHeader';
 import { StatCard } from '@/components/app-shell/StatCard';
-import { CopyLinkRow } from '@/components/app-shell/CopyLinkRow';
+import { EditCatalogCard } from '@/components/app-shell/EditCatalogCard';
 import { PlusUpsellCard } from '@/components/app-shell/PlusUpsellCard';
 import { ShareLinkButton } from '@/components/app-shell/ShareLinkButton';
 import { PageTitleBar } from '@/components/app-shell/PageTitleBar';
@@ -102,7 +102,7 @@ export default async function InicioPage({ params }: InicioPageProps) {
         </div>
       </div>
 
-      <CopyLinkRow label="Link de edição (só pra você)" path={`/c/${order.slug}?edit=${order.edit_token}`} />
+      <EditCatalogCard slug={order.slug} />
 
       {schedulingLive ? (
         <div className="rounded-2xl bg-emerald-50 border border-emerald-200 p-4 flex items-center gap-3">

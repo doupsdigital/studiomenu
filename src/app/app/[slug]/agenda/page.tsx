@@ -76,7 +76,7 @@ export default async function AgendaPage({ params, searchParams }: AgendaPagePro
     <>
       <PageTitleBar title="Agenda" icon={Calendar} />
       <main className="max-w-md mx-auto px-5 pt-6 pb-6 flex flex-col gap-5">
-      <GradientHeader>
+      <GradientHeader showSparkles={false}>
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
             <h1 className="font-serif-pro font-bold text-2xl leading-tight">Agenda</h1>

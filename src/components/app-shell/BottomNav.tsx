@@ -3,72 +3,56 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, LayoutGrid, Settings, CalendarCheck } from 'lucide-react';
+import { Home, Settings, CalendarCheck } from 'lucide-react';
 
 interface BottomNavProps {
   slug: string;
 }
 
-const SIDE_TABS_LEFT = [
-  { key: 'inicio', label: 'Início', icon: Home },
-  { key: 'catalogo', label: 'Catálogo', icon: LayoutGrid },
-] as const;
+const SIDE_TAB_LEFT = { key: 'inicio', label: 'Início', icon: Home } as const;
+const SIDE_TAB_RIGHT = { key: 'config', label: 'Config', icon: Settings } as const;
 
-const SIDE_TABS_RIGHT = [{ key: 'config', label: 'Config', icon: Settings }] as const;
-
-/** Navegação inferior do app da profissional — 3 abas laterais (Início,
- *  Catálogo, Config) + um botão central elevado pra Agenda, mesmo padrão do
- *  `TabBar` do LashAgenda (docs/REESTRUTURACAO_VISUAL_APP.md, Fase 1). */
+/** Navegação inferior do app da profissional — Início à esquerda, Config à
+ *  direita, e um botão central elevado pra Agenda, mesmo padrão do `TabBar`
+ *  do LashAgenda (docs/REESTRUTURACAO_VISUAL_APP.md, Fase 1). O Catálogo
+ *  saiu da tabbar — agora só se chega lá pelo card de destaque no Início. */
 export const BottomNav: React.FC<BottomNavProps> = ({ slug }) => {
   const pathname = usePathname();
 
-  // A aba Catálogo reaproveita o editor visual do catálogo público, que já
+  // O editor do catálogo (chegado pelo card do Início, não mais uma aba) já
   // tem sua própria barra flutuante fixa na base (`#lm-editor-bottom-bar`,
   // `bottom:16px`) — duas barras fixas na base colidiriam visualmente, então
-  // a navegação de abas fica escondida enquanto o editor está aberto.
+  // a navegação continua escondida enquanto o editor está aberto.
   if (pathname?.includes(`/app/${slug}/catalogo`)) return null;
 
   const isAgendaActive = pathname?.startsWith(`/app/${slug}/agenda`);
 
+  const renderTab = ({ key, label, icon: Icon }: typeof SIDE_TAB_LEFT | typeof SIDE_TAB_RIGHT) => {
+    const href = `/app/${slug}/${key}`;
+    const isActive = pathname?.startsWith(href);
+    return (
+      <Link
+        key={key}
+        href={href}
+        className={`flex-1 flex flex-col items-center justify-center gap-1.5 text-xs font-semibold transition-colors ${
+          isActive ? 'text-rose-600' : 'text-ink-faint hover:text-ink-soft'
+        }`}
+      >
+        <Icon className="w-6 h-6" strokeWidth={isActive ? 2.5 : 1.75} />
+        {label}
+      </Link>
+    );
+  };
+
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 bg-surface border-t border-linen pb-[env(safe-area-inset-bottom)]">
       <div className="max-w-md mx-auto relative flex items-stretch h-[68px]">
-        {SIDE_TABS_LEFT.map(({ key, label, icon: Icon }) => {
-          const href = `/app/${slug}/${key}`;
-          const isActive = pathname?.startsWith(href);
-          return (
-            <Link
-              key={key}
-              href={href}
-              className={`flex-1 flex flex-col items-center justify-center gap-1 text-[11px] font-semibold transition-colors ${
-                isActive ? 'text-rose-600' : 'text-ink-faint hover:text-ink-soft'
-              }`}
-            >
-              <Icon className="w-5 h-5" strokeWidth={isActive ? 2.5 : 1.75} />
-              {label}
-            </Link>
-          );
-        })}
-
-        {/* Espaço reservado pro botão central flutuante */}
-        <div className="flex-1" />
-
-        {SIDE_TABS_RIGHT.map(({ key, label, icon: Icon }) => {
-          const href = `/app/${slug}/${key}`;
-          const isActive = pathname?.startsWith(href);
-          return (
-            <Link
-              key={key}
-              href={href}
-              className={`flex-1 flex flex-col items-center justify-center gap-1 text-[11px] font-semibold transition-colors ${
-                isActive ? 'text-rose-600' : 'text-ink-faint hover:text-ink-soft'
-              }`}
-            >
-              <Icon className="w-5 h-5" strokeWidth={isActive ? 2.5 : 1.75} />
-              {label}
-            </Link>
-          );
-        })}
+        {/* Sem coluna reservada pro botão central — ele já é posicionado de
+         *  forma absoluta por cima, então as 2 abas dividem a largura toda
+         *  em metades (mais perto do centro do que ficariam em 3 colunas
+         *  iguais, que empurrava tudo pras bordas). */}
+        {renderTab(SIDE_TAB_LEFT)}
+        {renderTab(SIDE_TAB_RIGHT)}
 
         {/* Botão central em destaque — Agenda */}
         <Link
