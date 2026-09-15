@@ -150,7 +150,7 @@ Corrigido sem tocar no CSS do catálogo (arriscado demais mexer nesse arquivo le
 - [x] `src/app/globals.css` — regra de correção do bug de borda
 - [x] `tsc` + `build` limpos
 - [x] Teste visual (Playwright): os 2 formulários abrindo como bottom sheet; borda do botão "Cancelar agendamento" confirmada via `getComputedStyle` (border-width foi de `0px`/`none` pra `1px`/`solid`) e visualmente; conferido também que o bug afetava e foi corrigido pro "Recusar" da fila e "Voltar" do modal de recusar, sem precisar de nenhuma mudança nesses componentes especificamente (a correção no CSS resolveu todos de uma vez)
-- [ ] Commit (aguardando aprovação)
+- [x] Commit — `601609d`
 
 ## Como retomar em outra sessão
 
