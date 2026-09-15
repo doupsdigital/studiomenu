@@ -113,10 +113,16 @@
 
 ## Bloco 8 — Ações rápidas da Agenda (toolbar)
 
-- [ ] **8.1** Confirme que os 3 botões do topo (**"+ Novo"**, **"🔒 Trancar"**, **"Dia ⌄"**) têm o mesmo tamanho, mesma cor (rosé), alinhados lado a lado, ocupando a largura toda igualmente.
-- [ ] **8.2** Clique em "+ Novo" — abre o formulário de agendamento manual. Crie um agendamento pra depois de amanhã, qualquer serviço/horário livre, nome "Manual Teste". Deve criar **direto como confirmado** (sem passar pela fila de pendentes, diferente do agendamento feito pela cliente).
-- [ ] **8.3** Clique em "🔒 Trancar" — abre o formulário de bloqueio de horário. Bloqueie amanhã à tarde (ex: 14h–16h), motivo "Compromisso". Confirme que aparece bloqueado na grade daquele dia.
-- [ ] **8.4** O botão "Dia ⌄" não faz nada ao clicar (é só visual por enquanto, sem dropdown de semana/mês) — confirme que não quebra nem dá erro ao clicar.
+- [X] **8.1** Confirme que os 3 botões do topo (**"+ Novo"**, **"🔒 Trancar"**, **"Dia ⌄"**) têm o mesmo tamanho, mesma cor (rosé), alinhados lado a lado, ocupando a largura toda igualmente.
+- [X] **8.2** Clique em "+ Novo" — abre o formulário de agendamento manual. Crie um agendamento pra depois de amanhã, qualquer serviço/horário livre, nome "Manual Teste". Deve criar **direto como confirmado** (sem passar pela fila de pendentes, diferente do agendamento feito pela cliente). ✅ **Melhorado**: você notou que não aparecia nenhuma confirmação visual depois de criar — agora mostra o mesmo modal de sucesso ("Agendamento Criado!") usado no resto do app, com o resumo (cliente/serviço/data/horário).
+- [X] **8.3** Clique em "🔒 Trancar" — abre o formulário de bloqueio de horário. Bloqueie amanhã à tarde (ex: 14h–16h), motivo "Compromisso". Confirme que aparece bloqueado na grade daquele dia. ✅ **Melhorado**: (a) ganhou o mesmo modal de sucesso ("Horário Bloqueado!", com Data/Período/Motivo); (b) a célula bloqueada na grade agora mostra um ícone de cadeado (só na marca da hora cheia, igual ao LashAgenda) em vez de só ficar cinza sem explicação.
+- [X] **8.4** ✅ **Implementado** (deixou de ser só visual): o botão agora é um seletor de verdade com 2 opções — **Dia** (grade de horário, como já era) e **Mês** (calendário do mês inteiro, com cadeado nos dias fechados e chips coloridos por status pra cada agendamento — até 2 por dia, "+N mais" se tiver mais). Clicar num dia do calendário mensal leva direto pra visão diária daquele dia. Navegação ◀ Hoje ▶ passa a mover por mês inteiro quando está na visão Mês.
+  - [ ] **8.4.1** Toque em "Dia" → escolha "Mês" no menu — deve trocar pra um calendário de 6 semanas (domingo a sábado), com o dia de hoje destacado em círculo rosé.
+  - [ ] **8.4.2** Domingos devem aparecer com um cadeado pequeno (fechado, sem horário de atendimento configurado).
+  - [ ] **8.4.3** Navegue ◀ ▶ pra ver o mês anterior/seguinte — o cabeçalho deve trocar pra "Mês de Ano" (ex: "Outubro de 2026"), sem mostrar dia nenhum.
+  - [ ] **8.4.4** Crie 2-3 agendamentos de teste em dias diferentes do mês (pode usar "+ Novo") e confirme que aparecem como chips coloridos nas células certas do calendário.
+  - [ ] **8.4.5** Toque num dia qualquer do calendário — deve navegar direto pra visão **Dia** daquela data, com o seletor voltando pra "Dia" sozinho.
+  - [ ] **8.4.6** Toque em "Hoje" estando na visão Mês — deve voltar pro mês atual (não muda pra visão Dia sozinho).
 
 ---
 

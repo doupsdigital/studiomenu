@@ -7,10 +7,11 @@ import { AppointmentRow } from './AppointmentRow';
 import { ManualBookingForm } from './ManualBookingForm';
 import { BlockSlotForm } from './BlockSlotForm';
 import { DayTimeGrid } from './DayTimeGrid';
+import { MonthCalendar } from './MonthCalendar';
 import { AppointmentDetailSheet } from './AppointmentDetailSheet';
 import { ApproveModal } from './ApproveModal';
 import { RejectModal } from './RejectModal';
-import { SuccessModal } from './SuccessModal';
+import { SuccessModal, type SuccessModalRow } from './SuccessModal';
 import type { AgendaAppointment, ManualBookingService } from '@/lib/scheduling/agenda-service';
 import type { BusinessHoursConfigRow, ScheduleBlockConfigRow } from '@/lib/scheduling/config-service';
 
@@ -29,21 +30,34 @@ function buildWhatsappLink(appointment: AgendaAppointment, tipo: 'aprovado' | 'r
   return `https://wa.me/${appointment.client_whatsapp}?text=${encodeURIComponent(msg)}`;
 }
 
-function buildSuccessSummary(appointment: AgendaAppointment, title: string) {
+interface SuccessInfo {
+  title: string;
+  rows: SuccessModalRow[];
+}
+
+function buildSuccessSummary(appointment: AgendaAppointment, title: string): SuccessInfo {
+  const dateStr = new Date(appointment.starts_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric', timeZone: 'America/Sao_Paulo' });
+  const timeStr = new Date(appointment.starts_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
   return {
     title,
-    clientName: appointment.client_name,
-    services: appointment.service_title,
-    dateStr: new Date(appointment.starts_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric', timeZone: 'America/Sao_Paulo' }),
-    timeStr: new Date(appointment.starts_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' }),
+    rows: [
+      { label: 'Cliente', value: appointment.client_name },
+      { label: 'Procedimento(s)', value: appointment.service_title },
+      { label: 'Data', value: dateStr },
+      { label: 'Horário', value: timeStr },
+    ],
   };
 }
 
 interface AgendaClientProps {
   slug: string;
+  view: 'dia' | 'mes';
   selectedDate: string;
+  todayStr: string;
   pendingAppointments: AgendaAppointment[];
   dayAppointments: AgendaAppointment[];
+  monthDays: string[];
+  monthAppointments: AgendaAppointment[];
   services: ManualBookingService[];
   businessHours: BusinessHoursConfigRow[];
   scheduleBlocks: ScheduleBlockConfigRow[];
@@ -51,9 +65,13 @@ interface AgendaClientProps {
 
 export const AgendaClient: React.FC<AgendaClientProps> = ({
   slug,
+  view,
   selectedDate,
+  todayStr,
   pendingAppointments,
   dayAppointments,
+  monthDays,
+  monthAppointments,
   services,
   businessHours,
   scheduleBlocks,
@@ -67,10 +85,15 @@ export const AgendaClient: React.FC<AgendaClientProps> = ({
   const [detailAppointment, setDetailAppointment] = useState<AgendaAppointment | null>(null);
   const [approveAppointment, setApproveAppointment] = useState<AgendaAppointment | null>(null);
   const [rejectAppointment, setRejectAppointment] = useState<AgendaAppointment | null>(null);
-  const [successInfo, setSuccessInfo] = useState<ReturnType<typeof buildSuccessSummary> | null>(null);
+  const [successInfo, setSuccessInfo] = useState<SuccessInfo | null>(null);
   // Recolhida por padrão — igual ao layout de referência (só o cabeçalho com
   // a contagem, expande ao tocar).
   const [pendingOpen, setPendingOpen] = useState(false);
+  const [viewMenuOpen, setViewMenuOpen] = useState(false);
+  // Formulários abertos a partir da visão mensal não têm uma data óbvia
+  // (`selectedDate` ali é só o dia 1 do mês, âncora da grade) — usam hoje
+  // como padrão, que ela pode trocar no próprio formulário.
+  const formDefaultDate = view === 'mes' ? todayStr : selectedDate;
 
   const patchStatus = async (appointment: AgendaAppointment, status: 'confirmed' | 'cancelled') => {
     const res = await fetch(`/api/professional/appointments/${appointment.id}`, {
@@ -158,7 +181,8 @@ export const AgendaClient: React.FC<AgendaClientProps> = ({
   return (
     <div className="flex flex-col gap-4">
       {/* Barra de ações rápidas — Novo agendamento / Trancar horário /
-       *  seletor de visualização (só "Dia" por enquanto, sem semana/mês). */}
+       *  seletor de visualização (Dia ou Mês, Fase 11 — sem semana, decisão
+       *  já tomada antes). */}
       <div className="flex items-center gap-2">
         <button
           type="button"
@@ -181,13 +205,48 @@ export const AgendaClient: React.FC<AgendaClientProps> = ({
         >
           <Lock className="w-4 h-4" /> Trancar
         </button>
-        <button
-          type="button"
-          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-full text-xs font-bold shadow-sm transition-colors"
-          title="Só a visualização diária por enquanto"
-        >
-          Dia <ChevronDown className="w-3.5 h-3.5" />
-        </button>
+        <div className="relative flex-1">
+          <button
+            type="button"
+            onClick={() => setViewMenuOpen((v) => !v)}
+            className="w-full flex items-center justify-center gap-1.5 px-3 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-full text-xs font-bold shadow-sm transition-colors"
+          >
+            {view === 'mes' ? 'Mês' : 'Dia'}
+            <ChevronDown className={`w-3.5 h-3.5 transition-transform ${viewMenuOpen ? 'rotate-180' : ''}`} />
+          </button>
+
+          {viewMenuOpen && (
+            <>
+              <div className="fixed inset-0 z-20" onClick={() => setViewMenuOpen(false)} />
+              <div className="absolute right-0 mt-1.5 w-32 bg-surface rounded-lg shadow-lg border border-linen overflow-hidden z-30">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setViewMenuOpen(false);
+                    router.push(`/app/${slug}/agenda`);
+                  }}
+                  className={`w-full text-left px-4 py-2.5 text-xs font-semibold transition-colors ${
+                    view === 'dia' ? 'bg-rose-50 text-rose-600' : 'text-ink-soft hover:bg-cream'
+                  }`}
+                >
+                  Dia
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setViewMenuOpen(false);
+                    router.push(`/app/${slug}/agenda?view=mes`);
+                  }}
+                  className={`w-full text-left px-4 py-2.5 text-xs font-semibold transition-colors ${
+                    view === 'mes' ? 'bg-rose-50 text-rose-600' : 'text-ink-soft hover:bg-cream'
+                  }`}
+                >
+                  Mês
+                </button>
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Diferente do LashAgenda (que esconde o painel inteiro quando zera),
@@ -228,11 +287,12 @@ export const AgendaClient: React.FC<AgendaClientProps> = ({
         <ManualBookingForm
           slug={slug}
           services={services}
-          defaultDate={selectedDate}
+          defaultDate={formDefaultDate}
           defaultTime={manualPrefillTime}
           onClose={() => setShowManualForm(false)}
-          onCreated={() => {
+          onCreated={(summary) => {
             setShowManualForm(false);
+            setSuccessInfo(summary);
             router.refresh();
           }}
         />
@@ -241,23 +301,36 @@ export const AgendaClient: React.FC<AgendaClientProps> = ({
       {showBlockForm && (
         <BlockSlotForm
           slug={slug}
-          defaultDate={selectedDate}
+          defaultDate={formDefaultDate}
           onClose={() => setShowBlockForm(false)}
-          onCreated={() => {
+          onCreated={(summary) => {
             setShowBlockForm(false);
+            setSuccessInfo(summary);
             router.refresh();
           }}
         />
       )}
 
-      <DayTimeGrid
-        dateStr={selectedDate}
-        appointments={dayAppointments}
-        businessHours={businessHours}
-        scheduleBlocks={scheduleBlocks}
-        onSlotClick={handleSlotClick}
-        onAppointmentClick={setDetailAppointment}
-      />
+      {view === 'mes' ? (
+        <MonthCalendar
+          monthDateStr={selectedDate}
+          days={monthDays}
+          todayStr={todayStr}
+          appointments={monthAppointments}
+          businessHours={businessHours}
+          scheduleBlocks={scheduleBlocks}
+          onDayClick={(dateStr) => router.push(`/app/${slug}/agenda?date=${dateStr}`)}
+        />
+      ) : (
+        <DayTimeGrid
+          dateStr={selectedDate}
+          appointments={dayAppointments}
+          businessHours={businessHours}
+          scheduleBlocks={scheduleBlocks}
+          onSlotClick={handleSlotClick}
+          onAppointmentClick={setDetailAppointment}
+        />
+      )}
 
       {detailAppointment && (
         <AppointmentDetailSheet

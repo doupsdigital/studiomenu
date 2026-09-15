@@ -22,26 +22,39 @@ export interface ManualBookingService {
   duration_minutes: number;
 }
 
-/** Todos os agendamentos dentro dos limites do dia `dateStr` (fuso
- *  America/Sao_Paulo), ordenados por horário — inclui os cancelados/
- *  recusados de propósito (mesmo comportamento do LashAgenda: eles
+/** Todos os agendamentos entre `startDateStr` (inclusive) e `endDateStrExclusive`
+ *  (exclusive), fuso America/Sao_Paulo, ordenados por horário — inclui os
+ *  cancelados/recusados de propósito (mesmo comportamento do LashAgenda: eles
  *  continuam aparecendo no dia, cinza, como rastro histórico; o horário já
  *  fica livre pra outro agendamento de qualquer forma, já que nem a trava
  *  de conflito no banco nem a checagem de disponibilidade da grade
- *  consideram agendamentos cancelados). */
-export async function getAppointmentsForDay(orderId: string, dateStr: string): Promise<AgendaAppointment[]> {
-  const dayStart = localDateTimeToUTC(dateStr, '00:00:00');
-  const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60000);
+ *  consideram agendamentos cancelados). Usada tanto pela grade do dia
+ *  (intervalo de 1 dia) quanto pela visão mensal (intervalo de 42 dias,
+ *  Fase 11). */
+export async function getAppointmentsForRange(
+  orderId: string,
+  startDateStr: string,
+  endDateStrExclusive: string
+): Promise<AgendaAppointment[]> {
+  const rangeStart = localDateTimeToUTC(startDateStr, '00:00:00');
+  const rangeEnd = localDateTimeToUTC(endDateStrExclusive, '00:00:00');
 
   const { data } = await supabaseAdmin
     .from('appointments')
     .select('id, service_title, duration_minutes, price_snapshot, client_name, client_whatsapp, client_notes, starts_at, ends_at, status, origin')
     .eq('order_id', orderId)
-    .gte('starts_at', dayStart.toISOString())
-    .lt('starts_at', dayEnd.toISOString())
+    .gte('starts_at', rangeStart.toISOString())
+    .lt('starts_at', rangeEnd.toISOString())
     .order('starts_at', { ascending: true });
 
   return (data as AgendaAppointment[]) || [];
+}
+
+/** Agendamentos de um único dia — atalho sobre `getAppointmentsForRange`. */
+export async function getAppointmentsForDay(orderId: string, dateStr: string): Promise<AgendaAppointment[]> {
+  const dayStart = localDateTimeToUTC(dateStr, '00:00:00');
+  const nextDay = new Date(dayStart.getTime() + 24 * 60 * 60000).toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+  return getAppointmentsForRange(orderId, dateStr, nextDay);
 }
 
 /** Fila de agendamentos aguardando confirmação — sem filtro de data, é uma

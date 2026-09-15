@@ -2,12 +2,13 @@
 
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
+import type { SuccessModalRow } from './SuccessModal';
 
 interface BlockSlotFormProps {
   slug: string;
   defaultDate: string;
   onClose: () => void;
-  onCreated: () => void;
+  onCreated: (summary: { title: string; rows: SuccessModalRow[] }) => void;
 }
 
 export const BlockSlotForm: React.FC<BlockSlotFormProps> = ({ slug, defaultDate, onClose, onCreated }) => {
@@ -42,7 +43,20 @@ export const BlockSlotForm: React.FC<BlockSlotFormProps> = ({ slug, defaultDate,
         setError(json.message || 'Não foi possível criar o bloqueio.');
         return;
       }
-      onCreated();
+      const dateLabel = new Date(`${date}T12:00:00Z`).toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+        timeZone: 'America/Sao_Paulo',
+      });
+      onCreated({
+        title: 'Horário Bloqueado!',
+        rows: [
+          { label: 'Data', value: dateLabel },
+          { label: 'Período', value: allDay ? 'Dia inteiro' : `${startTime} às ${endTime}` },
+          { label: 'Motivo', value: reason.trim() || '—' },
+        ],
+      });
     } catch {
       setError('Falha na conexão.');
     } finally {

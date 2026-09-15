@@ -3,19 +3,26 @@
 import React from 'react';
 import { CheckCircle } from 'lucide-react';
 
+export interface SuccessModalRow {
+  label: string;
+  value: string;
+}
+
 interface SuccessModalProps {
   title: string;
-  clientName: string;
-  services: string;
-  dateStr: string;
-  timeStr: string;
+  /** Linhas rótulo/valor do resumo — genérico o bastante pra servir tanto
+   *  pra um agendamento (Cliente/Procedimento/Data/Horário) quanto pra um
+   *  bloqueio de horário (Data/Período/Motivo), sem forçar campos que não
+   *  fazem sentido em cada caso. */
+  rows: SuccessModalRow[];
   onClose: () => void;
 }
 
-/** Modal de sucesso depois de confirmar/recusar um agendamento — mesma
- *  estrutura exata do LashAgenda (ícone de check, resumo em linhas
- *  rótulo/valor, botão único "Concluir e Fechar"). */
-export const SuccessModal: React.FC<SuccessModalProps> = ({ title, clientName, services, dateStr, timeStr, onClose }) => {
+/** Modal de sucesso — mesma estrutura exata do LashAgenda (ícone de check,
+ *  resumo em linhas rótulo/valor, botão único "Concluir e Fechar"). Usado
+ *  depois de confirmar/recusar um agendamento, criar um agendamento manual
+ *  ou bloquear um horário. */
+export const SuccessModal: React.FC<SuccessModalProps> = ({ title, rows, onClose }) => {
   return (
     <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/45 backdrop-blur-sm" role="dialog" aria-modal="true">
       <div className="bg-surface rounded-2xl border border-linen shadow-2xl w-full max-w-md overflow-hidden">
@@ -29,22 +36,15 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({ title, clientName, s
 
         <div className="px-6 py-4 space-y-4">
           <div className="bg-cream border border-linen rounded-xl p-4 text-xs space-y-2.5">
-            <div className="flex justify-between border-b border-linen pb-1.5">
-              <span className="font-bold text-ink-soft uppercase text-[10px] tracking-wider">Cliente</span>
-              <span className="font-semibold text-ink">{clientName}</span>
-            </div>
-            <div className="flex justify-between border-b border-linen pb-1.5">
-              <span className="font-bold text-ink-soft uppercase text-[10px] tracking-wider">Procedimento(s)</span>
-              <span className="font-semibold text-ink max-w-[200px] truncate text-right">{services}</span>
-            </div>
-            <div className="flex justify-between border-b border-linen pb-1.5">
-              <span className="font-bold text-ink-soft uppercase text-[10px] tracking-wider">Data</span>
-              <span className="font-semibold text-ink">{dateStr}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="font-bold text-ink-soft uppercase text-[10px] tracking-wider">Horário</span>
-              <span className="font-semibold text-ink">{timeStr}</span>
-            </div>
+            {rows.map((row, i) => (
+              <div
+                key={row.label}
+                className={`flex justify-between ${i < rows.length - 1 ? 'border-b border-linen pb-1.5' : ''}`}
+              >
+                <span className="font-bold text-ink-soft uppercase text-[10px] tracking-wider">{row.label}</span>
+                <span className="font-semibold text-ink max-w-[200px] truncate text-right">{row.value}</span>
+              </div>
+            ))}
           </div>
 
           <button

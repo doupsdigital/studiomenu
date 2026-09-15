@@ -5,6 +5,7 @@ import { X } from 'lucide-react';
 import { localDateTimeToUTC } from '@/lib/scheduling/availability';
 import { formatPhoneBR } from '@/lib/format';
 import type { ManualBookingService } from '@/lib/scheduling/agenda-service';
+import type { SuccessModalRow } from './SuccessModal';
 
 interface ManualBookingFormProps {
   slug: string;
@@ -14,7 +15,7 @@ interface ManualBookingFormProps {
    *  clique numa célula livre da grade de horário (Fase 4). */
   defaultTime?: string;
   onClose: () => void;
-  onCreated: () => void;
+  onCreated: (summary: { title: string; rows: SuccessModalRow[] }) => void;
 }
 
 export const ManualBookingForm: React.FC<ManualBookingFormProps> = ({
@@ -59,7 +60,22 @@ export const ManualBookingForm: React.FC<ManualBookingFormProps> = ({
         setError(json.message || 'Não foi possível criar o agendamento.');
         return;
       }
-      onCreated();
+      const serviceTitle = services.find((s) => s.id === serviceId)?.title || '';
+      const dateLabel = localDateTimeToUTC(date, time).toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+        timeZone: 'America/Sao_Paulo',
+      });
+      onCreated({
+        title: 'Agendamento Criado!',
+        rows: [
+          { label: 'Cliente', value: clientName.trim() },
+          { label: 'Procedimento(s)', value: serviceTitle },
+          { label: 'Data', value: dateLabel },
+          { label: 'Horário', value: time },
+        ],
+      });
     } catch {
       setError('Falha na conexão.');
     } finally {
