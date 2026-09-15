@@ -1,4 +1,5 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import { isProfessionalRequestAuthorized } from '@/lib/professional-session';
 import { ServiceWorkerRegister } from '@/components/app-shell/ServiceWorkerRegister';
 import { BottomNav } from '@/components/app-shell/BottomNav';
@@ -6,6 +7,15 @@ import { BottomNav } from '@/components/app-shell/BottomNav';
 interface AppLayoutProps {
   children: React.ReactNode;
   params: Promise<{ slug: string }>;
+}
+
+/** Sobrescreve o manifest herdado da raiz (`start_url: '/'`, a landing page
+ *  de vendas) pelo manifest dinâmico escopado desse catálogo — sem isso,
+ *  instalar o PWA a partir de qualquer tela daqui abria a home de vendas
+ *  depois de instalado, não o app da profissional. */
+export async function generateMetadata({ params }: AppLayoutProps): Promise<Metadata> {
+  const { slug } = await params;
+  return { manifest: `/app/${slug}/manifest.webmanifest` };
 }
 
 export default async function ProfessionalAppLayout({ children, params }: AppLayoutProps) {

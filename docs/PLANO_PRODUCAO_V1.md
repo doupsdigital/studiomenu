@@ -37,6 +37,12 @@ Depois da bateria de testes local (Playwright + guiada pelo usuário) confirmar 
 
 **Ícone do PWA (resolvido no mesmo momento, fora de ordem — Fase 19 antecipada)**: usuário já tinha a arte final pronta. Redimensionada com `sharp` (já estava instalado no projeto) a partir do arquivo original (1254×1254, com transparência) pros 2 tamanhos que o manifest pede: `public/icon-192.png` e `public/icon-512.png`, substituindo os anteriores (que já tinham conteúdo real, mas eram só placeholder). Arquivo original movido pra `public/logo-source.png` (fora de `src/`, guardado como referência pra qualquer redimensionamento futuro — ex: ícone de loja de apps). `tsc` + `build` confirmados limpos depois da troca.
 
+**Bug achado pelo usuário testando no celular (instalação do PWA abria a landing de vendas)**: o `manifest.ts` da raiz (convenção de arquivo do Next — só existe UM por projeto, não dá pra ter um por segmento de rota) tem `start_url: '/'`. Instalar o PWA a partir de qualquer tela de `/app/[slug]/**` usava esse mesmo manifest, então o ícone instalado sempre abria a home de vendas, não o app da profissional.
+
+Corrigido com um manifest dinâmico só pra essa árvore de rotas: `src/app/app/[slug]/manifest.webmanifest/route.ts` (Route Handler, não a convenção de arquivo — essa só funciona na raiz) devolve um manifest com `start_url: /app/[slug]` e `scope: /app/[slug]/`; `src/app/app/[slug]/layout.tsx` ganhou um `generateMetadata` que aponta o campo `manifest` pra essa URL, sobrescrevendo o manifest herdado da raiz só dentro dessa árvore (o resto do site — home, `/c/[slug]` — continua usando o `/manifest.webmanifest` normal, confirmado com teste local). **Usuário precisa desinstalar e reinstalar o PWA** depois desse deploy — o ícone que já foi instalado com o manifest antigo não se autocorrige.
+- [x] `tsc` + `build` limpos
+- [x] Testado local: `curl /app/teste-local-1/manifest.webmanifest` devolve o manifest certo; a tag `<link rel="manifest">` na página autenticada aponta pra ele; home e `/c/[slug]` continuam com `/manifest.webmanifest` normal.
+
 ## Como retomar em outra sessão
 
 Leia este arquivo + a seção "Resumo do plano" acima, e o plano completo salvo em modo plano (2026-09-15) antes de continuar.
