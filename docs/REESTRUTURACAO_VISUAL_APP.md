@@ -194,7 +194,7 @@ Durante o teste do Bloco 11 (cancelamento de assinatura), o usuário reparou que
 - [x] Botão trocado de rosé-sobre-rosé (baixo contraste) pra **branco sólido sobre o gradiente** — o elemento de maior contraste do card, no lugar certo (é a ação que importa)
 - [x] `tsc` + `build` limpos
 - [x] Teste visual (Playwright) nos dois contextos (`variant="card"` no Início, `variant="full"` na Agenda bloqueada) — ambos com bom contraste e hierarquia visual clara
-- [ ] Commit (aguardando aprovação)
+- [x] Commit — `61027b7`
 
 ## Como retomar em outra sessão
 
