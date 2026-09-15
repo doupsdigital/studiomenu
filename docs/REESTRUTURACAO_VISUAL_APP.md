@@ -180,7 +180,7 @@ Achado do Bloco 10: cancelar um agendamento já confirmado (botão "Cancelar age
 - [x] `src/components/agenda/AgendaClient.tsx` — `handleCancelConfirmed` agora chama `setSuccessInfo(buildSuccessSummary(appointment, 'Agendamento Cancelado'))` depois de cancelar com sucesso, reaproveitando o mesmo `buildSuccessSummary`/`SuccessModal` já usado pra aprovar/recusar.
 - [x] `tsc` + `build` limpos
 - [x] Teste visual (Playwright): cancelamento de um agendamento confirmado mostrando o modal "Agendamento Cancelado" com o resumo correto.
-- [ ] Commit (aguardando aprovação)
+- [x] Commit — `4e12fdc`
 
 ## Como retomar em outra sessão
 
