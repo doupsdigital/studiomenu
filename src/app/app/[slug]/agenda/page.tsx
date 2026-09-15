@@ -114,19 +114,23 @@ export default async function AgendaPage({ params, searchParams }: AgendaPagePro
   // `todayStr` como padrão nesse modo, ver AgendaClient).
   const selectedDate = view === 'mes' ? firstOfMonth(rawDate) : rawDate;
   const todayStr = todayInSaoPaulo();
-
-  const [pendingAppointments, services, businessHours, scheduleBlocks] = await Promise.all([
-    getPendingAppointments(order.id),
-    getManualBookingServices(order.id),
-    getBusinessHours(order.id),
-    getScheduleBlocks(order.id),
-  ]);
-
   const monthDays = view === 'mes' ? getMonthGridDays(selectedDate) : [];
-  const [dayAppointments, monthAppointments] = await Promise.all([
-    view === 'dia' ? getAppointmentsForDay(order.id, selectedDate) : Promise.resolve([]),
-    view === 'mes' ? getAppointmentsForRange(order.id, monthDays[0], shiftDate(monthDays[41], 1)) : Promise.resolve([]),
-  ]);
+
+  // Uma única rodada com todas as 6 consultas em paralelo — antes eram 2
+  // rodadas sequenciais (a segunda esperava a primeira terminar) sem
+  // nenhuma dependência real entre elas (nenhuma usa o resultado da
+  // outra, só `order.id`/`selectedDate`/`view`, já conhecidos aqui). Cada
+  // rodada a mais custa uma ida-e-volta inteira ao banco — sensível com
+  // Vercel (Virgínia) e Supabase (São Paulo) em regiões diferentes.
+  const [pendingAppointments, services, businessHours, scheduleBlocks, dayAppointments, monthAppointments] =
+    await Promise.all([
+      getPendingAppointments(order.id),
+      getManualBookingServices(order.id),
+      getBusinessHours(order.id),
+      getScheduleBlocks(order.id),
+      view === 'dia' ? getAppointmentsForDay(order.id, selectedDate) : Promise.resolve([]),
+      view === 'mes' ? getAppointmentsForRange(order.id, monthDays[0], shiftDate(monthDays[41], 1)) : Promise.resolve([]),
+    ]);
 
   const prevHref =
     view === 'mes'
