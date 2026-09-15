@@ -182,6 +182,20 @@ Achado do Bloco 10: cancelar um agendamento já confirmado (botão "Cancelar age
 - [x] Teste visual (Playwright): cancelamento de um agendamento confirmado mostrando o modal "Agendamento Cancelado" com o resumo correto.
 - [x] Commit — `4e12fdc`
 
+### Fase 13 — Upsell do StudioMenu+ com mais destaque visual (2026-09-15)
+
+Durante o teste do Bloco 11 (cancelamento de assinatura), o usuário reparou que o card de upsell do StudioMenu+ (mostrado bloqueado no Início e como tela cheia na Agenda pra quem não é Plus) tinha ficado visualmente fraco — fundo rosé bem clarinho, texto pequeno, um parágrafo só — o elemento com menos destaque da tela, apesar de ser o principal gatilho de conversão do produto.
+
+`src/components/app-shell/PlusUpsellCard.tsx` redesenhado:
+- [x] Fundo sólido em gradiente (`rose-700`→`rose-500`, mesma linguagem do card "Editar meu catálogo") em vez do rosé lavado anterior — contraste bem maior com o resto da tela
+- [x] Ícone trocado de `Sparkles` solto pra um badge com `Crown` (coroa, mais associado a "premium"), com estrelinhas decorativas de fundo (baixa opacidade, mesmo padrão do `GradientHeader`)
+- [x] Texto "Desbloqueie" em uppercase acima do título, título maior
+- [x] Parágrafo único trocado por **lista de 3 benefícios** com ícone de check — mais fácil de escanear, mais "página de vendas"
+- [x] Botão trocado de rosé-sobre-rosé (baixo contraste) pra **branco sólido sobre o gradiente** — o elemento de maior contraste do card, no lugar certo (é a ação que importa)
+- [x] `tsc` + `build` limpos
+- [x] Teste visual (Playwright) nos dois contextos (`variant="card"` no Início, `variant="full"` na Agenda bloqueada) — ambos com bom contraste e hierarquia visual clara
+- [ ] Commit (aguardando aprovação)
+
 ## Como retomar em outra sessão
 
 Leia este arquivo + a seção "Resumo do plano" acima antes de continuar. Siga a mesma disciplina de teste + commit por fase usada no resto do projeto.
