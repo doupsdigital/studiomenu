@@ -205,7 +205,7 @@ Rodada de ajustes pedidos direto pelo usuário (fora da bateria de testes formal
 3. **Visibilidade por plano**: o card verde "StudioMenu+ ativo" que ficava no fim do Início foi removido (usuário achou redundante com o badge PLUS do banner). Os StatCards agora só aparecem quando o agendamento está de fato ativo (`booking_enabled`) — senão ficam sempre zerados. O card de upsell (`PlusUpsellCard`) passou a aparecer sempre que a profissional **não é Plus de verdade** (`!isPlusAtivo`), mesmo que o admin tenha ligado `booking_enabled` manualmente — o objetivo é sempre incentivar a assinatura real, não só a funcionalidade ligada.
 - [x] `tsc` + `build` limpos a cada rodada
 - [x] Teste visual (Playwright) nos 3 cenários de plano: Plus ativo (StatCards + nada embaixo), admin ligou manual sem Plus (StatCards + upsell), catálogo puro (sem StatCards, com upsell)
-- [ ] Commit (aguardando aprovação)
+- [x] Commit — `cd1fe88`
 
 ### Fase 15 — Config: acordeão sempre aberto + card de assinatura ativa redesenhado (2026-09-15)
 
@@ -217,7 +217,7 @@ Rodada de ajustes pedidos direto pelo usuário (fora da bateria de testes formal
    - Formulário de "Assine o StudioMenu+" (estado inativo/suspenso/cancelado) recebeu o mesmo polish: crown badge, aviso de suspenso/cancelado num box âmbar com fundo próprio, inputs e botão sem mudança de comportamento
 - [x] `tsc` + `build` limpos a cada rodada
 - [x] Teste visual (Playwright) nos 2 estados (ativo e cancelado/suspenso), incluindo o fluxo de confirmação de cancelamento
-- [ ] Commit (aguardando aprovação)
+- [x] Commit — `cd1fe88`
 
 ## Como retomar em outra sessão
 
