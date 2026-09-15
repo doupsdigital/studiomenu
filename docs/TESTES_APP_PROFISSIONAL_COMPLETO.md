@@ -99,15 +99,15 @@
 
 ## Bloco 7 — A grade de horário do dia
 
-- [ ] **7.1** Ainda na Agenda, olhando o dia de **hoje**: o agendamento do Cliente Um (confirmado no bloco 6) deve aparecer como um **bloco verde** na grade, na hora certa, com "Confirmado" escrito nele.
-- [ ] **7.2** O horário de almoço (12h–13h, bloqueado no Bloco 3) deve aparecer **cinza/travado** na grade, sem deixar clicar.
-- [ ] **7.3** Clique num horário **livre** qualquer da grade (fora do bloco do Cliente Um e fora do almoço) — deve abrir o formulário de "+ Novo agendamento" já **pré-preenchido** com aquele horário.
-- [ ] **7.4** Cancele esse formulário sem salvar (feche).
-- [ ] **7.5** Clique **no bloco verde do Cliente Um** — deve abrir um painel de detalhe (sheet de baixo pra cima) com os dados do agendamento e um botão "Cancelar agendamento".
-- [ ] **7.6** Feche esse painel sem cancelar.
-- [ ] **7.7** Use as setas ◀ ▶ no topo pra navegar até **amanhã** — o dia do Cliente Dois. **Mudou depois do seu teste do 6.8**: agendamentos recusados/cancelados agora aparecem na grade em **cinza**, com "Recusado"/"Cancelado" escrito, como rastro histórico (igual ao LashAgenda — antes eles simplesmente desapareciam). O horário continua livre pra qualquer outro agendamento normalmente. Confirme que o card do Cliente Dois aparece cinza nesse dia, não mais sumido.
-- [ ] **7.8** Navegue até o dia que você bloqueou como "Folga teste" no Bloco 3 — espera: você já apagou esse bloqueio no passo 3.7, então esse dia deve estar **normal**, não bloqueado. Se ainda aparecer bloqueado, é bug.
-- [ ] **7.9** Clique em "Hoje" na navegação pra voltar pro dia atual.
+- [X] **7.1** Ainda na Agenda, olhando o dia de **hoje**: o agendamento do Cliente Um (confirmado no bloco 6) deve aparecer como um **bloco verde** na grade, na hora certa, com "Confirmado" escrito nele.
+- [X] **7.2** O horário de almoço (12h–13h, bloqueado no Bloco 3) deve aparecer **cinza/travado** na grade, sem deixar clicar.
+- [X] **7.3** Clique num horário **livre** qualquer da grade (fora do bloco do Cliente Um e fora do almoço) — deve abrir o formulário de "+ Novo agendamento" já **pré-preenchido** com aquele horário. ✅ **Corrigido**: você reportou que ele aparecia como um card fixo empurrando o conteúdo da tela, em vez de modal/bottom sheet. Agora `ManualBookingForm` e `BlockSlotForm` (mesmo problema) abrem como bottom sheet de verdade, com fundo escurecido atrás e X pra fechar, igual ao resto dos modais do app.
+- [X] **7.4** Cancele esse formulário sem salvar (feche).
+- [X] **7.5** Clique **no bloco verde do Cliente Um** — deve abrir um painel de detalhe (sheet de baixo pra cima) com os dados do agendamento e um botão "Cancelar agendamento". ✅ **Corrigido**: o botão parecia desabilitado (fundo neutro claro). Troquei pro mesmo estilo do "Recusar" usado no resto do app (contorno vermelho, texto vermelho) — mais claramente uma ação destrutiva e clicável. Nessa investigação achei e corrigi um **bug maior por trás**: um CSS antigo do catálogo público (`catalog-theme.css`) zera a borda de *todo* `<button>` da aplicação de forma global, o que estava apagando silenciosamente a borda de vários outros botões do app da profissional também (ex: "Recusar" na fila de pendentes, "Voltar" nos modais de aprovar/recusar) — ninguém tinha notado ainda porque o efeito é sutil. Corrigido com uma regra CSS escopada só ao app da profissional, sem tocar no catálogo.
+- [X] **7.6** Feche esse painel sem cancelar.
+- [X] **7.7** Use as setas ◀ ▶ no topo pra navegar até **amanhã** — o dia do Cliente Dois. **Mudou depois do seu teste do 6.8**: agendamentos recusados/cancelados agora aparecem na grade em **cinza**, com "Recusado"/"Cancelado" escrito, como rastro histórico (igual ao LashAgenda — antes eles simplesmente desapareciam). O horário continua livre pra qualquer outro agendamento normalmente. Confirme que o card do Cliente Dois aparece cinza nesse dia, não mais sumido.
+- [X] **7.8** Navegue até o dia que você bloqueou como "Folga teste" no Bloco 3 — espera: você já apagou esse bloqueio no passo 3.7, então esse dia deve estar **normal**, não bloqueado. Se ainda aparecer bloqueado, é bug.
+- [X] **7.9** Clique em "Hoje" na navegação pra voltar pro dia atual.
 
 ---
 

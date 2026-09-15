@@ -133,6 +133,25 @@ Implementado:
 - [x] Teste visual (Playwright): card de pendentes com contador "0" permanecendo visível; agendamento recusado do dia seguinte aparecendo cinza na grade, como esperado.
 - [x] Commit — `6c9e9b2`
 
+### Fase 10 — Formulários viram bottom sheet + bug sistêmico de borda de botão (2026-09-15)
+
+Achados do Bloco 7 da bateria de testes:
+
+1. **7.3**: "+ Novo agendamento" e "🔒 Trancar" abriam como um card fixo empurrando o conteúdo da tela pra baixo, em vez de modal/bottom sheet — inconsistente com o resto do app (que já usa bottom sheet pro painel de detalhe e pros modais de aprovar/recusar). `ManualBookingForm.tsx` e `BlockSlotForm.tsx` reescritos nesse padrão (fundo escurecido, painel subindo de baixo, X pra fechar, `max-h-[85vh] overflow-y-auto` pra não estourar a tela com o teclado aberto no celular).
+2. **7.5**: o botão "Cancelar agendamento" do painel de detalhe (`AppointmentDetailSheet.tsx`) tinha estilo neutro (`bg-linen text-ink-soft`), parecendo desabilitado. Trocado pro mesmo padrão do "Recusar" usado no resto do app (contorno + texto vermelho).
+
+**Bug maior encontrado investigando o item 7.5**: o botão trocado continuava sem nenhuma borda visível mesmo com `border border-red-300` no código. Rastreei até `src/styles/catalog-theme.css` (CSS legado do catálogo público, importado globalmente em `globals.css`) — ele tem um reset `button { border: none; ... }` sem nenhum escopo, que zera a borda de **todo** `<button>` da aplicação inteira. A utilitária `border` do Tailwind só define `border-width`, não `border-style` — como o reset do catálogo deixa `border-style: none`, o navegador computa a largura da borda como 0 independente do que o Tailwind define (é assim que a spec de CSS funciona quando o estilo é `none`). Isso vinha apagando silenciosamente a borda de **vários outros botões** do app da profissional que ninguém tinha notado ainda: "Recusar" na fila de pendentes e no painel de detalhe, "Voltar" nos modais de aprovar/recusar.
+
+Corrigido sem tocar no CSS do catálogo (arriscado demais mexer nesse arquivo legado, usado em produção pelos catálogos reais): `src/app/app/[slug]/layout.tsx` ganhou uma classe `.pro-app-shell` no wrapper raiz do app, e `globals.css` ganhou uma regra escopada `.pro-app-shell button.border { border-style: solid; }` que restaura o comportamento correto só dentro do app da profissional.
+
+- [x] `src/components/agenda/ManualBookingForm.tsx` / `BlockSlotForm.tsx` — viram bottom sheet
+- [x] `src/components/agenda/AppointmentDetailSheet.tsx` — botão "Cancelar agendamento" com contorno vermelho
+- [x] `src/app/app/[slug]/layout.tsx` — classe `.pro-app-shell`
+- [x] `src/app/globals.css` — regra de correção do bug de borda
+- [x] `tsc` + `build` limpos
+- [x] Teste visual (Playwright): os 2 formulários abrindo como bottom sheet; borda do botão "Cancelar agendamento" confirmada via `getComputedStyle` (border-width foi de `0px`/`none` pra `1px`/`solid`) e visualmente; conferido também que o bug afetava e foi corrigido pro "Recusar" da fila e "Voltar" do modal de recusar, sem precisar de nenhuma mudança nesses componentes especificamente (a correção no CSS resolveu todos de uma vez)
+- [ ] Commit (aguardando aprovação)
+
 ## Como retomar em outra sessão
 
 Leia este arquivo + a seção "Resumo do plano" acima antes de continuar. Siga a mesma disciplina de teste + commit por fase usada no resto do projeto.

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { X } from 'lucide-react';
 
 interface BlockSlotFormProps {
   slug: string;
@@ -50,60 +51,75 @@ export const BlockSlotForm: React.FC<BlockSlotFormProps> = ({ slug, defaultDate,
   };
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-2xl bg-cream border border-linen p-4 flex flex-col gap-3">
-      <p className="text-sm font-bold text-ink">Bloquear horário</p>
-
-      <input
-        type="date"
-        value={date}
-        onChange={(e) => setDate(e.target.value)}
-        className="h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink"
-      />
-
-      <label className="flex items-center gap-2 text-xs text-ink-soft">
-        <input type="checkbox" checked={allDay} onChange={(e) => setAllDay(e.target.checked)} className="w-4 h-4 accent-rose-600" />
-        Bloquear o dia inteiro
-      </label>
-
-      {!allDay && (
-        <div className="flex gap-2">
-          <input
-            type="time"
-            value={startTime}
-            onChange={(e) => setStartTime(e.target.value)}
-            className="flex-1 h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink"
-          />
-          <input
-            type="time"
-            value={endTime}
-            onChange={(e) => setEndTime(e.target.value)}
-            className="flex-1 h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink"
-          />
-        </div>
-      )}
-
-      <input
-        type="text"
-        placeholder="Motivo (opcional)"
-        value={reason}
-        onChange={(e) => setReason(e.target.value)}
-        className="h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink placeholder:text-ink-faint"
-      />
-
-      {error && <p className="text-xs text-rose-600">{error}</p>}
-
-      <div className="flex gap-2">
-        <button type="button" onClick={onClose} className="flex-1 h-10 rounded-xl bg-linen text-ink-soft text-xs font-bold">
-          Cancelar
-        </button>
+    <div className="fixed inset-0 z-50 flex items-end justify-center" role="dialog" aria-modal="true">
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <form
+        onSubmit={handleSubmit}
+        className="relative w-full max-w-md max-h-[85vh] overflow-y-auto bg-surface rounded-t-3xl p-6 pb-8 shadow-2xl flex flex-col gap-3"
+      >
         <button
-          type="submit"
-          disabled={submitting || (!allDay && (!startTime || !endTime))}
-          className="flex-1 h-10 rounded-xl bg-rose-600 text-white text-xs font-bold disabled:opacity-50"
+          type="button"
+          onClick={onClose}
+          aria-label="Fechar"
+          className="absolute top-4 right-4 w-8 h-8 rounded-full bg-linen text-ink-soft flex items-center justify-center"
         >
-          {submitting ? 'Bloqueando...' : 'Bloquear'}
+          <X className="w-4 h-4" />
         </button>
-      </div>
-    </form>
+
+        <p className="font-serif-pro font-bold text-lg text-ink pr-8">Bloquear horário</p>
+
+        <input
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          className="h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink"
+        />
+
+        <label className="flex items-center gap-2 text-xs text-ink-soft">
+          <input type="checkbox" checked={allDay} onChange={(e) => setAllDay(e.target.checked)} className="w-4 h-4 accent-rose-600" />
+          Bloquear o dia inteiro
+        </label>
+
+        {!allDay && (
+          <div className="flex gap-2">
+            <input
+              type="time"
+              value={startTime}
+              onChange={(e) => setStartTime(e.target.value)}
+              className="flex-1 h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink"
+            />
+            <input
+              type="time"
+              value={endTime}
+              onChange={(e) => setEndTime(e.target.value)}
+              className="flex-1 h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink"
+            />
+          </div>
+        )}
+
+        <input
+          type="text"
+          placeholder="Motivo (opcional)"
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+          className="h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink placeholder:text-ink-faint"
+        />
+
+        {error && <p className="text-xs text-rose-600">{error}</p>}
+
+        <div className="flex gap-2 mt-1">
+          <button type="button" onClick={onClose} className="flex-1 h-11 rounded-xl bg-linen text-ink-soft text-sm font-bold">
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            disabled={submitting || (!allDay && (!startTime || !endTime))}
+            className="flex-1 h-11 rounded-xl bg-rose-600 text-white text-sm font-bold disabled:opacity-50"
+          >
+            {submitting ? 'Bloqueando...' : 'Bloquear'}
+          </button>
+        </div>
+      </form>
+    </div>
   );
 };

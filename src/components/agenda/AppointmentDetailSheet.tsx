@@ -110,7 +110,7 @@ export const AppointmentDetailSheet: React.FC<AppointmentDetailSheetProps> = ({
             type="button"
             disabled={busy}
             onClick={() => onCancelConfirmed(appointment)}
-            className="w-full h-11 rounded-xl bg-linen text-ink-soft text-sm font-bold disabled:opacity-50"
+            className="w-full h-11 rounded-xl border border-red-300 text-red-600 hover:bg-red-50 text-sm font-bold disabled:opacity-50 transition-colors"
           >
             Cancelar agendamento
           </button>

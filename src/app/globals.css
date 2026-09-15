@@ -38,6 +38,19 @@ body {
   font-family: 'Jost', system-ui, -apple-system, sans-serif;
 }
 
+/* `catalog-theme.css` (importado no topo deste arquivo) zera a borda de
+   todo <button> globalmente, pra estilizar os temas do catálogo público —
+   `button { border: none; }`. Isso também apaga visualmente qualquer botão
+   do app da profissional que usa a utilitária `border` do Tailwind: ela só
+   define `border-width`, não `border-style`, então herdava o `none` do
+   reset acima mesmo com `border-width: 1px` aplicado (a borda "existe" mas
+   renderiza com largura computada 0, por definição do CSS quando o estilo
+   é `none`). Restaurado aqui, escopado só à árvore do app (`.pro-app-shell`,
+   ver `src/app/app/[slug]/layout.tsx`) pra não alterar nada do catálogo. */
+.pro-app-shell button.border {
+  border-style: solid;
+}
+
 .glass-panel-rose {
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(12px);

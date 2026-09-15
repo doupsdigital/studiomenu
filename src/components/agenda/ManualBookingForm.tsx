@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { X } from 'lucide-react';
 import { localDateTimeToUTC } from '@/lib/scheduling/availability';
 import { formatPhoneBR } from '@/lib/format';
 import type { ManualBookingService } from '@/lib/scheduling/agenda-service';
@@ -67,83 +68,98 @@ export const ManualBookingForm: React.FC<ManualBookingFormProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-2xl bg-cream border border-linen p-4 flex flex-col gap-3">
-      <p className="text-sm font-bold text-ink">Novo agendamento manual</p>
-
-      {services.length === 0 ? (
-        <p className="text-xs text-amber-700">
-          Nenhum serviço com duração configurada ainda. Adicione a duração no editor do catálogo primeiro.
-        </p>
-      ) : (
-        <>
-          <select
-            value={serviceId}
-            onChange={(e) => setServiceId(e.target.value)}
-            className="h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink"
-          >
-            {services.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.title}
-              </option>
-            ))}
-          </select>
-
-          <div className="flex gap-2">
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="flex-1 h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink"
-            />
-            <input
-              type="time"
-              value={time}
-              onChange={(e) => setTime(e.target.value)}
-              className="w-28 h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink"
-            />
-          </div>
-
-          <input
-            type="text"
-            placeholder="Nome da cliente"
-            value={clientName}
-            onChange={(e) => setClientName(e.target.value)}
-            className="h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink placeholder:text-ink-faint"
-          />
-          <input
-            type="tel"
-            placeholder="(11) 99999-9999"
-            value={clientWhatsapp}
-            onChange={(e) => setClientWhatsapp(formatPhoneBR(e.target.value))}
-            className="h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink placeholder:text-ink-faint"
-          />
-          <textarea
-            placeholder="Observação (opcional)"
-            value={clientNotes}
-            onChange={(e) => setClientNotes(e.target.value)}
-            className="rounded-xl bg-surface border border-linen px-3 py-2 text-sm text-ink placeholder:text-ink-faint min-h-[60px]"
-          />
-        </>
-      )}
-
-      {error && <p className="text-xs text-rose-600">{error}</p>}
-
-      <div className="flex gap-2">
+    <div className="fixed inset-0 z-50 flex items-end justify-center" role="dialog" aria-modal="true">
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <form
+        onSubmit={handleSubmit}
+        className="relative w-full max-w-md max-h-[85vh] overflow-y-auto bg-surface rounded-t-3xl p-6 pb-8 shadow-2xl flex flex-col gap-3"
+      >
         <button
           type="button"
           onClick={onClose}
-          className="flex-1 h-10 rounded-xl bg-linen text-ink-soft text-xs font-bold"
+          aria-label="Fechar"
+          className="absolute top-4 right-4 w-8 h-8 rounded-full bg-linen text-ink-soft flex items-center justify-center"
         >
-          Cancelar
+          <X className="w-4 h-4" />
         </button>
-        <button
-          type="submit"
-          disabled={submitting || services.length === 0}
-          className="flex-1 h-10 rounded-xl bg-rose-600 text-white text-xs font-bold disabled:opacity-50"
-        >
-          {submitting ? 'Criando...' : 'Criar agendamento'}
-        </button>
-      </div>
-    </form>
+
+        <p className="font-serif-pro font-bold text-lg text-ink pr-8">Novo agendamento manual</p>
+
+        {services.length === 0 ? (
+          <p className="text-xs text-amber-700">
+            Nenhum serviço com duração configurada ainda. Adicione a duração no editor do catálogo primeiro.
+          </p>
+        ) : (
+          <>
+            <select
+              value={serviceId}
+              onChange={(e) => setServiceId(e.target.value)}
+              className="h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink"
+            >
+              {services.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.title}
+                </option>
+              ))}
+            </select>
+
+            <div className="flex gap-2">
+              <input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="flex-1 h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink"
+              />
+              <input
+                type="time"
+                value={time}
+                onChange={(e) => setTime(e.target.value)}
+                className="w-28 h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink"
+              />
+            </div>
+
+            <input
+              type="text"
+              placeholder="Nome da cliente"
+              value={clientName}
+              onChange={(e) => setClientName(e.target.value)}
+              className="h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink placeholder:text-ink-faint"
+            />
+            <input
+              type="tel"
+              placeholder="(11) 99999-9999"
+              value={clientWhatsapp}
+              onChange={(e) => setClientWhatsapp(formatPhoneBR(e.target.value))}
+              className="h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink placeholder:text-ink-faint"
+            />
+            <textarea
+              placeholder="Observação (opcional)"
+              value={clientNotes}
+              onChange={(e) => setClientNotes(e.target.value)}
+              className="rounded-xl bg-surface border border-linen px-3 py-2 text-sm text-ink placeholder:text-ink-faint min-h-[60px]"
+            />
+          </>
+        )}
+
+        {error && <p className="text-xs text-rose-600">{error}</p>}
+
+        <div className="flex gap-2 mt-1">
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex-1 h-11 rounded-xl bg-linen text-ink-soft text-sm font-bold"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            disabled={submitting || services.length === 0}
+            className="flex-1 h-11 rounded-xl bg-rose-600 text-white text-sm font-bold disabled:opacity-50"
+          >
+            {submitting ? 'Criando...' : 'Criar agendamento'}
+          </button>
+        </div>
+      </form>
+    </div>
   );
 };
