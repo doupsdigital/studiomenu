@@ -140,26 +140,26 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
   return (
     <div>
       {isActive ? (
-        <div className="rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100/60 border border-emerald-200 p-5">
+        <div className="rounded-2xl bg-gradient-to-br from-rose-50 to-rose-100/60 border border-rose-200 p-5">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-sm shadow-emerald-500/30">
+            <div className="w-12 h-12 rounded-2xl bg-rose-600 text-white flex items-center justify-center shrink-0 shadow-sm shadow-rose-600/30">
               <CheckCircle2 className="w-6 h-6" />
             </div>
             <div className="min-w-0">
-              <p className="font-serif-pro font-bold text-lg text-emerald-800 leading-tight">StudioMenu+ ativo</p>
-              <p className="text-xs text-emerald-700/70 mt-0.5">Cobrança recorrente via Pix</p>
+              <p className="font-serif-pro font-bold text-lg text-rose-800 leading-tight">StudioMenu+ ativo</p>
+              <p className="text-xs text-rose-800/70 mt-0.5">Cobrança recorrente via Pix</p>
             </div>
           </div>
 
-          <div className="bg-surface rounded-xl px-4 py-3 mb-4 border border-emerald-200/60">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-700/70 mb-0.5">Mensalidade</p>
-            <p className="font-serif-pro font-bold text-lg text-emerald-800 whitespace-nowrap">{PLUS_PRICE_LABEL}</p>
+          <div className="bg-surface rounded-xl px-4 py-3 mb-4 border border-rose-200/60">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-rose-700/70 mb-0.5">Mensalidade</p>
+            <p className="font-serif-pro font-bold text-lg text-rose-800 whitespace-nowrap">{PLUS_PRICE_LABEL}</p>
           </div>
 
           {error && <p className="text-xs text-rose-600 mb-3">{error}</p>}
 
           {confirmingCancel ? (
-            <div className="rounded-xl bg-surface border border-emerald-200/60 p-4">
+            <div className="rounded-xl bg-surface border border-rose-200/60 p-4">
               <p className="text-xs text-ink-soft mb-3">
                 Cancelar sua assinatura do StudioMenu+? Você perde acesso à agenda automática.
               </p>

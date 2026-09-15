@@ -69,36 +69,36 @@ export const BusinessHoursEditor: React.FC<BusinessHoursEditorProps> = ({ slug, 
   };
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-2.5">
       {days.map((day, weekday) => (
-        <div key={weekday} className="flex items-center gap-3">
-          <label className="flex items-center gap-2 w-28 shrink-0 text-xs text-ink-soft">
+        <div key={weekday} className="rounded-xl border border-linen bg-cream/50 p-3">
+          <label className="flex items-center gap-2.5 text-sm font-semibold text-ink">
             <input
               type="checkbox"
               checked={day.open}
               onChange={(e) => updateDay(weekday, { open: e.target.checked })}
-              className="w-4 h-4 accent-rose-600"
+              className="w-5 h-5 shrink-0 accent-rose-600"
             />
             {WEEKDAY_LABELS[weekday]}
           </label>
           {day.open ? (
-            <div className="flex items-center gap-2 flex-1">
+            <div className="flex items-center gap-2 mt-2.5 pl-[30px]">
               <input
                 type="time"
                 value={day.start_time}
                 onChange={(e) => updateDay(weekday, { start_time: e.target.value })}
-                className="flex-1 h-9 rounded-lg bg-cream border border-linen px-2 text-xs text-ink"
+                className="h-11 min-w-0 flex-1 rounded-lg bg-surface border border-linen px-2 text-sm text-ink"
               />
-              <span className="text-ink-faint text-xs">até</span>
+              <span className="shrink-0 text-xs text-ink-faint">até</span>
               <input
                 type="time"
                 value={day.end_time}
                 onChange={(e) => updateDay(weekday, { end_time: e.target.value })}
-                className="flex-1 h-9 rounded-lg bg-cream border border-linen px-2 text-xs text-ink"
+                className="h-11 min-w-0 flex-1 rounded-lg bg-surface border border-linen px-2 text-sm text-ink"
               />
             </div>
           ) : (
-            <span className="flex-1 text-xs text-ink-faint">Fechado</span>
+            <p className="mt-1.5 pl-[30px] text-sm text-ink-faint">Fechado</p>
           )}
         </div>
       ))}
@@ -109,7 +109,7 @@ export const BusinessHoursEditor: React.FC<BusinessHoursEditorProps> = ({ slug, 
         type="button"
         onClick={handleSave}
         disabled={saving}
-        className="mt-1 h-10 rounded-xl bg-rose-600 text-white text-xs font-bold disabled:opacity-50"
+        className="mt-1 h-11 rounded-xl bg-rose-600 text-white text-sm font-bold disabled:opacity-50"
       >
         {saving ? 'Salvando...' : saved ? 'Salvo ✓' : 'Salvar horários'}
       </button>
