@@ -32,6 +32,7 @@ export default async function ConfigPage({ params }: ConfigPageProps) {
           subscriptionStatus={order.subscription_status}
           billingEmail={order.billing_email}
           billingCpfCnpj={order.billing_cpf_cnpj}
+          bookingEnabled={order.booking_enabled}
         />
       </main>
     </>

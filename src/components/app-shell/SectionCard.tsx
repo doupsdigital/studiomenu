@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { LucideIcon, ChevronDown } from 'lucide-react';
+import { LucideIcon, ChevronDown, Lock } from 'lucide-react';
 
 interface SectionCardProps {
   icon: LucideIcon;
@@ -9,6 +9,13 @@ interface SectionCardProps {
   isOpen: boolean;
   onToggle: () => void;
   children: React.ReactNode;
+  /** Quando true, a seção fica travada — não expande, o chevron vira um
+   *  cadeado, e aparece uma legenda curta explicando o porquê. Usado pras
+   *  seções que só fazem sentido com o agendamento automático ligado
+   *  (Horários/Bloqueios), pra quem ainda não é Plus. */
+  locked?: boolean;
+  /** Legenda mostrada abaixo do cabeçalho só quando `locked`. */
+  lockedHint?: string;
 }
 
 /** Cartão de acordeão — cabeçalho em gradiente rose (ícone + título +
@@ -16,24 +23,33 @@ interface SectionCardProps {
  *  Configurações do LashAgenda (`SectionCard` de lá), usado aqui pras 3
  *  seções da aba Config. Sem lógica própria além de abrir/fechar — o
  *  conteúdo de cada seção continua sendo o componente que já existia. */
-export const SectionCard: React.FC<SectionCardProps> = ({ icon: Icon, title, isOpen, onToggle, children }) => {
+export const SectionCard: React.FC<SectionCardProps> = ({ icon: Icon, title, isOpen, onToggle, children, locked, lockedHint }) => {
   return (
     <div className="bg-surface border border-linen rounded-2xl shadow-sm overflow-hidden">
       <button
         type="button"
-        onClick={onToggle}
-        className="w-full px-5 py-5 cursor-pointer select-none text-left bg-gradient-to-br from-rose-700 to-rose-500"
+        onClick={locked ? undefined : onToggle}
+        aria-disabled={locked}
+        className={`w-full px-5 py-5 select-none text-left bg-gradient-to-br from-rose-700 to-rose-500 ${
+          locked ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'
+        }`}
       >
         <div className="flex items-center justify-between gap-3">
           <h3 className="font-serif-pro font-bold text-lg text-white flex items-center gap-2 min-w-0">
             <Icon className="w-5 h-5 text-white shrink-0" />
             <span className="truncate">{title}</span>
           </h3>
-          <ChevronDown className={`w-5 h-5 text-white/80 transition-transform duration-200 shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
+          {locked ? (
+            <Lock className="w-5 h-5 text-white/80 shrink-0" />
+          ) : (
+            <ChevronDown className={`w-5 h-5 text-white/80 transition-transform duration-200 shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
+          )}
         </div>
       </button>
 
-      {isOpen && <div className="p-5">{children}</div>}
+      {locked && lockedHint && <p className="px-5 py-3 text-xs text-ink-faint">{lockedHint}</p>}
+
+      {!locked && isOpen && <div className="p-5">{children}</div>}
     </div>
   );
 };

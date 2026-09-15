@@ -16,6 +16,10 @@ interface ConfigAccordionProps {
   subscriptionStatus: 'none' | 'ativo' | 'suspenso' | 'cancelado';
   billingEmail?: string;
   billingCpfCnpj?: string;
+  /** Agendamento automático de fato ligado (Plus ativo ou toggle manual do
+   *  admin) — sem isso, Horários e Bloqueios não têm nenhum efeito prático
+   *  (a Agenda nem chega a mostrar conteúdo real), então ficam travados. */
+  bookingEnabled: boolean;
 }
 
 type SectionKey = 'horarios' | 'bloqueios' | 'assinatura';
@@ -35,6 +39,7 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
   subscriptionStatus,
   billingEmail,
   billingCpfCnpj,
+  bookingEnabled,
 }) => {
   const [open, setOpen] = useState<Record<SectionKey, boolean>>({
     horarios: true,
@@ -52,11 +57,25 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
 
   return (
     <div className="flex flex-col gap-4">
-      <SectionCard icon={Clock} title="Horários de atendimento" isOpen={open.horarios} onToggle={() => toggle('horarios')}>
+      <SectionCard
+        icon={Clock}
+        title="Horários de atendimento"
+        isOpen={open.horarios}
+        onToggle={() => toggle('horarios')}
+        locked={!bookingEnabled}
+        lockedHint="Disponível quando o agendamento automático (StudioMenu+) estiver ativo."
+      >
         <BusinessHoursEditor slug={slug} initialHours={businessHours} />
       </SectionCard>
 
-      <SectionCard icon={CalendarX} title="Bloqueios e folgas" isOpen={open.bloqueios} onToggle={() => toggle('bloqueios')}>
+      <SectionCard
+        icon={CalendarX}
+        title="Bloqueios e folgas"
+        isOpen={open.bloqueios}
+        onToggle={() => toggle('bloqueios')}
+        locked={!bookingEnabled}
+        lockedHint="Disponível quando o agendamento automático (StudioMenu+) estiver ativo."
+      >
         <ScheduleBlocksManager slug={slug} blocks={scheduleBlocks} />
       </SectionCard>
 
