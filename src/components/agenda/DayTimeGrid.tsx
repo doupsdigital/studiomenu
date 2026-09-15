@@ -10,7 +10,8 @@ const SLOT_HEIGHT = 44; // px por meia-hora
 
 interface DayTimeGridProps {
   dateStr: string;
-  /** Agendamentos do dia, já sem cancelados (mesmo filtro de `getAppointmentsForDay`). */
+  /** Agendamentos do dia, incluindo cancelados/recusados (mostrados cinza,
+   *  como rastro histórico — mesmo comportamento do LashAgenda). */
   appointments: AgendaAppointment[];
   businessHours: BusinessHoursConfigRow[];
   scheduleBlocks: ScheduleBlockConfigRow[];

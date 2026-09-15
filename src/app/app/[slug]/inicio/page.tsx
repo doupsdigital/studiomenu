@@ -59,10 +59,14 @@ export default async function InicioPage({ params }: InicioPageProps) {
   // ligado via toggle manual do admin sem ela ser Plus — Fase 6).
   const schedulingLive = order.booking_enabled;
 
-  const [todayAppointments, pendingAppointments] = await Promise.all([
+  const [todayAppointmentsRaw, pendingAppointments] = await Promise.all([
     getAppointmentsForDay(order.id, todayInSaoPaulo()),
     getPendingAppointments(order.id),
   ]);
+  // `getAppointmentsForDay` agora inclui cancelados/recusados (pra Agenda
+  // mostrar o rastro histórico do dia) — a contagem do card não deve contar
+  // esses, só o que ainda está ativo (Fase 9).
+  const todayAppointments = todayAppointmentsRaw.filter((a) => a.status !== 'cancelled');
 
   const { greeting, dateLabel } = getGreetingAndDate();
   const firstName = order.client_name.split(' ')[0];

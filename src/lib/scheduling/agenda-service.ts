@@ -22,8 +22,13 @@ export interface ManualBookingService {
   duration_minutes: number;
 }
 
-/** Agendamentos (não cancelados) dentro dos limites do dia `dateStr`
- *  (fuso America/Sao_Paulo), ordenados por horário. */
+/** Todos os agendamentos dentro dos limites do dia `dateStr` (fuso
+ *  America/Sao_Paulo), ordenados por horário — inclui os cancelados/
+ *  recusados de propósito (mesmo comportamento do LashAgenda: eles
+ *  continuam aparecendo no dia, cinza, como rastro histórico; o horário já
+ *  fica livre pra outro agendamento de qualquer forma, já que nem a trava
+ *  de conflito no banco nem a checagem de disponibilidade da grade
+ *  consideram agendamentos cancelados). */
 export async function getAppointmentsForDay(orderId: string, dateStr: string): Promise<AgendaAppointment[]> {
   const dayStart = localDateTimeToUTC(dateStr, '00:00:00');
   const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60000);
@@ -32,7 +37,6 @@ export async function getAppointmentsForDay(orderId: string, dateStr: string): P
     .from('appointments')
     .select('id, service_title, duration_minutes, price_snapshot, client_name, client_whatsapp, client_notes, starts_at, ends_at, status, origin')
     .eq('order_id', orderId)
-    .neq('status', 'cancelled')
     .gte('starts_at', dayStart.toISOString())
     .lt('starts_at', dayEnd.toISOString())
     .order('starts_at', { ascending: true });

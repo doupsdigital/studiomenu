@@ -117,6 +117,22 @@ O usuário apontou que a tabbar com 4 itens (Início/Catálogo/Agenda/Config) ti
 - [x] Teste visual (Playwright): tabbar de 3 itens bem proporcionada e balanceada no Início/Config; clique no card novo abre o editor do catálogo com o botão de voltar funcionando; cabeçalho da Agenda sem as estrelinhas, Início mantém elas; nenhuma regressão na barra flutuante própria do editor (continua escondendo a tabbar, como antes).
 - [x] Commit — `54caf01`
 
+### Fase 9 — Achados da bateria de testes completa (`docs/TESTES_APP_PROFISSIONAL_COMPLETO.md`) ✅ CONCLUÍDA (2026-09-15)
+
+No item 6.8 dessa bateria, o usuário reportou 2 comportamentos estranhos depois de recusar um agendamento pendente e perguntou qual era o certo. Fui checar direto no código-fonte do LashAgenda antes de decidir:
+
+1. **Card amarelo "Aguardando confirmação" sumindo inteiro quando zera pendentes** — conferido: é o comportamento exato da referência (`pendingAppts.length > 0 &&` no `Agendamentos.tsx` original). Não era bug/regressão nossa. Perguntei ao usuário se queria manter fiel à referência ou divergir — escolheu **divergir**: o card agora fica sempre visível, com o contador em "0" e uma mensagem de estado vazio ao expandir, em vez de sumir da tela sem explicação.
+2. **Agendamento recusado sumindo completamente da grade do dia** — aqui era uma divergência real da referência: o LashAgenda mantém agendamentos cancelados/recusados visíveis no dia, cinza, com a etiqueta "Cancelado" (view-only, sem poder editar) — `visibleAppointments = agendamentos` sem filtro nenhum lá. Aqui, `getAppointmentsForDay` tinha um `.neq('status', 'cancelled')` que os tirava da consulta inteiramente. O usuário escolheu ficar fiel à referência aqui também.
+
+Implementado:
+- [x] `src/lib/scheduling/agenda-service.ts` — `getAppointmentsForDay` não filtra mais `cancelled`; retorna todos os status do dia (a checagem de horário livre pra novos agendamentos, tanto no wizard do cliente quanto na grade, nunca considerou cancelados de qualquer forma — mostrar o card não muda a disponibilidade).
+- [x] `src/app/app/[slug]/inicio/page.tsx` — o card de estatística "Agendamentos hoje" agora filtra `status !== 'cancelled'` explicitamente na contagem, já que a função que ele usa passou a incluir cancelados (senão infla o número).
+- [x] `src/components/agenda/DayTimeGrid.tsx` — já tinha o estilo cinza pra status `cancelled` desde a Fase 4 (nunca chegava a ser usado, porque o filtro escondia esses agendamentos antes) — só o comentário foi atualizado, nenhuma mudança visual necessária.
+- [x] `src/components/agenda/AgendaClient.tsx` — painel de pendentes sempre renderizado (tirei o `pendingAppointments.length > 0 &&` que envolvia o card inteiro); estado vazio ao expandir com 0 pendentes ganhou uma mensagem própria.
+- [x] `tsc` + `build` limpos
+- [x] Teste visual (Playwright): card de pendentes com contador "0" permanecendo visível; agendamento recusado do dia seguinte aparecendo cinza na grade, como esperado.
+- [ ] Commit (aguardando aprovação)
+
 ## Como retomar em outra sessão
 
 Leia este arquivo + a seção "Resumo do plano" acima antes de continuar. Siga a mesma disciplina de teste + commit por fase usada no resto do projeto.

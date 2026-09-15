@@ -190,32 +190,37 @@ export const AgendaClient: React.FC<AgendaClientProps> = ({
         </button>
       </div>
 
-      {pendingAppointments.length > 0 && (
-        <div className="bg-surface border border-amber-200 rounded-2xl shadow-sm overflow-hidden">
-          <button
-            type="button"
-            onClick={() => setPendingOpen((v) => !v)}
-            className="w-full flex items-center justify-between px-5 py-4 hover:bg-amber-50/50 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <Clock className="w-4 h-4 text-amber-500" />
-              <span className="font-serif-pro font-semibold text-base text-ink">Aguardando confirmação</span>
-              <span className="bg-amber-100 text-amber-700 border border-amber-200 text-xs font-bold px-2 py-0.5 rounded-full">
-                {pendingAppointments.length}
-              </span>
-            </div>
-            <ChevronDown className={`w-4 h-4 text-ink-soft transition-transform ${pendingOpen ? 'rotate-180' : ''}`} />
-          </button>
+      {/* Diferente do LashAgenda (que esconde o painel inteiro quando zera),
+       *  aqui ele fica sempre visível com o contador em 0 — decisão do
+       *  usuário, pra não sumir da tela sem explicação (Fase 9). */}
+      <div className="bg-surface border border-amber-200 rounded-2xl shadow-sm overflow-hidden">
+        <button
+          type="button"
+          onClick={() => setPendingOpen((v) => !v)}
+          className="w-full flex items-center justify-between px-5 py-4 hover:bg-amber-50/50 transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <Clock className="w-4 h-4 text-amber-500" />
+            <span className="font-serif-pro font-semibold text-base text-ink">Aguardando confirmação</span>
+            <span className="bg-amber-100 text-amber-700 border border-amber-200 text-xs font-bold px-2 py-0.5 rounded-full">
+              {pendingAppointments.length}
+            </span>
+          </div>
+          <ChevronDown className={`w-4 h-4 text-ink-soft transition-transform ${pendingOpen ? 'rotate-180' : ''}`} />
+        </button>
 
-          {pendingOpen && (
-            <div className="border-t border-amber-100 divide-y divide-linen">
-              {pendingAppointments.map((a) => (
+        {pendingOpen && (
+          <div className="border-t border-amber-100 divide-y divide-linen">
+            {pendingAppointments.length > 0 ? (
+              pendingAppointments.map((a) => (
                 <AppointmentRow key={a.id} appointment={a} onApprove={setApproveAppointment} onReject={setRejectAppointment} />
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+              ))
+            ) : (
+              <p className="px-5 py-4 text-xs text-ink-faint">Nenhum agendamento aguardando confirmação no momento.</p>
+            )}
+          </div>
+        )}
+      </div>
 
       {actionError && <p className="text-xs text-rose-600">{actionError}</p>}
 
