@@ -164,6 +164,7 @@ export const AgendaClient: React.FC<AgendaClientProps> = ({
         return;
       }
       setDetailAppointment(null);
+      setSuccessInfo(buildSuccessSummary(appointment, 'Agendamento Cancelado'));
       router.refresh();
     } catch {
       setActionError('Falha na conexão.');

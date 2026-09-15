@@ -173,6 +173,15 @@ Implementado:
 - [x] Teste visual completo (Playwright): visão mensal renderizando certo (cadeados nos domingos fechados, hoje destacado, chips corretos incluindo o "+1 mais" quando passa de 2, recusado corretamente ausente); clique num dia navegando pra visão Dia com os agendamentos certos; dropdown Dia/Mês trocando de visão e voltando; navegação de mês anterior mostrando um mês vazio corretamente; testado também em viewport landscape (844×390) — o conteúdo continua centrado em `max-w-md` (mesmo padrão do resto do app, não tenta virar layout de tablet) e a grade do mês reflui sem quebrar; cadeado da célula bloqueada revisado depois de feedback (agora um único badge âmbar centralizado no trecho contínuo bloqueado, não mais um por célula de 30min); título do banner da visão Dia trocado por dia da semana.
 - [x] Commit — `83b2587`
 
+### Fase 12 — Modal de sucesso ao cancelar agendamento confirmado (2026-09-15)
+
+Achado do Bloco 10: cancelar um agendamento já confirmado (botão "Cancelar agendamento" no painel de detalhe) não dava nenhuma confirmação visual — só fechava o painel e atualizava a grade em silêncio, inconsistente com as outras ações (aprovar, recusar, criar manual, bloquear horário) que já mostravam o modal de sucesso.
+
+- [x] `src/components/agenda/AgendaClient.tsx` — `handleCancelConfirmed` agora chama `setSuccessInfo(buildSuccessSummary(appointment, 'Agendamento Cancelado'))` depois de cancelar com sucesso, reaproveitando o mesmo `buildSuccessSummary`/`SuccessModal` já usado pra aprovar/recusar.
+- [x] `tsc` + `build` limpos
+- [x] Teste visual (Playwright): cancelamento de um agendamento confirmado mostrando o modal "Agendamento Cancelado" com o resumo correto.
+- [ ] Commit (aguardando aprovação)
+
 ## Como retomar em outra sessão
 
 Leia este arquivo + a seção "Resumo do plano" acima antes de continuar. Siga a mesma disciplina de teste + commit por fase usada no resto do projeto.

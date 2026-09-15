@@ -117,28 +117,28 @@
 - [X] **8.2** Clique em "+ Novo" — abre o formulário de agendamento manual. Crie um agendamento pra depois de amanhã, qualquer serviço/horário livre, nome "Manual Teste". Deve criar **direto como confirmado** (sem passar pela fila de pendentes, diferente do agendamento feito pela cliente). ✅ **Melhorado**: você notou que não aparecia nenhuma confirmação visual depois de criar — agora mostra o mesmo modal de sucesso ("Agendamento Criado!") usado no resto do app, com o resumo (cliente/serviço/data/horário).
 - [X] **8.3** Clique em "🔒 Trancar" — abre o formulário de bloqueio de horário. Bloqueie amanhã à tarde (ex: 14h–16h), motivo "Compromisso". Confirme que aparece bloqueado na grade daquele dia. ✅ **Melhorado**: (a) ganhou o mesmo modal de sucesso ("Horário Bloqueado!", com Data/Período/Motivo); (b) a célula bloqueada na grade agora mostra um ícone de cadeado (só na marca da hora cheia, igual ao LashAgenda) em vez de só ficar cinza sem explicação.
 - [X] **8.4** ✅ **Implementado** (deixou de ser só visual): o botão agora é um seletor de verdade com 2 opções — **Dia** (grade de horário, como já era) e **Mês** (calendário do mês inteiro, com cadeado nos dias fechados e chips coloridos por status pra cada agendamento — até 2 por dia, "+N mais" se tiver mais). Clicar num dia do calendário mensal leva direto pra visão diária daquele dia. Navegação ◀ Hoje ▶ passa a mover por mês inteiro quando está na visão Mês.
-  - [ ] **8.4.1** Toque em "Dia" → escolha "Mês" no menu — deve trocar pra um calendário de 6 semanas (domingo a sábado), com o dia de hoje destacado em círculo rosé.
-  - [ ] **8.4.2** Domingos devem aparecer com um cadeado pequeno (fechado, sem horário de atendimento configurado).
-  - [ ] **8.4.3** Navegue ◀ ▶ pra ver o mês anterior/seguinte — o cabeçalho deve trocar pra "Mês de Ano" (ex: "Outubro de 2026"), sem mostrar dia nenhum.
-  - [ ] **8.4.4** Crie 2-3 agendamentos de teste em dias diferentes do mês (pode usar "+ Novo") e confirme que aparecem como chips coloridos nas células certas do calendário.
-  - [ ] **8.4.5** Toque num dia qualquer do calendário — deve navegar direto pra visão **Dia** daquela data, com o seletor voltando pra "Dia" sozinho.
-  - [ ] **8.4.6** Toque em "Hoje" estando na visão Mês — deve voltar pro mês atual (não muda pra visão Dia sozinho).
+  - [X] **8.4.1** Toque em "Dia" → escolha "Mês" no menu — deve trocar pra um calendário de 6 semanas (domingo a sábado), com o dia de hoje destacado em círculo rosé.
+  - [X] **8.4.2** Domingos devem aparecer com um cadeado pequeno (fechado, sem horário de atendimento configurado).
+  - [X] **8.4.3** Navegue ◀ ▶ pra ver o mês anterior/seguinte — o cabeçalho deve trocar pra "Mês de Ano" (ex: "Outubro de 2026"), sem mostrar dia nenhum.
+  - [X] **8.4.4** Crie 2-3 agendamentos de teste em dias diferentes do mês (pode usar "+ Novo") e confirme que aparecem como chips coloridos nas células certas do calendário.
+  - [X] **8.4.5** Toque num dia qualquer do calendário — deve navegar direto pra visão **Dia** daquela data, com o seletor voltando pra "Dia" sozinho.
+  - [X] **8.4.6** Toque em "Hoje" estando na visão Mês — deve voltar pro mês atual (não muda pra visão Dia sozinho).
 
 ---
 
 ## Bloco 9 — Cabeçalho da Agenda
 
-- [ ] **9.1** Confira o cabeçalho gradiente: título "Agenda" + data por extenso à esquerda, navegação **◀ Hoje ▶** como uma pílula única à direita.
-- [ ] **9.2** Confirme que **não tem** as estrelinhas decorativas "✦" nesse cabeçalho (elas ficavam coladas na pílula de navegação — removidas só aqui).
-- [ ] **9.3** Volte pro Início e confirme que lá o banner de saudação **continua** com as estrelinhas (elas só saíram do cabeçalho da Agenda, não do resto do app).
+- [X] **9.1** Confira o cabeçalho gradiente: título "Agenda" + data por extenso à esquerda, navegação **◀ Hoje ▶** como uma pílula única à direita. Aqui fizemos um ajuste, agora mostra o dia "Hoje" e data por extenso.
+- [X] **9.2** Confirme que **não tem** as estrelinhas decorativas "✦" nesse cabeçalho (elas ficavam coladas na pílula de navegação — removidas só aqui).
+- [X] **9.3** Volte pro Início e confirme que lá o banner de saudação **continua** com as estrelinhas (elas só saíram do cabeçalho da Agenda, não do resto do app).
 
 ---
 
 ## Bloco 10 — Cancelando um agendamento já confirmado
 
-- [ ] **10.1** Na Agenda de hoje, clique no bloco verde do Cliente Um de novo (o painel de detalhe do passo 7.5).
-- [ ] **10.2** Clique em "Cancelar agendamento" — deve cancelar direto, **sem** abrir nenhum modal de WhatsApp (esse fluxo de 2 passos é só pra aprovar/recusar pendente, não pra cancelar algo já confirmado).
-- [ ] **10.3** Confirme que o bloco sumiu (ou virou cinza "Cancelado", dependendo do que a grade mostrar) e os cards de estatística do Início refletem isso ao recarregar.
+- [X] **10.1** Na Agenda de hoje, clique no bloco verde do Cliente Um de novo (o painel de detalhe do passo 7.5).
+- [X] **10.2** Clique em "Cancelar agendamento" — deve cancelar direto, **sem** abrir nenhum modal de WhatsApp (esse fluxo de 2 passos é só pra aprovar/recusar pendente, não pra cancelar algo já confirmado). ✅ **Melhorado**: você notou que não tinha nenhuma confirmação visual depois de cancelar — agora mostra o modal de sucesso "Agendamento Cancelado" (mesmo padrão dos outros, com o resumo).
+- [X] **10.3** Confirme que o bloco sumiu (ou virou cinza "Cancelado", dependendo do que a grade mostrar) e os cards de estatística do Início refletem isso ao recarregar.
 
 ---
 
