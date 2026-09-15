@@ -23,8 +23,10 @@ type SectionKey = 'horarios' | 'bloqueios' | 'assinatura';
 /** Acordeão da aba Config — 3 seções que já existiam (`BusinessHoursEditor`,
  *  `ScheduleBlocksManager`, `SubscriptionSection`), agora dentro de
  *  `SectionCard`. Só controla abrir/fechar; nenhum dos formulários internos
- *  mudou de comportamento. Abre "Minha assinatura" sozinho quando a URL
- *  chega com `#assinatura` (link do cartão de upsell do StudioMenu+). */
+ *  mudou de comportamento. Todas começam abertas (Fase 15 — antes só
+ *  "Minha assinatura" abria sozinha via `#assinatura`, link do cartão de
+ *  upsell do StudioMenu+; esse comportamento continua, só que agora não
+ *  muda nada já que tudo já vem aberto). */
 export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
   slug,
   businessHours,
@@ -35,14 +37,14 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
   billingCpfCnpj,
 }) => {
   const [open, setOpen] = useState<Record<SectionKey, boolean>>({
-    horarios: false,
-    bloqueios: false,
-    assinatura: false,
+    horarios: true,
+    bloqueios: true,
+    assinatura: true,
   });
 
   useEffect(() => {
     if (window.location.hash === '#assinatura') {
-      setOpen((prev) => ({ ...prev, assinatura: true }));
+      document.getElementById('assinatura')?.scrollIntoView({ block: 'start' });
     }
   }, []);
 

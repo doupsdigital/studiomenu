@@ -4,11 +4,12 @@ import { getOrderForProfessionalApp } from '@/lib/professional-app-service';
 import { getAppointmentsForDay, getPendingAppointments } from '@/lib/scheduling/agenda-service';
 import { GradientHeader } from '@/components/app-shell/GradientHeader';
 import { StatCard } from '@/components/app-shell/StatCard';
+import { ViewCatalogCard } from '@/components/app-shell/ViewCatalogCard';
 import { EditCatalogCard } from '@/components/app-shell/EditCatalogCard';
 import { PlusUpsellCard } from '@/components/app-shell/PlusUpsellCard';
 import { ShareLinkButton } from '@/components/app-shell/ShareLinkButton';
 import { PageTitleBar } from '@/components/app-shell/PageTitleBar';
-import { CalendarDays, Clock, Check, CalendarCheck, Crown, Home } from 'lucide-react';
+import { CalendarDays, Clock, Share2, Crown, Home } from 'lucide-react';
 
 interface InicioPageProps {
   params: Promise<{ slug: string }>;
@@ -90,35 +91,42 @@ export default async function InicioPage({ params }: InicioPageProps) {
         )}
       </GradientHeader>
 
-      <div className="grid grid-cols-2 gap-3">
-        <StatCard icon={CalendarDays} label="Agendamentos hoje" value={todayAppointments.length} />
-        <StatCard icon={Clock} label="Aguardando confirmação" value={pendingAppointments.length} tone="amber" />
-      </div>
+      {/* Só fazem sentido com o agendamento de fato funcionando — senão
+       *  ficam sempre zerados, sem nenhuma ação possível por trás. */}
+      {schedulingLive && (
+        <div className="grid grid-cols-2 gap-3">
+          <StatCard icon={CalendarDays} label="Agendamentos hoje" value={todayAppointments.length} href={`/app/${slug}/agenda`} />
+          <StatCard
+            icon={Clock}
+            label="Aguardando confirmação"
+            value={pendingAppointments.length}
+            tone="amber"
+            href={`/app/${slug}/agenda#pendentes`}
+          />
+        </div>
+      )}
+
+      <ViewCatalogCard slug={order.slug} />
+
+      <EditCatalogCard slug={order.slug} />
 
       <div className="rounded-2xl p-6 bg-gradient-to-br from-rose-200 to-rose-100 border border-rose-200/60 relative overflow-hidden text-center">
-        <CalendarCheck className="absolute -top-3 -right-3 w-24 h-24 text-rose-300/50 rotate-12 pointer-events-none select-none" strokeWidth={1.25} />
+        <Share2 className="absolute -top-3 -right-3 w-24 h-24 text-rose-300/50 rotate-12 pointer-events-none select-none" strokeWidth={1.25} />
         <div className="relative z-10">
-          <h2 className="font-serif-pro font-bold text-xl text-rose-800 mb-1.5">Compartilhe sua Agenda</h2>
+          <h2 className="font-serif-pro font-bold text-xl text-rose-800 mb-1.5">Compartilhe seu Catálogo</h2>
           <p className="text-sm text-rose-800/70 mb-4 max-w-xs mx-auto">
-            Envie o link de produção pra suas clientes agendarem sozinhas, quando quiserem.
+            Envie esse link pra suas clientes verem seus serviços e preços, e agendarem sozinhas se o agendamento automático estiver ativo.
           </p>
           <ShareLinkButton path={`/c/${order.slug}`} />
         </div>
       </div>
 
-      <EditCatalogCard slug={order.slug} />
-
-      {schedulingLive ? (
-        <div className="rounded-2xl bg-emerald-50 border border-emerald-200 p-4 flex items-center gap-3">
-          <Check className="w-5 h-5 text-emerald-600 shrink-0" />
-          <p className="text-xs text-emerald-800">
-            {isPlusAtivo ? 'StudioMenu+ ativo' : 'Agendamento automático ativo'} — sua agenda com horários reais está
-            na aba <strong>Agenda</strong>.
-          </p>
-        </div>
-      ) : (
-        <PlusUpsellCard variant="card" slug={slug} />
-      )}
+      {/* Sem card nenhum aqui quando já é Plus de verdade — o badge PLUS no
+       *  banner do topo já avisa disso, não precisa repetir embaixo
+       *  (Fase 15). O upsell fica sempre visível pra quem não é Plus, mesmo
+       *  que o agendamento já esteja ligado manualmente via admin — o
+       *  objetivo é sempre incentivar a assinatura de verdade. */}
+      {!isPlusAtivo && <PlusUpsellCard variant="card" slug={slug} />}
       </main>
     </>
   );

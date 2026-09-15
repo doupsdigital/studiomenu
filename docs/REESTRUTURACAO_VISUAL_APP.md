@@ -196,6 +196,29 @@ Durante o teste do Bloco 11 (cancelamento de assinatura), o usuário reparou que
 - [x] Teste visual (Playwright) nos dois contextos (`variant="card"` no Início, `variant="full"` na Agenda bloqueada) — ambos com bom contraste e hierarquia visual clara
 - [x] Commit — `61027b7`
 
+### Fase 14 — Início: cards clicáveis, reordenação e visibilidade por plano (2026-09-15)
+
+Rodada de ajustes pedidos direto pelo usuário (fora da bateria de testes formal), depois de finalizar o Bloco 11:
+
+1. **StatCards clicáveis**: "Agendamentos hoje" e "Aguardando confirmação" (Início) viravam apenas decorativos — agora levam pra Agenda; o segundo abre a fila de pendentes já expandida (`/app/[slug]/agenda#pendentes`), mesmo padrão do `#assinatura` já usado na Config. `StatCard.tsx` ganhou uma prop `href` opcional (renderiza como `next/link` em vez de `button`, já que `inicio/page.tsx` é server component e não pode passar uma função `onClick`).
+2. **Reordenação + novo card "Visualizar catálogo"**: usuário pediu um trio de ações do catálogo, nessa ordem: Visualizar → Editar → Compartilhar. `ViewCatalogCard.tsx` (novo) leva pro catálogo público (`/c/slug`) em nova aba. Passou por 3 rodadas de estilo até o usuário aprovar: fundo branco neutro → contorno rosé → **mesmo gradiente sólido do `EditCatalogCard`** (a versão final, pra não destoar do par). O card "Compartilhe sua Agenda" foi renomeado pra "Compartilhe seu Catálogo" (o link já era o do catálogo público, só o nome/tema estava errado, falando de "Agenda").
+3. **Visibilidade por plano**: o card verde "StudioMenu+ ativo" que ficava no fim do Início foi removido (usuário achou redundante com o badge PLUS do banner). Os StatCards agora só aparecem quando o agendamento está de fato ativo (`booking_enabled`) — senão ficam sempre zerados. O card de upsell (`PlusUpsellCard`) passou a aparecer sempre que a profissional **não é Plus de verdade** (`!isPlusAtivo`), mesmo que o admin tenha ligado `booking_enabled` manualmente — o objetivo é sempre incentivar a assinatura real, não só a funcionalidade ligada.
+- [x] `tsc` + `build` limpos a cada rodada
+- [x] Teste visual (Playwright) nos 3 cenários de plano: Plus ativo (StatCards + nada embaixo), admin ligou manual sem Plus (StatCards + upsell), catálogo puro (sem StatCards, com upsell)
+- [ ] Commit (aguardando aprovação)
+
+### Fase 15 — Config: acordeão sempre aberto + card de assinatura ativa redesenhado (2026-09-15)
+
+1. **Acordeão sempre expandido**: as 3 seções da Config (Horários, Bloqueios, Minha assinatura) exigiam um toque pra abrir cada uma — usuário pediu pra já vir tudo aberto. `ConfigAccordion.tsx`: estado inicial de todas as seções virou `true`; o link `#assinatura` (do card de upsell) agora só rola a tela até a seção em vez de expandir (já vem expandida).
+2. **Card "StudioMenu+ ativo" (dentro de Minha assinatura)**: passou por 3 rodadas de ajuste até o usuário aprovar:
+   - v1: fundo verde claro, botão de cancelar com contorno vermelho — usuário achou sem contraste e o preço pequeno
+   - v2: fundo verde **sólido** saturado, preço grande numa pílula, botão branco — usuário achou que fugiu da paleta rosé/creme do resto do app
+   - v3 (final): voltou pro fundo verde claro (mesma família visual do estado "cancelado" do próprio card, que já usava esse tom), badge do ícone em verde sólido (não o card inteiro), preço numa pílula branca em tamanho menor (`text-lg`), botão de cancelar em **rosé sólido** (`bg-rose-600`, cor de marca do projeto, não vermelho genérico nem contorno)
+   - Formulário de "Assine o StudioMenu+" (estado inativo/suspenso/cancelado) recebeu o mesmo polish: crown badge, aviso de suspenso/cancelado num box âmbar com fundo próprio, inputs e botão sem mudança de comportamento
+- [x] `tsc` + `build` limpos a cada rodada
+- [x] Teste visual (Playwright) nos 2 estados (ativo e cancelado/suspenso), incluindo o fluxo de confirmação de cancelamento
+- [ ] Commit (aguardando aprovação)
+
 ## Como retomar em outra sessão
 
 Leia este arquivo + a seção "Resumo do plano" acima antes de continuar. Siga a mesma disciplina de teste + commit por fase usada no resto do projeto.

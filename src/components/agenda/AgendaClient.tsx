@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { CalendarPlus, Lock, Clock, ChevronDown } from 'lucide-react';
 import { AppointmentRow } from './AppointmentRow';
@@ -87,9 +87,18 @@ export const AgendaClient: React.FC<AgendaClientProps> = ({
   const [rejectAppointment, setRejectAppointment] = useState<AgendaAppointment | null>(null);
   const [successInfo, setSuccessInfo] = useState<SuccessInfo | null>(null);
   // Recolhida por padrão — igual ao layout de referência (só o cabeçalho com
-  // a contagem, expande ao tocar).
+  // a contagem, expande ao tocar) — exceto quando a URL chega com
+  // `#pendentes` (link do card "Aguardando confirmação" do Início), mesmo
+  // padrão do `#assinatura` da Config.
   const [pendingOpen, setPendingOpen] = useState(false);
   const [viewMenuOpen, setViewMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (window.location.hash === '#pendentes') {
+      setPendingOpen(true);
+      document.getElementById('pendentes')?.scrollIntoView({ block: 'start' });
+    }
+  }, []);
   // Formulários abertos a partir da visão mensal não têm uma data óbvia
   // (`selectedDate` ali é só o dia 1 do mês, âncora da grade) — usam hoje
   // como padrão, que ela pode trocar no próprio formulário.
@@ -253,7 +262,7 @@ export const AgendaClient: React.FC<AgendaClientProps> = ({
       {/* Diferente do LashAgenda (que esconde o painel inteiro quando zera),
        *  aqui ele fica sempre visível com o contador em 0 — decisão do
        *  usuário, pra não sumir da tela sem explicação (Fase 9). */}
-      <div className="bg-surface border border-amber-200 rounded-2xl shadow-sm overflow-hidden">
+      <div id="pendentes" className="bg-surface border border-amber-200 rounded-2xl shadow-sm overflow-hidden">
         <button
           type="button"
           onClick={() => setPendingOpen((v) => !v)}

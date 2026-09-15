@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CheckCircle2, AlertTriangle } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, Crown } from 'lucide-react';
 import { PLUS_PRICE_LABEL } from '@/lib/pricing';
 
 interface SubscriptionSectionProps {
@@ -140,17 +140,27 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
   return (
     <div>
       {isActive ? (
-        <div className="rounded-2xl bg-emerald-50 border border-emerald-200 p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-            <p className="text-sm font-bold text-emerald-800">StudioMenu+ ativo</p>
+        <div className="rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100/60 border border-emerald-200 p-5">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-sm shadow-emerald-500/30">
+              <CheckCircle2 className="w-6 h-6" />
+            </div>
+            <div className="min-w-0">
+              <p className="font-serif-pro font-bold text-lg text-emerald-800 leading-tight">StudioMenu+ ativo</p>
+              <p className="text-xs text-emerald-700/70 mt-0.5">Cobrança recorrente via Pix</p>
+            </div>
           </div>
-          <p className="text-xs text-ink-soft mb-3">{PLUS_PRICE_LABEL} · cobrança recorrente via Pix</p>
-          {error && <p className="text-xs text-rose-600 mb-2">{error}</p>}
+
+          <div className="bg-surface rounded-xl px-4 py-3 mb-4 border border-emerald-200/60">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-700/70 mb-0.5">Mensalidade</p>
+            <p className="font-serif-pro font-bold text-lg text-emerald-800 whitespace-nowrap">{PLUS_PRICE_LABEL}</p>
+          </div>
+
+          {error && <p className="text-xs text-rose-600 mb-3">{error}</p>}
 
           {confirmingCancel ? (
-            <div className="rounded-xl bg-rose-50 border border-rose-200 p-3">
-              <p className="text-xs text-rose-800 mb-3">
+            <div className="rounded-xl bg-surface border border-emerald-200/60 p-4">
+              <p className="text-xs text-ink-soft mb-3">
                 Cancelar sua assinatura do StudioMenu+? Você perde acesso à agenda automática.
               </p>
               <div className="flex gap-2">
@@ -158,7 +168,7 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
                   type="button"
                   onClick={() => setConfirmingCancel(false)}
                   disabled={loading}
-                  className="flex-1 h-10 rounded-xl bg-linen text-ink-soft text-xs font-bold disabled:opacity-50"
+                  className="flex-1 h-11 rounded-xl bg-linen text-ink-soft text-sm font-bold disabled:opacity-50"
                 >
                   Voltar
                 </button>
@@ -166,7 +176,7 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
                   type="button"
                   onClick={handleCancel}
                   disabled={loading}
-                  className="flex-1 h-10 rounded-xl bg-rose-600 text-white text-xs font-bold disabled:opacity-50"
+                  className="flex-1 h-11 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold disabled:opacity-50 transition-colors"
                 >
                   {loading ? 'Cancelando...' : 'Sim, cancelar'}
                 </button>
@@ -177,16 +187,16 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
               type="button"
               onClick={() => setConfirmingCancel(true)}
               disabled={loading}
-              className="w-full h-10 rounded-xl bg-linen text-ink-soft text-xs font-bold disabled:opacity-50"
+              className="w-full h-11 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold disabled:opacity-50 transition-colors"
             >
               Cancelar assinatura
             </button>
           )}
         </div>
       ) : (
-        <div className="rounded-2xl bg-cream border border-linen p-4">
+        <div className="rounded-2xl bg-gradient-to-br from-rose-50 to-cream border border-rose-200 p-5">
           {(subscriptionStatus === 'suspenso' || subscriptionStatus === 'cancelado') && (
-            <div className="flex items-start gap-2 mb-3 text-amber-700">
+            <div className="flex items-start gap-2 mb-4 bg-amber-50 border border-amber-200 rounded-xl p-3 text-amber-700">
               <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
               <p className="text-xs">
                 {subscriptionStatus === 'suspenso'
@@ -199,12 +209,14 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
 
           {qr ? (
             <div className="flex flex-col items-center gap-3">
-              <img src={`data:image/png;base64,${qr.image}`} alt="QR Code Pix" className="w-48 h-48 rounded-xl bg-white p-2" />
+              <img src={`data:image/png;base64,${qr.image}`} alt="QR Code Pix" className="w-48 h-48 rounded-xl bg-white p-2 shadow-sm" />
               <p className="text-[11px] text-ink-faint text-center">Escaneie o QR code ou copie o código Pix abaixo.</p>
               <button
                 type="button"
                 onClick={handleCopyPix}
-                className={`w-full h-10 rounded-xl text-xs font-bold ${copied ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-600'}`}
+                className={`w-full h-11 rounded-xl text-sm font-bold transition-colors ${
+                  copied ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-600 text-white hover:bg-rose-700'
+                }`}
               >
                 {copied ? 'Copiado ✓' : 'Copiar código Pix'}
               </button>
@@ -212,10 +224,13 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
             </div>
           ) : (
             <form onSubmit={handleSubscribe} className="flex flex-col gap-3">
-              <p className="text-sm text-ink-soft">
-                Assine o <strong className="text-ink">StudioMenu+</strong> por {PLUS_PRICE_LABEL} e libere o agendamento
-                automático.
-              </p>
+              <div className="text-center mb-1">
+                <div className="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-2">
+                  <Crown className="w-6 h-6" />
+                </div>
+                <p className="font-serif-pro font-bold text-lg text-ink">Assine o StudioMenu+</p>
+                <p className="text-sm text-ink-soft mt-0.5">{PLUS_PRICE_LABEL} · libere o agendamento automático</p>
+              </div>
               <input
                 type="email"
                 required
@@ -236,7 +251,7 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
               <button
                 type="submit"
                 disabled={loading}
-                className="h-11 rounded-xl bg-rose-600 text-white text-xs font-bold disabled:opacity-50"
+                className="h-11 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold disabled:opacity-50 transition-colors"
               >
                 {loading ? 'Gerando Pix...' : `Assinar por ${PLUS_PRICE_LABEL}`}
               </button>
