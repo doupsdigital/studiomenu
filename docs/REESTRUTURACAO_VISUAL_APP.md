@@ -171,7 +171,7 @@ Implementado:
 - [x] **Ajuste após feedback (2)**: usuário pediu pra não mexer mais na visão Dia (já estava boa), mas na visão Mês tirar o "Agenda" também e colocar o mês/ano maior no lugar do título, sem subtítulo embaixo. Título da visão Mês virou "Setembro de 2026" no tamanho do `h1` (antes era subtítulo pequeno); pode quebrar em 2 linhas por causa do espaço dividido com a pílula "Hoje", mas continua legível.
 - [x] `tsc` + `build` limpos
 - [x] Teste visual completo (Playwright): visão mensal renderizando certo (cadeados nos domingos fechados, hoje destacado, chips corretos incluindo o "+1 mais" quando passa de 2, recusado corretamente ausente); clique num dia navegando pra visão Dia com os agendamentos certos; dropdown Dia/Mês trocando de visão e voltando; navegação de mês anterior mostrando um mês vazio corretamente; testado também em viewport landscape (844×390) — o conteúdo continua centrado em `max-w-md` (mesmo padrão do resto do app, não tenta virar layout de tablet) e a grade do mês reflui sem quebrar; cadeado da célula bloqueada revisado depois de feedback (agora um único badge âmbar centralizado no trecho contínuo bloqueado, não mais um por célula de 30min); título do banner da visão Dia trocado por dia da semana.
-- [ ] Commit (aguardando aprovação)
+- [x] Commit — `83b2587`
 
 ## Como retomar em outra sessão
 
