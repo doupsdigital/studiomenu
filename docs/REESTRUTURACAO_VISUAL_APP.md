@@ -30,13 +30,13 @@ Referência visual: LashAgenda (`legacy/lashmenu-vendas-feature-lashmenu-agendam
 - [x] **Achado à parte**: a cópia de referência do LashMenu/LashAgenda que o usuário colou em `legacy/` (além da que já existia em `docs/`) voltou a poluir o `tsc`/integridade — generalizei a exclusão em `tsconfig.json` (glob `**/lashmenu-vendas-feature-lashmenu-agendamento/**`), `.gitignore` e `scripts/check-integrity.js` pra cobrir qualquer cópia dessa pasta, não só a de `docs/`.
 - [x] `tsc` + `build` limpos
 - [x] Teste visual no navegador (Playwright): tela de "link inválido" com o novo visual claro confirmada; barra de navegação com botão central elevado confirmada. Conteúdo do Início ainda no visual antigo (esperado — é a Fase 2).
-- [ ] Commit (aguardando aprovação)
+- [x] Commit — `6c9e9b2`
 
 ### Fase 2 — Início ✅ CONCLUÍDA (2026-09-14)
 - [x] Redesign completo de `src/app/app/[slug]/inicio/page.tsx`: `GradientHeader` com saudação (Bom dia/Boa tarde/Boa noite calculado no fuso America/Sao_Paulo, não no fuso do servidor) + badge PLUS, 2 `StatCard`s (Agendamentos hoje / Aguardando confirmação, contagens reais via `getAppointmentsForDay`/`getPendingAppointments`, já existentes), cartão gradiente "Compartilhe sua Agenda" (novo `ShareLinkButton.tsx`), `CopyLinkRow`/`PlusUpsellCard` restyled pro tema claro.
 - [x] `tsc` + `build` limpos
 - [x] Teste visual (Playwright, catálogo de teste): saudação/data corretas, contagens batendo com os dados reais (2 agendamentos hoje, 0 aguardando), badge PLUS aparecendo.
-- [ ] Commit (aguardando aprovação)
+- [x] Commit — `6c9e9b2`
 
 ### Fase 3 — Config ✅ CONCLUÍDA (2026-09-14)
 - [x] Novo `src/components/config/ConfigAccordion.tsx` — envolve as 3 seções existentes em `SectionCard`, controla abrir/fechar, e abre "Minha assinatura" sozinho quando a URL chega com `#assinatura` (link do cartão de upsell)
@@ -44,7 +44,7 @@ Referência visual: LashAgenda (`legacy/lashmenu-vendas-feature-lashmenu-agendam
 - [x] `config/page.tsx` simplificado pra só buscar dado e passar pro `ConfigAccordion`
 - [x] `tsc` + `build` limpos
 - [x] Teste visual (Playwright): acordeão fechado por padrão, abre/fecha ao clicar, formulário de horários com o visual novo. Testado o link `#assinatura` numa navegação nova de verdade — abre a seção certa sozinho, mostrando "StudioMenu+ ativo" (bate com o estado real do catálogo de teste).
-- [ ] Commit (aguardando aprovação)
+- [x] Commit — `6c9e9b2`
 
 ### Fase 4 — Agenda (a maior) ✅ CONCLUÍDA (2026-09-14)
 - [x] `agenda/page.tsx` busca `business_hours`+`schedule_blocks` também, cabeçalho vira `GradientHeader` (título em cima, navegação ◀ HOJE ▶ como pill embaixo — o layout original com tudo numa linha só cortava a data, corrigido)
@@ -55,7 +55,7 @@ Referência visual: LashAgenda (`legacy/lashmenu-vendas-feature-lashmenu-agendam
 - [x] Pendentes voltaram a aparecer também na grade (bloco âmbar), não só na fila — decisão revista em relação à correção anterior: antes era duplicação de exibição real (2 listas idênticas lado a lado); agora fila (lista de ação) e grade (visão do dia) são representações diferentes do mesmo agendamento, como o próprio LashAgenda faz — não é mais confuso, é informação útil nos dois lugares.
 - [x] `tsc` + `build` limpos
 - [x] Reteste manual (Playwright) de tudo do Bloco 9 com a grade nova: clique em horário livre abre o formulário com a hora certa pré-preenchida; clique num agendamento abre o painel de detalhe com os dados corretos; confirmar um pendente funciona de ponta a ponta (fila esvazia, aviso de WhatsApp aparece, bloco muda de âmbar pra verde na grade automaticamente). Dados de teste criados especificamente pra esse reteste foram removidos depois.
-- [ ] Commit (aguardando aprovação)
+- [x] Commit — `6c9e9b2`
 
 ### Fase 5 — Polish ✅ CONCLUÍDA (2026-09-14)
 - [x] Botão de voltar da aba Catálogo (`catalogo/page.tsx`) — tom rose escuro translúcido em vez de preto, continua legível sobre qualquer tema de catálogo (Rose ou Luxury)
@@ -63,7 +63,7 @@ Referência visual: LashAgenda (`legacy/lashmenu-vendas-feature-lashmenu-agendam
 - [x] Varredura final por qualquer classe `slate-*`/`bg-black` esquecida em toda a árvore `/app/[slug]` — nada encontrado além de usos intencionais (ícone branco sobre botão rose, scrim de modal)
 - [x] `tsc` + `build` limpos
 - [x] Teste visual: editor do catálogo (aba Catálogo) continua 100% intocado, botão de voltar com a nova identidade, sem regressão
-- [ ] Commit (aguardando aprovação)
+- [x] Commit — `6c9e9b2`
 
 ## Reestruturação concluída (2026-09-14)
 
@@ -131,7 +131,7 @@ Implementado:
 - [x] `src/components/agenda/AgendaClient.tsx` — painel de pendentes sempre renderizado (tirei o `pendingAppointments.length > 0 &&` que envolvia o card inteiro); estado vazio ao expandir com 0 pendentes ganhou uma mensagem própria.
 - [x] `tsc` + `build` limpos
 - [x] Teste visual (Playwright): card de pendentes com contador "0" permanecendo visível; agendamento recusado do dia seguinte aparecendo cinza na grade, como esperado.
-- [ ] Commit (aguardando aprovação)
+- [x] Commit — `6c9e9b2`
 
 ## Como retomar em outra sessão
 
