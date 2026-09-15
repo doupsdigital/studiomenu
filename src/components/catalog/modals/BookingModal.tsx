@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { CheckCircle, CalendarX } from 'lucide-react';
 import { ProcedureItem } from '@/types/catalog';
 import type { AvailabilitySlot } from '@/lib/scheduling/availability';
 import { formatPhoneBR } from '@/lib/format';
@@ -9,8 +10,6 @@ import '@/styles/scheduling-wizard.css';
 interface BookingModalProps {
   service: ProcedureItem;
   slug: string;
-  whatsappNumber: string;
-  professionalName: string;
   onClose: () => void;
 }
 
@@ -60,8 +59,6 @@ function formatPrice(val: string): string {
 export const BookingModal: React.FC<BookingModalProps> = ({
   service,
   slug,
-  whatsappNumber,
-  professionalName,
   onClose,
 }) => {
   const days = useState(() => buildNextDays(DAYS_AHEAD))[0];
@@ -157,14 +154,56 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     }
   };
 
-  const whatsappMessage = booked
-    ? encodeURIComponent(
-        `Olá, ${professionalName.split(' ')[0]}! Acabei de agendar *${service.title}* pra ${booked.dateLabel} às ${booked.time} pelo catálogo.`
-      )
-    : '';
-  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
-
   const fallbackImage = 'https://images.unsplash.com/photo-1583001809873-a1284d563391?auto=format&fit=crop&w=400&q=80';
+
+  // Passo 3 (confirmado) não é mais parte do bottom sheet do wizard — é um
+  // evento concluído, não um passo do formulário, por isso vira um modal
+  // centralizado próprio (ver comentário em scheduling-wizard.css). Sem
+  // botão de avisar a profissional pelo WhatsApp de propósito — isso era um
+  // paliativo enquanto não existe push notification pra ela (que vem numa
+  // fase futura); pedir isso da cliente não é a experiência final desejada,
+  // só confirma que o agendamento foi reservado.
+  if (step === 'confirm' && booked) {
+    return (
+      <div className="wizard-success" role="dialog" aria-modal="true" aria-label="Agendamento reservado">
+        <div className="wizard-success__backdrop" onClick={onClose} />
+        <div className="wizard-success__card">
+          <button type="button" className="modal__fechar" aria-label="Fechar" onClick={onClose} style={{ position: 'absolute', top: 14, right: 14 }}>
+            ✕
+          </button>
+
+          <div className="wizard-success__icon">
+            <CheckCircle className="w-8 h-8" />
+          </div>
+          <p className="wizard-success__titulo">Agendamento reservado!</p>
+          <p className="wizard-success__subtitulo">A profissional vai confirmar seu horário em breve.</p>
+
+          <div className="wizard__resumo">
+            <div className="wizard__resumo-linha">
+              <span className="wizard__resumo-k">Procedimento</span>
+              <span className="wizard__resumo-v">{service.title}</span>
+            </div>
+            <div className="wizard__resumo-linha">
+              <span className="wizard__resumo-k">Quando</span>
+              <span className="wizard__resumo-v">
+                {booked.dateLabel} às {booked.time}
+              </span>
+            </div>
+            <div className="wizard__resumo-linha">
+              <span className="wizard__resumo-k">Investimento</span>
+              <span className="wizard__resumo-v">{formatPrice(service.price)}</span>
+            </div>
+          </div>
+
+          <div className="modal__acoes">
+            <button type="button" className="modal__cta" onClick={onClose}>
+              Ok, entendido
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="modal-detalhe" role="dialog" aria-modal="true" aria-label={`Agendar ${service.title}`}>
@@ -184,10 +223,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
 
           <div className="wizard__steps" aria-hidden="true">
             <div className={`wizard__step-dot ${step === 'datetime' ? 'is-active' : 'is-done'}`} />
-            <div
-              className={`wizard__step-dot ${step === 'contact' ? 'is-active' : step === 'confirm' ? 'is-done' : ''}`}
-            />
-            <div className={`wizard__step-dot ${step === 'confirm' ? 'is-active' : ''}`} />
+            <div className={`wizard__step-dot ${step === 'contact' ? 'is-active' : ''}`} />
           </div>
 
           {step === 'datetime' && (
@@ -209,11 +245,16 @@ export const BookingModal: React.FC<BookingModalProps> = ({
 
               <span className="wizard__label">Horários disponíveis</span>
               {loadingSlots ? (
-                <p className="wizard__vazio">Carregando horários...</p>
+                <div className="wizard__vazio">Carregando horários...</div>
               ) : slotsError ? (
-                <p className="wizard__vazio">{slotsError}</p>
+                <div className="wizard__vazio">{slotsError}</div>
               ) : slots.length === 0 ? (
-                <p className="wizard__vazio">Sem horários livres nesse dia. Escolha outra data.</p>
+                <div className="wizard__vazio">
+                  <CalendarX className="w-6 h-6" />
+                  Sem horários livres nesse dia.
+                  <br />
+                  Escolha outra data acima.
+                </div>
               ) : (
                 <div className="wizard__slots">
                   {slots.map((slot) => (
@@ -298,36 +339,6 @@ export const BookingModal: React.FC<BookingModalProps> = ({
             </>
           )}
 
-          {step === 'confirm' && booked && (
-            <>
-              <div className="wizard__resumo">
-                <div className="wizard__resumo-linha">
-                  <span className="wizard__resumo-k">Procedimento</span>
-                  <span className="wizard__resumo-v">{service.title}</span>
-                </div>
-                <div className="wizard__resumo-linha">
-                  <span className="wizard__resumo-k">Quando</span>
-                  <span className="wizard__resumo-v">
-                    {booked.dateLabel} às {booked.time}
-                  </span>
-                </div>
-                <div className="wizard__resumo-linha">
-                  <span className="wizard__resumo-k">Investimento</span>
-                  <span className="wizard__resumo-v">{formatPrice(service.price)}</span>
-                </div>
-              </div>
-
-              <p className="wizard__label" style={{ marginBottom: 14 }}>
-                Seu horário foi reservado. Avise a profissional pelo WhatsApp pra confirmar.
-              </p>
-
-              <div className="modal__acoes">
-                <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="modal__cta">
-                  Avisar no WhatsApp →
-                </a>
-              </div>
-            </>
-          )}
         </div>
       </div>
     </div>

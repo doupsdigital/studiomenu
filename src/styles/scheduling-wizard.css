@@ -20,6 +20,8 @@
   --wizard-error-color: #c0392b;
   --wizard-error-bg: rgba(192, 57, 43, 0.08);
   --wizard-summary-border: var(--modal-spec-border);
+  --wizard-success-color: #1f8a55;
+  --wizard-success-bg: rgba(31, 138, 85, 0.12);
 }
 
 [data-theme="luxury"] {
@@ -35,6 +37,8 @@
   --wizard-error-color: #e07a68;
   --wizard-error-bg: rgba(224, 122, 104, 0.12);
   --wizard-summary-border: var(--modal-spec-border);
+  --wizard-success-color: #4ade80;
+  --wizard-success-bg: rgba(74, 222, 128, 0.14);
 }
 
 /* Indicador de passo (1/2/3) */
@@ -149,10 +153,22 @@
 }
 
 .wizard__vazio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
   font-size: 13px;
-  color: var(--modal-desc-color);
-  padding: 18px 4px;
+  line-height: 1.5;
+  color: var(--wizard-label-color);
+  background: var(--wizard-input-bg);
+  border: 1px dashed var(--wizard-input-border);
+  border-radius: 14px;
+  padding: 26px 16px;
   text-align: center;
+}
+.wizard__vazio svg {
+  color: var(--wizard-back-color);
+  opacity: 0.7;
 }
 
 /* Passo 2: formulário */
@@ -226,4 +242,74 @@ textarea.wizard__input {
 @media (max-width: 480px) {
   .wizard__dia-chip { min-width: 48px; padding: 8px 4px; }
   .wizard__slots { grid-template-columns: repeat(auto-fill, minmax(68px, 1fr)); }
+}
+
+/* ==========================================================================
+   MODAL DE SUCESSO (passo 3, centralizado) — separado do bottom sheet do
+   wizard de propósito: escolher dia/horário/dados é uma ação em andamento
+   (sheet), mas "agendamento reservado" é um evento concluído, por isso vira
+   um modal centralizado — mesmo padrão do modal de sucesso do app da
+   profissional, adaptado pro sistema de variáveis de tema do catálogo
+   público (Rose/Luxury).
+   ========================================================================== */
+.wizard-success {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.wizard-success__backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--modal-backdrop-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.wizard-success__card {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 380px;
+  max-height: 88vh;
+  overflow-y: auto;
+  background: var(--modal-sheet-bg);
+  border: 1px solid var(--modal-sheet-border);
+  border-radius: 22px;
+  box-shadow: var(--modal-sheet-shadow);
+  padding: 34px 24px 24px;
+  text-align: center;
+}
+
+.wizard-success__icon {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  background: var(--wizard-success-bg);
+  color: var(--wizard-success-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wizard-success__titulo {
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 500;
+  font-style: italic;
+  font-size: 26px;
+  line-height: 1.15;
+  color: var(--modal-title-color);
+  margin: 0 0 8px;
+}
+
+.wizard-success__subtitulo {
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--modal-desc-color);
+  margin: 0 0 22px;
 }

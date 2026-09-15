@@ -477,8 +477,6 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
         <BookingModal
           service={bookingItem}
           slug={catalogState.slug}
-          whatsappNumber={catalogState.whatsapp_number}
-          professionalName={catalogState.client_name}
           onClose={() => setBookingItem(null)}
         />
       )}
