@@ -179,8 +179,12 @@ export const DayTimeGrid: React.FC<DayTimeGridProps> = ({
           {appointments.map((appt) => {
             const { hour, minute } = getSaoPauloHourMinute(new Date(appt.starts_at));
             const minutesFromStart = (hour - range.startHour) * 60 + minute;
-            const top = (minutesFromStart / 30) * SLOT_HEIGHT;
-            const height = (appt.duration_minutes / 30) * SLOT_HEIGHT;
+            const rawTop = (minutesFromStart / 30) * SLOT_HEIGHT;
+            const rawHeight = (appt.duration_minutes / 30) * SLOT_HEIGHT;
+
+            // Respiro vertical de 2px no topo e na base (total 4px de gap) para evitar cards colados
+            const top = rawTop + 2;
+            const height = Math.max(rawHeight - 4, 28);
             const style = STATUS_STYLES[appt.status];
 
             return (
@@ -189,7 +193,7 @@ export const DayTimeGrid: React.FC<DayTimeGridProps> = ({
                 type="button"
                 onClick={() => onAppointmentClick(appt)}
                 style={{ top: `${top}px`, height: `${height}px` }}
-                className={`absolute left-2 right-2 rounded-lg border border-l-[4px] overflow-hidden flex flex-col shadow-sm z-10 text-left transition-all ${style.border} ${style.accent} ${style.bg} ${
+                className={`absolute left-2 right-2 rounded-xl border border-l-[4px] overflow-hidden flex flex-col shadow-md hover:shadow-lg z-10 text-left transition-all ${style.border} ${style.accent} ${style.bg} ${
                   height < 48 ? 'px-2 py-0.5' : height < 84 ? 'px-2.5 py-1' : 'px-3 py-1.5'
                 }`}
               >
