@@ -1,6 +1,8 @@
 -- ==========================================================================
 -- STUDIOMENU — SCHEMA DO BANCO DE DADOS SUPABASE (ESTRUTURA OFICIAL V2)
--- Execute este script no SQL Editor do seu projeto Supabase (orrfslursoielebvdhbf)
+-- Execute este script no SQL Editor do seu projeto Supabase (spcbbxwnbqaeyhhygyew —
+-- projeto oficial na conta profissional desde 2026-09-16; o antigo, orrfslursoielebvdhbf,
+-- era um provisório na conta pessoal)
 -- ==========================================================================
 
 -- 1. TABELA DE PEDIDOS / CATÁLOGOS (`orders`)
@@ -31,6 +33,10 @@ CREATE TABLE IF NOT EXISTS public.orders (
     procedures JSONB DEFAULT '[]'::jsonb,
     edit_token TEXT UNIQUE DEFAULT encode(gen_random_bytes(16), 'hex'),
     status TEXT DEFAULT 'active',
+    -- Categorias autônomas do catálogo (Visual Editor) — coluna adicionada
+    -- manualmente em produção há tempos (handoff 2026-09-09) mas nunca tinha
+    -- sido registrada aqui; drift achado só agora, na migração de banco.
+    categories TEXT[] DEFAULT '{}'::text[],
     -- Agendamento + StudioMenu+ (docs/PLANO_AGENDAMENTO_STUDIOMENU_PLUS.md, Fase 0)
     booking_enabled BOOLEAN DEFAULT false,
     plan_tier TEXT DEFAULT 'catalog' CHECK (plan_tier IN ('catalog', 'plus')),

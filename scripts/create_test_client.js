@@ -1,5 +1,5 @@
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://orrfslursoielebvdhbf.supabase.co';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ycmZzbHVyc29pZWxlYnZkaGJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4ODc4NTIsImV4cCI6MjEwNDQ2Mzg1Mn0.WFjKCJOvmf2cXY8zR29cgS7zS9Drtbx1zgPa3jplErw';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://spcbbxwnbqaeyhhygyew.supabase.co';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNwY2JieHduYnFhZXloaHlneWV3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk1NzAxMTUsImV4cCI6MjEwNTE0NjExNX0.cZcQ61P_MHLkTW8uzZ7BZnrl9Xwp8BEUdFhfNUdkqvM';
 
 const headers = {
   'apikey': supabaseAnonKey,

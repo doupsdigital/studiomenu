@@ -2,7 +2,7 @@
 
 > Documento vivo de acompanhamento, mesmo padrão do `docs/REESTRUTURACAO_VISUAL_APP.md`. Plano completo (contexto, decisões, pesquisa sobre o LashAgenda) foi feito em modo plano em 2026-09-15 — resumo abaixo. Cada fase só avança pra próxima depois de testada e aprovada.
 
-**Status geral:** ✅ Fases 17, 18 e 19 (A+B) concluídas e validadas em produção. Fase 19C (lembrete 1h antes) descartada por enquanto — ver nota abaixo. Próximas: Fase 20 (multi-tenant/concorrência) e Fase 21 (auditoria de banco).
+**Status geral:** ✅ Fases 17, 18, 19 (A+B) e a Migração do Supabase concluídas e validadas em produção. Fase 19C (lembrete 1h antes) descartada por enquanto — ver nota abaixo. Próximas: ativar o domínio oficial, depois Fase 20 (multi-tenant/concorrência) e Fase 21 (auditoria de banco).
 
 **Legenda:** `[ ]` pendente · `[x]` feito e testado
 
@@ -115,6 +115,23 @@ Achado testando push em produção no celular: o banner nativo de instalação d
 Também 2 ajustes finos pedidos depois do teste: a Central de notificações fecha sozinha ao confirmar "Sim, recebi"; o sino pulsa com uma bolinha rosa enquanto a notificação ainda não foi decidida.
 
 **Fase C (lembrete 1h antes do atendimento) — descartada por enquanto** (2026-09-16). Cheguei a montar a implementação (schema, rota de preferências, rota de cron, GitHub Actions), mas o usuário reconsiderou antes de commitar: risco de excesso de notificação (uma por atendimento, todo dia, ofuscando a notificação que já importa — "novo agendamento") não compensava a infra extra (GitHub Actions + secret) pro ganho. Revertido, nada disso ficou no código. Pode ser retomado no futuro se fizer sentido — o plano completo (Fase C) continua salvo em modo plano caso o usuário peça de novo.
+
+### Migração do Supabase (conta pessoal → conta profissional) ✅ CONCLUÍDA (2026-09-16)
+
+O banco estava num projeto Supabase da conta pessoal do usuário (`orrfslursoielebvdhbf`, usado como provisório porque a conta profissional já tinha os 2 projetos do free tier ocupados). Migrado pro projeto oficial `spcbbxwnbqaeyhhygyew` (conta `doupsdigital@gmail.com`, mesma região São Paulo). Plano completo salvo em modo plano.
+
+- [x] **Schema + RLS + Storage bucket** recriados do zero no projeto novo a partir de `docs/schema.sql`.
+- [x] **Achado durante a migração**: a coluna `orders.categories` (TEXT[], adicionada manualmente em produção há meses — handoff 2026-09-09) nunca tinha sido registrada em `docs/schema.sql` — drift de schema real. Corrigido nos dois lugares (projeto novo + documentação).
+- [x] **Auth reconfigurado** no projeto novo: Email (Confirm email desligado), Google (mesmo Client ID/Secret), URL Configuration (mesmos curingas de Redirect URLs).
+- [x] **Google Cloud Console**: adicionado o redirect URI do projeto novo (`https://spcbbxwnbqaeyhhygyew.supabase.co/auth/v1/callback`) ao OAuth Client existente, mantendo o antigo.
+- [x] **Dados migrados por completo** (script único, rodado localmente, apagado depois): 8 orders, 30 order_services, 6 business_hours, 3 schedule_blocks, 19 appointments, 1 push_subscription — contagens conferidas batendo nos dois projetos. UUIDs preservados.
+- [x] **Storage migrado**: 13 arquivos copiados do bucket `catalog-assets` antigo pro novo; URLs de imagem nas linhas migradas (`cover_media_url`, `avatar_url`, etc.) reescritas pro domínio novo — testado que uma imagem migrada carrega (200).
+- [x] **Limitação conhecida**: `auth.users` (contas de login real, Fase 17) não migra via API pública — `orders.auth_user_id` foi zerado nos dados migrados. O link mágico (`edit_token`, que FOI migrado) continua funcionando normalmente; a profissional de teste (`teste-local-1`) precisa "reivindicar" o login de novo no projeto novo quando for testar (mesmo fluxo de sempre, Config → Minha conta). Push notifications **não** precisam ser reativadas — as inscrições (`push_subscriptions`) foram migradas e independem de qual projeto Supabase as armazena.
+- [x] **Corte**: `.env` local + variáveis na Vercel (Production e Preview) trocadas pras do projeto novo, redeploy feito.
+- [x] **Validado em produção**: catálogo público, as 3 páginas autenticadas (Início/Agenda/Config, via cookie de sessão real) e uma imagem migrada — todos 200 no banco novo.
+- [x] `scripts/create_test_client.js` (fallback hardcoded) e comentários em `docs/schema.sql` atualizados pro projeto novo.
+- [x] `tsc` + `build` limpos.
+- **Projeto antigo** (`orrfslursoielebvdhbf`, conta pessoal) continua no ar por enquanto, sem uso — decisão de apagar fica pra depois.
 
 ## Como retomar em outra sessão
 
