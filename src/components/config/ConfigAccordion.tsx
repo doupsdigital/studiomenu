@@ -49,11 +49,11 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
   authUserId,
 }) => {
   const [open, setOpen] = useState<Record<SectionKey, boolean>>({
-    horarios: true,
+    horarios: false,
     bloqueios: true,
-    assinatura: true,
-    conta: true,
-    notificacoes: true,
+    assinatura: false,
+    conta: false,
+    notificacoes: false,
   });
 
   // O card de "Notificações" some da lista quando esse dispositivo já tem
@@ -65,6 +65,7 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
 
   useEffect(() => {
     if (window.location.hash === '#assinatura') {
+      setOpen((prev) => ({ ...prev, assinatura: true }));
       document.getElementById('assinatura')?.scrollIntoView({ block: 'start' });
     }
   }, []);
