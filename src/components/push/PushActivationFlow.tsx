@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CheckCircle2, HelpCircle } from 'lucide-react';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 
@@ -41,8 +41,20 @@ export const PushActivationFlow: React.FC<PushActivationFlowProps> = ({
   onConfirmed,
 }) => {
   const { permission, subscribing, subscribe, sendTest } = usePushNotifications(slug);
-  const [phase, setPhase] = useState<Phase>(permission === 'granted' ? 'confirmed' : 'idle');
+  const [phase, setPhase] = useState<Phase>('idle');
   const [sendingTest, setSendingTest] = useState(false);
+
+  // `usePushNotifications` só sabe a permissão real depois de montar (lê
+  // `Notification.permission` num efeito) — nesse primeiro render ela ainda
+  // está no valor padrão. Sem isso, toda vez que esse componente remonta
+  // (abrir a Central de notificações nesse cabeçalho de novo, entrar em
+  // Config) ele "esquecia" que já tinha sido ativado antes e mostrava o
+  // convite de novo, mesmo já ativo.
+  useEffect(() => {
+    if (permission === 'granted') {
+      setPhase((prev) => (prev === 'idle' || prev === 'activating' ? 'confirmed' : prev));
+    }
+  }, [permission]);
 
   const confirm = () => {
     setPhase('confirmed');
