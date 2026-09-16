@@ -40,6 +40,7 @@ export const NotificationCenterSheet: React.FC<NotificationCenterSheetProps> = (
             slug={slug}
             primaryButtonClassName="h-11 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold disabled:opacity-50 transition-colors w-full"
             secondaryButtonClassName="h-11 px-4 rounded-xl bg-surface border border-linen text-ink text-sm font-bold disabled:opacity-50 transition-colors w-full"
+            onConfirmed={onClose}
           />
         </div>
       </div>

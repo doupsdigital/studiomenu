@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Bell, Download } from 'lucide-react';
 import { useInstallPrompt } from './InstallPromptProvider';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { NotificationCenterSheet } from '@/components/push/NotificationCenterSheet';
 
 interface PageTitleBarProps {
@@ -28,7 +29,11 @@ interface PageTitleBarProps {
  *  sino que abre a Central de notificações. */
 export const PageTitleBar: React.FC<PageTitleBarProps> = ({ title, icon, slug }) => {
   const { canInstall, isInstalled, promptInstall } = useInstallPrompt();
+  const { permission } = usePushNotifications(slug);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  // Só chama atenção pro sino enquanto a notificação ainda não foi decidida
+  // (nem ativada, nem recusada) — some assim que a profissional resolver.
+  const needsActivation = permission === 'default';
 
   return (
     <>
@@ -37,8 +42,14 @@ export const PageTitleBar: React.FC<PageTitleBarProps> = ({ title, icon, slug })
 
         <div className="absolute right-4 flex items-center gap-3">
           {isInstalled ? (
-            <button type="button" onClick={() => setNotificationsOpen(true)} aria-label="Central de notificações" className="text-rose-600">
-              <Bell className="w-5 h-5" />
+            <button type="button" onClick={() => setNotificationsOpen(true)} aria-label="Central de notificações" className="relative text-rose-600">
+              <Bell className={`w-5 h-5 ${needsActivation ? 'animate-pulse' : ''}`} />
+              {needsActivation && (
+                <span className="absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75" />
+                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-rose-500" />
+                </span>
+              )}
             </button>
           ) : canInstall ? (
             <button
