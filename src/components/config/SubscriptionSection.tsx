@@ -147,20 +147,20 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
             </div>
             <div className="min-w-0">
               <p className="font-serif-pro font-bold text-lg text-rose-800 leading-tight">StudioMenu+ ativo</p>
-              <p className="text-xs text-rose-800/70 mt-0.5">Cobrança recorrente via Pix</p>
+              <p className="text-[13px] text-rose-800/70 mt-0.5">Cobrança recorrente via Pix</p>
             </div>
           </div>
 
           <div className="bg-surface rounded-xl px-4 py-3 mb-4 border border-rose-200/60">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-rose-700/70 mb-0.5">Mensalidade</p>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-rose-700/70 mb-0.5">Mensalidade</p>
             <p className="font-serif-pro font-bold text-lg text-rose-800 whitespace-nowrap">{PLUS_PRICE_LABEL}</p>
           </div>
 
-          {error && <p className="text-xs text-rose-600 mb-3">{error}</p>}
+          {error && <p className="text-[13px] text-rose-600 mb-3">{error}</p>}
 
           {confirmingCancel ? (
             <div className="rounded-xl bg-surface border border-rose-200/60 p-4">
-              <p className="text-xs text-ink-soft mb-3">
+              <p className="text-[13px] text-ink-soft mb-3">
                 Cancelar sua assinatura do StudioMenu+? Você perde acesso à agenda automática.
               </p>
               <div className="flex gap-2">
@@ -198,7 +198,7 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
           {(subscriptionStatus === 'suspenso' || subscriptionStatus === 'cancelado') && (
             <div className="flex items-start gap-2 mb-4 bg-amber-50 border border-amber-200 rounded-xl p-3 text-amber-700">
               <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
-              <p className="text-xs">
+              <p className="text-[13px]">
                 {subscriptionStatus === 'suspenso'
                   ? 'Sua assinatura está suspensa (pagamento em atraso).'
                   : 'Sua assinatura foi cancelada.'}{' '}
@@ -210,7 +210,7 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
           {qr ? (
             <div className="flex flex-col items-center gap-3">
               <img src={`data:image/png;base64,${qr.image}`} alt="QR Code Pix" className="w-48 h-48 rounded-xl bg-white p-2 shadow-sm" />
-              <p className="text-[11px] text-ink-faint text-center">Escaneie o QR code ou copie o código Pix abaixo.</p>
+              <p className="text-[13px] text-ink-faint text-center">Escaneie o QR code ou copie o código Pix abaixo.</p>
               <button
                 type="button"
                 onClick={handleCopyPix}
@@ -220,7 +220,7 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
               >
                 {copied ? 'Copiado ✓' : 'Copiar código Pix'}
               </button>
-              {polling && <p className="text-[11px] text-ink-faint">Aguardando confirmação do pagamento...</p>}
+              {polling && <p className="text-[13px] text-ink-faint">Aguardando confirmação do pagamento...</p>}
             </div>
           ) : (
             <form onSubmit={handleSubscribe} className="flex flex-col gap-3">
@@ -247,7 +247,7 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
                 onChange={(e) => setCpfCnpj(e.target.value)}
                 className="h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink placeholder:text-ink-faint"
               />
-              {error && <p className="text-xs text-rose-600">{error}</p>}
+              {error && <p className="text-[13px] text-rose-600">{error}</p>}
               <button
                 type="submit"
                 disabled={loading}

@@ -161,7 +161,7 @@ export const ScheduleBlocksManager: React.FC<ScheduleBlocksManagerProps> = ({ sl
         </form>
       )}
 
-      {error && <p className="text-xs text-rose-600 mb-2">{error}</p>}
+      {error && <p className="text-[13px] text-rose-600 mb-2">{error}</p>}
 
       {blocks.length === 0 ? (
         <p className="text-sm text-ink-faint py-4 text-center">Nenhum bloqueio cadastrado.</p>
@@ -171,7 +171,7 @@ export const ScheduleBlocksManager: React.FC<ScheduleBlocksManagerProps> = ({ sl
             <div key={b.id} className="rounded-2xl bg-cream border border-linen p-3.5 flex items-center justify-between gap-3">
               <div className="min-w-0">
                 <p className="text-sm font-bold text-ink">{formatBlockLabel(b)}</p>
-                {b.reason && <p className="text-xs text-ink-faint truncate mt-1">{b.reason}</p>}
+                {b.reason && <p className="text-[13px] text-ink-faint truncate mt-1">{b.reason}</p>}
               </div>
               <button
                 type="button"

@@ -66,7 +66,7 @@ export const AppointmentDetailSheet: React.FC<AppointmentDetailSheetProps> = ({
           <X className="w-4 h-4" />
         </button>
 
-        <span className={`inline-block px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide mb-3 ${STATUS_BADGE[appointment.status]}`}>
+        <span className={`inline-block px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide mb-3 ${STATUS_BADGE[appointment.status]}`}>
           {STATUS_LABEL[appointment.status]}
         </span>
 
@@ -76,12 +76,12 @@ export const AppointmentDetailSheet: React.FC<AppointmentDetailSheetProps> = ({
         </p>
 
         <div className="rounded-xl bg-cream p-4 mb-5 flex flex-col gap-1">
-          <p className="text-sm text-ink font-bold">{appointment.client_name}</p>
-          <p className="text-xs text-ink-soft flex items-center gap-1.5">
+          <p className="text-[15px] text-ink font-bold">{appointment.client_name}</p>
+          <p className="text-[13px] text-ink-soft flex items-center gap-1.5">
             <MessageCircle className="w-3.5 h-3.5" /> {appointment.client_whatsapp}
           </p>
-          {appointment.client_notes && <p className="text-xs text-ink-faint italic mt-1">{appointment.client_notes}</p>}
-          {appointment.price_snapshot && <p className="text-xs text-ink-soft mt-1">Investimento: {appointment.price_snapshot}</p>}
+          {appointment.client_notes && <p className="text-[13px] text-ink-faint italic mt-1">{appointment.client_notes}</p>}
+          {appointment.price_snapshot && <p className="text-[13px] text-ink-soft mt-1">Investimento: {appointment.price_snapshot}</p>}
         </div>
 
         {appointment.status === 'pending' && (

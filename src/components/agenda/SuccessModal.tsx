@@ -31,17 +31,17 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({ title, rows, onClose
             <CheckCircle className="w-9 h-9" />
           </div>
           <h3 className="font-serif-pro font-bold text-2xl text-ink">{title}</h3>
-          <p className="text-xs text-ink-soft mt-1">Os dados foram registrados com sucesso no sistema.</p>
+          <p className="text-[13px] text-ink-soft mt-1">Os dados foram registrados com sucesso no sistema.</p>
         </div>
 
         <div className="px-6 py-4 space-y-4">
-          <div className="bg-cream border border-linen rounded-xl p-4 text-xs space-y-2.5">
+          <div className="bg-cream border border-linen rounded-xl p-4 text-sm space-y-2.5">
             {rows.map((row, i) => (
               <div
                 key={row.label}
                 className={`flex justify-between ${i < rows.length - 1 ? 'border-b border-linen pb-1.5' : ''}`}
               >
-                <span className="font-bold text-ink-soft uppercase text-[10px] tracking-wider">{row.label}</span>
+                <span className="font-bold text-ink-soft uppercase text-[11px] tracking-wider">{row.label}</span>
                 <span className="font-semibold text-ink max-w-[200px] truncate text-right">{row.value}</span>
               </div>
             ))}
@@ -50,7 +50,7 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({ title, rows, onClose
           <button
             type="button"
             onClick={onClose}
-            className="w-full py-3 rounded-lg text-xs font-semibold bg-rose-600 hover:bg-rose-800 text-white transition-colors"
+            className="w-full py-3 rounded-lg text-sm font-semibold bg-rose-600 hover:bg-rose-800 text-white transition-colors"
           >
             Concluir e Fechar
           </button>

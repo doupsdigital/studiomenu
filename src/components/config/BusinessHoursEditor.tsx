@@ -89,7 +89,7 @@ export const BusinessHoursEditor: React.FC<BusinessHoursEditorProps> = ({ slug, 
                 onChange={(e) => updateDay(weekday, { start_time: e.target.value })}
                 className="h-11 min-w-0 flex-1 rounded-lg bg-surface border border-linen px-2 text-sm text-ink"
               />
-              <span className="shrink-0 text-xs text-ink-faint">até</span>
+              <span className="shrink-0 text-[13px] text-ink-faint">até</span>
               <input
                 type="time"
                 value={day.end_time}
@@ -103,7 +103,7 @@ export const BusinessHoursEditor: React.FC<BusinessHoursEditorProps> = ({ slug, 
         </div>
       ))}
 
-      {error && <p className="text-xs text-rose-600">{error}</p>}
+      {error && <p className="text-[13px] text-rose-600">{error}</p>}
 
       <button
         type="button"

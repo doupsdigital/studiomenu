@@ -155,7 +155,7 @@ export const AccountSection: React.FC<AccountSectionProps> = ({ slug, hasAccount
             </div>
             <div className="min-w-0">
               <p className="font-serif-pro font-bold text-lg text-rose-800 leading-tight">Login ativo</p>
-              <p className="text-xs text-rose-800/70 mt-0.5">
+              <p className="text-[13px] text-rose-800/70 mt-0.5">
                 {justLinkedGoogle ? 'Conta Google vinculada com sucesso.' : 'Você já pode entrar direto por /entrar.'}
               </p>
             </div>
@@ -179,11 +179,11 @@ export const AccountSection: React.FC<AccountSectionProps> = ({ slug, hasAccount
 
         {needsConfirmation ? (
           <div className="flex flex-col gap-3">
-            <p className="text-xs text-ink-soft text-center leading-relaxed">
+            <p className="text-[13px] text-ink-soft text-center leading-relaxed">
               Enviamos um e-mail de confirmação pra <strong>{email}</strong>. Depois de confirmar, toque no botão
               abaixo.
             </p>
-            {error && <p className="text-xs text-rose-600 text-center">{error}</p>}
+            {error && <p className="text-[13px] text-rose-600 text-center">{error}</p>}
             <button
               type="button"
               onClick={handleAlreadyConfirmed}
@@ -212,7 +212,7 @@ export const AccountSection: React.FC<AccountSectionProps> = ({ slug, hasAccount
               onChange={(e) => setPassword(e.target.value)}
               className="h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink placeholder:text-ink-faint"
             />
-            {error && <p className="text-xs text-rose-600">{error}</p>}
+            {error && <p className="text-[13px] text-rose-600">{error}</p>}
             <button
               type="submit"
               disabled={loading !== null}

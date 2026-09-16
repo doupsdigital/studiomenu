@@ -20,7 +20,7 @@ export const EditCatalogCard: React.FC<EditCatalogCardProps> = ({ slug }) => {
       </div>
       <div className="flex-1 min-w-0">
         <h2 className="font-serif-pro font-bold text-lg leading-tight">Editar meu catálogo</h2>
-        <p className="text-xs text-white/70 mt-0.5">Serviços, fotos, preços e mais</p>
+        <p className="text-[13px] text-white/70 mt-0.5">Serviços, fotos, preços e mais</p>
       </div>
       <ChevronRight className="w-5 h-5 text-white/70 shrink-0" />
     </Link>

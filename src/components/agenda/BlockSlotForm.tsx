@@ -89,7 +89,7 @@ export const BlockSlotForm: React.FC<BlockSlotFormProps> = ({ slug, defaultDate,
           className="h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink"
         />
 
-        <label className="flex items-center gap-2 text-xs text-ink-soft">
+        <label className="flex items-center gap-2 text-sm text-ink-soft">
           <input type="checkbox" checked={allDay} onChange={(e) => setAllDay(e.target.checked)} className="w-4 h-4 accent-rose-600" />
           Bloquear o dia inteiro
         </label>
@@ -119,7 +119,7 @@ export const BlockSlotForm: React.FC<BlockSlotFormProps> = ({ slug, defaultDate,
           className="h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink placeholder:text-ink-faint"
         />
 
-        {error && <p className="text-xs text-rose-600">{error}</p>}
+        {error && <p className="text-[13px] text-rose-600">{error}</p>}
 
         <div className="flex gap-2 mt-1">
           <button type="button" onClick={onClose} className="flex-1 h-11 rounded-xl bg-linen text-ink-soft text-sm font-bold">

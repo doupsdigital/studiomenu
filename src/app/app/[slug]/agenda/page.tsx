@@ -166,7 +166,7 @@ export default async function AgendaPage({ params, searchParams }: AgendaPagePro
             </Link>
             <Link
               href={todayHref}
-              className="px-3 py-1.5 text-xs font-semibold hover:bg-white/20 rounded-md transition-colors text-white/80 hover:text-white"
+              className="px-3 py-1.5 text-[13px] font-semibold hover:bg-white/20 rounded-md transition-colors text-white/80 hover:text-white"
             >
               Hoje
             </Link>

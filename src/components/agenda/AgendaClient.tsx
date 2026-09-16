@@ -201,7 +201,7 @@ export const AgendaClient: React.FC<AgendaClientProps> = ({
             setShowManualForm((v) => !v);
             setShowBlockForm(false);
           }}
-          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-full text-xs font-bold shadow-sm transition-colors"
+          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-full text-sm font-bold shadow-sm transition-colors"
         >
           <CalendarPlus className="w-4 h-4" /> Novo
         </button>
@@ -211,7 +211,7 @@ export const AgendaClient: React.FC<AgendaClientProps> = ({
             setShowBlockForm((v) => !v);
             setShowManualForm(false);
           }}
-          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-full text-xs font-bold shadow-sm transition-colors"
+          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-full text-sm font-bold shadow-sm transition-colors"
         >
           <Lock className="w-4 h-4" /> Trancar
         </button>
@@ -219,7 +219,7 @@ export const AgendaClient: React.FC<AgendaClientProps> = ({
           <button
             type="button"
             onClick={() => setViewMenuOpen((v) => !v)}
-            className="w-full flex items-center justify-center gap-1.5 px-3 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-full text-xs font-bold shadow-sm transition-colors"
+            className="w-full flex items-center justify-center gap-1.5 px-3 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-full text-sm font-bold shadow-sm transition-colors"
           >
             {view === 'mes' ? 'Mês' : 'Dia'}
             <ChevronDown className={`w-3.5 h-3.5 transition-transform ${viewMenuOpen ? 'rotate-180' : ''}`} />
@@ -235,7 +235,7 @@ export const AgendaClient: React.FC<AgendaClientProps> = ({
                     setViewMenuOpen(false);
                     router.push(`/app/${slug}/agenda`);
                   }}
-                  className={`w-full text-left px-4 py-2.5 text-xs font-semibold transition-colors ${
+                  className={`w-full text-left px-4 py-2.5 text-sm font-semibold transition-colors ${
                     view === 'dia' ? 'bg-rose-50 text-rose-600' : 'text-ink-soft hover:bg-cream'
                   }`}
                 >
@@ -247,7 +247,7 @@ export const AgendaClient: React.FC<AgendaClientProps> = ({
                     setViewMenuOpen(false);
                     router.push(`/app/${slug}/agenda?view=mes`);
                   }}
-                  className={`w-full text-left px-4 py-2.5 text-xs font-semibold transition-colors ${
+                  className={`w-full text-left px-4 py-2.5 text-sm font-semibold transition-colors ${
                     view === 'mes' ? 'bg-rose-50 text-rose-600' : 'text-ink-soft hover:bg-cream'
                   }`}
                 >
@@ -285,13 +285,13 @@ export const AgendaClient: React.FC<AgendaClientProps> = ({
                 <AppointmentRow key={a.id} appointment={a} onApprove={setApproveAppointment} onReject={setRejectAppointment} />
               ))
             ) : (
-              <p className="px-5 py-4 text-xs text-ink-faint">Nenhum agendamento aguardando confirmação no momento.</p>
+              <p className="px-5 py-4 text-[13px] text-ink-faint">Nenhum agendamento aguardando confirmação no momento.</p>
             )}
           </div>
         )}
       </div>
 
-      {actionError && <p className="text-xs text-rose-600">{actionError}</p>}
+      {actionError && <p className="text-[13px] text-rose-600">{actionError}</p>}
 
       {showManualForm && (
         <ManualBookingForm

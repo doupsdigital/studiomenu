@@ -22,10 +22,10 @@ export const AppointmentRow: React.FC<AppointmentRowProps> = ({ appointment, onA
     <div className="flex items-center justify-between gap-4 px-5 py-3.5 hover:bg-amber-50/40 transition-colors">
       <div className="flex items-center gap-4 min-w-0">
         <div className="min-w-0">
-          <p className="font-semibold text-sm text-ink truncate">{appointment.client_name}</p>
-          <p className="text-xs text-ink-soft mt-0.5">{dateLabel} às {timeLabel}</p>
+          <p className="font-semibold text-[15px] text-ink truncate">{appointment.client_name}</p>
+          <p className="text-[13px] text-ink-soft mt-0.5">{dateLabel} às {timeLabel}</p>
         </div>
-        <p className="text-xs text-ink-faint truncate hidden sm:block">{appointment.service_title}</p>
+        <p className="text-[13px] text-ink-faint truncate hidden sm:block">{appointment.service_title}</p>
       </div>
       <div className="flex items-center gap-2 shrink-0">
         <button

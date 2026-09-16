@@ -102,7 +102,7 @@ export const ManualBookingForm: React.FC<ManualBookingFormProps> = ({
         <p className="font-serif-pro font-bold text-lg text-ink pr-8">Novo agendamento manual</p>
 
         {services.length === 0 ? (
-          <p className="text-xs text-amber-700">
+          <p className="text-[13px] text-amber-700">
             Nenhum serviço com duração configurada ainda. Adicione a duração no editor do catálogo primeiro.
           </p>
         ) : (
@@ -157,7 +157,7 @@ export const ManualBookingForm: React.FC<ManualBookingFormProps> = ({
           </>
         )}
 
-        {error && <p className="text-xs text-rose-600">{error}</p>}
+        {error && <p className="text-[13px] text-rose-600">{error}</p>}
 
         <div className="flex gap-2 mt-1">
           <button

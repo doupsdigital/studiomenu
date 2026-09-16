@@ -7,7 +7,7 @@ import type { BusinessHoursConfigRow, ScheduleBlockConfigRow } from '@/lib/sched
 import { localDateTimeToUTC } from '@/lib/scheduling/availability';
 import { STATUS_STYLES, STATUS_LABEL } from './status-styles';
 
-const SLOT_HEIGHT = 44; // px por meia-hora
+const SLOT_HEIGHT = 54; // px por meia-hora (54, não 44 — dá espaço pra fonte maior nos blocos sem cortar nada, ver docs/REESTRUTURACAO_VISUAL_APP.md, ajuste de legibilidade)
 
 interface DayTimeGridProps {
   dateStr: string;
@@ -123,7 +123,7 @@ export const DayTimeGrid: React.FC<DayTimeGridProps> = ({
     <div className="bg-surface border border-linen rounded-2xl overflow-hidden shadow-sm">
       <div className="grid grid-cols-[52px_1fr] border-b border-linen bg-rose-50/40 text-center">
         <div className="border-r border-linen" />
-        <div className="py-3 flex items-center justify-center gap-1.5 font-serif-pro font-semibold text-sm text-ink">
+        <div className="py-3 flex items-center justify-center gap-1.5 font-serif-pro font-semibold text-base text-ink">
           <CalendarDays className="w-4 h-4 text-rose-600" />
           {formatGridDateLabel(dateStr)}
         </div>
@@ -137,7 +137,7 @@ export const DayTimeGrid: React.FC<DayTimeGridProps> = ({
               key={`label-${hour}-${minute}`}
               style={{ height: SLOT_HEIGHT }}
               className={`border-b border-linen/70 flex items-center justify-end pr-1.5 ${
-                minute === 0 ? 'text-[11px] font-bold text-ink-soft' : 'text-[9px] text-ink-faint'
+                minute === 0 ? 'text-xs font-bold text-ink-soft' : 'text-[10px] text-ink-faint'
               }`}
             >
               {hour.toString().padStart(2, '0')}:{minute.toString().padStart(2, '0')}
@@ -190,28 +190,28 @@ export const DayTimeGrid: React.FC<DayTimeGridProps> = ({
                 onClick={() => onAppointmentClick(appt)}
                 style={{ top: `${top}px`, height: `${height}px` }}
                 className={`absolute left-2 right-2 rounded-lg border border-l-[4px] overflow-hidden flex flex-col shadow-sm z-10 text-left transition-all ${style.border} ${style.accent} ${style.bg} ${
-                  height < 40 ? 'px-2 py-0.5' : height < 70 ? 'px-2.5 py-1' : 'px-3 py-1.5'
+                  height < 48 ? 'px-2 py-0.5' : height < 84 ? 'px-2.5 py-1' : 'px-3 py-1.5'
                 }`}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <p className={`font-bold truncate flex-1 leading-tight ${height < 40 ? 'text-[10px]' : 'text-xs'} ${style.text}`}>
+                  <p className={`font-bold truncate flex-1 leading-tight ${height < 48 ? 'text-[11px]' : 'text-sm'} ${style.text}`}>
                     {appt.client_name}
                   </p>
-                  <span className={`font-bold opacity-90 whitespace-nowrap shrink-0 leading-none ${height < 40 ? 'text-[10px]' : 'text-xs'} ${style.text}`}>
+                  <span className={`font-bold opacity-90 whitespace-nowrap shrink-0 leading-none ${height < 48 ? 'text-[11px]' : 'text-sm'} ${style.text}`}>
                     {hour.toString().padStart(2, '0')}:{minute.toString().padStart(2, '0')}
                   </span>
                 </div>
-                {height >= 40 && (
-                  <p className={`opacity-75 truncate leading-none text-[10px] mt-0.5 ${style.text}`}>{appt.service_title}</p>
+                {height >= 48 && (
+                  <p className={`opacity-75 truncate leading-none text-xs mt-0.5 ${style.text}`}>{appt.service_title}</p>
                 )}
-                {height >= 60 && (
+                {height >= 72 && (
                   <div className="flex items-center justify-between mt-auto w-full">
-                    {height >= 70 ? (
-                      <p className={`text-[10px] opacity-50 font-medium leading-none ${style.text}`}>{appt.duration_minutes} min</p>
+                    {height >= 84 ? (
+                      <p className={`text-[11px] opacity-50 font-medium leading-none ${style.text}`}>{appt.duration_minutes} min</p>
                     ) : (
                       <span />
                     )}
-                    <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-semibold leading-none ${style.badge}`}>
+                    <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-semibold leading-none ${style.badge}`}>
                       {STATUS_LABEL[appt.status]}
                     </span>
                   </div>

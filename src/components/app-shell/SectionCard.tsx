@@ -47,7 +47,7 @@ export const SectionCard: React.FC<SectionCardProps> = ({ icon: Icon, title, isO
         </div>
       </button>
 
-      {locked && lockedHint && <p className="px-5 py-3 text-xs text-ink-faint">{lockedHint}</p>}
+      {locked && lockedHint && <p className="px-5 py-3 text-[13px] text-ink-faint">{lockedHint}</p>}
 
       {!locked && isOpen && <div className="p-5">{children}</div>}
     </div>
