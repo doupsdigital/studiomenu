@@ -1,12 +1,13 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Clock, CalendarX, CreditCard, UserCircle } from 'lucide-react';
+import { Clock, CalendarX, CreditCard, UserCircle, Bell } from 'lucide-react';
 import { SectionCard } from '@/components/app-shell/SectionCard';
 import { BusinessHoursEditor } from './BusinessHoursEditor';
 import { ScheduleBlocksManager } from './ScheduleBlocksManager';
 import { SubscriptionSection } from './SubscriptionSection';
 import { AccountSection } from './AccountSection';
+import { NotificationsSection } from './NotificationsSection';
 import type { BusinessHoursConfigRow, ScheduleBlockConfigRow } from '@/lib/scheduling/config-service';
 
 interface ConfigAccordionProps {
@@ -26,7 +27,7 @@ interface ConfigAccordionProps {
   authUserId: string | null;
 }
 
-type SectionKey = 'horarios' | 'bloqueios' | 'assinatura' | 'conta';
+type SectionKey = 'horarios' | 'bloqueios' | 'assinatura' | 'conta' | 'notificacoes';
 
 /** Acordeão da aba Config — 3 seções que já existiam (`BusinessHoursEditor`,
  *  `ScheduleBlocksManager`, `SubscriptionSection`), agora dentro de
@@ -51,6 +52,7 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
     bloqueios: true,
     assinatura: true,
     conta: true,
+    notificacoes: true,
   });
 
   useEffect(() => {
@@ -83,6 +85,17 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
         lockedHint="Disponível quando o agendamento automático (StudioMenu+) estiver ativo."
       >
         <ScheduleBlocksManager slug={slug} blocks={scheduleBlocks} />
+      </SectionCard>
+
+      <SectionCard
+        icon={Bell}
+        title="Notificações"
+        isOpen={open.notificacoes}
+        onToggle={() => toggle('notificacoes')}
+        locked={!bookingEnabled}
+        lockedHint="Disponível quando o agendamento automático (StudioMenu+) estiver ativo."
+      >
+        <NotificationsSection slug={slug} />
       </SectionCard>
 
       <div id="assinatura">

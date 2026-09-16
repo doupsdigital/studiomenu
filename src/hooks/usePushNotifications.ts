@@ -60,5 +60,20 @@ export function usePushNotifications(slug: string) {
     }
   }, [slug, permission]);
 
-  return { permission, subscribing, subscribe };
+  const sendTest = useCallback(async (): Promise<boolean> => {
+    try {
+      const res = await fetch('/api/professional/push-test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug }),
+      });
+      const json = await res.json();
+      return Boolean(json.success);
+    } catch (error) {
+      console.error('[usePushNotifications] Falha ao enviar teste:', error);
+      return false;
+    }
+  }, [slug]);
+
+  return { permission, subscribing, subscribe, sendTest };
 }

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Bell } from 'lucide-react';
-import { usePushNotifications } from '@/hooks/usePushNotifications';
+import { PushActivationFlow } from '@/components/push/PushActivationFlow';
 
 interface PushPermissionBannerProps {
   slug: string;
@@ -14,9 +14,10 @@ const dismissedKey = (slug: string) => `sm_push_dismissed_${slug}`;
  *  assim que o navegador já tiver uma decisão (`granted`/`denied`) ou se a
  *  profissional dispensar ("Agora não", guardado no localStorage, mesmo
  *  espírito do `PushPermissionBanner` do LashAgenda). Não aparece em
- *  navegadores sem suporte a Push API. */
+ *  navegadores sem suporte a Push API. A ativação em si (incluindo o
+ *  envio de uma notificação de teste pra confirmar que chegou de
+ *  verdade) fica em `PushActivationFlow`, reaproveitado também em Config. */
 export const PushPermissionBanner: React.FC<PushPermissionBannerProps> = ({ slug }) => {
-  const { permission, subscribing, subscribe } = usePushNotifications(slug);
   const [dismissed, setDismissed] = useState(true);
 
   useEffect(() => {
@@ -36,7 +37,7 @@ export const PushPermissionBanner: React.FC<PushPermissionBannerProps> = ({ slug
     }
   };
 
-  if (permission !== 'default' || dismissed) return null;
+  if (dismissed) return null;
 
   return (
     <div className="rounded-2xl bg-gradient-to-br from-rose-600 to-rose-500 text-white p-5 flex items-start gap-3">
@@ -46,19 +47,15 @@ export const PushPermissionBanner: React.FC<PushPermissionBannerProps> = ({ slug
       <div className="flex-1 min-w-0">
         <p className="font-serif-pro font-bold text-base">Ative as notificações</p>
         <p className="text-xs text-white/80 mt-0.5 mb-3">Receba um aviso na hora que uma cliente marcar um horário novo.</p>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={subscribe}
-            disabled={subscribing}
-            className="h-9 px-4 rounded-lg bg-white text-rose-700 text-xs font-bold disabled:opacity-50"
-          >
-            {subscribing ? 'Ativando...' : 'Ativar'}
-          </button>
-          <button type="button" onClick={handleDismiss} className="h-9 px-4 rounded-lg bg-white/15 text-white text-xs font-bold">
-            Agora não
-          </button>
-        </div>
+        <PushActivationFlow
+          slug={slug}
+          primaryButtonClassName="h-9 px-4 rounded-lg bg-white text-rose-700 text-xs font-bold disabled:opacity-50"
+          secondaryButtonClassName="h-9 px-4 rounded-lg bg-white/15 text-white text-xs font-bold disabled:opacity-50"
+          onConfirmed={handleDismiss}
+        />
+        <button type="button" onClick={handleDismiss} className="text-[11px] text-white/70 mt-2 underline">
+          Agora não
+        </button>
       </div>
     </div>
   );
