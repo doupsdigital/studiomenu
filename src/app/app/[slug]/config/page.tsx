@@ -22,7 +22,7 @@ export default async function ConfigPage({ params }: ConfigPageProps) {
 
   return (
     <>
-      <PageTitleBar title="Configurações" icon={Settings} slug={slug} />
+      <PageTitleBar title="Configurações" icon={<Settings className="w-5 h-5 text-ink-soft" />} slug={slug} />
       <main className="max-w-md mx-auto px-5 pt-6 pb-6 flex flex-col gap-5">
         <ConfigAccordion
           slug={slug}

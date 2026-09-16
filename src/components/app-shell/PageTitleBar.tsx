@@ -1,13 +1,18 @@
 'use client';
 
 import React, { useState } from 'react';
-import { LucideIcon, Bell, Download } from 'lucide-react';
+import { Bell, Download } from 'lucide-react';
 import { useInstallPrompt } from './InstallPromptProvider';
 import { NotificationCenterSheet } from '@/components/push/NotificationCenterSheet';
 
 interface PageTitleBarProps {
   title: string;
-  icon: LucideIcon;
+  /** Elemento já renderizado (ex. `<Home className="..." />`), não a
+   *  referência do componente — como `PageTitleBar` é Client Component
+   *  (precisa do botão de instalar/sino), só dá pra receber JSX já
+   *  resolvido do lado do servidor, não uma função/componente cru (React
+   *  não deixa passar funções pela fronteira servidor→cliente). */
+  icon: React.ReactNode;
   slug: string;
 }
 
@@ -21,7 +26,7 @@ interface PageTitleBarProps {
  *  uma pílula "Instalar" (dispara o diálogo nativo do Chrome sob demanda,
  *  em vez do mini-banner automático dele); depois de instalado, vira um
  *  sino que abre a Central de notificações. */
-export const PageTitleBar: React.FC<PageTitleBarProps> = ({ title, icon: Icon, slug }) => {
+export const PageTitleBar: React.FC<PageTitleBarProps> = ({ title, icon, slug }) => {
   const { canInstall, isInstalled, promptInstall } = useInstallPrompt();
   const [notificationsOpen, setNotificationsOpen] = useState(false);
 
@@ -45,7 +50,7 @@ export const PageTitleBar: React.FC<PageTitleBarProps> = ({ title, icon: Icon, s
               Instalar
             </button>
           ) : null}
-          <Icon className="w-5 h-5 text-ink-soft" />
+          {icon}
         </div>
       </header>
 

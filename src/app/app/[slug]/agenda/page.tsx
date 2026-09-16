@@ -98,7 +98,7 @@ export default async function AgendaPage({ params, searchParams }: AgendaPagePro
   if (!order.booking_enabled) {
     return (
       <>
-        <PageTitleBar title="Agenda" icon={Calendar} slug={slug} />
+        <PageTitleBar title="Agenda" icon={<Calendar className="w-5 h-5 text-ink-soft" />} slug={slug} />
         <main className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
           <PlusUpsellCard variant="full" slug={slug} />
         </main>
@@ -149,7 +149,7 @@ export default async function AgendaPage({ params, searchParams }: AgendaPagePro
 
   return (
     <>
-      <PageTitleBar title="Agenda" icon={Calendar} slug={slug} />
+      <PageTitleBar title="Agenda" icon={<Calendar className="w-5 h-5 text-ink-soft" />} slug={slug} />
       <main className="max-w-md mx-auto px-5 pt-6 pb-6 flex flex-col gap-5">
       <GradientHeader showSparkles={false}>
         <div className="flex items-center justify-between gap-3">
