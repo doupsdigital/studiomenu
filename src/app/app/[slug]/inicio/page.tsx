@@ -64,6 +64,7 @@ export default async function InicioPage({ params }: InicioPageProps) {
         <h1 className="font-serif-pro font-bold text-3xl">
           {greeting}, {firstName}!
         </h1>
+        <p className="text-sm text-white/70 mt-1.5">Bem-vinda ao seu Studio! ✨</p>
         {isPlusAtivo && (
           <div className="flex justify-end">
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 mt-3 rounded-full bg-white/15 backdrop-blur-sm text-xs font-bold tracking-wide">
