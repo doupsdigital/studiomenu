@@ -2,7 +2,7 @@
 
 > Documento vivo de acompanhamento, mesmo padrão do `docs/REESTRUTURACAO_VISUAL_APP.md`. Plano completo (contexto, decisões, pesquisa sobre o LashAgenda) foi feito em modo plano em 2026-09-15 — resumo abaixo. Cada fase só avança pra próxima depois de testada e aprovada.
 
-**Status geral:** ✅ Fase 17 concluída e testada — aguardando aprovação pra commit. Próxima: Fase 18 (push notifications).
+**Status geral:** ✅ Fase 17 concluída, commitada e validada em produção. 🟡 Fase 18 (push notifications) em andamento.
 
 **Legenda:** `[ ]` pendente · `[x]` feito e testado
 
@@ -71,7 +71,30 @@ Modelo implementado: `orders.auth_user_id` (nullable, 1:1 com `auth.users`) — 
 - [x] Vincular com Google pela interface (depois de resetar o `auth_user_id` pra testar do zero) → "Login ativo — Conta Google vinculada com sucesso".
 - [x] Sair → entrar de novo por `/entrar` com Google → funcionou.
 
-**Nada commitado ainda** — aguardando aprovação do usuário.
+**Commit:** `dc5a613` — `git push` feito.
+
+**Deploy em produção**: o push não disparou o auto-deploy da Vercel dessa vez (bug pontual — confirmado via API do GitHub que o commit `dc5a613` não recebeu nenhum status/check da Vercel, diferente do `1a23c80` anterior que tinha `"Vercel: Deployment has completed"`). Resolvido criando um deployment manual pela Vercel Dashboard ("Create Deployment" → branch `main`). Depois disso, `https://studiomenu.vercel.app/entrar` e `/entrar/callback` responderam 200, e o usuário testou e confirmou os dois logins (senha e Google) funcionando em produção de verdade.
+
+### Fase 18 — Push notifications 🟡 EM ANDAMENTO (2026-09-16)
+
+Simplificado do LashAgenda como já decidido no planejamento: chamada direta em `/api/scheduling/book` (mesmo padrão non-blocking do `telegram.ts`), sem trigger de banco nem Edge Function.
+
+**Código:**
+- [x] `web-push` + `@types/web-push` instalados.
+- [x] Par de chaves VAPID gerado (`npx web-push generate-vapid-keys`) e salvo no `.env` local: `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`.
+- [x] `docs/migrations/2026-09-16_fase18_push_notifications.sql` (novo) + `docs/schema.sql` atualizado — tabela `push_subscriptions` (`order_id`, `endpoint`, `p256dh`, `auth`, `UNIQUE(order_id, endpoint)`), RLS ligado, `REVOKE ALL FROM anon` (mesmo padrão das outras tabelas de agendamento).
+- [x] `src/lib/push-notifications.ts` (novo) — `sendPushToOrder(orderId, payload)`, non-blocking, limpa do banco inscrições expiradas (404/410 do serviço de push).
+- [x] `src/app/api/scheduling/book/route.ts` — chama `sendPushToOrder` depois de inserir o agendamento (só essa rota é usada pra reservas da cliente; as manuais da profissional passam por outra rota, então não dão eco nela mesma).
+- [x] `public/sw.js` — handlers `push` (mostra a notificação) e `notificationclick` (foca aba existente ou abre uma nova).
+- [x] `src/hooks/usePushNotifications.ts` (novo) — pede permissão, assina via `PushManager`, salva a inscrição.
+- [x] `src/app/api/professional/push-subscribe/route.ts` + `push-unsubscribe/route.ts` (novos).
+- [x] `src/components/app-shell/PushPermissionBanner.tsx` (novo) + `inicio/page.tsx` — banner dispensável (localStorage), só some quando `booking_enabled` está ligado.
+- [x] `tsc` + `build` limpos. Rota `push-subscribe` testada via script (recusa sem cookie válido, 401).
+
+**Pendente antes de testar de ponta a ponta (ações do usuário):**
+- [ ] Rodar `docs/migrations/2026-09-16_fase18_push_notifications.sql` no SQL Editor do Supabase.
+- [ ] Adicionar na Vercel (Production **e** Preview) as 3 variáveis com os **mesmos valores** do `.env` local (o banco de `push_subscriptions` é compartilhado entre local e produção — usar chaves VAPID diferentes quebraria as inscrições feitas num ambiente quando o outro tentar enviar): `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`. Redeploy depois.
+- [ ] Teste guiado: no app (local ou produção), banner "Ative as notificações" no Início → Ativar → aceitar a permissão do navegador → fazer uma reserva como cliente em `/c/teste-local-1` → confirmar que a notificação chega.
 
 ## Como retomar em outra sessão
 

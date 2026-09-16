@@ -3,6 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin';
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 import { getAvailableSlotsForDate } from '@/lib/scheduling/slot-lookup';
 import { buildAppointmentInsertPayload } from '@/lib/scheduling/appointment-payload';
+import { sendPushToOrder } from '@/lib/push-notifications';
 
 /** POST /api/scheduling/book
  *  Pública (o cliente final não tem conta — só nome + WhatsApp), rate-limited.
@@ -108,6 +109,15 @@ export async function POST(request: Request) {
       console.error('[API Scheduling Book] Erro ao inserir appointment:', insertErr);
       return NextResponse.json({ success: false, message: 'Erro ao confirmar o agendamento.' }, { status: 500 });
     }
+
+    // Só agendamentos feitos pela cliente (origin 'catalog', sempre o caso
+    // nesta rota) disparam push — a profissional já sabe dos que ela mesma
+    // cria manualmente pelo app.
+    await sendPushToOrder(order.id, {
+      title: 'Novo agendamento!',
+      body: `${client_name} quer marcar ${service.title}.`,
+      url: `/app/${slug.toLowerCase().trim()}/agenda#pendentes`,
+    });
 
     return NextResponse.json({ success: true, appointment: inserted, service: { title: service.title, price: service.price } });
   } catch (error) {

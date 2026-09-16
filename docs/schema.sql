@@ -145,6 +145,21 @@ CREATE INDEX IF NOT EXISTS idx_appointments_starts_at ON public.appointments(sta
 ALTER TABLE public.appointments ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON public.appointments FROM anon;
 
+-- Push notifications (docs/PLANO_PRODUCAO_V1.md, Fase 18): uma linha por
+-- dispositivo/navegador inscrito nas notificações de um catálogo.
+CREATE TABLE IF NOT EXISTS public.push_subscriptions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    order_id UUID REFERENCES public.orders(id) ON DELETE CASCADE,
+    endpoint TEXT NOT NULL,
+    p256dh TEXT NOT NULL,
+    auth TEXT NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT now(),
+    UNIQUE (order_id, endpoint)
+);
+CREATE INDEX IF NOT EXISTS idx_push_subscriptions_order_id ON public.push_subscriptions(order_id);
+ALTER TABLE public.push_subscriptions ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON public.push_subscriptions FROM anon;
+
 -- 3. PERMISSÕES DE LEITURA E GRAVAÇÃO (ROW LEVEL SECURITY - RLS)
 --
 -- ATUALIZADO (auditoria de segurança, item C1): `orders` e `order_services` não têm

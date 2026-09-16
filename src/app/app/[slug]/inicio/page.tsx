@@ -7,6 +7,7 @@ import { StatCard } from '@/components/app-shell/StatCard';
 import { ViewCatalogCard } from '@/components/app-shell/ViewCatalogCard';
 import { EditCatalogCard } from '@/components/app-shell/EditCatalogCard';
 import { PlusUpsellCard } from '@/components/app-shell/PlusUpsellCard';
+import { PushPermissionBanner } from '@/components/app-shell/PushPermissionBanner';
 import { ShareLinkButton } from '@/components/app-shell/ShareLinkButton';
 import { PageTitleBar } from '@/components/app-shell/PageTitleBar';
 import { CalendarDays, Clock, Share2, Crown, Home } from 'lucide-react';
@@ -105,6 +106,8 @@ export default async function InicioPage({ params }: InicioPageProps) {
           />
         </div>
       )}
+
+      {schedulingLive && <PushPermissionBanner slug={slug} />}
 
       <ViewCatalogCard slug={order.slug} />
 
