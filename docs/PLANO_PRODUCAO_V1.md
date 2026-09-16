@@ -2,7 +2,7 @@
 
 > Documento vivo de acompanhamento, mesmo padrão do `docs/REESTRUTURACAO_VISUAL_APP.md`. Plano completo (contexto, decisões, pesquisa sobre o LashAgenda) foi feito em modo plano em 2026-09-15 — resumo abaixo. Cada fase só avança pra próxima depois de testada e aprovada.
 
-**Status geral:** ✅ Fases 17 e 18 concluídas e validadas em produção. 🟡 Fase 19 (central de instalação/notificações + lembrete 1h antes) em andamento — plano completo salvo em modo plano (2026-09-16).
+**Status geral:** ✅ Fases 17, 18 e 19 (A+B) concluídas e validadas em produção. Fase 19C (lembrete 1h antes) descartada por enquanto — ver nota abaixo. Próximas: Fase 20 (multi-tenant/concorrência) e Fase 21 (auditoria de banco).
 
 **Legenda:** `[ ]` pendente · `[x]` feito e testado
 
@@ -110,9 +110,11 @@ Achado testando push em produção no celular: o banner nativo de instalação d
 - [x] `PushPermissionBanner` removido (do Início e do projeto) — redundante com o sino novo.
 - [x] `tsc` + `build` limpos.
 
-**Fase C — lembrete 1h antes do atendimento**: ainda não iniciada (schema novo, rota de cron, GitHub Actions agendado — ver plano completo).
+**Fases A+B testadas e aprovadas em produção** (2026-09-16), incluindo um bug crítico achado e corrigido nesse meio-tempo: `PageTitleBar` virou Client Component (precisava do hook de instalar/sino) mas continuava recebendo `icon={Home}` como referência de componente vinda de um Server Component — React não deixa passar funções pela fronteira servidor→cliente, quebrando as 3 páginas (500 em Início/Agenda/Config) até ser corrigido passando o ícone já renderizado. Lição: `tsc`/`build` não pegam esse tipo de erro, só aparece com uma sessão autenticada de verdade — passei a testar isso via script (cookie real) antes de declarar uma fase pronta, não só `curl` simples.
 
-**Pendente:** teste guiado do usuário no celular (Fases A+B) antes de commitar e seguir pra Fase C.
+Também 2 ajustes finos pedidos depois do teste: a Central de notificações fecha sozinha ao confirmar "Sim, recebi"; o sino pulsa com uma bolinha rosa enquanto a notificação ainda não foi decidida.
+
+**Fase C (lembrete 1h antes do atendimento) — descartada por enquanto** (2026-09-16). Cheguei a montar a implementação (schema, rota de preferências, rota de cron, GitHub Actions), mas o usuário reconsiderou antes de commitar: risco de excesso de notificação (uma por atendimento, todo dia, ofuscando a notificação que já importa — "novo agendamento") não compensava a infra extra (GitHub Actions + secret) pro ganho. Revertido, nada disso ficou no código. Pode ser retomado no futuro se fizer sentido — o plano completo (Fase C) continua salvo em modo plano caso o usuário peça de novo.
 
 ## Como retomar em outra sessão
 
