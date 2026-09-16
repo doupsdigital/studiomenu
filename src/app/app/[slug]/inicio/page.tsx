@@ -39,7 +39,8 @@ function getGreetingAndDate(): { greeting: string; dateLabel: string } {
   const weekdayIdx = new Date(now.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' })).getDay();
 
   const greeting = hour >= 5 && hour < 12 ? 'Bom dia' : hour >= 12 && hour < 18 ? 'Boa tarde' : 'Boa noite';
-  const dateLabel = `${WEEK_DAYS[weekdayIdx]}, ${day} de ${MONTHS_PT[month - 1]}`;
+  const rawDate = `${WEEK_DAYS[weekdayIdx]}, ${day} de ${MONTHS_PT[month - 1]}`;
+  const dateLabel = rawDate.charAt(0).toUpperCase() + rawDate.slice(1);
 
   return { greeting, dateLabel };
 }
@@ -80,7 +81,7 @@ export default async function InicioPage({ params }: InicioPageProps) {
         <h1 className="font-serif-pro font-bold text-3xl">
           {greeting}, {firstName}!
         </h1>
-        <p className="text-sm text-white/70 mt-1.5">Aqui está o resumo do seu dia — {dateLabel}.</p>
+        <p className="text-sm text-white/70 mt-1.5">{dateLabel}</p>
         {isPlusAtivo && (
           <div className="flex justify-end">
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 mt-3 rounded-full bg-white/15 backdrop-blur-sm text-xs font-bold tracking-wide">
