@@ -15,34 +15,17 @@ interface InicioPageProps {
   params: Promise<{ slug: string }>;
 }
 
-const WEEK_DAYS = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
-const MONTHS_PT = [
-  'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
-  'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro',
-];
-
-/** Saudação + data de hoje, sempre no fuso America/Sao_Paulo (mesmo padrão
- *  do resto do agendamento) — não o fuso do servidor. */
-function getGreetingAndDate(): { greeting: string; dateLabel: string } {
+/** Saudação baseada na hora em America/Sao_Paulo (não o fuso do servidor). */
+function getGreeting(): string {
   const now = new Date();
   const parts = new Intl.DateTimeFormat('en-US', {
     timeZone: 'America/Sao_Paulo',
     hour: 'numeric',
     hour12: false,
-    day: 'numeric',
-    month: 'numeric',
   }).formatToParts(now);
 
   const hour = Number(parts.find((p) => p.type === 'hour')?.value ?? 12);
-  const day = Number(parts.find((p) => p.type === 'day')?.value ?? 1);
-  const month = Number(parts.find((p) => p.type === 'month')?.value ?? 1);
-  const weekdayIdx = new Date(now.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' })).getDay();
-
-  const greeting = hour >= 5 && hour < 12 ? 'Bom dia' : hour >= 12 && hour < 18 ? 'Boa tarde' : 'Boa noite';
-  const rawDate = `${WEEK_DAYS[weekdayIdx]}, ${day} de ${MONTHS_PT[month - 1]}`;
-  const dateLabel = rawDate.charAt(0).toUpperCase() + rawDate.slice(1);
-
-  return { greeting, dateLabel };
+  return hour >= 5 && hour < 12 ? 'Bom dia' : hour >= 12 && hour < 18 ? 'Boa tarde' : 'Boa noite';
 }
 
 function todayInSaoPaulo(): string {
@@ -70,7 +53,7 @@ export default async function InicioPage({ params }: InicioPageProps) {
   // esses, só o que ainda está ativo (Fase 9).
   const todayAppointments = todayAppointmentsRaw.filter((a) => a.status !== 'cancelled');
 
-  const { greeting, dateLabel } = getGreetingAndDate();
+  const greeting = getGreeting();
   const firstName = order.client_name.split(' ')[0];
 
   return (
@@ -81,7 +64,6 @@ export default async function InicioPage({ params }: InicioPageProps) {
         <h1 className="font-serif-pro font-bold text-3xl">
           {greeting}, {firstName}!
         </h1>
-        <p className="text-sm text-white/70 mt-1.5">{dateLabel}</p>
         {isPlusAtivo && (
           <div className="flex justify-end">
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 mt-3 rounded-full bg-white/15 backdrop-blur-sm text-xs font-bold tracking-wide">
