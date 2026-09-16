@@ -2,7 +2,7 @@
 
 > Documento vivo de acompanhamento, mesmo padrão do `docs/REESTRUTURACAO_VISUAL_APP.md`. Plano completo (contexto, decisões, pesquisa sobre o LashAgenda) foi feito em modo plano em 2026-09-15 — resumo abaixo. Cada fase só avança pra próxima depois de testada e aprovada.
 
-**Status geral:** ✅ Fases 17, 18, 19 (A+B), Migração do Supabase e Ativação do domínio oficial concluídas e validadas em produção. Fase 19C (lembrete 1h antes) descartada por enquanto — ver nota abaixo. Próximas: Fase 20 (multi-tenant/concorrência) e Fase 21 (auditoria de banco).
+**Status geral:** ✅ Fases 17, 18, 19 (A+B), Migração do Supabase, Ativação do domínio oficial e Fase 20 (multi-tenant/concorrência) concluídas e validadas em produção. Fase 19C (lembrete 1h antes) descartada por enquanto — ver nota abaixo. Próxima: Fase 21 (auditoria de banco).
 
 **Legenda:** `[ ]` pendente · `[x]` feito e testado
 
@@ -145,6 +145,13 @@ Domínio próprio (`studiomenu.art`, registrado na Hostinger) ativado como princ
 - [x] **Validado em produção**: domínio raiz + `www` + subdomínio de teste (`vanessa-camargo.studiomenu.art`, carrega o catálogo dela direto) + bloqueio de `/admin` em subdomínio (404, como já era esperado) + login completo (link mágico e Google) — tudo testado.
 - [x] **Achado no caminho**: a profissional de teste precisou "reivindicar" o login de novo (Config → Minha conta) — consequência já esperada da migração do Supabase (Fase anterior), não do domínio em si.
 - [x] `tsc` + `build` limpos.
+
+### Fase 20 — Multi-tenant e concorrência ✅ CONCLUÍDA (2026-09-16)
+
+- [x] **3 catálogos fictícios criados** direto em produção via `/api/onboarding/create-catalog` (rota real, mesma que qualquer catálogo novo usa), niches diferentes: `studio-nails-bella-504` (nail), `clinica-estetica-aurora-176` (estetica), `studio-beauty-prime-745` (studio). StudioMenu+ ativado manualmente (`plan_tier`/`subscription_status`/`booking_enabled`) + horários seg-sex 09h-18h configurados em cada um.
+- [x] **Isolamento confirmado**: login (link mágico) funcionando em cada um, contagem de serviços correta (4 por catálogo, dos presets do niche), e a página Início de cada um checada pra não conter o nome de nenhum outro catálogo — zero vazamento entre tenants.
+- [x] **Concorrência testada**: 2 requisições `POST /api/scheduling/book` disparadas em paralelo (`Promise.all`) pro mesmo `service_id` + `starts_at` exato — uma retornou `200` (sucesso), a outra `409` ("Esse horário não está mais disponível"). Conferido também direto no banco: só existe 1 linha em `appointments` pra esse horário. A trava `EXCLUDE USING gist` segura a condição de corrida sob concorrência real em produção, não só localmente.
+- [x] **Catálogos fictícios apagados** depois do teste (decisão do usuário) — `ON DELETE CASCADE` removeu serviços/horários/agendamento de teste junto, confirmado que não sobrou nada órfão.
 
 ## Como retomar em outra sessão
 
