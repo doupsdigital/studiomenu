@@ -10,6 +10,10 @@ interface PushActivationFlowProps {
    *  (banner rosa vs. cartão branco de Config) usa uma paleta diferente. */
   primaryButtonClassName: string;
   secondaryButtonClassName: string;
+  /** Classe do texto explicativo (pergunta de confirmação, checklist de
+   *  troubleshooting, status "ativo") — precisa ter contraste com o fundo
+   *  de cada contexto (card branco em Config vs. banner rosa no Início). */
+  textClassName?: string;
   /** Chamado quando a ativação é confirmada (a profissional respondeu "Sim,
    *  recebi", ou a permissão já vinha concedida de uma visita anterior) —
    *  o banner do Início usa isso pra se dispensar sozinho; a seção de
@@ -32,6 +36,7 @@ export const PushActivationFlow: React.FC<PushActivationFlowProps> = ({
   slug,
   primaryButtonClassName,
   secondaryButtonClassName,
+  textClassName = 'text-ink-soft',
   onConfirmed,
 }) => {
   const { permission, subscribing, subscribe, sendTest } = usePushNotifications(slug);
@@ -64,7 +69,7 @@ export const PushActivationFlow: React.FC<PushActivationFlowProps> = ({
 
   if (permission === 'denied') {
     return (
-      <p className="text-xs text-ink-soft leading-relaxed">
+      <p className={`text-xs leading-relaxed ${textClassName}`}>
         As notificações estão bloqueadas pro StudioMenu nesse navegador. Pra reativar: menu do navegador → Configurações do site → Notificações → mude pra "Permitir".
       </p>
     );
@@ -73,7 +78,7 @@ export const PushActivationFlow: React.FC<PushActivationFlowProps> = ({
   if (phase === 'confirming') {
     return (
       <div>
-        <p className="text-xs text-ink-soft mb-2">{sendingTest ? 'Enviando notificação de teste...' : 'Enviamos uma notificação de teste — você recebeu?'}</p>
+        <p className={`text-xs mb-2 ${textClassName}`}>{sendingTest ? 'Enviando notificação de teste...' : 'Enviamos uma notificação de teste — você recebeu?'}</p>
         {!sendingTest && (
           <div className="flex gap-2">
             <button type="button" onClick={confirm} className={primaryButtonClassName}>
@@ -91,7 +96,7 @@ export const PushActivationFlow: React.FC<PushActivationFlowProps> = ({
   if (phase === 'troubleshooting') {
     return (
       <div className="flex flex-col gap-2">
-        <div className="flex items-start gap-2 text-xs text-ink-soft leading-relaxed">
+        <div className={`flex items-start gap-2 text-xs leading-relaxed ${textClassName}`}>
           <HelpCircle className="w-4 h-4 shrink-0 mt-0.5" />
           <p>
             É comum o celular ter uma permissão separada pro navegador em si. No Android: Configurações → Apps →
@@ -109,7 +114,7 @@ export const PushActivationFlow: React.FC<PushActivationFlowProps> = ({
   if (phase === 'confirmed') {
     return (
       <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-2 text-xs">
+        <div className={`flex items-center gap-2 text-xs ${textClassName}`}>
           <CheckCircle2 className="w-4 h-4 shrink-0" />
           <span>Notificações ativas nesse dispositivo.</span>
         </div>

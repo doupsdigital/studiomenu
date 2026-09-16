@@ -51,6 +51,7 @@ export const PushPermissionBanner: React.FC<PushPermissionBannerProps> = ({ slug
           slug={slug}
           primaryButtonClassName="h-9 px-4 rounded-lg bg-white text-rose-700 text-xs font-bold disabled:opacity-50"
           secondaryButtonClassName="h-9 px-4 rounded-lg bg-white/15 text-white text-xs font-bold disabled:opacity-50"
+          textClassName="text-white/90"
           onConfirmed={handleDismiss}
         />
         <button type="button" onClick={handleDismiss} className="text-[11px] text-white/70 mt-2 underline">
