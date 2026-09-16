@@ -23,9 +23,10 @@ interface PushActivationFlowProps {
 
 type Phase = 'idle' | 'activating' | 'confirming' | 'confirmed' | 'troubleshooting';
 
-/** Núcleo da ativação de push, reaproveitado no banner do Início
- *  (`PushPermissionBanner`) e na seção persistente de Config
- *  (`NotificationsSection`). Depois de ativar, manda uma notificação de
+/** Núcleo da ativação de push, reaproveitado na Central de notificações
+ *  (`NotificationCenterSheet`, aberta pelo sino no cabeçalho) e na seção
+ *  persistente de Config (`NotificationsSection`). Depois de ativar, manda
+ *  uma notificação de
  *  teste de verdade e pergunta se chegou — a permissão do site
  *  (`Notification.permission`) pode aparecer como concedida mesmo com a
  *  notificação do Chrome desligada no nível do Android, e não tem nenhuma

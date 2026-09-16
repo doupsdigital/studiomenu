@@ -7,7 +7,6 @@ import { StatCard } from '@/components/app-shell/StatCard';
 import { ViewCatalogCard } from '@/components/app-shell/ViewCatalogCard';
 import { EditCatalogCard } from '@/components/app-shell/EditCatalogCard';
 import { PlusUpsellCard } from '@/components/app-shell/PlusUpsellCard';
-import { PushPermissionBanner } from '@/components/app-shell/PushPermissionBanner';
 import { ShareLinkButton } from '@/components/app-shell/ShareLinkButton';
 import { PageTitleBar } from '@/components/app-shell/PageTitleBar';
 import { CalendarDays, Clock, Share2, Crown, Home } from 'lucide-react';
@@ -75,7 +74,7 @@ export default async function InicioPage({ params }: InicioPageProps) {
 
   return (
     <>
-      <PageTitleBar title="Início" icon={Home} />
+      <PageTitleBar title="Início" icon={Home} slug={slug} />
       <main className="max-w-md mx-auto px-5 pt-6 pb-6 flex flex-col gap-4">
       <GradientHeader>
         <h1 className="font-serif-pro font-bold text-3xl">
@@ -106,8 +105,6 @@ export default async function InicioPage({ params }: InicioPageProps) {
           />
         </div>
       )}
-
-      {schedulingLive && <PushPermissionBanner slug={slug} />}
 
       <ViewCatalogCard slug={order.slug} />
 

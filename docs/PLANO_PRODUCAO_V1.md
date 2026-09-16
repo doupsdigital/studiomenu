@@ -2,7 +2,7 @@
 
 > Documento vivo de acompanhamento, mesmo padrão do `docs/REESTRUTURACAO_VISUAL_APP.md`. Plano completo (contexto, decisões, pesquisa sobre o LashAgenda) foi feito em modo plano em 2026-09-15 — resumo abaixo. Cada fase só avança pra próxima depois de testada e aprovada.
 
-**Status geral:** ✅ Fase 17 concluída, commitada e validada em produção. 🟡 Fase 18 (push notifications) em andamento.
+**Status geral:** ✅ Fases 17 e 18 concluídas e validadas em produção. 🟡 Fase 19 (central de instalação/notificações + lembrete 1h antes) em andamento — plano completo salvo em modo plano (2026-09-16).
 
 **Legenda:** `[ ]` pendente · `[x]` feito e testado
 
@@ -95,6 +95,24 @@ Simplificado do LashAgenda como já decidido no planejamento: chamada direta em 
 - [ ] Rodar `docs/migrations/2026-09-16_fase18_push_notifications.sql` no SQL Editor do Supabase.
 - [ ] Adicionar na Vercel (Production **e** Preview) as 3 variáveis com os **mesmos valores** do `.env` local (o banco de `push_subscriptions` é compartilhado entre local e produção — usar chaves VAPID diferentes quebraria as inscrições feitas num ambiente quando o outro tentar enviar): `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`. Redeploy depois.
 - [ ] Teste guiado: no app (local ou produção), banner "Ative as notificações" no Início → Ativar → aceitar a permissão do navegador → fazer uma reserva como cliente em `/c/teste-local-1` → confirmar que a notificação chega.
+
+### Fase 19 — Central de instalação/notificações + lembrete 1h antes 🟡 EM ANDAMENTO (2026-09-16)
+
+Achado testando push em produção no celular: o banner nativo de instalação do Chrome aparecia antes do login (bug), e a ativação de notificações estava pouco descobrível (só um banner dispensável). Usuário trouxe a referência de um app concorrente (botão "Instalar" no cabeçalho que vira "sino" depois de instalado, abrindo uma central de notificações) e pediu pra also planejar um lembrete novo (1h antes do atendimento, pra profissional). Plano completo salvo em modo plano.
+
+**Fase A — corrige o banner prematuro:**
+- [x] `src/app/app/[slug]/layout.tsx`: `generateMetadata` só devolve o manifest escopado quando a sessão é válida.
+
+**Fase B — botão de instalar controlado + sino:**
+- [x] `src/components/app-shell/InstallPromptProvider.tsx` (novo) — Context/hook `useInstallPrompt()`, captura `beforeinstallprompt` (com `preventDefault`) e `appinstalled`.
+- [x] `PageTitleBar.tsx` — vira client component, ganha `slug` e o controle novo (pílula "Instalar" ou sino, ao lado do ícone decorativo de sempre).
+- [x] `src/components/push/NotificationCenterSheet.tsx` (novo, bottom sheet) — por enquanto só a seção "Novo agendamento" (reaproveita `PushActivationFlow`).
+- [x] `PushPermissionBanner` removido (do Início e do projeto) — redundante com o sino novo.
+- [x] `tsc` + `build` limpos.
+
+**Fase C — lembrete 1h antes do atendimento**: ainda não iniciada (schema novo, rota de cron, GitHub Actions agendado — ver plano completo).
+
+**Pendente:** teste guiado do usuário no celular (Fases A+B) antes de commitar e seguir pra Fase C.
 
 ## Como retomar em outra sessão
 

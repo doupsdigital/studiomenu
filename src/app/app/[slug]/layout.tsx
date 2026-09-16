@@ -2,6 +2,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 import { isProfessionalRequestAuthorized } from '@/lib/professional-session';
 import { ServiceWorkerRegister } from '@/components/app-shell/ServiceWorkerRegister';
+import { InstallPromptProvider } from '@/components/app-shell/InstallPromptProvider';
 import { BottomNav } from '@/components/app-shell/BottomNav';
 
 interface AppLayoutProps {
@@ -12,9 +13,16 @@ interface AppLayoutProps {
 /** Sobrescreve o manifest herdado da raiz (`start_url: '/'`, a landing page
  *  de vendas) pelo manifest dinâmico escopado desse catálogo — sem isso,
  *  instalar o PWA a partir de qualquer tela daqui abria a home de vendas
- *  depois de instalado, não o app da profissional. */
+ *  depois de instalado, não o app da profissional.
+ *
+ *  Só devolve esse manifest quando a sessão é válida: sem isso, o Chrome
+ *  considerava a tela de "link inválido" instalável e oferecia o app antes
+ *  do login (achado testando no celular) — sem sessão, cai de volta no
+ *  manifest raiz (inofensivo, é o mesmo já usado pela home de vendas). */
 export async function generateMetadata({ params }: AppLayoutProps): Promise<Metadata> {
   const { slug } = await params;
+  const isAuthenticated = await isProfessionalRequestAuthorized(slug);
+  if (!isAuthenticated) return {};
   return { manifest: `/app/${slug}/manifest.webmanifest` };
 }
 
@@ -36,10 +44,12 @@ export default async function ProfessionalAppLayout({ children, params }: AppLay
   }
 
   return (
-    <div className="pro-app-shell min-h-screen bg-cream text-ink font-body-pro pb-20">
-      <ServiceWorkerRegister />
-      {children}
-      <BottomNav slug={slug} />
-    </div>
+    <InstallPromptProvider>
+      <div className="pro-app-shell min-h-screen bg-cream text-ink font-body-pro pb-20">
+        <ServiceWorkerRegister />
+        {children}
+        <BottomNav slug={slug} />
+      </div>
+    </InstallPromptProvider>
   );
 }

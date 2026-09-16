@@ -19,7 +19,7 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array<ArrayBuffer> {
 
 /** Gerencia a inscrição de push notifications do navegador atual pro
  *  catálogo. Não decide UI nenhuma — só expõe `permission` e `subscribe()`
- *  pro banner (`PushPermissionBanner`) usar. */
+ *  pro `PushActivationFlow` usar. */
 export function usePushNotifications(slug: string) {
   const [permission, setPermission] = useState<PushPermissionState>('default');
   const [subscribing, setSubscribing] = useState(false);
