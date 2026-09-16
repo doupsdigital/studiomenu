@@ -154,9 +154,10 @@ export const AccountSection: React.FC<AccountSectionProps> = ({ slug, hasAccount
               <CheckCircle2 className="w-6 h-6" />
             </div>
             <div className="min-w-0">
-              <p className="font-serif-pro font-bold text-lg text-rose-800 leading-tight">Login ativo</p>
+              <p className="font-serif-pro font-bold text-lg text-rose-800 leading-tight">Acesso configurado</p>
               <p className="text-[13px] text-rose-800/70 mt-0.5">
-                {justLinkedGoogle ? 'Conta Google vinculada com sucesso.' : 'Você já pode entrar direto por /entrar.'}
+                {justLinkedGoogle && 'Conta Google vinculada com sucesso. '}
+                Você não depende mais do link de acesso — entre quando quiser em studiomenu.art/entrar, com seu e-mail e senha (ou Google).
               </p>
             </div>
           </div>
