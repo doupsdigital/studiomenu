@@ -2,7 +2,7 @@
 
 > Documento vivo de acompanhamento, mesmo padrão do `docs/REESTRUTURACAO_VISUAL_APP.md`. Plano completo (contexto, decisões, pesquisa sobre o LashAgenda) foi feito em modo plano em 2026-09-15 — resumo abaixo. Cada fase só avança pra próxima depois de testada e aprovada.
 
-**Status geral:** ✅ Fases 17, 18, 19 (A+B) e a Migração do Supabase concluídas e validadas em produção. Fase 19C (lembrete 1h antes) descartada por enquanto — ver nota abaixo. Próximas: ativar o domínio oficial, depois Fase 20 (multi-tenant/concorrência) e Fase 21 (auditoria de banco).
+**Status geral:** ✅ Fases 17, 18, 19 (A+B), Migração do Supabase e Ativação do domínio oficial concluídas e validadas em produção. Fase 19C (lembrete 1h antes) descartada por enquanto — ver nota abaixo. Próximas: Fase 20 (multi-tenant/concorrência) e Fase 21 (auditoria de banco).
 
 **Legenda:** `[ ]` pendente · `[x]` feito e testado
 
@@ -132,6 +132,19 @@ O banco estava num projeto Supabase da conta pessoal do usuário (`orrfslursoiel
 - [x] `scripts/create_test_client.js` (fallback hardcoded) e comentários em `docs/schema.sql` atualizados pro projeto novo.
 - [x] `tsc` + `build` limpos.
 - **Projeto antigo** (`orrfslursoielebvdhbf`, conta pessoal) continua no ar por enquanto, sem uso — decisão de apagar fica pra depois.
+
+### Ativação do domínio oficial (studiomenu.art) ✅ CONCLUÍDA (2026-09-16)
+
+Domínio próprio (`studiomenu.art`, registrado na Hostinger) ativado como principal, substituindo `studiomenu.vercel.app` (que continua funcionando em paralelo, sem forçar redirect). Decisão do usuário: ativar também o subdomínio curinga por profissional na mesma leva — funcionalidade que **já estava implementada** em `src/proxy.ts`/`src/lib/reserved-slugs.ts`, só esperando o domínio existir. Plano completo salvo em modo plano.
+
+- [x] **Vercel**: 3 domínios adicionados ao projeto — `studiomenu.art` (redireciona 308 pro `www`), `www.studiomenu.art` (canônico), `*.studiomenu.art` (curinga).
+- [x] **DNS (Hostinger)**: nameservers do domínio trocados pra `ns1.vercel-dns.com`/`ns2.vercel-dns.com` (delegação completa — confirmado antes que o domínio não tem e-mail nem outro serviço configurado, então não havia registro nenhum a preservar). Propagação levou menos de 1h; certificados SSL emitidos automaticamente pela Vercel.
+- [x] **Supabase Auth** (projeto `spcbbxwnbqaeyhhygyew`): Site URL trocado pra `https://studiomenu.art`; Redirect URLs ganhou `https://studiomenu.art/**` e `https://*.studiomenu.art/**` (esse segundo essencial — o domínio raiz redireciona pro `www`, então o navegador acaba em `www.studiomenu.art` de fato, e só um padrão com curinga no host cobre isso).
+- [x] **Google Cloud Console**: nenhuma mudança necessária (o redirect URI configurado lá aponta pro domínio do Supabase, não pro do app).
+- [x] `src/components/app-shell/ShareLinkButton.tsx` — botão "Copiar Link Público" do Início agora gera `slug.studiomenu.art` (subdomínio) em vez de `studiomenu.art/c/slug`, quando rodando no domínio oficial; em `localhost`/`*.vercel.app` continua no formato de caminho de sempre (mesma checagem que `proxy.ts` já usa).
+- [x] **Validado em produção**: domínio raiz + `www` + subdomínio de teste (`vanessa-camargo.studiomenu.art`, carrega o catálogo dela direto) + bloqueio de `/admin` em subdomínio (404, como já era esperado) + login completo (link mágico e Google) — tudo testado.
+- [x] **Achado no caminho**: a profissional de teste precisou "reivindicar" o login de novo (Config → Minha conta) — consequência já esperada da migração do Supabase (Fase anterior), não do domínio em si.
+- [x] `tsc` + `build` limpos.
 
 ## Como retomar em outra sessão
 
