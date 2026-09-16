@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { InstallPromptProvider } from "@/components/app-shell/InstallPromptProvider";
 
 export const metadata: Metadata = {
   title: "StudioMenu — Catálogos Digitais de Alta Conversão",
@@ -23,7 +24,7 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased selection:bg-rose-200 selection:text-rose-900">
-        {children}
+        <InstallPromptProvider>{children}</InstallPromptProvider>
       </body>
     </html>
   );

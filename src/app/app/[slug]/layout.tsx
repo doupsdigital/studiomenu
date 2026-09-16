@@ -2,7 +2,6 @@ import React from 'react';
 import type { Metadata } from 'next';
 import { isProfessionalRequestAuthorized } from '@/lib/professional-session';
 import { ServiceWorkerRegister } from '@/components/app-shell/ServiceWorkerRegister';
-import { InstallPromptProvider } from '@/components/app-shell/InstallPromptProvider';
 import { BottomNav } from '@/components/app-shell/BottomNav';
 
 interface AppLayoutProps {
@@ -44,12 +43,10 @@ export default async function ProfessionalAppLayout({ children, params }: AppLay
   }
 
   return (
-    <InstallPromptProvider>
-      <div className="pro-app-shell min-h-screen bg-cream text-ink font-body-pro pb-20">
-        <ServiceWorkerRegister />
-        {children}
-        <BottomNav slug={slug} />
-      </div>
-    </InstallPromptProvider>
+    <div className="pro-app-shell min-h-screen bg-cream text-ink font-body-pro pb-20">
+      <ServiceWorkerRegister />
+      {children}
+      <BottomNav slug={slug} />
+    </div>
   );
 }
