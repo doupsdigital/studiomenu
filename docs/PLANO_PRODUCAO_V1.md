@@ -2,7 +2,7 @@
 
 > Documento vivo de acompanhamento, mesmo padrão do `docs/REESTRUTURACAO_VISUAL_APP.md`. Plano completo (contexto, decisões, pesquisa sobre o LashAgenda) foi feito em modo plano em 2026-09-15 — resumo abaixo. Cada fase só avança pra próxima depois de testada e aprovada.
 
-**Status geral:** ✅ Fases 17, 18, 19 (A+B), Migração do Supabase, Ativação do domínio oficial e Fase 20 (multi-tenant/concorrência) concluídas e validadas em produção. Fase 19C (lembrete 1h antes) descartada por enquanto — ver nota abaixo. Próxima: Fase 21 (auditoria de banco).
+**Status geral:** ✅ Todas as fases do plano de produção concluídas — Fases 17, 18, 19 (A+B), Migração do Supabase, Ativação do domínio oficial, Fase 20 (multi-tenant/concorrência) e Fase 21 (auditoria de banco). Fase 19C (lembrete 1h antes) descartada por enquanto — ver nota abaixo. Único item fora do plano, deliberadamente deixado por último: integração real do Asaas (cobrança de verdade).
 
 **Legenda:** `[ ]` pendente · `[x]` feito e testado
 
@@ -152,6 +152,14 @@ Domínio próprio (`studiomenu.art`, registrado na Hostinger) ativado como princ
 - [x] **Isolamento confirmado**: login (link mágico) funcionando em cada um, contagem de serviços correta (4 por catálogo, dos presets do niche), e a página Início de cada um checada pra não conter o nome de nenhum outro catálogo — zero vazamento entre tenants.
 - [x] **Concorrência testada**: 2 requisições `POST /api/scheduling/book` disparadas em paralelo (`Promise.all`) pro mesmo `service_id` + `starts_at` exato — uma retornou `200` (sucesso), a outra `409` ("Esse horário não está mais disponível"). Conferido também direto no banco: só existe 1 linha em `appointments` pra esse horário. A trava `EXCLUDE USING gist` segura a condição de corrida sob concorrência real em produção, não só localmente.
 - [x] **Catálogos fictícios apagados** depois do teste (decisão do usuário) — `ON DELETE CASCADE` removeu serviços/horários/agendamento de teste junto, confirmado que não sobrou nada órfão.
+
+### Fase 21 — Auditoria de banco de dados ✅ CONCLUÍDA (2026-09-16)
+
+- [x] **Índices**: revisados todos os padrões de consulta reais do código contra os índices existentes — `orders` (slug, edit_token, auth_user_id via UNIQUE), `order_services`/`business_hours`/`schedule_blocks`/`appointments`/`push_subscriptions` (order_id, todos indexados ou cobertos por UNIQUE composto). Tudo consistente, nenhuma mudança necessária no tamanho atual de dados. Observação pra o futuro: se `appointments` crescer muito, um índice composto `(order_id, starts_at)` seria mais eficiente que os dois índices separados atuais pra consulta típica da Agenda — não vale a pena agora (poucas dezenas de linhas).
+- [x] **RLS**: revalidado que todas as 7 tabelas (`orders`, `order_services`, `business_hours`, `schedule_blocks`, `appointments`, `push_subscriptions`, `rate_limits`) seguem o mesmo padrão — RLS ligado, zero policy pública, `REVOKE ALL FROM anon`, acesso só via `supabaseAdmin` (service_role) nas rotas server-side. Nenhuma tabela nova (`push_subscriptions`, Fase 18) fugiu do padrão.
+- [x] **Limpeza de `rate_limits`**: implementado `src/app/api/cron/cleanup-rate-limits/route.ts` + `vercel.json` (Vercel Cron Job nativo, `0 3 * * *` — 1x/dia é suficiente aqui, diferente do lembrete de 1h da Fase 19C que precisava de granularidade que a Vercel Hobby não permite; limpeza diária não tem esse problema). Apaga linhas com mais de 24h (as janelas de rate limit usadas no projeto nunca passam de 1h). Protegida por `CRON_SECRET`, que a própria Vercel injeta automaticamente nas chamadas de Cron Job. Testado local (401 sem o segredo, 200 com).
+- [x] **Decisões de escalabilidade registradas**: `@supabase/supabase-js` fala REST (PostgREST), não Postgres direto — sem problema de esgotar conexões em ambiente serverless (cada invocação é uma requisição HTTP stateless, não uma conexão de banco persistente). A trava `EXCLUDE USING gist` em `appointments` já testada sob concorrência real (Fase 20). Tamanho atual do banco é pequeno (dezenas de linhas por tabela) — nenhuma tabela precisa de particionamento ou arquivamento por enquanto.
+- **Pendente do usuário**: adicionar `CRON_SECRET` na Vercel (Production) com o mesmo valor do `.env` local, e redeploy.
 
 ## Como retomar em outra sessão
 
