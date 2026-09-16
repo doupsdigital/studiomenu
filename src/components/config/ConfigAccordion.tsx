@@ -8,6 +8,7 @@ import { ScheduleBlocksManager } from './ScheduleBlocksManager';
 import { SubscriptionSection } from './SubscriptionSection';
 import { AccountSection } from './AccountSection';
 import { NotificationsSection } from './NotificationsSection';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
 import type { BusinessHoursConfigRow, ScheduleBlockConfigRow } from '@/lib/scheduling/config-service';
 
 interface ConfigAccordionProps {
@@ -55,6 +56,13 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
     notificacoes: true,
   });
 
+  // O card de "Notificações" some da lista quando esse dispositivo já tem
+  // notificação ativada (ou quando o navegador não suporta) — nesses casos
+  // não sobra nenhuma ação útil pra oferecer aqui; o sino no cabeçalho
+  // continua disponível pra reativar/testar de novo quando precisar.
+  const { permission: pushPermission, ready: pushReady } = usePushNotifications(slug);
+  const showNotifications = pushReady && pushPermission !== 'granted' && pushPermission !== 'unsupported';
+
   useEffect(() => {
     if (window.location.hash === '#assinatura') {
       document.getElementById('assinatura')?.scrollIntoView({ block: 'start' });
@@ -87,16 +95,18 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
         <ScheduleBlocksManager slug={slug} blocks={scheduleBlocks} />
       </SectionCard>
 
-      <SectionCard
-        icon={Bell}
-        title="Notificações"
-        isOpen={open.notificacoes}
-        onToggle={() => toggle('notificacoes')}
-        locked={!bookingEnabled}
-        lockedHint="Disponível quando o agendamento automático (StudioMenu+) estiver ativo."
-      >
-        <NotificationsSection slug={slug} />
-      </SectionCard>
+      {showNotifications && (
+        <SectionCard
+          icon={Bell}
+          title="Notificações"
+          isOpen={open.notificacoes}
+          onToggle={() => toggle('notificacoes')}
+          locked={!bookingEnabled}
+          lockedHint="Disponível quando o agendamento automático (StudioMenu+) estiver ativo."
+        >
+          <NotificationsSection slug={slug} />
+        </SectionCard>
+      )}
 
       <div id="assinatura">
         <SectionCard icon={CreditCard} title="Minha assinatura" isOpen={open.assinatura} onToggle={() => toggle('assinatura')}>

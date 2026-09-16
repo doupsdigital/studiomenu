@@ -22,11 +22,17 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array<ArrayBuffer> {
  *  pro `PushActivationFlow` usar. */
 export function usePushNotifications(slug: string) {
   const [permission, setPermission] = useState<PushPermissionState>('default');
+  // `Notification.permission` só pode ser lido no client, depois de montar —
+  // `ready` distingue "ainda não sei" de "sei e é 'default'", pra quem
+  // decide mostrar/esconder UI com base nisso não piscar (mostrar e sumir
+  // em seguida) enquanto essa checagem inicial não termina.
+  const [ready, setReady] = useState(false);
   const [subscribing, setSubscribing] = useState(false);
 
   useEffect(() => {
     const supported = typeof window !== 'undefined' && 'Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window;
     setPermission(supported ? Notification.permission : 'unsupported');
+    setReady(true);
   }, []);
 
   const subscribe = useCallback(async (): Promise<boolean> => {
@@ -75,5 +81,5 @@ export function usePushNotifications(slug: string) {
     }
   }, [slug]);
 
-  return { permission, subscribing, subscribe, sendTest };
+  return { permission, ready, subscribing, subscribe, sendTest };
 }
