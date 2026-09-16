@@ -4,20 +4,26 @@ import React, { useEffect, useState } from 'react';
 import { Copy, Check } from 'lucide-react';
 
 interface ShareLinkButtonProps {
-  /** Caminho relativo (ex: `/c/slug`) — o domínio é resolvido no client via
-   *  `window.location.origin`, mesmo padrão do `CopyLinkRow`. */
-  path: string;
+  slug: string;
 }
 
+const PRODUCTION_DOMAIN = 'studiomenu.art';
+
 /** Botão pill "Copiar Link Público" do cartão "Compartilhe sua Agenda" do
- *  Início. */
-export const ShareLinkButton: React.FC<ShareLinkButtonProps> = ({ path }) => {
+ *  Início. No domínio oficial, compartilha o link no formato de subdomínio
+ *  por profissional (`slug.studiomenu.art`, `src/proxy.ts`) — mais curto e
+ *  pessoal que `studiomenu.art/c/slug`. Em `localhost`/`*.vercel.app`
+ *  (onde esse roteamento por subdomínio é propositalmente ignorado, ver
+ *  `proxy.ts`), continua usando o caminho `/c/slug` de sempre. */
+export const ShareLinkButton: React.FC<ShareLinkButtonProps> = ({ slug }) => {
   const [copied, setCopied] = useState(false);
-  const [url, setUrl] = useState(path);
+  const [url, setUrl] = useState(`/c/${slug}`);
 
   useEffect(() => {
-    setUrl(`${window.location.origin}${path}`);
-  }, [path]);
+    const { hostname, origin } = window.location;
+    const usesSubdomainRouting = hostname !== 'localhost' && !hostname.endsWith('.vercel.app');
+    setUrl(usesSubdomainRouting ? `https://${slug}.${PRODUCTION_DOMAIN}` : `${origin}/c/${slug}`);
+  }, [slug]);
 
   const handleCopy = async () => {
     try {

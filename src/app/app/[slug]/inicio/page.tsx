@@ -117,7 +117,7 @@ export default async function InicioPage({ params }: InicioPageProps) {
           <p className="text-sm text-rose-800/70 mb-4 max-w-xs mx-auto">
             Envie esse link pra suas clientes verem seus serviços e preços, e agendarem sozinhas se o agendamento automático estiver ativo.
           </p>
-          <ShareLinkButton path={`/c/${order.slug}`} />
+          <ShareLinkButton slug={order.slug} />
         </div>
       </div>
 
