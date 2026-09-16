@@ -39,7 +39,11 @@ CREATE TABLE IF NOT EXISTS public.orders (
     asaas_subscription_id TEXT,
     billing_email TEXT,
     billing_cpf_cnpj TEXT,
-    cancellation_notice_hours INTEGER DEFAULT 24
+    cancellation_notice_hours INTEGER DEFAULT 24,
+    -- Login real da profissional (docs/PLANO_PRODUCAO_V1.md, Fase 17): vínculo
+    -- 1:1 opcional com uma conta do Supabase Auth. NULL até ela "reivindicar"
+    -- o login (continua entrando só pelo link mágico até lá).
+    auth_user_id UUID UNIQUE REFERENCES auth.users(id) ON DELETE SET NULL
 );
 
 -- Index para buscas ultrarrápidas por slug e edit_token

@@ -17,6 +17,10 @@ export interface ProfessionalOrderSummary {
    *  upsell (ver docs/PLANO_AGENDAMENTO_STUDIOMENU_PLUS.md, achado da
    *  revisão pós-Fase 7). */
   booking_enabled: boolean;
+  /** Conta do Supabase Auth vinculada pro login real (Fase 17), se a
+   *  profissional já "reivindicou" o login — null enquanto ela só entra
+   *  pelo link mágico. */
+  auth_user_id: string | null;
 }
 
 /** Busca os dados que o app da profissional (`/app/[slug]`) precisa — um
@@ -27,7 +31,7 @@ export async function getOrderForProfessionalApp(slug: string): Promise<Professi
 
   const { data, error } = await supabaseAdmin
     .from('orders')
-    .select('id, slug, edit_token, client_name, studio_name, whatsapp_number, plan_tier, subscription_status, billing_email, billing_cpf_cnpj, booking_enabled')
+    .select('id, slug, edit_token, client_name, studio_name, whatsapp_number, plan_tier, subscription_status, billing_email, billing_cpf_cnpj, booking_enabled, auth_user_id')
     .eq('slug', normalizedSlug)
     .single();
 
@@ -47,5 +51,6 @@ export async function getOrderForProfessionalApp(slug: string): Promise<Professi
     billing_email: data.billing_email || undefined,
     billing_cpf_cnpj: data.billing_cpf_cnpj || undefined,
     booking_enabled: Boolean(data.booking_enabled),
+    auth_user_id: data.auth_user_id || null,
   };
 }

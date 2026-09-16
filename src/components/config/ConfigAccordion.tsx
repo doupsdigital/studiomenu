@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Clock, CalendarX, CreditCard } from 'lucide-react';
+import { Clock, CalendarX, CreditCard, UserCircle } from 'lucide-react';
 import { SectionCard } from '@/components/app-shell/SectionCard';
 import { BusinessHoursEditor } from './BusinessHoursEditor';
 import { ScheduleBlocksManager } from './ScheduleBlocksManager';
 import { SubscriptionSection } from './SubscriptionSection';
+import { AccountSection } from './AccountSection';
 import type { BusinessHoursConfigRow, ScheduleBlockConfigRow } from '@/lib/scheduling/config-service';
 
 interface ConfigAccordionProps {
@@ -20,9 +21,12 @@ interface ConfigAccordionProps {
    *  admin) — sem isso, Horários e Bloqueios não têm nenhum efeito prático
    *  (a Agenda nem chega a mostrar conteúdo real), então ficam travados. */
   bookingEnabled: boolean;
+  /** Conta do Supabase Auth já vinculada pro login real (Fase 17) — null
+   *  enquanto a profissional só entra pelo link mágico. */
+  authUserId: string | null;
 }
 
-type SectionKey = 'horarios' | 'bloqueios' | 'assinatura';
+type SectionKey = 'horarios' | 'bloqueios' | 'assinatura' | 'conta';
 
 /** Acordeão da aba Config — 3 seções que já existiam (`BusinessHoursEditor`,
  *  `ScheduleBlocksManager`, `SubscriptionSection`), agora dentro de
@@ -40,11 +44,13 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
   billingEmail,
   billingCpfCnpj,
   bookingEnabled,
+  authUserId,
 }) => {
   const [open, setOpen] = useState<Record<SectionKey, boolean>>({
     horarios: true,
     bloqueios: true,
     assinatura: true,
+    conta: true,
   });
 
   useEffect(() => {
@@ -90,6 +96,10 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
           />
         </SectionCard>
       </div>
+
+      <SectionCard icon={UserCircle} title="Minha conta" isOpen={open.conta} onToggle={() => toggle('conta')}>
+        <AccountSection slug={slug} hasAccount={Boolean(authUserId)} />
+      </SectionCard>
     </div>
   );
 };

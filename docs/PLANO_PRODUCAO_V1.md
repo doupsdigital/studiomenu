@@ -2,7 +2,7 @@
 
 > Documento vivo de acompanhamento, mesmo padrão do `docs/REESTRUTURACAO_VISUAL_APP.md`. Plano completo (contexto, decisões, pesquisa sobre o LashAgenda) foi feito em modo plano em 2026-09-15 — resumo abaixo. Cada fase só avança pra próxima depois de testada e aprovada.
 
-**Status geral:** 🟡 Fase 16 em andamento.
+**Status geral:** ✅ Fase 17 concluída e testada — aguardando aprovação pra commit. Próxima: Fase 18 (push notifications).
 
 **Legenda:** `[ ]` pendente · `[x]` feito e testado
 
@@ -42,6 +42,36 @@ Depois da bateria de testes local (Playwright + guiada pelo usuário) confirmar 
 Corrigido com um manifest dinâmico só pra essa árvore de rotas: `src/app/app/[slug]/manifest.webmanifest/route.ts` (Route Handler, não a convenção de arquivo — essa só funciona na raiz) devolve um manifest com `start_url: /app/[slug]` e `scope: /app/[slug]/`; `src/app/app/[slug]/layout.tsx` ganhou um `generateMetadata` que aponta o campo `manifest` pra essa URL, sobrescrevendo o manifest herdado da raiz só dentro dessa árvore (o resto do site — home, `/c/[slug]` — continua usando o `/manifest.webmanifest` normal, confirmado com teste local). **Usuário precisa desinstalar e reinstalar o PWA** depois desse deploy — o ícone que já foi instalado com o manifest antigo não se autocorrige.
 - [x] `tsc` + `build` limpos
 - [x] Testado local: `curl /app/teste-local-1/manifest.webmanifest` devolve o manifest certo; a tag `<link rel="manifest">` na página autenticada aponta pra ele; home e `/c/[slug]` continuam com `/manifest.webmanifest` normal.
+
+### Fase 17 — Login real da profissional (Supabase Auth) ✅ CONCLUÍDA (2026-09-16)
+
+Modelo implementado: `orders.auth_user_id` (nullable, 1:1 com `auth.users`) — a profissional continua entrando pelo link mágico até "reivindicar" o login numa seção nova em Config; dali em diante pode entrar direto por `/entrar` (e-mail/senha ou Google). O login real só troca o cookie de sempre (`sm_pro_session`) — nenhuma outra parte do app precisou mudar.
+
+**Código:**
+- [x] `docs/migrations/2026-09-16_fase17_login_real.sql` (novo) + `docs/schema.sql` atualizado — coluna `orders.auth_user_id UUID UNIQUE REFERENCES auth.users(id)`. Rodado pelo usuário no SQL Editor.
+- [x] `src/lib/supabase-browser.ts` (novo) — client Supabase só de Auth (chave anon), usado nos componentes `'use client'`.
+- [x] `src/app/api/professional/session-from-auth/route.ts` (novo) — recebe um `access_token` de sessão do Supabase Auth, confirma no servidor (`supabaseAdmin.auth.getUser`), acha o catálogo por `auth_user_id` e grava o mesmo cookie `sm_pro_session` do link mágico.
+- [x] `src/app/api/professional/claim-account/route.ts` (novo) — vincula a conta logada ao catálogo atual; só funciona pra quem já está autenticada nesse catálogo (cookie do link mágico) e só se o catálogo ainda não tiver login vinculado.
+- [x] `src/app/api/professional/logout/route.ts` (novo, adicionado durante o teste guiado — faltava qualquer forma de sair do app) — apaga o cookie `sm_pro_session`.
+- [x] `src/app/entrar/page.tsx` + `src/components/auth/ProfessionalLoginForm.tsx` (novos) — tela de login (e-mail/senha + Google, com o ícone oficial do Google no botão via `src/components/auth/GoogleIcon.tsx`).
+- [x] `src/app/entrar/callback/page.tsx` (novo) — retorno único do Google OAuth, tanto pro login quanto pra vinculação feita em Config (`?claim=1&slug=X`); usa Suspense por causa do `useSearchParams` (build de produção exige).
+- [x] `src/components/config/AccountSection.tsx` (novo) + `ConfigAccordion`/`config/page.tsx` atualizados — 4ª seção "Minha conta": cria acesso com senha (lida com projeto exigindo ou não confirmação de e-mail) ou vincula com Google; mostra "Login ativo" depois de vinculado; botão "Sair desse dispositivo".
+- [x] `tsc` + `build` limpos.
+
+**Configuração feita pelo usuário nos dashboards:**
+- [x] Migração rodada no SQL Editor do Supabase.
+- [x] Provider Google configurado no Supabase (Authentication → Providers → Google) + OAuth Client criado no Google Cloud Console, redirecionando pra `https://orrfslursoielebvdhbf.supabase.co/auth/v1/callback`.
+- [x] "Confirm email" desativado em Authentication → Providers → Email (decisão do usuário — sem essa etapa a conta já fica ativa na hora do cadastro, sem precisar confirmar por e-mail).
+- [x] Authentication → URL Configuration: Site URL = `https://studiomenu.vercel.app`; Redirect URLs com padrão curinga `http://localhost:3000/**` e `https://studiomenu.vercel.app/**` (trocado de URLs exatas pra curinga depois de um teste que caiu na home de vendas com o token na URL — o `redirect_to` de `/entrar/callback` não batia exatamente com a URL cadastrada, então o Supabase caiu no fallback pra Site URL).
+
+**Testado e validado em `teste-local-1` (local, via script automatizado + guiado pelo usuário na interface):**
+- [x] Script automatizado (12 verificações): criação de conta, vínculo via cookie do link mágico, recusa de vínculo sem cookie (401), recusa de vínculo duplicado (409), troca de sessão por access_token, recusa de token inválido (401).
+- [x] Criar acesso com e-mail/senha pela interface → "Login ativo" automático (sem confirmação de e-mail).
+- [x] Sair → entrar de novo por `/entrar` com e-mail/senha → funcionou.
+- [x] Vincular com Google pela interface (depois de resetar o `auth_user_id` pra testar do zero) → "Login ativo — Conta Google vinculada com sucesso".
+- [x] Sair → entrar de novo por `/entrar` com Google → funcionou.
+
+**Nada commitado ainda** — aguardando aprovação do usuário.
 
 ## Como retomar em outra sessão
 
