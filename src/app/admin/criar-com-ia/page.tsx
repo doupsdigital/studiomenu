@@ -11,8 +11,25 @@ import { nichePresetsMap } from '@/data/niche-presets';
 import { CatalogLayout } from '@/components/catalog/CatalogLayout';
 import { StylePickerPanel } from '@/components/catalog/StylePickerPanel';
 import { ArrowLeft, Upload, Sparkles, Trash2, Plus, ImageIcon, FileText, Check } from 'lucide-react';
+import { compressImageFile, compressImageFiles } from '@/lib/image-compress-client';
 
 type Step = 'form' | 'reviewing';
+
+/** `res.json()` direto quebra quando o corpo não é JSON de verdade — ex: a
+ *  Vercel devolve texto puro ("Request Entity Too Large") em respostas de
+ *  erro 413 antes mesmo da nossa rota rodar, e isso virava genericamente
+ *  "Falha de conexão" pro usuário sem explicar o motivo real. */
+async function readJsonSafely(res: Response): Promise<{ success: boolean; message?: string; [key: string]: any }> {
+  const text = await res.text();
+  try {
+    return JSON.parse(text);
+  } catch {
+    if (res.status === 413) {
+      return { success: false, message: 'Arquivos grandes demais mesmo após compressão. Tente enviar menos fotos por vez.' };
+    }
+    return { success: false, message: `Erro inesperado do servidor (status ${res.status}).` };
+  }
+}
 
 export default function CriarComIAPage() {
   const router = useRouter();
@@ -60,8 +77,13 @@ export default function CriarComIAPage() {
     setErrorMsg('');
 
     try {
+      // Comprime antes de enviar — a soma de várias fotos de celular passa
+      // fácil do limite de 4.5MB por requisição da Vercel (fixo, não dá pra
+      // configurar), e a IA não precisa de resolução máxima pra ler texto.
+      const compressedFiles = await compressImageFiles(menuFiles);
+
       const fd = new FormData();
-      menuFiles.forEach((f) => fd.append('files', f));
+      compressedFiles.forEach((f) => fd.append('files', f));
       fd.append('niche', niche);
 
       const res = await fetch('/api/admin/extract-catalog', {
@@ -69,7 +91,7 @@ export default function CriarComIAPage() {
         credentials: 'same-origin',
         body: fd,
       });
-      const json = await res.json();
+      const json = await readJsonSafely(res);
 
       if (!json.success) {
         setErrorMsg(json.message || 'Não foi possível extrair os procedimentos.');
@@ -113,7 +135,7 @@ export default function CriarComIAPage() {
       fd.append('layoutModel', layoutModel);
       fd.append('themeVariant', themeVariant);
       fd.append('procedures', JSON.stringify(procedures));
-      if (coverFile) fd.append('coverFile', coverFile);
+      if (coverFile) fd.append('coverFile', await compressImageFile(coverFile));
       fd.append('aiAdaptCover', aiAdaptCover ? '1' : '0');
 
       const res = await fetch('/api/admin/finalize-catalog', {
@@ -121,7 +143,7 @@ export default function CriarComIAPage() {
         credentials: 'same-origin',
         body: fd,
       });
-      const json = await res.json();
+      const json = await readJsonSafely(res);
 
       if (!json.success) {
         setErrorMsg(json.message || 'Erro ao criar o catálogo.');
