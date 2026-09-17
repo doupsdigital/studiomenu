@@ -42,12 +42,9 @@ interface ProcedureGridProps {
 }
 
 /** Envolve um card de procedimento (mosaico OU clássico) pra deixar arrastar
- *  pra reordenar, e concentra a barra de ações (arrastar + editar + excluir)
- *  num único bloco — antes eram dois elementos flutuantes separados (a alça
- *  sozinha e o par Editar/Excluir), que ficavam espremidos um em cima do
- *  outro nos cards mais estreitos do grid mosaico. A alça vem primeiro,
- *  com uma cor própria (rosa sólido) pra se diferenciar visualmente de
- *  Editar/Excluir — é uma ação diferente (arrastar, não tocar). Só a alça
+ *  pra reordenar — Editar/Excluir ficam centralizados no topo, e a alça de
+ *  arrastar fica isolada no canto inferior direito (perto do preço), longe
+ *  o suficiente pra não disputar espaço/toque com os outros dois. Só a alça
  *  tem `touch-action: none`/os listeners de arraste; o resto do card
  *  continua rolando a página normalmente. */
 const SortableProcCard: React.FC<{
@@ -69,17 +66,19 @@ const SortableProcCard: React.FC<{
   return (
     <div ref={setNodeRef} style={style} className="lm-sortable-proc">
       {isEditMode && (
-        <div className="lm-svc-actions-bar">
+        <>
+          <div className="lm-svc-actions-bar">
+            <button type="button" className="lm-svc-btn-action" onClick={onEdit}>
+              ✏️ Editar
+            </button>
+            <button type="button" className="lm-svc-btn-action lm-svc-btn-danger" title="Excluir" onClick={onDelete}>
+              🗑️
+            </button>
+          </div>
           <span className="lm-proc-drag-handle" aria-hidden="true" {...attributes} {...listeners}>
             <GripVertical className="w-3.5 h-3.5" />
           </span>
-          <button type="button" className="lm-svc-btn-action" onClick={onEdit}>
-            ✏️ Editar
-          </button>
-          <button type="button" className="lm-svc-btn-action lm-svc-btn-danger" title="Excluir" onClick={onDelete}>
-            🗑️
-          </button>
-        </div>
+        </>
       )}
       {children}
     </div>
