@@ -60,7 +60,7 @@ export function buildOrderInsertPayload(input: OrderInsertInput) {
   return {
     slug: input.slug,
     client_name: input.clientName,
-    studio_name: preset.studio_name,
+    studio_name: `Studio ${input.clientName}`,
     hero_phrase: preset.hero_phrase,
     bio_description: preset.bio_description || '',
     cover_media_url: input.coverUrl,
