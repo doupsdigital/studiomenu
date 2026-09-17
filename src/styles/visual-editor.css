@@ -341,7 +341,9 @@ body[data-theme="luxury"] .lm-cover-edit-btn,
  * vermelho) — é uma interação diferente (arrastar, não tocar). */
 .lm-proc-drag-handle {
   position: absolute;
-  bottom: 10px;
+  /* Acima da linha de preço/duração (`.tile__meta`), não em cima dela —
+   * 10px cobria o "1h30" no card do Mosaico. */
+  bottom: 42px;
   right: 10px;
   z-index: 89;
   display: flex;
