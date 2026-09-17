@@ -7,6 +7,19 @@ const TARGET_RATIO = TARGET_W / TARGET_H;
 const OUTPAINT_PROMPT =
   'Estenda o fundo desta foto de forma natural e realista para preencher todo o quadro vertical, mantendo a pessoa e os elementos originais exatamente como estão, na mesma posição e proporção, sem adicionar texto, objetos novos ou logotipos, preservando o estilo, iluminação e cores originais.';
 
+/** Onde a foto original (redimensionada, sem cortar nada) fica posicionada
+ *  dentro do canvas-alvo, igual ao `fit: 'contain'` do sharp — calculado à
+ *  parte porque precisamos reusar exatamente essas coordenadas depois, pra
+ *  colar a foto original de volta por cima do resultado da IA. */
+function computeContainLayout(srcW: number, srcH: number, dstW: number, dstH: number) {
+  const scale = Math.min(dstW / srcW, dstH / srcH);
+  const width = Math.max(1, Math.round(srcW * scale));
+  const height = Math.max(1, Math.round(srcH * scale));
+  const left = Math.round((dstW - width) / 2);
+  const top = Math.round((dstH - height) / 2);
+  return { width, height, left, top };
+}
+
 /**
  * Remove faixas pretas sólidas nas bordas (comum em fotos exportadas/print de
  * vídeo, tipo a da capa dessa foto de cílios) — sem isso o cálculo de
@@ -99,8 +112,19 @@ function mimeForFormat(format: string | undefined): string {
 }
 
 async function callOutpaint(buffer: Buffer, apiKey: string): Promise<Buffer | null> {
-  const padded = await sharp(buffer)
-    .resize(TARGET_W, TARGET_H, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+  const meta = await sharp(buffer).metadata();
+  if (!meta.width || !meta.height) return null;
+
+  const layout = computeContainLayout(meta.width, meta.height, TARGET_W, TARGET_H);
+  // Sem `fit: 'contain'` do resize aqui — usamos composite manual pra saber
+  // exatamente `left`/`top`, e reaproveitar essa mesma foto redimensionada
+  // (nunca repassada pela IA) depois.
+  const resizedOriginal = await sharp(buffer).resize(layout.width, layout.height).toBuffer();
+
+  const padded = await sharp({
+    create: { width: TARGET_W, height: TARGET_H, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } },
+  })
+    .composite([{ input: resizedOriginal, left: layout.left, top: layout.top }])
     .png()
     .toBuffer();
 
@@ -123,7 +147,19 @@ async function callOutpaint(buffer: Buffer, apiKey: string): Promise<Buffer | nu
 
   const json = await res.json();
   const b64 = json.data?.[0]?.b64_json;
-  return b64 ? Buffer.from(b64, 'base64') : null;
+  if (!b64) return null;
+
+  const generated = Buffer.from(b64, 'base64');
+
+  // O prompt pede pra IA não tocar na foto original, mas o modelo não
+  // garante isso de verdade (já alterou traços do rosto numa foto de
+  // teste) — então colamos a foto original de volta, sem nenhuma
+  // alteração, exatamente na mesma posição. A IA só pode contribuir com a
+  // moldura ao redor; a foto da cliente nunca é regenerada.
+  return sharp(generated)
+    .composite([{ input: resizedOriginal, left: layout.left, top: layout.top }])
+    .png()
+    .toBuffer();
 }
 
 /**
