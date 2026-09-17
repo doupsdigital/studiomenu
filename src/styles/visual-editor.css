@@ -342,8 +342,8 @@ body[data-theme="luxury"] .lm-cover-edit-btn,
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
+  width: 34px;
+  height: 34px;
   border-radius: 100px;
   background: rgba(20, 16, 15, 0.92);
   backdrop-filter: blur(10px);
@@ -351,7 +351,14 @@ body[data-theme="luxury"] .lm-cover-edit-btn,
   border: 1px solid rgba(229, 169, 184, 0.35);
   color: #ffffff;
   cursor: grab;
-  pointer-events: none; /* o arraste é do card inteiro (lm-sortable-proc); é só indicativo visual */
+  /* Só essa alça intercepta o toque pra arrastar — o resto do card
+   * continua rolando a página normalmente (`touch-action` fora daqui). */
+  touch-action: none;
+  -webkit-touch-callout: none;
+}
+
+.lm-proc-drag-handle:active {
+  cursor: grabbing;
 }
 
 .lm-svc-actions-bar {

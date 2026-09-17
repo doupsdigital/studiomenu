@@ -42,12 +42,11 @@ interface ProcedureGridProps {
 }
 
 /** Envolve um card de procedimento (mosaico OU clássico) pra deixar arrastar
- *  pra reordenar — pressiona e segura em qualquer parte do card (mesmo
- *  padrão do Instagram pra reorganizar grade), com um pequeno ícone de
- *  "alça" (GripVertical) só como indicativo visual de que dá pra arrastar.
- *  O atraso de ativação (`activationConstraint.delay`) é o que permite o
- *  dedo continuar rolando a página normalmente — só inicia o arraste se a
- *  pessoa realmente segurar parada por um instante. */
+ *  pra reordenar — o arraste só inicia a partir do ícone de alça
+ *  (GripVertical), nunca do card inteiro: só o ícone tem
+ *  `touch-action: none` (o que desliga o scroll nativo do toque ali), o
+ *  resto do card continua rolando a página normalmente, sem nenhuma
+ *  interferência. */
 const SortableProcCard: React.FC<{ id: string; isEditMode: boolean; children: React.ReactNode }> = ({
   id,
   isEditMode,
@@ -60,13 +59,12 @@ const SortableProcCard: React.FC<{ id: string; isEditMode: boolean; children: Re
     transition,
     opacity: isDragging ? 0.5 : 1,
     zIndex: isDragging ? 50 : undefined,
-    touchAction: isEditMode ? 'none' : undefined,
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...(isEditMode ? { ...attributes, ...listeners } : {})} className="lm-sortable-proc">
+    <div ref={setNodeRef} style={style} className="lm-sortable-proc">
       {isEditMode && (
-        <span className="lm-proc-drag-handle" aria-hidden="true">
+        <span className="lm-proc-drag-handle" aria-hidden="true" {...attributes} {...listeners}>
           <GripVertical className="w-3.5 h-3.5" />
         </span>
       )}
@@ -117,10 +115,11 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
-      // Segurar ~250ms antes de iniciar o arraste — dá tempo do navegador
-      // distinguir de um scroll/toque normal na tela, sem exigir uma alça
-      // minúscula pra acertar.
-      activationConstraint: { delay: 250, tolerance: 6 },
+      // O arraste já só começa a partir do ícone de alça (não do card
+      // inteiro), então não precisa de atraso pra distinguir de scroll —
+      // só uma tolerância mínima de movimento pra não iniciar num toque
+      // parado sem intenção de arrastar.
+      activationConstraint: { distance: 4 },
     })
   );
 
