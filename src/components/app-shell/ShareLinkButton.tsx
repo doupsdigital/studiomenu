@@ -2,12 +2,11 @@
 
 import React, { useEffect, useState } from 'react';
 import { Copy, Check } from 'lucide-react';
+import { usesSubdomainRouting, PRODUCTION_DOMAIN } from '@/lib/public-url';
 
 interface ShareLinkButtonProps {
   slug: string;
 }
-
-const PRODUCTION_DOMAIN = 'studiomenu.art';
 
 /** Botão pill "Copiar Link Público" do cartão "Compartilhe sua Agenda" do
  *  Início. No domínio oficial, compartilha o link no formato de subdomínio
@@ -21,8 +20,7 @@ export const ShareLinkButton: React.FC<ShareLinkButtonProps> = ({ slug }) => {
 
   useEffect(() => {
     const { hostname, origin } = window.location;
-    const usesSubdomainRouting = hostname !== 'localhost' && !hostname.endsWith('.vercel.app');
-    setUrl(usesSubdomainRouting ? `https://${slug}.${PRODUCTION_DOMAIN}` : `${origin}/c/${slug}`);
+    setUrl(usesSubdomainRouting(hostname) ? `https://${slug}.${PRODUCTION_DOMAIN}` : `${origin}/c/${slug}`);
   }, [slug]);
 
   const handleCopy = async () => {

@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import { CatalogOrderData } from '@/types/catalog';
 import { normalizeWhatsappBR } from '@/lib/format';
 import Link from 'next/link';
-import { ArrowLeft, Sparkles, ExternalLink, Search, RefreshCw, Scissors, Plus, Trash2, MessageCircle, Phone, Clock, Smartphone, CalendarClock } from 'lucide-react';
+import { ArrowLeft, Sparkles, ExternalLink, Search, RefreshCw, Scissors, Plus, Trash2, MessageCircle, Phone, Clock, Smartphone, CalendarClock, Globe } from 'lucide-react';
+import { usesSubdomainRouting, PRODUCTION_DOMAIN } from '@/lib/public-url';
 
 /** Campos de billing/agendamento não fazem parte do shape público do
  *  catálogo (`CatalogOrderData`) — extensão só local, pro admin. */
@@ -105,15 +106,27 @@ export default function AdminCatalogosPage() {
   const buildDeliveryWhatsappUrl = (item: AdminCatalog) => {
     const cleanPhone = normalizeWhatsappBR(item.whatsapp_number);
     const firstName = (item.client_name || '').split(' ')[0];
-    const origin = typeof window !== 'undefined' ? window.location.origin : '';
-    const catalogUrl = `${origin}/c/${item.slug}`;
+    const catalogUrl = buildProfessionalLinks(item).official;
     const message = `Olá, ${firstName}! ✨\n\nSeu catálogo digital oficial StudioMenu está pronto, calibrado e no ar! 🚀\n\n🔗 *Seu Link Exclusivo:*\n👉 ${catalogUrl}\n\n📌 *O que fazer agora:*\n1. Abra o link no seu celular e confira seu catálogo completo.\n2. Coloque este link na bio do seu Instagram e no seu perfil do WhatsApp Business.\n3. Comece a enviar para suas clientes no momento do agendamento!\n\nQualquer dúvida ou ajuste que precisar, nossa equipe está à sua inteira disposição. Parabéns pelo seu novo posicionamento! 💖✨`;
     return `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(message)}`;
   };
 
-  const buildAppLoginUrl = (item: AdminCatalog) => {
-    const origin = typeof window !== 'undefined' ? window.location.origin : '';
-    return `${origin}/api/professional/login?slug=${item.slug}&token=${item.edit_token}`;
+  /** Os 3 links que a profissional pode receber, todos no mesmo formato de
+   *  subdomínio pessoal (`slug.studiomenu.art`) no domínio oficial — o
+   *  roteamento por subdomínio (`src/proxy.ts`) só reescreve a raiz `/`
+   *  pro catálogo, preservando querystring, e rotas `/api/...` não olham
+   *  pro host, então tanto o link de edição (`?edit=`) quanto o do app
+   *  (`/api/professional/login`) funcionam normalmente nesse formato. Em
+   *  localhost/*.vercel.app (onde esse roteamento é propositalmente
+   *  ignorado) cai pro caminho `/c/slug` de sempre. */
+  const buildProfessionalLinks = (item: AdminCatalog) => {
+    if (typeof window === 'undefined' || !item.slug) return { official: '', edit: '', app: '' };
+    const { hostname, origin } = window.location;
+    const subdomain = usesSubdomainRouting(hostname);
+    const root = subdomain ? `https://${item.slug}.${PRODUCTION_DOMAIN}` : origin;
+    const official = subdomain ? root : `${root}/c/${item.slug}`;
+    const app = `${root}/api/professional/login?slug=${item.slug}&token=${item.edit_token}`;
+    return { official, edit: `${official}?edit=${item.edit_token}`, app };
   };
 
   const toggleBookingEnabled = async (item: AdminCatalog) => {
@@ -278,14 +291,35 @@ export default function AdminCatalogosPage() {
                       {item.layout_model || 'mosaico'} / {item.theme_variant || 'rose'}
                     </div>
 
-                    <div className="mt-3.5 p-3 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1.5">
+                    <div className="mt-3.5 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold uppercase tracking-wider text-rose-300 flex items-center gap-1.5">
+                          <Globe className="w-3.5 h-3.5" />
+                          Link Oficial do Catálogo
+                        </span>
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(buildProfessionalLinks(item).official);
+                            showToast('🌐 Link Oficial copiado!');
+                          }}
+                          className="text-xs text-rose-300 hover:text-rose-200 font-bold underline flex items-center gap-1"
+                        >
+                          Copiar Link
+                        </button>
+                      </div>
+                      <p className="text-xs font-mono text-rose-200/80 truncate">
+                        {item.slug}.{PRODUCTION_DOMAIN}
+                      </p>
+                      <p className="text-[11px] text-rose-300/60">É esse que ela divulga: bio, WhatsApp, etc.</p>
+                    </div>
+
+                    <div className="mt-2 p-3 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1.5">
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Link Mágico da Cliente</span>
                         {item.edit_token && (
                           <button
                             onClick={() => {
-                              const url = `${window.location.origin}/c/${item.slug}?edit=${item.edit_token}`;
-                              navigator.clipboard.writeText(url);
+                              navigator.clipboard.writeText(buildProfessionalLinks(item).edit);
                               showToast('🔗 Link Mágico de Edição copiado!');
                             }}
                             className="text-xs text-rose-400 hover:text-rose-300 font-bold underline flex items-center gap-1"
@@ -295,7 +329,7 @@ export default function AdminCatalogosPage() {
                         )}
                       </div>
                       <p className="text-xs font-mono text-slate-400 truncate">
-                        /c/{item.slug}{item.edit_token ? `?edit=${item.edit_token.substring(0, 8)}...` : ''}
+                        {item.slug}.{PRODUCTION_DOMAIN}{item.edit_token ? `?edit=${item.edit_token.substring(0, 8)}...` : ''}
                       </p>
                     </div>
 
@@ -308,7 +342,7 @@ export default function AdminCatalogosPage() {
                           </span>
                           <button
                             onClick={() => {
-                              navigator.clipboard.writeText(buildAppLoginUrl(item));
+                              navigator.clipboard.writeText(buildProfessionalLinks(item).app);
                               showToast('📱 Link do App copiado!');
                             }}
                             className="text-xs text-rose-400 hover:text-rose-300 font-bold underline flex items-center gap-1"
@@ -317,7 +351,7 @@ export default function AdminCatalogosPage() {
                           </button>
                         </div>
                         <p className="text-xs font-mono text-slate-400 truncate">
-                          /api/professional/login?slug={item.slug}&token={item.edit_token.substring(0, 8)}...
+                          {item.slug}.{PRODUCTION_DOMAIN}/api/professional/login?slug={item.slug}&token={item.edit_token.substring(0, 8)}...
                         </p>
                       </div>
                     )}
