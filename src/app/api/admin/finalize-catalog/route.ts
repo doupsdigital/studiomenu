@@ -23,6 +23,7 @@ export async function POST(request: Request) {
     const themeVariant = (formData.get('themeVariant') as string) || 'rose';
     const proceduresRaw = (formData.get('procedures') as string) || '[]';
     const coverFile = formData.get('coverFile') as File | null;
+    const aiAdaptCover = formData.get('aiAdaptCover') === '1';
 
     if (!clientName || !whatsappNumber) {
       return NextResponse.json({ success: false, message: 'Nome e WhatsApp são obrigatórios.' }, { status: 400 });
@@ -51,7 +52,7 @@ export async function POST(request: Request) {
       let contentType = coverFile.type;
       let fileExt = coverFile.name.split('.').pop() || 'jpg';
 
-      const adapted = await adaptCoverToPortrait(buffer);
+      const adapted = aiAdaptCover ? await adaptCoverToPortrait(buffer) : null;
       if (adapted) {
         buffer = adapted.buffer;
         contentType = adapted.contentType;

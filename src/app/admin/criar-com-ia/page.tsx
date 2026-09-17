@@ -27,6 +27,7 @@ export default function CriarComIAPage() {
   const [onCoverScreen, setOnCoverScreen] = useState(true);
 
   const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [aiAdaptCover, setAiAdaptCover] = useState(false);
   const [menuFiles, setMenuFiles] = useState<File[]>([]);
   const [procedures, setProcedures] = useState<ProcedureItem[]>([]);
 
@@ -113,6 +114,7 @@ export default function CriarComIAPage() {
       fd.append('themeVariant', themeVariant);
       fd.append('procedures', JSON.stringify(procedures));
       if (coverFile) fd.append('coverFile', coverFile);
+      fd.append('aiAdaptCover', aiAdaptCover ? '1' : '0');
 
       const res = await fetch('/api/admin/finalize-catalog', {
         method: 'POST',
@@ -358,12 +360,38 @@ export default function CriarComIAPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-slate-300 mb-1.5">Foto de Capa</label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-sm font-semibold text-slate-300">Foto de Capa</label>
+              <button
+                type="button"
+                onClick={() => setAiAdaptCover((v) => !v)}
+                className="flex items-center gap-2 text-xs font-semibold text-slate-400"
+                title="Se ligado, a IA estende automaticamente o fundo da foto pro formato retrato (útil quando você não teve tempo de preparar a foto antes)."
+              >
+                <span className={aiAdaptCover ? 'text-rose-400' : ''}>Adaptar formato com IA</span>
+                <span
+                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                    aiAdaptCover ? 'bg-rose-500' : 'bg-slate-700'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${
+                      aiAdaptCover ? 'translate-x-[18px]' : 'translate-x-[3px]'
+                    }`}
+                  />
+                </span>
+              </button>
+            </div>
             <label className="flex items-center justify-center gap-2.5 w-full bg-slate-950 border-2 border-dashed border-slate-800 hover:border-rose-500 rounded-xl p-5 text-sm text-slate-400 cursor-pointer transition-all">
               <ImageIcon className="w-5 h-5" />
               <span>{coverFile ? coverFile.name : 'Escolher foto do dispositivo'}</span>
               <input type="file" accept="image/*" className="hidden" onChange={(e) => setCoverFile(e.target.files?.[0] || null)} />
             </label>
+            <p className="text-xs text-slate-500 mt-1.5">
+              {aiAdaptCover
+                ? 'A IA vai estender o fundo da foto pro formato retrato antes de criar o catálogo (leva alguns segundos a mais).'
+                : 'A foto sobe exatamente como você enviou, sem nenhum processamento.'}
+            </p>
           </div>
 
           <div>
