@@ -52,7 +52,7 @@ export async function POST(request: Request) {
       let contentType = coverFile.type;
       let fileExt = coverFile.name.split('.').pop() || 'jpg';
 
-      const adapted = aiAdaptCover ? await adaptCoverToPortrait(buffer) : null;
+      const adapted = aiAdaptCover ? await adaptCoverToPortrait(buffer, coverFile.type) : null;
       if (adapted) {
         buffer = adapted.buffer;
         contentType = adapted.contentType;
