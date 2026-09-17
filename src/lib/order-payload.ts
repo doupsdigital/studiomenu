@@ -2,32 +2,69 @@ import { CatalogOrderData, NicheType, LayoutModel, ThemeVariant, ProcedureItem }
 import { nichePresetsMap } from '@/data/niche-presets';
 import { normalizeWhatsappBR } from './format';
 import { supabaseAdmin } from './supabase-admin';
+import { RESERVED_SLUGS } from './reserved-slugs';
 
-function slugifyName(name: string): string {
-  return name
+/** Uma "palavra" do nome, normalizada pra virar pedaço de slug/subdomínio:
+ *  minúscula, sem acento, só letras e números (sem espaço, sem traço —
+ *  concatena direto com as outras palavras). */
+function normalizeNameWord(word: string): string {
+  return word
     .toLowerCase()
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '')
-    .replace(/[^a-z0-9]/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '');
+    .replace(/[^a-z0-9]/g, '');
 }
 
-/** Gera um slug único a partir do nome da cliente, checando colisão no banco
- *  antes de devolver (em vez de confiar cegamente no sufixo aleatório, que
- *  tinha ~900 combinações por nome-base e podia colidir sem aviso). */
-export async function generateUniqueSlug(clientName: string): Promise<string> {
-  const base = slugifyName(clientName) || 'catalogo';
+function splitNameWords(fullName: string): string[] {
+  return fullName
+    .trim()
+    .split(/\s+/)
+    .map(normalizeNameWord)
+    .filter(Boolean);
+}
 
-  for (let attempt = 0; attempt < 10; attempt++) {
-    const suffix = Math.floor(100 + Math.random() * 900);
-    const candidate = `${base}-${suffix}`;
-    const { data } = await supabaseAdmin.from('orders').select('id').eq('slug', candidate).maybeSingle();
-    if (!data) return candidate;
+function joinNameSlug(words: string[], count: number): string {
+  return words.slice(0, count).join('');
+}
+
+export type ProfessionalSlugResult =
+  | { ok: true; slug: string }
+  | { ok: false; attemptedSlug: string };
+
+/**
+ * Resolve o slug/subdomínio (`{slug}.studiomenu.art`) a partir do NOME da
+ * profissional — nunca com número aleatório no fim (isso já causou links
+ * tipo "ana-laura-890" que ela não pode divulgar). Usa as 2 primeiras
+ * palavras do nome digitado: cobre tanto "Primeiro Sobrenome" (ex: "Mariana
+ * Alves" → `marianaalves`) quanto nome composto sem sobrenome (ex: "Ana
+ * Laura" → `analaura`) — nos dois casos são só as 2 primeiras palavras,
+ * mecanicamente.
+ *
+ * Se esse slug já existe (outra profissional, ou colide com uma palavra
+ * reservada do sistema — `RESERVED_SLUGS`), tenta a PRÓXIMA palavra do nome
+ * já digitado (ex: admin recadastra como "Ana Laura Alves" → tenta
+ * `analauraalves`), e assim por diante enquanto houver mais palavras. Se
+ * não houver mais nenhuma palavra disponível pra tentar, devolve
+ * `{ok: false}` — quem chamou deve pedir pro admin acrescentar mais um
+ * sobrenome ao campo de nome e tentar de novo. Nunca inventa um slug
+ * diferente do nome sozinho.
+ */
+export async function resolveProfessionalSlug(fullName: string): Promise<ProfessionalSlugResult> {
+  const words = splitNameWords(fullName);
+  if (words.length === 0) return { ok: false, attemptedSlug: '' };
+
+  let count = Math.min(2, words.length);
+  for (;;) {
+    const candidate = joinNameSlug(words, count);
+    let taken = RESERVED_SLUGS.includes(candidate);
+    if (!taken) {
+      const { data } = await supabaseAdmin.from('orders').select('id').eq('slug', candidate).maybeSingle();
+      taken = Boolean(data);
+    }
+    if (!taken) return { ok: true, slug: candidate };
+    if (count >= words.length) return { ok: false, attemptedSlug: candidate };
+    count += 1;
   }
-
-  // Último recurso, praticamente impossível de colidir.
-  return `${base}-${Date.now()}`;
 }
 
 /**

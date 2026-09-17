@@ -3,7 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin';
 import { NicheType, LayoutModel, ThemeVariant } from '@/types/catalog';
 import { nichePresetsMap } from '@/data/niche-presets';
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
-import { buildOrderInsertPayload, buildServicesPayload, generateUniqueSlug } from '@/lib/order-payload';
+import { buildOrderInsertPayload, buildServicesPayload, resolveProfessionalSlug } from '@/lib/order-payload';
 
 export async function POST(request: Request) {
   try {
@@ -31,7 +31,17 @@ export async function POST(request: Request) {
 
     const preset = nichePresetsMap[niche] || nichePresetsMap.lash;
 
-    const finalSlug = await generateUniqueSlug(clientName);
+    const slugResult = await resolveProfessionalSlug(clientName);
+    if (!slugResult.ok) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: `Já existe uma profissional cadastrada com esse nome (${slugResult.attemptedSlug}.studiomenu.art). Acrescente mais um sobrenome ao nome pra diferenciar.`,
+        },
+        { status: 409 }
+      );
+    }
+    const finalSlug = slugResult.slug;
 
     const coverUrl =
       layoutModel === 'classico' ? '/modelos/classico/assets/img/Hero.png' : '/modelos/mosaico/assets/img/Hero.png';

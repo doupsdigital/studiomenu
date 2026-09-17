@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { ProcedureItem, NicheType, LayoutModel, ThemeVariant } from '@/types/catalog';
 import { isAdminRequestAuthorized } from '@/lib/admin-session';
-import { buildOrderInsertPayload, buildServicesPayload, generateUniqueSlug } from '@/lib/order-payload';
+import { buildOrderInsertPayload, buildServicesPayload, resolveProfessionalSlug } from '@/lib/order-payload';
 import { isAllowedImageType } from '@/lib/file-validation';
 import { adaptCoverToPortrait } from '@/lib/cover-image-ai';
 
@@ -36,7 +36,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: 'Lista de procedimentos inválida.' }, { status: 400 });
     }
 
-    const finalSlug = await generateUniqueSlug(clientName);
+    const slugResult = await resolveProfessionalSlug(clientName);
+    if (!slugResult.ok) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: `Já existe uma profissional cadastrada com esse nome (${slugResult.attemptedSlug}.studiomenu.art). Acrescente mais um sobrenome ao nome pra diferenciar.`,
+        },
+        { status: 409 }
+      );
+    }
+    const finalSlug = slugResult.slug;
 
     let coverUrl = layoutModel === 'classico' ? '/modelos/classico/assets/img/Hero.png' : '/modelos/mosaico/assets/img/Hero.png';
 
