@@ -326,6 +326,34 @@ body[data-theme="luxury"] .lm-cover-edit-btn,
   position: relative !important;
 }
 
+/* Wrapper de arrastar-pra-reordenar (dnd-kit) em volta de cada card de
+ * procedimento — precisa ser só o suficiente pra não quebrar o grid/lista
+ * de fora (que espera o card ocupando 100% da célula/linha). */
+.lm-sortable-proc {
+  position: relative;
+  width: 100%;
+}
+
+.lm-proc-drag-handle {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 89;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 100px;
+  background: rgba(20, 16, 15, 0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(229, 169, 184, 0.35);
+  color: #ffffff;
+  cursor: grab;
+  pointer-events: none; /* o arraste é do card inteiro (lm-sortable-proc); é só indicativo visual */
+}
+
 .lm-svc-actions-bar {
   position: absolute !important;
   top: 10px !important;

@@ -1,7 +1,23 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, GripVertical } from 'lucide-react';
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  rectSortingStrategy,
+  verticalListSortingStrategy,
+  arrayMove,
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 import { ProcedureItem, LayoutModel } from '@/types/catalog';
 import { ProcedureCard } from './ProcedureCard';
@@ -16,6 +32,7 @@ interface ProcedureGridProps {
   isEditMode?: boolean;
   onEditProc?: (item: ProcedureItem) => void;
   onDeleteProc?: (item: ProcedureItem) => void;
+  onReorderProcedures?: (newProcedures: ProcedureItem[]) => void;
   onOpenAddProcModal?: () => void;
   onOpenAddCatModal?: () => void;
   onDeleteCategory?: (categoryName: string, count: number) => void;
@@ -23,6 +40,40 @@ interface ProcedureGridProps {
   bookingEnabled?: boolean;
   onRequestBooking?: (item: ProcedureItem) => void;
 }
+
+/** Envolve um card de procedimento (mosaico OU clássico) pra deixar arrastar
+ *  pra reordenar — pressiona e segura em qualquer parte do card (mesmo
+ *  padrão do Instagram pra reorganizar grade), com um pequeno ícone de
+ *  "alça" (GripVertical) só como indicativo visual de que dá pra arrastar.
+ *  O atraso de ativação (`activationConstraint.delay`) é o que permite o
+ *  dedo continuar rolando a página normalmente — só inicia o arraste se a
+ *  pessoa realmente segurar parada por um instante. */
+const SortableProcCard: React.FC<{ id: string; isEditMode: boolean; children: React.ReactNode }> = ({
+  id,
+  isEditMode,
+  children,
+}) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id, disabled: !isEditMode });
+
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 50 : undefined,
+    touchAction: isEditMode ? 'none' : undefined,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...(isEditMode ? { ...attributes, ...listeners } : {})} className="lm-sortable-proc">
+      {isEditMode && (
+        <span className="lm-proc-drag-handle" aria-hidden="true">
+          <GripVertical className="w-3.5 h-3.5" />
+        </span>
+      )}
+      {children}
+    </div>
+  );
+};
 
 export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
   procedures,
@@ -33,6 +84,7 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
   isEditMode = false,
   onEditProc,
   onDeleteProc,
+  onReorderProcedures,
   onOpenAddProcModal,
   onOpenAddCatModal,
   onDeleteCategory,
@@ -62,6 +114,39 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
     if (activeCategory === 'Todos') return procedures;
     return procedures.filter((p) => p.category === activeCategory);
   }, [procedures, activeCategory]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      // Segurar ~250ms antes de iniciar o arraste — dá tempo do navegador
+      // distinguir de um scroll/toque normal na tela, sem exigir uma alça
+      // minúscula pra acertar.
+      activationConstraint: { delay: 250, tolerance: 6 },
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id || !onReorderProcedures) return;
+
+    const oldIndex = filteredProcedures.findIndex((p) => p.id === active.id);
+    const newIndex = filteredProcedures.findIndex((p) => p.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    const reorderedFiltered = arrayMove(filteredProcedures, oldIndex, newIndex);
+
+    // Se o filtro ativo é "Todos", a lista filtrada já É a lista completa.
+    // Se é uma categoria específica, recoloca os itens reordenados nas
+    // mesmas posições que ocupavam na lista completa, sem mexer na posição
+    // relativa dos itens de outras categorias.
+    if (activeCategory === 'Todos') {
+      onReorderProcedures(reorderedFiltered);
+      return;
+    }
+    const filteredIds = new Set(filteredProcedures.map((p) => p.id));
+    const queue = [...reorderedFiltered];
+    const newFullList = procedures.map((item) => (filteredIds.has(item.id) ? queue.shift()! : item));
+    onReorderProcedures(newFullList);
+  };
 
   const handleNextProcedure = () => {
     if (!selectedProcedure) return;
@@ -94,7 +179,9 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
           <h2 className="secao-catalogo__titulo">
             {isClassico ? <>Procedimentos &amp; <em>Valores</em></> : <>Escolha o seu <em>estilo</em></>}
           </h2>
-          <p className="secao-catalogo__sub">Toque nos Cards para ver detalhes, tempo e valores.</p>
+          <p className="secao-catalogo__sub">
+            {isEditMode ? 'Segure e arraste um card pra reordenar.' : 'Toque nos Cards para ver detalhes, tempo e valores.'}
+          </p>
         </header>
 
         {/* Filtros em Chips Horizontais */}
@@ -172,78 +259,87 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
         </div>
 
         {/* Renderização condicional por modelo (Clássico = Lista / Mosaico = Grid) */}
-        {isClassico ? (
-          <div className="studio__lista">
-            {filteredProcedures.map((item) => (
-              <div
-                key={item.id}
-                className={`servico-card ${isEditMode ? 'lm-service-card-wrapper' : ''}`}
-                onClick={() => {
-                  if (!isEditMode) setSelectedProcedure(item);
-                }}
-              >
-                {isEditMode && (
-                  <div className="lm-svc-actions-bar">
-                    <button
-                      type="button"
-                      className="lm-svc-btn-action"
-                      onClick={(ev) => {
-                        ev.stopPropagation();
-                        if (onEditProc) onEditProc(item);
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext
+            items={filteredProcedures.map((p) => p.id)}
+            strategy={isClassico ? verticalListSortingStrategy : rectSortingStrategy}
+          >
+            {isClassico ? (
+              <div className="studio__lista">
+                {filteredProcedures.map((item) => (
+                  <SortableProcCard key={item.id} id={item.id} isEditMode={isEditMode}>
+                    <div
+                      className={`servico-card ${isEditMode ? 'lm-service-card-wrapper' : ''}`}
+                      onClick={() => {
+                        if (!isEditMode) setSelectedProcedure(item);
                       }}
                     >
-                      ✏️ Editar
-                    </button>
-                    <button
-                      type="button"
-                      className="lm-svc-btn-action lm-svc-btn-danger"
-                      title="Excluir"
-                      onClick={(ev) => {
-                        ev.stopPropagation();
-                        if (onDeleteProc) onDeleteProc(item);
-                      }}
-                    >
-                      🗑️
-                    </button>
-                  </div>
-                )}
+                      {isEditMode && (
+                        <div className="lm-svc-actions-bar">
+                          <button
+                            type="button"
+                            className="lm-svc-btn-action"
+                            onClick={(ev) => {
+                              ev.stopPropagation();
+                              if (onEditProc) onEditProc(item);
+                            }}
+                          >
+                            ✏️ Editar
+                          </button>
+                          <button
+                            type="button"
+                            className="lm-svc-btn-action lm-svc-btn-danger"
+                            title="Excluir"
+                            onClick={(ev) => {
+                              ev.stopPropagation();
+                              if (onDeleteProc) onDeleteProc(item);
+                            }}
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      )}
 
-                <div className="servico-card__foto-box">
-                  <img
-                    src={item.image_url || fallbackImage}
-                    alt={item.title}
-                    className="servico-card__foto"
-                    loading="lazy"
-                  />
-                </div>
-                <div className="servico-card__conteudo">
-                  {item.category && <span className="servico-card__cat">{item.category}</span>}
-                  <h3 className="servico-card__titulo">{item.title}</h3>
-                  {item.description && <p className="servico-card__desc">{item.description}</p>}
-                </div>
-                <div className="servico-card__lado-dir">
-                  <span className="servico-card__preco">{formatPrice(item.price)}</span>
-                  {item.duration && <span className="servico-card__duracao">{item.duration}</span>}
-                  <span className="servico-card__seta">→</span>
-                </div>
+                      <div className="servico-card__foto-box">
+                        <img
+                          src={item.image_url || fallbackImage}
+                          alt={item.title}
+                          className="servico-card__foto"
+                          loading="lazy"
+                        />
+                      </div>
+                      <div className="servico-card__conteudo">
+                        {item.category && <span className="servico-card__cat">{item.category}</span>}
+                        <h3 className="servico-card__titulo">{item.title}</h3>
+                        {item.description && <p className="servico-card__desc">{item.description}</p>}
+                      </div>
+                      <div className="servico-card__lado-dir">
+                        <span className="servico-card__preco">{formatPrice(item.price)}</span>
+                        {item.duration && <span className="servico-card__duracao">{item.duration}</span>}
+                        <span className="servico-card__seta">→</span>
+                      </div>
+                    </div>
+                  </SortableProcCard>
+                ))}
               </div>
-            ))}
-          </div>
-        ) : (
-          <div className="mosaico__grid">
-            {filteredProcedures.map((item) => (
-              <ProcedureCard
-                key={item.id}
-                item={item}
-                whatsappNumber={whatsappNumber}
-                isEditMode={isEditMode}
-                onSelect={(proc) => setSelectedProcedure(proc)}
-                onEditProc={onEditProc}
-                onDeleteProc={onDeleteProc}
-              />
-            ))}
-          </div>
-        )}
+            ) : (
+              <div className="mosaico__grid">
+                {filteredProcedures.map((item) => (
+                  <SortableProcCard key={item.id} id={item.id} isEditMode={isEditMode}>
+                    <ProcedureCard
+                      item={item}
+                      whatsappNumber={whatsappNumber}
+                      isEditMode={isEditMode}
+                      onSelect={(proc) => setSelectedProcedure(proc)}
+                      onEditProc={onEditProc}
+                      onDeleteProc={onDeleteProc}
+                    />
+                  </SortableProcCard>
+                ))}
+              </div>
+            )}
+          </SortableContext>
+        </DndContext>
 
         {/* BOTÃO ADICIONAR NOVO PROCEDIMENTO DENTRO DO GRID */}
         {isEditMode && (

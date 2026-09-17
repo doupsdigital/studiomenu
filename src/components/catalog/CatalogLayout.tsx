@@ -288,6 +288,15 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
     showToast('🗑️ Procedimento excluído!');
   };
 
+  // Reordenar procedimentos por arrastar (modo edição) — recebe a lista já
+  // na nova ordem (`ProcedureGrid` já resolve o caso de reordenar só dentro
+  // de uma categoria filtrada) e reusa o mesmo pushState/undo/Salvar de
+  // qualquer outra edição. A ordem final vira `order_index` no banco a
+  // partir da posição no array (ver buildServicesPayload).
+  const handleReorderProcedures = (newProcedures: ProcedureItem[]) => {
+    pushState({ ...catalogState, procedures: newProcedures });
+  };
+
   const handleAddCategory = (categoryName: string) => {
     const trimmed = categoryName.trim();
     if (!trimmed) return;
@@ -441,6 +450,7 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
             setActiveModal('procedure');
           }}
           onDeleteProc={handleDeleteProcedure}
+          onReorderProcedures={handleReorderProcedures}
           onDeleteCategory={handleAttemptDeleteCategory}
           onMoveCategory={handleMoveCategory}
           onOpenAddProcModal={() => {
