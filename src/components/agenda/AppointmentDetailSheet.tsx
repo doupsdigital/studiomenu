@@ -118,7 +118,7 @@ export const AppointmentDetailSheet: React.FC<AppointmentDetailSheetProps> = ({
                 type="button"
                 disabled={busy}
                 onClick={() => onComplete(appointment)}
-                className="flex-1 h-11 rounded-xl bg-blue-600 text-white text-sm font-bold disabled:opacity-50 flex items-center justify-center gap-1.5"
+                className="flex-1 h-11 rounded-xl bg-emerald-600 text-white text-sm font-bold disabled:opacity-50 flex items-center justify-center gap-1.5"
               >
                 <CheckCircle2 className="w-4 h-4" /> Concluir
               </button>
@@ -126,7 +126,7 @@ export const AppointmentDetailSheet: React.FC<AppointmentDetailSheetProps> = ({
                 type="button"
                 disabled={busy}
                 onClick={() => onNoShow(appointment)}
-                className="flex-1 h-11 rounded-xl border border-red-300 text-red-600 hover:bg-red-50 text-sm font-bold disabled:opacity-50 flex items-center justify-center gap-1.5 transition-colors"
+                className="flex-1 h-11 rounded-xl bg-red-600 text-white text-sm font-bold disabled:opacity-50 flex items-center justify-center gap-1.5"
               >
                 <XCircle className="w-4 h-4" /> Marcar falta
               </button>
@@ -135,7 +135,7 @@ export const AppointmentDetailSheet: React.FC<AppointmentDetailSheetProps> = ({
               type="button"
               disabled={busy}
               onClick={() => onCancelConfirmed(appointment)}
-              className="w-full h-10 rounded-xl text-ink-faint hover:text-red-600 text-[13px] font-semibold disabled:opacity-50 transition-colors"
+              className="w-full h-10 rounded-xl bg-gray-200 hover:bg-gray-300 text-gray-700 text-[13px] font-bold disabled:opacity-50 transition-colors"
             >
               Cancelar agendamento
             </button>
