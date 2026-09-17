@@ -24,6 +24,11 @@ const PROCEDURES_TOOL = {
             title: { type: 'string', description: 'Nome do procedimento/serviço.' },
             price: { type: 'string', description: 'Preço exatamente como está escrito (ex: "R$ 150", "A partir de R$ 200", "Sob Consulta").' },
             duration: { type: 'string', description: 'Duração do procedimento, se estiver indicada (ex: "1h30"). Deixe vazio se não houver.' },
+            duration_minutes: {
+              type: 'integer',
+              description:
+                'A mesma duração do campo "duration", convertida pro total em minutos (ex: "1h30" → 90, "45min" → 45, "2h" → 120). Se "duration" estiver vazio ou não for uma duração de verdade (ex: "Diário", "Guia"), deixe este campo ausente/null.',
+            },
             category: { type: 'string', description: 'Categoria/agrupamento do procedimento, se a tabela indicar (ex: "Cílios", "Unhas"). Use "Geral" se não houver agrupamento claro.' },
             description: { type: 'string', description: 'Descrição curta, se houver algum detalhe extra no material. Deixe vazio se não houver.' },
             image_url: {
@@ -152,6 +157,7 @@ export async function POST(request: Request) {
       description: p.description || '',
       price: p.price || 'Sob Consulta',
       duration: p.duration || '',
+      duration_minutes: typeof p.duration_minutes === 'number' ? p.duration_minutes : null,
       category: p.category || 'Geral',
       image_url: p.image_url || defaultImage,
       badge: '',

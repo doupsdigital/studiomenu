@@ -1,6 +1,6 @@
 import { CatalogOrderData, NicheType, LayoutModel, ThemeVariant, ProcedureItem } from '@/types/catalog';
 import { nichePresetsMap } from '@/data/niche-presets';
-import { normalizeWhatsappBR } from './format';
+import { normalizeWhatsappBR, parseDurationToMinutes } from './format';
 import { supabaseAdmin } from './supabase-admin';
 import { RESERVED_SLUGS } from './reserved-slugs';
 
@@ -177,7 +177,11 @@ export function buildServicesPayload(procedures: ProcedureItem[], orderId: strin
       description: p.description || '',
       price: p.price || 'Sob Consulta',
       duration: p.duration || '',
-      duration_minutes: typeof p.duration_minutes === 'number' ? p.duration_minutes : null,
+      // Se não veio um valor numérico explícito (IA, preset de nicho ou
+      // edição manual sem preencher o campo específico), tenta calcular a
+      // partir do texto livre de duração — sem isso, o serviço nunca fica
+      // agendável no StudioMenu+ mesmo já mostrando "1h30" pro cliente.
+      duration_minutes: typeof p.duration_minutes === 'number' ? p.duration_minutes : parseDurationToMinutes(p.duration),
       bookable: p.bookable !== false,
       category: p.category || 'Geral',
       image_url: p.image_url || '',
