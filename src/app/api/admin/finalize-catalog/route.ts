@@ -4,6 +4,7 @@ import { ProcedureItem, NicheType, LayoutModel, ThemeVariant } from '@/types/cat
 import { isAdminRequestAuthorized } from '@/lib/admin-session';
 import { buildOrderInsertPayload, buildServicesPayload, generateUniqueSlug } from '@/lib/order-payload';
 import { isAllowedImageType } from '@/lib/file-validation';
+import { adaptCoverToPortrait } from '@/lib/cover-image-ai';
 
 const MAX_COVER_SIZE = 8 * 1024 * 1024; // 8MB
 
@@ -46,13 +47,22 @@ export async function POST(request: Request) {
         return NextResponse.json({ success: false, message: 'Foto de capa muito grande. O limite é 8MB.' }, { status: 400 });
       }
 
-      const fileExt = coverFile.name.split('.').pop() || 'jpg';
+      let buffer: Buffer = Buffer.from(await coverFile.arrayBuffer());
+      let contentType = coverFile.type;
+      let fileExt = coverFile.name.split('.').pop() || 'jpg';
+
+      const adapted = await adaptCoverToPortrait(buffer);
+      if (adapted) {
+        buffer = adapted.buffer;
+        contentType = adapted.contentType;
+        fileExt = 'png';
+      }
+
       const fileName = `${finalSlug}/${Date.now()}_cover.${fileExt}`;
-      const buffer = Buffer.from(await coverFile.arrayBuffer());
 
       const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
         .from('catalog-assets')
-        .upload(fileName, buffer, { contentType: coverFile.type, upsert: true });
+        .upload(fileName, new Uint8Array(buffer), { contentType, upsert: true });
 
       if (uploadError) {
         console.error('[Finalize Catalog] Erro no upload da capa:', uploadError);
