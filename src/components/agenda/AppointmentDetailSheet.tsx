@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { X, Check, MessageCircle } from 'lucide-react';
+import { X, Check, MessageCircle, CheckCircle2, XCircle } from 'lucide-react';
 import type { AgendaAppointment } from '@/lib/scheduling/agenda-service';
 
 interface AppointmentDetailSheetProps {
@@ -13,6 +13,10 @@ interface AppointmentDetailSheetProps {
   onReject: (appointment: AgendaAppointment) => void;
   /** Já confirmado → cancelamento direto, sem o fluxo de aprovação. */
   onCancelConfirmed: (appointment: AgendaAppointment) => void;
+  /** Marca como concluído/falta — só faz sentido pra um agendamento já
+   *  confirmado (controle pós-atendimento). */
+  onComplete: (appointment: AgendaAppointment) => void;
+  onNoShow: (appointment: AgendaAppointment) => void;
 }
 
 const STATUS_LABEL: Record<AgendaAppointment['status'], string> = {
@@ -40,6 +44,8 @@ export const AppointmentDetailSheet: React.FC<AppointmentDetailSheetProps> = ({
   onApprove,
   onReject,
   onCancelConfirmed,
+  onComplete,
+  onNoShow,
 }) => {
   const time = new Date(appointment.starts_at).toLocaleTimeString('pt-BR', {
     hour: '2-digit',
@@ -106,14 +112,34 @@ export const AppointmentDetailSheet: React.FC<AppointmentDetailSheetProps> = ({
         )}
 
         {appointment.status === 'confirmed' && (
-          <button
-            type="button"
-            disabled={busy}
-            onClick={() => onCancelConfirmed(appointment)}
-            className="w-full h-11 rounded-xl border border-red-300 text-red-600 hover:bg-red-50 text-sm font-bold disabled:opacity-50 transition-colors"
-          >
-            Cancelar agendamento
-          </button>
+          <div className="flex flex-col gap-2">
+            <div className="flex gap-2">
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => onComplete(appointment)}
+                className="flex-1 h-11 rounded-xl bg-blue-600 text-white text-sm font-bold disabled:opacity-50 flex items-center justify-center gap-1.5"
+              >
+                <CheckCircle2 className="w-4 h-4" /> Concluir
+              </button>
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => onNoShow(appointment)}
+                className="flex-1 h-11 rounded-xl border border-red-300 text-red-600 hover:bg-red-50 text-sm font-bold disabled:opacity-50 flex items-center justify-center gap-1.5 transition-colors"
+              >
+                <XCircle className="w-4 h-4" /> Marcar falta
+              </button>
+            </div>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => onCancelConfirmed(appointment)}
+              className="w-full h-10 rounded-xl text-ink-faint hover:text-red-600 text-[13px] font-semibold disabled:opacity-50 transition-colors"
+            >
+              Cancelar agendamento
+            </button>
+          </div>
         )}
       </div>
     </div>

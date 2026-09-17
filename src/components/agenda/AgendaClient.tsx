@@ -104,7 +104,7 @@ export const AgendaClient: React.FC<AgendaClientProps> = ({
   // como padrão, que ela pode trocar no próprio formulário.
   const formDefaultDate = view === 'mes' ? todayStr : selectedDate;
 
-  const patchStatus = async (appointment: AgendaAppointment, status: 'confirmed' | 'cancelled') => {
+  const patchStatus = async (appointment: AgendaAppointment, status: 'confirmed' | 'cancelled' | 'completed' | 'no_show') => {
     const res = await fetch(`/api/professional/appointments/${appointment.id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -174,6 +174,44 @@ export const AgendaClient: React.FC<AgendaClientProps> = ({
       }
       setDetailAppointment(null);
       setSuccessInfo(buildSuccessSummary(appointment, 'Agendamento Cancelado'));
+      router.refresh();
+    } catch {
+      setActionError('Falha na conexão.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleComplete = async (appointment: AgendaAppointment) => {
+    setBusy(true);
+    setActionError(null);
+    try {
+      const json = await patchStatus(appointment, 'completed');
+      if (!json.success) {
+        setActionError(json.message || 'Não foi possível concluir o agendamento.');
+        return;
+      }
+      setDetailAppointment(null);
+      setSuccessInfo(buildSuccessSummary(appointment, 'Agendamento Concluído!'));
+      router.refresh();
+    } catch {
+      setActionError('Falha na conexão.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleNoShow = async (appointment: AgendaAppointment) => {
+    setBusy(true);
+    setActionError(null);
+    try {
+      const json = await patchStatus(appointment, 'no_show');
+      if (!json.success) {
+        setActionError(json.message || 'Não foi possível marcar a falta.');
+        return;
+      }
+      setDetailAppointment(null);
+      setSuccessInfo(buildSuccessSummary(appointment, 'Falta registrada'));
       router.refresh();
     } catch {
       setActionError('Falha na conexão.');
@@ -350,6 +388,8 @@ export const AgendaClient: React.FC<AgendaClientProps> = ({
           onApprove={setApproveAppointment}
           onReject={setRejectAppointment}
           onCancelConfirmed={handleCancelConfirmed}
+          onComplete={handleComplete}
+          onNoShow={handleNoShow}
         />
       )}
 

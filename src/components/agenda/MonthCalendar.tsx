@@ -19,9 +19,8 @@ interface MonthCalendarProps {
    *  meses vizinhos pra fechar as semanas completas. */
   days: string[];
   todayStr: string;
-  /** Agendamentos em todo o intervalo da grade — sem cancelados, a visão
-   *  mensal é pra planejamento (o que está ativo), o rastro histórico de
-   *  recusados já fica só na grade do dia. */
+  /** Agendamentos em todo o intervalo da grade — `getAppointmentsForRange`
+   *  já nunca inclui cancelados. */
   appointments: AgendaAppointment[];
   businessHours: BusinessHoursConfigRow[];
   scheduleBlocks: ScheduleBlockConfigRow[];
@@ -54,7 +53,6 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
   const appointmentsByDate = useMemo(() => {
     const map = new Map<string, AgendaAppointment[]>();
     for (const appt of appointments) {
-      if (appt.status === 'cancelled') continue;
       const key = getSaoPauloDateStr(appt.starts_at);
       const list = map.get(key);
       if (list) list.push(appt);

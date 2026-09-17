@@ -3,13 +3,13 @@ import { supabaseAdmin } from '@/lib/supabase-admin';
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 import { isProfessionalRequestAuthorized } from '@/lib/professional-session';
 
-const ALLOWED_STATUSES = ['confirmed', 'cancelled'] as const;
+const ALLOWED_STATUSES = ['confirmed', 'cancelled', 'completed', 'no_show'] as const;
 
 interface RouteParams {
   params: Promise<{ id: string }>;
 }
 
-/** PATCH /api/professional/appointments/[id]  Body: { status: 'confirmed' | 'cancelled' }
+/** PATCH /api/professional/appointments/[id]  Body: { status: 'confirmed' | 'cancelled' | 'completed' | 'no_show' }
  *  A autorização nunca confia num `slug` vindo do cliente pra decidir o que
  *  pode ser mexido: resolve o `order_id`/`slug` a partir do próprio
  *  agendamento no banco, e só then confere a sessão contra esse slug real —

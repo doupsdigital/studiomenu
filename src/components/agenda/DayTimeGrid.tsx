@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { CalendarDays, Lock } from 'lucide-react';
+import { CalendarDays, Lock, CheckCircle2, XCircle } from 'lucide-react';
 import type { AgendaAppointment } from '@/lib/scheduling/agenda-service';
 import type { BusinessHoursConfigRow, ScheduleBlockConfigRow } from '@/lib/scheduling/config-service';
 import { localDateTimeToUTC } from '@/lib/scheduling/availability';
@@ -11,8 +11,8 @@ const SLOT_HEIGHT = 54; // px por meia-hora (54, não 44 — dá espaço pra fon
 
 interface DayTimeGridProps {
   dateStr: string;
-  /** Agendamentos do dia, incluindo cancelados/recusados (mostrados cinza,
-   *  como rastro histórico — mesmo comportamento do LashAgenda). */
+  /** Agendamentos do dia — `getAppointmentsForDay` já nunca inclui
+   *  cancelados (somem da agenda assim que cancelados). */
   appointments: AgendaAppointment[];
   businessHours: BusinessHoursConfigRow[];
   scheduleBlocks: ScheduleBlockConfigRow[];
@@ -197,6 +197,19 @@ export const DayTimeGrid: React.FC<DayTimeGridProps> = ({
                   height < 48 ? 'px-2 py-0.5' : height < 84 ? 'px-2.5 py-1' : 'px-3 py-1.5'
                 }`}
               >
+                {/* Marca d'água grande atrás do conteúdo pra concluído/falta —
+                 *  dá pra ver o status batendo o olho, sem tampar nome/horário
+                 *  por cima (z-index negativo, pinta atrás do texto em fluxo
+                 *  normal mas na frente do fundo colorido do card). */}
+                {(appt.status === 'completed' || appt.status === 'no_show') && height >= 40 && (
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none -z-10">
+                    {appt.status === 'completed' ? (
+                      <CheckCircle2 className="text-emerald-600/25" style={{ width: Math.min(height * 0.65, 56), height: Math.min(height * 0.65, 56) }} />
+                    ) : (
+                      <XCircle className="text-red-600/25" style={{ width: Math.min(height * 0.65, 56), height: Math.min(height * 0.65, 56) }} />
+                    )}
+                  </div>
+                )}
                 <div className="flex items-center justify-between gap-2">
                   <p className={`font-bold truncate flex-1 leading-tight ${height < 48 ? 'text-[11px]' : 'text-sm'} ${style.text}`}>
                     {appt.client_name}

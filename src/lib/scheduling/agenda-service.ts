@@ -23,14 +23,10 @@ export interface ManualBookingService {
 }
 
 /** Todos os agendamentos entre `startDateStr` (inclusive) e `endDateStrExclusive`
- *  (exclusive), fuso America/Sao_Paulo, ordenados por horário — inclui os
- *  cancelados/recusados de propósito (mesmo comportamento do LashAgenda: eles
- *  continuam aparecendo no dia, cinza, como rastro histórico; o horário já
- *  fica livre pra outro agendamento de qualquer forma, já que nem a trava
- *  de conflito no banco nem a checagem de disponibilidade da grade
- *  consideram agendamentos cancelados). Usada tanto pela grade do dia
- *  (intervalo de 1 dia) quanto pela visão mensal (intervalo de 42 dias,
- *  Fase 11). */
+ *  (exclusive), fuso America/Sao_Paulo, ordenados por horário — nunca inclui
+ *  cancelados (some da agenda assim que cancelado, não fica ocupando espaço
+ *  visual). Usada tanto pela grade do dia (intervalo de 1 dia) quanto pela
+ *  visão mensal (intervalo de 42 dias, Fase 11). */
 export async function getAppointmentsForRange(
   orderId: string,
   startDateStr: string,
@@ -43,6 +39,7 @@ export async function getAppointmentsForRange(
     .from('appointments')
     .select('id, service_title, duration_minutes, price_snapshot, client_name, client_whatsapp, client_notes, starts_at, ends_at, status, origin')
     .eq('order_id', orderId)
+    .neq('status', 'cancelled')
     .gte('starts_at', rangeStart.toISOString())
     .lt('starts_at', rangeEnd.toISOString())
     .order('starts_at', { ascending: true });
