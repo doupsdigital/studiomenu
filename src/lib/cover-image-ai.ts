@@ -5,7 +5,7 @@ const TARGET_H = 1536; // maior retrato suportado pela API de imagem da OpenAI �
 const TARGET_RATIO = TARGET_W / TARGET_H;
 
 const OUTPAINT_PROMPT =
-  'Estenda o fundo desta foto de forma natural e realista para preencher todo o quadro vertical, mantendo a pessoa e os elementos originais exatamente como estão, na mesma posição e proporção, sem adicionar texto, objetos novos ou logotipos, preservando o estilo, iluminação e cores originais.';
+  'This is a photo outpainting task. The image has a photograph in the center and fully transparent regions above and/or below it. Fill ONLY the transparent regions with new, photorealistic content that plausibly continues the same scene (same wall, room, floor, lighting, shadows and color tone visible in the photo) so the canvas becomes one seamless full-height photograph. Do not zoom, crop, rescale, reframe, or move the existing photograph — it must stay at its exact original size and position. Do not alter, redraw, or stylize the person, their face, or any object already visible. Do not add text, watermarks, logos or new objects.';
 
 /** Onde a foto original (redimensionada, sem cortar nada) fica posicionada
  *  dentro do canvas-alvo, igual ao `fit: 'contain'` do sharp — calculado à
@@ -133,6 +133,10 @@ async function callOutpaint(buffer: Buffer, apiKey: string): Promise<Buffer | nu
   form.append('image', new Blob([new Uint8Array(padded)], { type: 'image/png' }), 'cover.png');
   form.append('prompt', OUTPAINT_PROMPT);
   form.append('size', `${TARGET_W}x${TARGET_H}`);
+  // Preserva rosto/detalhes finos da imagem de entrada em vez de tratá-la só
+  // como referência solta — é o parâmetro que a própria OpenAI recomenda pra
+  // edição que precisa manter uma pessoa reconhecível.
+  form.append('input_fidelity', 'high');
 
   const res = await fetch('https://api.openai.com/v1/images/edits', {
     method: 'POST',
