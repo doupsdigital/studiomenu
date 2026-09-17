@@ -42,16 +42,21 @@ interface ProcedureGridProps {
 }
 
 /** Envolve um card de procedimento (mosaico OU clássico) pra deixar arrastar
- *  pra reordenar — o arraste só inicia a partir do ícone de alça
- *  (GripVertical), nunca do card inteiro: só o ícone tem
- *  `touch-action: none` (o que desliga o scroll nativo do toque ali), o
- *  resto do card continua rolando a página normalmente, sem nenhuma
- *  interferência. */
-const SortableProcCard: React.FC<{ id: string; isEditMode: boolean; children: React.ReactNode }> = ({
-  id,
-  isEditMode,
-  children,
-}) => {
+ *  pra reordenar, e concentra a barra de ações (arrastar + editar + excluir)
+ *  num único bloco — antes eram dois elementos flutuantes separados (a alça
+ *  sozinha e o par Editar/Excluir), que ficavam espremidos um em cima do
+ *  outro nos cards mais estreitos do grid mosaico. A alça vem primeiro,
+ *  com uma cor própria (rosa sólido) pra se diferenciar visualmente de
+ *  Editar/Excluir — é uma ação diferente (arrastar, não tocar). Só a alça
+ *  tem `touch-action: none`/os listeners de arraste; o resto do card
+ *  continua rolando a página normalmente. */
+const SortableProcCard: React.FC<{
+  id: string;
+  isEditMode: boolean;
+  onEdit?: () => void;
+  onDelete?: () => void;
+  children: React.ReactNode;
+}> = ({ id, isEditMode, onEdit, onDelete, children }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id, disabled: !isEditMode });
 
   const style: React.CSSProperties = {
@@ -64,9 +69,17 @@ const SortableProcCard: React.FC<{ id: string; isEditMode: boolean; children: Re
   return (
     <div ref={setNodeRef} style={style} className="lm-sortable-proc">
       {isEditMode && (
-        <span className="lm-proc-drag-handle" aria-hidden="true" {...attributes} {...listeners}>
-          <GripVertical className="w-3.5 h-3.5" />
-        </span>
+        <div className="lm-svc-actions-bar">
+          <span className="lm-proc-drag-handle" aria-hidden="true" {...attributes} {...listeners}>
+            <GripVertical className="w-3.5 h-3.5" />
+          </span>
+          <button type="button" className="lm-svc-btn-action" onClick={onEdit}>
+            ✏️ Editar
+          </button>
+          <button type="button" className="lm-svc-btn-action lm-svc-btn-danger" title="Excluir" onClick={onDelete}>
+            🗑️
+          </button>
+        </div>
       )}
       {children}
     </div>
@@ -266,39 +279,19 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
             {isClassico ? (
               <div className="studio__lista">
                 {filteredProcedures.map((item) => (
-                  <SortableProcCard key={item.id} id={item.id} isEditMode={isEditMode}>
+                  <SortableProcCard
+                    key={item.id}
+                    id={item.id}
+                    isEditMode={isEditMode}
+                    onEdit={() => onEditProc?.(item)}
+                    onDelete={() => onDeleteProc?.(item)}
+                  >
                     <div
                       className={`servico-card ${isEditMode ? 'lm-service-card-wrapper' : ''}`}
                       onClick={() => {
                         if (!isEditMode) setSelectedProcedure(item);
                       }}
                     >
-                      {isEditMode && (
-                        <div className="lm-svc-actions-bar">
-                          <button
-                            type="button"
-                            className="lm-svc-btn-action"
-                            onClick={(ev) => {
-                              ev.stopPropagation();
-                              if (onEditProc) onEditProc(item);
-                            }}
-                          >
-                            ✏️ Editar
-                          </button>
-                          <button
-                            type="button"
-                            className="lm-svc-btn-action lm-svc-btn-danger"
-                            title="Excluir"
-                            onClick={(ev) => {
-                              ev.stopPropagation();
-                              if (onDeleteProc) onDeleteProc(item);
-                            }}
-                          >
-                            🗑️
-                          </button>
-                        </div>
-                      )}
-
                       <div className="servico-card__foto-box">
                         <img
                           src={item.image_url || fallbackImage}
@@ -324,14 +317,18 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
             ) : (
               <div className="mosaico__grid">
                 {filteredProcedures.map((item) => (
-                  <SortableProcCard key={item.id} id={item.id} isEditMode={isEditMode}>
+                  <SortableProcCard
+                    key={item.id}
+                    id={item.id}
+                    isEditMode={isEditMode}
+                    onEdit={() => onEditProc?.(item)}
+                    onDelete={() => onDeleteProc?.(item)}
+                  >
                     <ProcedureCard
                       item={item}
                       whatsappNumber={whatsappNumber}
                       isEditMode={isEditMode}
                       onSelect={(proc) => setSelectedProcedure(proc)}
-                      onEditProc={onEditProc}
-                      onDeleteProc={onDeleteProc}
                     />
                   </SortableProcCard>
                 ))}

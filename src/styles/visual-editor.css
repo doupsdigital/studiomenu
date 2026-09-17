@@ -334,21 +334,21 @@ body[data-theme="luxury"] .lm-cover-edit-btn,
   width: 100%;
 }
 
+/* Alça de arrastar — primeiro item da mesma pill de Editar/Excluir (não é
+ * mais um badge separado, que ficava espremido em cima do outro grupo nos
+ * cards estreitos do mosaico). Cor sólida rosa própria pra se diferenciar
+ * das outras duas ações (Editar = branco translúcido, Excluir = vermelho) —
+ * é uma interação diferente (arrastar, não tocar). */
 .lm-proc-drag-handle {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  z-index: 89;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
   border-radius: 100px;
-  background: rgba(20, 16, 15, 0.92);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(229, 169, 184, 0.35);
+  background: #e0568a;
+  border: 1px solid rgba(255, 255, 255, 0.25);
   color: #ffffff;
   cursor: grab;
   /* Só essa alça intercepta o toque pra arrastar — o resto do card

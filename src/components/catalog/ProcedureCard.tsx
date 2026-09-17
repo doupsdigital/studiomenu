@@ -6,18 +6,9 @@ interface ProcedureCardProps {
   whatsappNumber: string;
   isEditMode?: boolean;
   onSelect?: (item: ProcedureItem) => void;
-  onEditProc?: (item: ProcedureItem) => void;
-  onDeleteProc?: (item: ProcedureItem) => void;
 }
 
-export const ProcedureCard: React.FC<ProcedureCardProps> = ({
-  item,
-  whatsappNumber,
-  isEditMode = false,
-  onSelect,
-  onEditProc,
-  onDeleteProc,
-}) => {
+export const ProcedureCard: React.FC<ProcedureCardProps> = ({ item, whatsappNumber, isEditMode = false, onSelect }) => {
   const formatPrice = (val: string) => {
     if (!val) return 'Sob Consulta';
     const lower = val.toLowerCase();
@@ -44,33 +35,6 @@ export const ProcedureCard: React.FC<ProcedureCardProps> = ({
       className={`tile ${item.is_highlight ? 'tile--destaque' : ''} is-revealed ${isEditMode ? 'lm-service-card-wrapper' : ''}`}
       onClick={handleBooking}
     >
-      {/* BARRA DE AÇÃO SOBREPOSTA NO CARD QUANDO MODO EDIÇÃO ATIVO */}
-      {isEditMode && (
-        <div className="lm-svc-actions-bar">
-          <button
-            type="button"
-            className="lm-svc-btn-action"
-            onClick={(ev) => {
-              ev.stopPropagation();
-              if (onEditProc) onEditProc(item);
-            }}
-          >
-            ✏️ Editar
-          </button>
-          <button
-            type="button"
-            className="lm-svc-btn-action lm-svc-btn-danger"
-            title="Excluir Procedimento"
-            onClick={(ev) => {
-              ev.stopPropagation();
-              if (onDeleteProc) onDeleteProc(item);
-            }}
-          >
-            🗑️
-          </button>
-        </div>
-      )}
-
       <img
         src={item.image_url || fallbackImage}
         alt={item.title}
