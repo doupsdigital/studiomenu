@@ -55,7 +55,7 @@ export async function POST(request: Request) {
       if (adapted) {
         buffer = adapted.buffer;
         contentType = adapted.contentType;
-        fileExt = 'png';
+        fileExt = contentType.split('/').pop() || fileExt;
       }
 
       const fileName = `${finalSlug}/${Date.now()}_cover.${fileExt}`;
