@@ -95,16 +95,12 @@ export default async function AgendaPage({ params, searchParams }: AgendaPagePro
   // num catálogo que não é Plus (Fase 6, via de escape pra teste/período
   // promocional), e nesse caso a profissional precisa conseguir gerenciar
   // os agendamentos reais que os clientes estão criando, mesmo sem assinar.
-  if (!order.booking_enabled) {
-    return (
-      <>
-        <PageTitleBar title="Agenda" icon={<Calendar className="w-5 h-5 text-ink-soft" />} slug={slug} />
-        <main className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
-          <PlusUpsellCard variant="full" slug={slug} />
-        </main>
-      </>
-    );
-  }
+  //
+  // Sem `booking_enabled`, a tela continua sendo montada por inteiro (dados
+  // reais, geralmente vazios já que ninguém pôde agendar ainda) — só entra
+  // desfocada/travada atrás do card de assinar, em vez de um upsell isolado
+  // numa tela em branco (Fase 20, dá pra "ver" o produto antes de comprar).
+  const bookingEnabled = order.booking_enabled;
 
   const view: 'dia' | 'mes' = viewParam === 'mes' ? 'mes' : 'dia';
   const rawDate = date && DATE_RE.test(date) ? date : todayInSaoPaulo();
@@ -150,49 +146,58 @@ export default async function AgendaPage({ params, searchParams }: AgendaPagePro
   return (
     <>
       <PageTitleBar title="Agenda" icon={<Calendar className="w-5 h-5 text-ink-soft" />} slug={slug} />
-      <main className="max-w-md mx-auto px-5 pt-6 pb-6 flex flex-col gap-5">
-      <GradientHeader showSparkles={false}>
-        <div className="flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <h1 className="font-serif-pro font-bold text-2xl leading-tight">{headerTitle}</h1>
-            {headerSubtitle && <p className="text-sm text-white/80 mt-0.5 truncate">{headerSubtitle}</p>}
+      <main className="relative max-w-md mx-auto px-5 pt-6 pb-6 flex flex-col gap-5">
+      <div className={bookingEnabled ? 'flex flex-col gap-5' : 'flex flex-col gap-5 pointer-events-none select-none blur-sm opacity-60'}>
+        <GradientHeader showSparkles={false}>
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <h1 className="font-serif-pro font-bold text-2xl leading-tight">{headerTitle}</h1>
+              {headerSubtitle && <p className="text-sm text-white/80 mt-0.5 truncate">{headerSubtitle}</p>}
+            </div>
+            <div data-tour="agenda-date-nav" className="flex items-center bg-white/15 backdrop-blur-sm rounded-lg p-0.5 border border-white/20 shrink-0">
+              <Link
+                href={prevHref}
+                className="p-2 hover:bg-white/20 rounded-md transition-colors text-white/80 hover:text-white"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </Link>
+              <Link
+                href={todayHref}
+                className="px-3 py-1.5 text-[13px] font-semibold hover:bg-white/20 rounded-md transition-colors text-white/80 hover:text-white"
+              >
+                Hoje
+              </Link>
+              <Link
+                href={nextHref}
+                className="p-2 hover:bg-white/20 rounded-md transition-colors text-white/80 hover:text-white"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
           </div>
-          <div data-tour="agenda-date-nav" className="flex items-center bg-white/15 backdrop-blur-sm rounded-lg p-0.5 border border-white/20 shrink-0">
-            <Link
-              href={prevHref}
-              className="p-2 hover:bg-white/20 rounded-md transition-colors text-white/80 hover:text-white"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </Link>
-            <Link
-              href={todayHref}
-              className="px-3 py-1.5 text-[13px] font-semibold hover:bg-white/20 rounded-md transition-colors text-white/80 hover:text-white"
-            >
-              Hoje
-            </Link>
-            <Link
-              href={nextHref}
-              className="p-2 hover:bg-white/20 rounded-md transition-colors text-white/80 hover:text-white"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </Link>
-          </div>
-        </div>
-      </GradientHeader>
+        </GradientHeader>
 
-      <AgendaClient
-        slug={slug}
-        view={view}
-        selectedDate={selectedDate}
-        todayStr={todayStr}
-        pendingAppointments={pendingAppointments}
-        dayAppointments={dayAppointments}
-        monthDays={monthDays}
-        monthAppointments={monthAppointments}
-        services={services}
-        businessHours={businessHours}
-        scheduleBlocks={scheduleBlocks}
-      />
+        <AgendaClient
+          slug={slug}
+          view={view}
+          selectedDate={selectedDate}
+          todayStr={todayStr}
+          pendingAppointments={pendingAppointments}
+          dayAppointments={dayAppointments}
+          monthDays={monthDays}
+          monthAppointments={monthAppointments}
+          services={services}
+          businessHours={businessHours}
+          scheduleBlocks={scheduleBlocks}
+          bookingEnabled={bookingEnabled}
+        />
+      </div>
+
+      {!bookingEnabled && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center px-5 py-10">
+          <PlusUpsellCard variant="full" slug={slug} />
+        </div>
+      )}
       </main>
     </>
   );

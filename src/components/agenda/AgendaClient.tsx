@@ -75,6 +75,11 @@ interface AgendaClientProps {
   services: ManualBookingService[];
   businessHours: BusinessHoursConfigRow[];
   scheduleBlocks: ScheduleBlockConfigRow[];
+  /** Quando false, essa árvore inteira é renderizada só pra aparecer
+   *  desfocada/travada atrás do card de assinar (Fase 20) — o tour não deve
+   *  rodar nesse estado (não tem nada clicável mesmo, e ninguém deveria ver
+   *  um balão apontando pra um card bloqueado embaixo do blur). */
+  bookingEnabled: boolean;
 }
 
 export const AgendaClient: React.FC<AgendaClientProps> = ({
@@ -89,6 +94,7 @@ export const AgendaClient: React.FC<AgendaClientProps> = ({
   services,
   businessHours,
   scheduleBlocks,
+  bookingEnabled,
 }) => {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -430,7 +436,7 @@ export const AgendaClient: React.FC<AgendaClientProps> = ({
 
       {successInfo && <SuccessModal {...successInfo} onClose={() => setSuccessInfo(null)} />}
 
-      <ProductTour tourId="agenda" slug={slug} steps={AGENDA_TOUR_STEPS} enabled />
+      <ProductTour tourId="agenda" slug={slug} steps={AGENDA_TOUR_STEPS} enabled={bookingEnabled} />
     </div>
   );
 };
