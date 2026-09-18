@@ -3,16 +3,19 @@ import { LayoutGrid, ChevronRight } from 'lucide-react';
 
 interface EditCatalogCardProps {
   slug: string;
+  /** Âncora pro tour guiado (Fase 20) apontar um balão nesse card. */
+  dataTour?: string;
 }
 
 /** Card de destaque no Início que leva direto pro editor do catálogo — único
  *  jeito de chegar lá agora que "Catálogo" saiu da tabbar (só sobrou o link
  *  de edição em si, sem a opção de copiar por aqui; isso fica disponível no
  *  painel admin). */
-export const EditCatalogCard: React.FC<EditCatalogCardProps> = ({ slug }) => {
+export const EditCatalogCard: React.FC<EditCatalogCardProps> = ({ slug, dataTour }) => {
   return (
     <Link
       href={`/app/${slug}/catalogo`}
+      data-tour={dataTour}
       className="flex items-center gap-4 rounded-2xl p-5 bg-gradient-to-br from-rose-600 to-rose-700 text-white shadow-sm shadow-rose-600/20 transition-transform active:scale-[0.98]"
     >
       <div className="w-12 h-12 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center shrink-0">

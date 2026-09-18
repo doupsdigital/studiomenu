@@ -3,6 +3,8 @@ import { Eye, ChevronRight } from 'lucide-react';
 
 interface ViewCatalogCardProps {
   slug: string;
+  /** Âncora pro tour guiado (Fase 20) apontar um balão nesse card. */
+  dataTour?: string;
 }
 
 /** Leva pro catálogo público (`/c/slug`), a mesma página que a cliente final
@@ -12,12 +14,13 @@ interface ViewCatalogCardProps {
  *  demais da dupla "Editar"/"Compartilhar catálogo", que já são sólidas;
  *  os 3 cards de catálogo do Início formam um grupo visualmente coeso agora
  *  (Fase 14). */
-export const ViewCatalogCard: React.FC<ViewCatalogCardProps> = ({ slug }) => {
+export const ViewCatalogCard: React.FC<ViewCatalogCardProps> = ({ slug, dataTour }) => {
   return (
     <Link
       href={`/c/${slug}`}
       target="_blank"
       rel="noopener noreferrer"
+      data-tour={dataTour}
       className="flex items-center gap-4 rounded-2xl p-5 bg-gradient-to-br from-rose-600 to-rose-700 text-white shadow-sm shadow-rose-600/20 transition-transform active:scale-[0.98]"
     >
       <div className="w-12 h-12 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center shrink-0">
