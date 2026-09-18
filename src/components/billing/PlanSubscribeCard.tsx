@@ -2,8 +2,14 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Crown, BookOpen, type LucideIcon } from 'lucide-react';
+import { Crown, BookOpen, Check, type LucideIcon } from 'lucide-react';
 import { PLAN_PRICING, type PayablePlanTier } from '@/lib/pricing';
+
+const UPGRADE_BENEFITS = [
+  'Clientes agendam sozinhas, a qualquer hora',
+  'Agenda organizada com horários reais',
+  'Menos ida e volta pelo WhatsApp',
+];
 
 interface PlanSubscribeCardProps {
   slug: string;
@@ -43,6 +49,7 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
   const [qr, setQr] = useState<QrState | null>(null);
   const [polling, setPolling] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [upgraded, setUpgraded] = useState(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -93,8 +100,15 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
         setError(json.message || 'Não foi possível iniciar a assinatura.');
         return;
       }
-      if (json.alreadyActive || json.upgraded) {
+      if (json.alreadyActive) {
         router.refresh();
+        return;
+      }
+      if (json.upgraded) {
+        // Sem QR pra mostrar (troca de plano ativa na hora, sem cobrança
+        // nova nesse instante — ver checkout/route.ts) — em vez de só
+        // atualizar a tela, celebra a troca antes de levar pro Início.
+        setUpgraded(true);
         return;
       }
       setQr({ paymentId: json.paymentId, image: json.pixQrCodeImage, payload: json.pixKey });
@@ -116,6 +130,36 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
       // sem fallback, ação secundária
     }
   };
+
+  if (upgraded) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-6" role="dialog" aria-modal="true">
+        <div className="absolute inset-0 bg-black/40" />
+        <div className="relative w-full max-w-sm rounded-3xl bg-gradient-to-br from-rose-700 via-rose-600 to-rose-500 text-white text-center p-7 shadow-2xl">
+          <div className="w-14 h-14 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center mx-auto mb-3">
+            <Crown className="w-7 h-7" />
+          </div>
+          <p className="text-[11px] font-bold tracking-widest uppercase text-white/70 mb-1">Parabéns</p>
+          <h3 className="font-serif-pro font-bold text-2xl mb-3">Agora você tem o StudioMenu+</h3>
+          <ul className="text-left mx-auto max-w-[230px] flex flex-col gap-1.5 mb-6">
+            {UPGRADE_BENEFITS.map((benefit) => (
+              <li key={benefit} className="flex items-start gap-2 text-[13px] text-white/90 leading-snug">
+                <Check className="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-300" />
+                {benefit}
+              </li>
+            ))}
+          </ul>
+          <button
+            type="button"
+            onClick={() => router.push(`/app/${slug}/inicio`)}
+            className="w-full py-3 rounded-xl bg-white text-rose-700 text-sm font-bold shadow-sm hover:bg-rose-50 transition-colors"
+          >
+            Ir para o Início
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-2xl bg-gradient-to-br from-rose-50 to-cream border border-rose-200 p-5">
