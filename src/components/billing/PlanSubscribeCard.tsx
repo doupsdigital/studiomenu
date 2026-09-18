@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Crown, BookOpen, Check, type LucideIcon } from 'lucide-react';
 import { PLAN_PRICING, type PayablePlanTier } from '@/lib/pricing';
+import { formatCpfCnpj } from '@/lib/format';
 
 interface PlanSubscribeCardProps {
   slug: string;
@@ -64,7 +65,7 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
   const successCopy = SUCCESS_COPY[plan];
 
   const [email, setEmail] = useState(billingEmail || '');
-  const [cpfCnpj, setCpfCnpj] = useState(billingCpfCnpj || '');
+  const [cpfCnpj, setCpfCnpj] = useState(formatCpfCnpj(billingCpfCnpj || ''));
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [qr, setQr] = useState<QrState | null>(null);
@@ -228,10 +229,12 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
           />
           <input
             type="text"
+            inputMode="numeric"
             required
             placeholder="CPF ou CNPJ"
             value={cpfCnpj}
-            onChange={(e) => setCpfCnpj(e.target.value)}
+            onChange={(e) => setCpfCnpj(formatCpfCnpj(e.target.value))}
+            maxLength={18}
             className="h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink placeholder:text-ink-faint"
           />
           {error && <p className="text-[13px] text-rose-600">{error}</p>}

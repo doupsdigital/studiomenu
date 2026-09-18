@@ -6,6 +6,39 @@ export function formatPhoneBR(value: string): string {
   return digits.replace(/^(\d{2})(\d{5})(\d*)/, '($1) $2-$3');
 }
 
+/** Máscara de CPF (000.000.000-00) enquanto ela digita, trocando sozinha
+ *  pra CNPJ (00.000.000/0000-00) assim que passar de 11 dígitos — nunca
+ *  bloqueia CNPJ, só começa mostrando o formato mais comum (pessoa física,
+ *  a maioria das assinantes). Usado no card de assinar (Fase 20, feedback
+ *  de teste real: o campo de CPF/CNPJ não tinha máscara nenhuma). */
+export function formatCpfCnpj(value: string): string {
+  const digits = value.replace(/\D/g, '').slice(0, 14);
+
+  if (digits.length <= 11) {
+    const p1 = digits.slice(0, 3);
+    const p2 = digits.slice(3, 6);
+    const p3 = digits.slice(6, 9);
+    const p4 = digits.slice(9, 11);
+    let out = p1;
+    if (p2) out += `.${p2}`;
+    if (p3) out += `.${p3}`;
+    if (p4) out += `-${p4}`;
+    return out;
+  }
+
+  const p1 = digits.slice(0, 2);
+  const p2 = digits.slice(2, 5);
+  const p3 = digits.slice(5, 8);
+  const p4 = digits.slice(8, 12);
+  const p5 = digits.slice(12, 14);
+  let out = p1;
+  if (p2) out += `.${p2}`;
+  if (p3) out += `.${p3}`;
+  if (p4) out += `/${p4}`;
+  if (p5) out += `-${p5}`;
+  return out;
+}
+
 /** Normaliza um número de WhatsApp pra sempre incluir o código do país (55),
  *  formato exigido pelos links `wa.me`/`api.whatsapp.com`. Aceita tanto
  *  "DDD+número" (10-11 dígitos) quanto números já prefixados com 55. */
