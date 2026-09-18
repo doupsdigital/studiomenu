@@ -20,7 +20,15 @@ interface ProductTourProps {
   initialStepId?: string;
 }
 
-const storageKey = (tourId: string, slug: string) => `sm_tour_seen_${tourId}_${slug}`;
+/** Inclui os alvos dos steps na chave — de propósito. Sem isso, um tour já
+ *  visto com MENOS passos (ex: Config com só Básico, sem Horários/
+ *  Bloqueios ainda liberados) ficava marcado como "visto" pra sempre, e
+ *  as seções que só apareceram DEPOIS (ao virar Plus) nunca chegavam a
+ *  mostrar balão nenhum (achado testando de verdade — Fase 20). Um
+ *  conjunto de passos diferente é, pra fins de "já vi isso", um tour
+ *  diferente. */
+const storageKey = (tourId: string, slug: string, steps: Step[]) =>
+  `sm_tour_seen_${tourId}_${slug}_${steps.map((s) => String(s.target)).join('|')}`;
 
 /** Tour guiado (balões apontando elementos da tela, um por vez) — reaproveitável
  *  pelas telas do app (primeiro contato/Início/Agenda/Config, Fase 20).
@@ -39,21 +47,23 @@ const storageKey = (tourId: string, slug: string) => `sm_tour_seen_${tourId}_${s
 export const ProductTour: React.FC<ProductTourProps> = ({ tourId, slug, steps, enabled, initialStepId }) => {
   const [run, setRun] = useState(false);
 
+  const key = storageKey(tourId, slug, steps);
+
   useEffect(() => {
     if (!enabled || steps.length === 0) return;
     try {
-      const seen = window.localStorage.getItem(storageKey(tourId, slug));
+      const seen = window.localStorage.getItem(key);
       if (!seen) setRun(true);
     } catch {
       setRun(true);
     }
-  }, [enabled, tourId, slug, steps.length]);
+  }, [enabled, key]);
 
   const handleEvent = (data: EventData) => {
     if (data.status === STATUS.FINISHED || data.status === STATUS.SKIPPED) {
       setRun(false);
       try {
-        window.localStorage.setItem(storageKey(tourId, slug), '1');
+        window.localStorage.setItem(key, '1');
       } catch {
         // localStorage indisponível (modo privado, etc.) — só não persiste entre sessões.
       }

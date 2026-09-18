@@ -84,23 +84,53 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
 
   const toggle = (key: SectionKey) => setOpen((prev) => ({ ...prev, [key]: !prev[key] }));
 
-  // Tour guiado da Config (Fase 20) — um balão por seção. Horários/Bloqueios/
-  // Notificações ficam de fora enquanto `!bookingEnabled` (Básico sem Plus):
-  // são cards travados, mostrar um balão explicando algo que ela ainda não
-  // pode usar só confunde (achado testando: ela via "Horários de
-  // atendimento" antes mesmo de assinar o Plus).
+  // Enquanto o tour passa por uma seção fechada, abre ela — senão o balão
+  // aponta pra um cabeçalho vazio, sem o conteúdo que ele está explicando.
+  // Fecha de novo ao sair (menos "Bloqueios", que já é aberta por padrão e
+  // continua assim) — pedido explícito do usuário, mesmo comportamento de
+  // "abre enquanto explica, fecha ao passar pra próxima" (Fase 20).
+  const openSection = (key: SectionKey) => setOpen((prev) => (prev[key] ? prev : { ...prev, [key]: true }));
+  const closeSection = (key: SectionKey) => {
+    if (key === 'bloqueios') return;
+    setOpen((prev) => (prev[key] ? { ...prev, [key]: false } : prev));
+  };
+  const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+  // `before`/`after` são hooks do próprio Joyride pra esperar conteúdo
+  // assíncrono/dinâmico ficar pronto antes de medir a posição do balão —
+  // uso certo aqui: abrir a seção MUDA a altura do card, e sem esperar um
+  // instante a posição calculada fica baseada no card ainda fechado.
+  const buildStep = (key: SectionKey, target: string, title: string, content: string): Step => ({
+    id: key,
+    target,
+    title,
+    content,
+    before: async () => {
+      openSection(key);
+      await wait(220);
+    },
+    after: async () => {
+      closeSection(key);
+    },
+  });
+
+  // Tour guiado da Config (Fase 20) — um balão por seção, de cima pra baixo.
+  // Horários/Bloqueios/Notificações ficam de fora enquanto `!bookingEnabled`
+  // (Básico sem Plus): são cards travados, mostrar um balão explicando algo
+  // que ela ainda não pode usar só confunde (achado testando: ela via
+  // "Horários de atendimento" antes mesmo de assinar o Plus).
   const tourSteps: Step[] = [
     ...(bookingEnabled
       ? [
-          { id: 'horarios', target: '#horarios', title: 'Horários de atendimento', content: 'Defina os dias e horários em que você atende.' },
-          { id: 'bloqueios', target: '#bloqueios', title: 'Bloqueios e folgas', content: 'Bloqueie datas específicas (férias, feriado, etc) sem mexer no seu expediente fixo.' },
+          buildStep('horarios', '#horarios', 'Horários de atendimento', 'Defina os dias e horários em que você atende.'),
+          buildStep('bloqueios', '#bloqueios', 'Bloqueios e folgas', 'Bloqueie datas específicas (férias, feriado, etc) sem mexer no seu expediente fixo.'),
           ...(showNotifications
-            ? [{ id: 'notificacoes', target: '#notificacoes', title: 'Notificações', content: 'Ative avisos no seu celular pra novos agendamentos.' }]
+            ? [buildStep('notificacoes', '#notificacoes', 'Notificações', 'Ative avisos no seu celular pra novos agendamentos.')]
             : []),
         ]
       : []),
-    { id: 'assinatura', target: '#assinatura', title: 'Minha assinatura', content: 'Gerencie seu plano por aqui — assinar, trocar ou cancelar.' },
-    { id: 'conta', target: '#conta', title: 'Minha conta', content: 'Crie um acesso com senha pra não depender só do link mágico.' },
+    buildStep('assinatura', '#assinatura', 'Minha assinatura', 'Gerencie seu plano por aqui — assinar, trocar ou cancelar.'),
+    buildStep('conta', '#conta', 'Minha conta', 'Crie um acesso com senha pra não depender só do link mágico.'),
   ];
 
   return (
