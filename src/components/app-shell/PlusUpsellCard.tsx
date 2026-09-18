@@ -50,7 +50,7 @@ export const PlusUpsellCard: React.FC<PlusUpsellCardProps> = ({ variant, slug })
         </ul>
 
         <Link
-          href={`/app/${slug}/config#assinatura`}
+          href={`/app/${slug}/config#upgrade-plus`}
           className="block w-full py-3 rounded-xl bg-white text-rose-700 text-sm font-bold shadow-sm hover:bg-rose-50 transition-colors"
         >
           Assinar por {PLUS_PRICE_LABEL}

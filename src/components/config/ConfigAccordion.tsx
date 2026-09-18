@@ -73,12 +73,38 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
   // o hash pro tour começar por ali (Fase 20) — sem isso, o tour sempre
   // começava do primeiro card e "puxava" a tela de volta, brigando com o
   // scroll que o link já tinha feito (achado testando o card "Criar acesso").
+  //
+  // `upgrade-plus` é um hash "extra", à parte das 5 seções: fica DENTRO da
+  // seção "assinatura" (só existe no DOM pra quem já é Básico ativo — ver
+  // `SubscriptionSection`) e rola direto pro formulário de assinar o Plus
+  // (e-mail/CPF já preenchidos, botão "Assinar por R$69,90"), em vez de
+  // parar no topo do card "Básico ativo" que fica acima dele — pedido
+  // explícito do usuário, o CTA de upgrade deve levar direto pra ação, não
+  // só pra seção genérica.
   useEffect(() => {
-    const hash = window.location.hash.slice(1) as SectionKey | '';
-    if (hash === 'assinatura' || hash === 'conta' || hash === 'horarios' || hash === 'bloqueios' || hash === 'notificacoes') {
-      setOpen((prev) => ({ ...prev, [hash]: true }));
-      document.getElementById(hash)?.scrollIntoView({ block: 'start' });
-      setTourStartHash(hash);
+    const hash = window.location.hash.slice(1);
+    const sectionForHash: Partial<Record<string, SectionKey>> = {
+      assinatura: 'assinatura',
+      'upgrade-plus': 'assinatura',
+      conta: 'conta',
+      horarios: 'horarios',
+      bloqueios: 'bloqueios',
+      notificacoes: 'notificacoes',
+    };
+    const key = sectionForHash[hash];
+    if (key) {
+      setOpen((prev) => ({ ...prev, [key]: true }));
+      setTourStartHash(key);
+      // Espera um tick antes de rolar — o alvo específico (`#upgrade-plus`)
+      // só existe no DOM depois que a seção abre (conteúdo condicional,
+      // `isOpen` acabou de virar `true` acima); sem esperar, o elemento
+      // ainda não tinha sido renderizado. Cai pro id da seção como reserva
+      // se o alvo específico não existir (ex: ela não é Básico ativo).
+      setTimeout(() => {
+        const specific = document.getElementById(hash);
+        const fallback = document.getElementById(key);
+        (specific || fallback)?.scrollIntoView({ block: 'start' });
+      }, 50);
     }
   }, []);
 

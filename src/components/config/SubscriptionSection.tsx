@@ -135,7 +135,7 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
     return (
       <div className="flex flex-col gap-4">
         <ActivePlanCard tier="basico" onCancel={handleCancel} loading={loading} error={error} />
-        <div>
+        <div id="upgrade-plus">
           <p className="flex items-center gap-1.5 text-sm font-bold text-ink mb-2">
             <Sparkles className="w-4 h-4 text-rose-600" /> Evolua pro StudioMenu+
           </p>
