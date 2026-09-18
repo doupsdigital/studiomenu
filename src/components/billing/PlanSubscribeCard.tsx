@@ -99,12 +99,12 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
           if (pollRef.current) clearInterval(pollRef.current);
           setPolling(false);
           setQr(null);
-          // Invalida o cache de rota AGORA (não só quando ela clicar "Ir
-          // para o Início") — sem isso, o Router Cache do Next guardava a
-          // versão de antes de assinar pra essa URL, e voltar (botão físico
-          // do Android, por ex.) mostrava ela de novo sem o menu embaixo
-          // (achado testando de verdade — Fase 20).
-          router.refresh();
+          // NÃO chama router.refresh() aqui — faria o Next re-renderizar a
+          // rota (`/inicio`) com dado fresco na hora, trocando `plan_tier`
+          // e desmontando esse componente (e o modal de sucesso junto)
+          // antes dela sequer ver o banner (achado testando: o refresh
+          // adiantado "engolia" a comemoração). O refresh acontece só
+          // quando ela mesma escolhe sair, no clique de "Ir para o Início".
           setSuccess(true);
         }
       } catch {
@@ -135,8 +135,7 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
       if (json.upgraded) {
         // Sem QR pra mostrar (troca de plano ativa na hora, sem cobrança
         // nova nesse instante — ver checkout/route.ts). Mesmo motivo do
-        // polling acima: invalida o cache de rota já aqui.
-        router.refresh();
+        // polling acima: sem refresh adiantado, só no clique do botão.
         setSuccess(true);
         return;
       }
