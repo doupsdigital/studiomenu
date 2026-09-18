@@ -70,6 +70,11 @@ export const ProductTour: React.FC<ProductTourProps> = ({ tourId, slug, steps, e
       steps={steps}
       initialStepIndex={initialStepIndex}
       continuous
+      // Sem isso, o PRIMEIRO passo não rola a tela até o alvo (só os
+      // seguintes, ao clicar "Próximo") — supõe que o primeiro alvo já
+      // está visível no carregamento, o que quase nunca é verdade aqui
+      // (achado testando: o primeiro balão de cada tela saía desencaixado).
+      scrollToFirstStep
       onEvent={handleEvent}
       locale={{
         back: 'Voltar',
@@ -91,6 +96,11 @@ export const ProductTour: React.FC<ProductTourProps> = ({ tourId, slug, steps, e
         skipBeacon: true,
         spotlightRadius: 16,
         spotlightPadding: 6,
+        // Distância extra ao rolar até o alvo — sem isso, a barra fixa do
+        // topo (`PageTitleBar`, 60px, `sticky top-0`) cobria a borda de
+        // cima do card em destaque, deixando o balão desalinhado (achado
+        // testando de verdade no Início e na Agenda).
+        scrollOffset: 90,
       }}
       styles={{
         tooltip: {
