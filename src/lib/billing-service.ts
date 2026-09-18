@@ -21,6 +21,16 @@ export async function activateSubscription(orderId: string): Promise<void> {
   // antes de criar/atualizar a assinatura no Asaas (Fase 19). Sem
   // `pending_plan_tier` (dado antigo, ou fluxo legado) assume Plus, único
   // tier que existia antes dessa fase.
+  //
+  // IMPORTANTE: `pending_plan_tier` NÃO é zerado depois de usado — fica
+  // sempre refletindo o último tier pedido no checkout. Chegou a ser
+  // zerado numa versão anterior, e isso criava uma corrida real: o webhook
+  // e o polling do navegador (`check-payment`) podem confirmar o MESMO
+  // pagamento duas vezes; na segunda chamada, com o valor já zerado, caía
+  // no fallback 'plus' e reclassificava a assinatura pra Plus de graça,
+  // sem nenhum pagamento de Plus de verdade (achado testando manualmente,
+  // Fase 19). Mantendo o valor, toda chamada — quantas vezes for repetida —
+  // lê o mesmo dado e converge pro mesmo resultado (idempotente de verdade).
   const tier = before?.pending_plan_tier === 'basico' ? 'basico' : 'plus';
 
   // `booking_enabled` liga junto só pro Plus — sem isso, pagar o Plus não
@@ -30,7 +40,7 @@ export async function activateSubscription(orderId: string): Promise<void> {
   // Básico nunca liga agendamento (só catálogo + edição).
   await supabaseAdmin
     .from('orders')
-    .update({ plan_tier: tier, subscription_status: 'ativo', booking_enabled: tier === 'plus', pending_plan_tier: null })
+    .update({ plan_tier: tier, subscription_status: 'ativo', booking_enabled: tier === 'plus' })
     .eq('id', orderId);
 
   if (before && before.subscription_status !== 'ativo') {
