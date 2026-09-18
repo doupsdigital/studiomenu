@@ -5,12 +5,6 @@ import { useRouter } from 'next/navigation';
 import { Crown, BookOpen, Check, type LucideIcon } from 'lucide-react';
 import { PLAN_PRICING, type PayablePlanTier } from '@/lib/pricing';
 
-const UPGRADE_BENEFITS = [
-  'Clientes agendam sozinhas, a qualquer hora',
-  'Agenda organizada com horários reais',
-  'Menos ida e volta pelo WhatsApp',
-];
-
 interface PlanSubscribeCardProps {
   slug: string;
   plan: PayablePlanTier;
@@ -32,15 +26,42 @@ const PLAN_COPY: Record<PayablePlanTier, { icon: LucideIcon; headline: string; s
   plus: { icon: Crown, headline: 'Assine o StudioMenu+', subheadline: 'libere o agendamento automático' },
 };
 
+/** Copy do modal de "parabéns" pós-assinatura — mostrado tanto quando ela
+ *  assina pela primeira vez (Básico, via QR/polling) quanto quando troca de
+ *  plano (Básico → Plus, ativação direta, sem QR). */
+const SUCCESS_COPY: Record<PayablePlanTier, { headline: string; benefits: string[] }> = {
+  basico: {
+    headline: 'Agora você tem o StudioMenu Básico',
+    benefits: [
+      'Catálogo online sempre no ar',
+      'Edite fotos, preços e serviços quando quiser',
+      'Link profissional pra compartilhar com suas clientes',
+    ],
+  },
+  plus: {
+    headline: 'Agora você tem o StudioMenu+',
+    benefits: [
+      'Clientes agendam sozinhas, a qualquer hora',
+      'Agenda organizada com horários reais',
+      'Menos ida e volta pelo WhatsApp',
+    ],
+  },
+};
+
 /** Card de assinar (form e-mail/CPF → QR Pix → polling de confirmação) —
  *  extraído de `SubscriptionSection` (Fase 19) pra ser reaproveitado tanto
  *  lá (assinar/trocar de plano em `/config`) quanto na tela de primeiro
  *  contato (`FirstContactScreen`, assinar o Básico). Não sabe nada sobre
- *  "já está ativo" — quem chama decide quando mostrar isso. */
+ *  "já está ativo" — quem chama decide quando mostrar isso.
+ *
+ *  Sempre termina numa confirmação de sucesso (Fase 20) — nunca leva a
+ *  profissional de volta pra tela seguinte em silêncio, mesmo quando não
+ *  tem QR pra mostrar (troca de plano ativa na hora). */
 export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan, billingEmail, billingCpfCnpj }) => {
   const router = useRouter();
   const copy = PLAN_COPY[plan];
   const pricing = PLAN_PRICING[plan];
+  const successCopy = SUCCESS_COPY[plan];
 
   const [email, setEmail] = useState(billingEmail || '');
   const [cpfCnpj, setCpfCnpj] = useState(billingCpfCnpj || '');
@@ -49,7 +70,7 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
   const [qr, setQr] = useState<QrState | null>(null);
   const [polling, setPolling] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [upgraded, setUpgraded] = useState(false);
+  const [success, setSuccess] = useState(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -77,7 +98,8 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
         if (json.active) {
           if (pollRef.current) clearInterval(pollRef.current);
           setPolling(false);
-          router.refresh();
+          setQr(null);
+          setSuccess(true);
         }
       } catch {
         // Falha isolada de uma tentativa de polling não interrompe o ciclo.
@@ -106,9 +128,8 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
       }
       if (json.upgraded) {
         // Sem QR pra mostrar (troca de plano ativa na hora, sem cobrança
-        // nova nesse instante — ver checkout/route.ts) — em vez de só
-        // atualizar a tela, celebra a troca antes de levar pro Início.
-        setUpgraded(true);
+        // nova nesse instante — ver checkout/route.ts).
+        setSuccess(true);
         return;
       }
       setQr({ paymentId: json.paymentId, image: json.pixQrCodeImage, payload: json.pixKey });
@@ -131,18 +152,18 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
     }
   };
 
-  if (upgraded) {
+  if (success) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center p-6" role="dialog" aria-modal="true">
         <div className="absolute inset-0 bg-black/40" />
         <div className="relative w-full max-w-sm rounded-3xl bg-gradient-to-br from-rose-700 via-rose-600 to-rose-500 text-white text-center p-7 shadow-2xl">
           <div className="w-14 h-14 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center mx-auto mb-3">
-            <Crown className="w-7 h-7" />
+            <copy.icon className="w-7 h-7" />
           </div>
           <p className="text-[11px] font-bold tracking-widest uppercase text-white/70 mb-1">Parabéns</p>
-          <h3 className="font-serif-pro font-bold text-2xl mb-3">Agora você tem o StudioMenu+</h3>
+          <h3 className="font-serif-pro font-bold text-2xl mb-3">{successCopy.headline}</h3>
           <ul className="text-left mx-auto max-w-[230px] flex flex-col gap-1.5 mb-6">
-            {UPGRADE_BENEFITS.map((benefit) => (
+            {successCopy.benefits.map((benefit) => (
               <li key={benefit} className="flex items-start gap-2 text-[13px] text-white/90 leading-snug">
                 <Check className="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-300" />
                 {benefit}

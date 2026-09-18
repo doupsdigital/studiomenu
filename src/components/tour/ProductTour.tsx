@@ -11,6 +11,13 @@ interface ProductTourProps {
   /** Quando false, não roda (ex: Agenda sem agendamento automático ligado —
    *  nada relevante pra apontar ainda). */
   enabled: boolean;
+  /** `id` de um step (ver `Step.id`) pra começar o tour a partir dele em vez
+   *  do primeiro — usado quando ela chega na tela por um link específico
+   *  (ex: card "Criar acesso" leva pra `#conta`; sem isso, o tour começava
+   *  do zero e "puxava" a tela de volta pro primeiro card, brigando com o
+   *  scroll que o link já tinha feito). Ignorado se não bater com nenhum
+   *  step. */
+  initialStepId?: string;
 }
 
 const storageKey = (tourId: string, slug: string) => `sm_tour_seen_${tourId}_${slug}`;
@@ -29,7 +36,7 @@ const storageKey = (tourId: string, slug: string) => `sm_tour_seen_${tourId}_${s
  *  (`tailwind.config.js`: rose-600 `#b04e6c`, `ink` `#2C1810`, fontes
  *  Fraunces/Jost de `globals.css`, não as `font-serif`/`font-sans` padrão
  *  do Tailwind que não estão carregadas aqui). */
-export const ProductTour: React.FC<ProductTourProps> = ({ tourId, slug, steps, enabled }) => {
+export const ProductTour: React.FC<ProductTourProps> = ({ tourId, slug, steps, enabled, initialStepId }) => {
   const [run, setRun] = useState(false);
 
   useEffect(() => {
@@ -55,10 +62,13 @@ export const ProductTour: React.FC<ProductTourProps> = ({ tourId, slug, steps, e
 
   if (!enabled || steps.length === 0) return null;
 
+  const initialStepIndex = initialStepId ? Math.max(0, steps.findIndex((s) => s.id === initialStepId)) : undefined;
+
   return (
     <Joyride
       run={run}
       steps={steps}
+      initialStepIndex={initialStepIndex}
       continuous
       onEvent={handleEvent}
       locale={{
