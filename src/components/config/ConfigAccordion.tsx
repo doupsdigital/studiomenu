@@ -2,7 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { Clock, CalendarX, CreditCard, UserCircle, Bell } from 'lucide-react';
+import type { Step } from 'react-joyride';
 import { SectionCard } from '@/components/app-shell/SectionCard';
+import { ProductTour } from '@/components/tour/ProductTour';
 import { BusinessHoursEditor } from './BusinessHoursEditor';
 import { ScheduleBlocksManager } from './ScheduleBlocksManager';
 import { SubscriptionSection } from './SubscriptionSection';
@@ -76,8 +78,21 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
 
   const toggle = (key: SectionKey) => setOpen((prev) => ({ ...prev, [key]: !prev[key] }));
 
+  // Tour guiado da Config (Fase 20) — um balão por seção; "Notificações" só
+  // entra quando o card de fato existe na tela.
+  const tourSteps: Step[] = [
+    { target: '#horarios', title: 'Horários de atendimento', content: 'Defina os dias e horários em que você atende.' },
+    { target: '#bloqueios', title: 'Bloqueios e folgas', content: 'Bloqueie datas específicas (férias, feriado, etc) sem mexer no seu expediente fixo.' },
+    ...(showNotifications
+      ? [{ target: '#notificacoes', title: 'Notificações', content: 'Ative avisos no seu celular pra novos agendamentos.' }]
+      : []),
+    { target: '#assinatura', title: 'Minha assinatura', content: 'Gerencie seu plano por aqui — assinar, trocar ou cancelar.' },
+    { target: '#conta', title: 'Minha conta', content: 'Crie um acesso com senha pra não depender só do link mágico.' },
+  ];
+
   return (
     <div className="flex flex-col gap-4">
+      <ProductTour tourId="config" slug={slug} steps={tourSteps} enabled />
       <div id="horarios">
         <SectionCard
           icon={Clock}
@@ -91,28 +106,32 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
         </SectionCard>
       </div>
 
-      <SectionCard
-        icon={CalendarX}
-        title="Bloqueios e folgas"
-        isOpen={open.bloqueios}
-        onToggle={() => toggle('bloqueios')}
-        locked={!bookingEnabled}
-        lockedHint="Disponível quando o agendamento automático (StudioMenu+) estiver ativo."
-      >
-        <ScheduleBlocksManager slug={slug} blocks={scheduleBlocks} />
-      </SectionCard>
-
-      {showNotifications && (
+      <div id="bloqueios">
         <SectionCard
-          icon={Bell}
-          title="Notificações"
-          isOpen={open.notificacoes}
-          onToggle={() => toggle('notificacoes')}
+          icon={CalendarX}
+          title="Bloqueios e folgas"
+          isOpen={open.bloqueios}
+          onToggle={() => toggle('bloqueios')}
           locked={!bookingEnabled}
           lockedHint="Disponível quando o agendamento automático (StudioMenu+) estiver ativo."
         >
-          <NotificationsSection slug={slug} />
+          <ScheduleBlocksManager slug={slug} blocks={scheduleBlocks} />
         </SectionCard>
+      </div>
+
+      {showNotifications && (
+        <div id="notificacoes">
+          <SectionCard
+            icon={Bell}
+            title="Notificações"
+            isOpen={open.notificacoes}
+            onToggle={() => toggle('notificacoes')}
+            locked={!bookingEnabled}
+            lockedHint="Disponível quando o agendamento automático (StudioMenu+) estiver ativo."
+          >
+            <NotificationsSection slug={slug} />
+          </SectionCard>
+        </div>
       )}
 
       <div id="assinatura">

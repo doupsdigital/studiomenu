@@ -157,7 +157,7 @@ export default async function AgendaPage({ params, searchParams }: AgendaPagePro
             <h1 className="font-serif-pro font-bold text-2xl leading-tight">{headerTitle}</h1>
             {headerSubtitle && <p className="text-sm text-white/80 mt-0.5 truncate">{headerSubtitle}</p>}
           </div>
-          <div className="flex items-center bg-white/15 backdrop-blur-sm rounded-lg p-0.5 border border-white/20 shrink-0">
+          <div data-tour="agenda-date-nav" className="flex items-center bg-white/15 backdrop-blur-sm rounded-lg p-0.5 border border-white/20 shrink-0">
             <Link
               href={prevHref}
               className="p-2 hover:bg-white/20 rounded-md transition-colors text-white/80 hover:text-white"

@@ -12,6 +12,8 @@ interface StatCardProps {
    *  de um botão com `onClick` — usado pelos cards do Início, que são
    *  server component e não podem passar uma função pro client. */
   href?: string;
+  /** Âncora pro tour guiado (Fase 20) apontar um balão nesse card. */
+  dataTour?: string;
 }
 
 const TONE_CLASSES: Record<NonNullable<StatCardProps['tone']>, { border: string; icon: string; label: string; value: string }> = {
@@ -22,7 +24,7 @@ const TONE_CLASSES: Record<NonNullable<StatCardProps['tone']>, { border: string;
 /** Cartão de estatística simples (ícone decorativo de fundo + label + valor
  *  em destaque) — mesmo padrão dos KPIs do LashAgenda. Sem lógica própria,
  *  só apresentação; quem chama decide o número. */
-export const StatCard: React.FC<StatCardProps> = ({ icon: Icon, label, value, tone = 'rose', onClick, href }) => {
+export const StatCard: React.FC<StatCardProps> = ({ icon: Icon, label, value, tone = 'rose', onClick, href, dataTour }) => {
   const t = TONE_CLASSES[tone];
   const isInteractive = Boolean(onClick || href);
   const className = `relative overflow-hidden bg-surface border ${t.border} rounded-2xl p-4 shadow-sm text-left w-full block ${
@@ -41,7 +43,7 @@ export const StatCard: React.FC<StatCardProps> = ({ icon: Icon, label, value, to
 
   if (href) {
     return (
-      <Link href={href} className={className}>
+      <Link href={href} data-tour={dataTour} className={className}>
         {content}
       </Link>
     );
@@ -49,7 +51,7 @@ export const StatCard: React.FC<StatCardProps> = ({ icon: Icon, label, value, to
 
   const Tag = onClick ? 'button' : 'div';
   return (
-    <Tag onClick={onClick} type={onClick ? 'button' : undefined} className={className}>
+    <Tag onClick={onClick} type={onClick ? 'button' : undefined} data-tour={dataTour} className={className}>
       {content}
     </Tag>
   );

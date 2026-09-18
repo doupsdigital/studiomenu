@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { CalendarPlus, Lock, Clock, ChevronDown } from 'lucide-react';
+import type { Step } from 'react-joyride';
+import { ProductTour } from '@/components/tour/ProductTour';
 import { AppointmentRow } from './AppointmentRow';
 import { ManualBookingForm } from './ManualBookingForm';
 import { BlockSlotForm } from './BlockSlotForm';
@@ -29,6 +31,18 @@ function buildWhatsappLink(appointment: AgendaAppointment, tipo: 'aprovado' | 'r
 
   return `https://wa.me/${appointment.client_whatsapp}?text=${encodeURIComponent(msg)}`;
 }
+
+// Tour guiado da Agenda (Fase 20) — só monta quando `AgendaClient` existe,
+// que já só acontece com `booking_enabled` true (a página devolve o upsell
+// de tela cheia antes disso), então não precisa de gate próprio aqui.
+const AGENDA_TOUR_STEPS: Step[] = [
+  { target: '[data-tour="agenda-date-nav"]', title: 'Navegue pelos dias', content: 'Vá pro dia anterior/seguinte ou volte pra hoje por aqui.' },
+  { target: '[data-tour="agenda-new"]', title: 'Novo agendamento', content: 'Crie um agendamento manual pra uma cliente que te chamou por fora.' },
+  { target: '[data-tour="agenda-block"]', title: 'Trancar horário', content: 'Bloqueie um horário ou o dia inteiro (folga, compromisso, etc).' },
+  { target: '[data-tour="agenda-view-toggle"]', title: 'Dia ou Mês', content: 'Troque entre a visão de um dia só e a visão do mês inteiro.' },
+  { target: '#pendentes', title: 'Aguardando confirmação', content: 'Agendamentos que ainda esperam sua aprovação aparecem aqui.' },
+  { target: '[data-tour="agenda-day-grid"]', title: 'Sua grade de horários', content: 'Toque num horário livre pra agendar, ou num agendamento existente pra ver os detalhes.' },
+];
 
 interface SuccessInfo {
   title: string;
@@ -234,6 +248,7 @@ export const AgendaClient: React.FC<AgendaClientProps> = ({
       <div className="flex items-center gap-2">
         <button
           type="button"
+          data-tour="agenda-new"
           onClick={() => {
             setManualPrefillTime(undefined);
             setShowManualForm((v) => !v);
@@ -245,6 +260,7 @@ export const AgendaClient: React.FC<AgendaClientProps> = ({
         </button>
         <button
           type="button"
+          data-tour="agenda-block"
           onClick={() => {
             setShowBlockForm((v) => !v);
             setShowManualForm(false);
@@ -256,6 +272,7 @@ export const AgendaClient: React.FC<AgendaClientProps> = ({
         <div className="relative flex-1">
           <button
             type="button"
+            data-tour="agenda-view-toggle"
             onClick={() => setViewMenuOpen((v) => !v)}
             className="w-full flex items-center justify-center gap-1.5 px-3 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-full text-sm font-bold shadow-sm transition-colors"
           >
@@ -412,6 +429,8 @@ export const AgendaClient: React.FC<AgendaClientProps> = ({
       )}
 
       {successInfo && <SuccessModal {...successInfo} onClose={() => setSuccessInfo(null)} />}
+
+      <ProductTour tourId="agenda" slug={slug} steps={AGENDA_TOUR_STEPS} enabled />
     </div>
   );
 };

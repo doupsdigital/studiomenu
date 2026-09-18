@@ -11,6 +11,7 @@ import { ShareLinkButton } from '@/components/app-shell/ShareLinkButton';
 import { PageTitleBar } from '@/components/app-shell/PageTitleBar';
 import { FirstContactScreen } from '@/components/app-shell/FirstContactScreen';
 import { OnboardingCardStack } from '@/components/app-shell/OnboardingCardStack';
+import { InicioTour } from '@/components/tour/InicioTour';
 import { CalendarDays, Clock, Share2, Crown, Home } from 'lucide-react';
 
 interface InicioPageProps {
@@ -89,13 +90,14 @@ export default async function InicioPage({ params }: InicioPageProps) {
        *  ficam sempre zerados, sem nenhuma ação possível por trás. */}
       {schedulingLive && (
         <div className="grid grid-cols-2 gap-3">
-          <StatCard icon={CalendarDays} label="Agendamentos hoje" value={todayAppointments.length} href={`/app/${slug}/agenda`} />
+          <StatCard icon={CalendarDays} label="Agendamentos hoje" value={todayAppointments.length} href={`/app/${slug}/agenda`} dataTour="stat-today" />
           <StatCard
             icon={Clock}
             label="Aguardando confirmação"
             value={pendingAppointments.length}
             tone="amber"
             href={`/app/${slug}/agenda#pendentes`}
+            dataTour="stat-pending"
           />
         </div>
       )}
@@ -123,6 +125,14 @@ export default async function InicioPage({ params }: InicioPageProps) {
       {!isPlusAtivo && <PlusUpsellCard variant="card" slug={slug} />}
 
       <OnboardingCardStack slug={slug} planTier={order.plan_tier} subscriptionStatus={order.subscription_status} hasAccount={Boolean(order.auth_user_id)} />
+
+      <InicioTour
+        slug={slug}
+        planTier={order.plan_tier}
+        subscriptionStatus={order.subscription_status}
+        hasAccount={Boolean(order.auth_user_id)}
+        schedulingLive={schedulingLive}
+      />
       </main>
     </>
   );

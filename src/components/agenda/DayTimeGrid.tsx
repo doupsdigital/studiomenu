@@ -120,7 +120,7 @@ export const DayTimeGrid: React.FC<DayTimeGridProps> = ({
   }
 
   return (
-    <div className="bg-surface border border-linen rounded-2xl overflow-hidden shadow-sm">
+    <div data-tour="agenda-day-grid" className="bg-surface border border-linen rounded-2xl overflow-hidden shadow-sm">
       <div className="grid grid-cols-[52px_1fr] border-b border-linen bg-rose-50/40 text-center">
         <div className="border-r border-linen" />
         <div className="py-3 flex items-center justify-center gap-1.5 font-serif-pro font-semibold text-base text-ink">
