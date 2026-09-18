@@ -9,6 +9,8 @@ import { EditCatalogCard } from '@/components/app-shell/EditCatalogCard';
 import { PlusUpsellCard } from '@/components/app-shell/PlusUpsellCard';
 import { ShareLinkButton } from '@/components/app-shell/ShareLinkButton';
 import { PageTitleBar } from '@/components/app-shell/PageTitleBar';
+import { FirstContactScreen } from '@/components/app-shell/FirstContactScreen';
+import { OnboardingCardStack } from '@/components/app-shell/OnboardingCardStack';
 import { CalendarDays, Clock, Share2, Crown, Home } from 'lucide-react';
 
 interface InicioPageProps {
@@ -37,6 +39,18 @@ export default async function InicioPage({ params }: InicioPageProps) {
   const order = await getOrderForProfessionalApp(slug);
 
   if (!order) notFound();
+
+  // Nunca assinou nada ainda — tela de primeiro contato, deliberadamente
+  // simples (Fase 19). Permanece assim até ela pagar Básico ou Plus; não
+  // regride de volta aqui mesmo se cancelar depois (ver `SubscriptionSection`).
+  if (order.plan_tier === 'catalog') {
+    return (
+      <>
+        <PageTitleBar title="Início" icon={<Home className="w-5 h-5 text-ink-soft" />} slug={slug} />
+        <FirstContactScreen order={order} />
+      </>
+    );
+  }
 
   const isPlusAtivo = order.plan_tier === 'plus' && order.subscription_status === 'ativo';
   // Mesmo gate da Agenda: `booking_enabled` decide se o agendamento está de
@@ -107,6 +121,8 @@ export default async function InicioPage({ params }: InicioPageProps) {
        *  que o agendamento já esteja ligado manualmente via admin — o
        *  objetivo é sempre incentivar a assinatura de verdade. */}
       {!isPlusAtivo && <PlusUpsellCard variant="card" slug={slug} />}
+
+      <OnboardingCardStack slug={slug} planTier={order.plan_tier} subscriptionStatus={order.subscription_status} hasAccount={Boolean(order.auth_user_id)} />
       </main>
     </>
   );

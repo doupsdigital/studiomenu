@@ -7,7 +7,7 @@ export interface ProfessionalOrderSummary {
   client_name: string;
   studio_name?: string;
   whatsapp_number: string;
-  plan_tier: 'catalog' | 'plus';
+  plan_tier: 'catalog' | 'basico' | 'plus';
   subscription_status: 'none' | 'ativo' | 'suspenso' | 'cancelado';
   billing_email?: string;
   billing_cpf_cnpj?: string;
@@ -44,7 +44,7 @@ export async function getOrderForProfessionalApp(slug: string): Promise<Professi
     client_name: data.client_name || normalizedSlug,
     studio_name: data.studio_name || undefined,
     whatsapp_number: data.whatsapp_number || '',
-    plan_tier: data.plan_tier === 'plus' ? 'plus' : 'catalog',
+    plan_tier: data.plan_tier === 'plus' || data.plan_tier === 'basico' ? data.plan_tier : 'catalog',
     subscription_status: ['ativo', 'suspenso', 'cancelado'].includes(data.subscription_status)
       ? data.subscription_status
       : 'none',

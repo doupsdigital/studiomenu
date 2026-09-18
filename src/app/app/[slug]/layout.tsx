@@ -1,6 +1,7 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import { isProfessionalRequestAuthorized } from '@/lib/professional-session';
+import { getOrderForProfessionalApp } from '@/lib/professional-app-service';
 import { ServiceWorkerRegister } from '@/components/app-shell/ServiceWorkerRegister';
 import { BottomNav } from '@/components/app-shell/BottomNav';
 
@@ -42,11 +43,18 @@ export default async function ProfessionalAppLayout({ children, params }: AppLay
     );
   }
 
+  // Sem BottomNav enquanto ela nunca assinou nada (`plan_tier === 'catalog'`)
+  // — tela de primeiro contato deliberadamente simples, sem navegação pra
+  // outras abas (Fase 19). Mesma leitura repetida que `config/page.tsx`/
+  // `inicio/page.tsx` já fazem cada um pra si, custo desprezível.
+  const order = await getOrderForProfessionalApp(slug);
+  const showNav = order?.plan_tier !== 'catalog';
+
   return (
-    <div className="pro-app-shell min-h-screen bg-cream text-ink font-body-pro pb-20">
+    <div className={`pro-app-shell min-h-screen bg-cream text-ink font-body-pro ${showNav ? 'pb-20' : ''}`}>
       <ServiceWorkerRegister />
       {children}
-      <BottomNav slug={slug} />
+      {showNav && <BottomNav slug={slug} />}
     </div>
   );
 }

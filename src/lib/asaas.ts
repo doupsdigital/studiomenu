@@ -138,3 +138,15 @@ export async function getPayment(paymentId: string): Promise<AsaasPayment> {
 export async function cancelSubscription(subscriptionId: string): Promise<void> {
   await asaasRequest('DELETE', `/subscriptions/${subscriptionId}`);
 }
+
+/** Atualiza valor/descrição de uma assinatura existente EM VEZ de criar uma
+ *  nova — usado na troca de tier (ex: Básico → Plus), pra manter um único
+ *  `asaas_subscription_id` por profissional a vida toda (evita cobrança
+ *  duplicada e mantém o webhook, que resolve pedidos por esse id, sem
+ *  precisar de nenhum caso especial). */
+export async function updateSubscription(input: { subscriptionId: string; value: number; description: string }): Promise<AsaasSubscription> {
+  return asaasRequest<AsaasSubscription>('PUT', `/subscriptions/${input.subscriptionId}`, {
+    value: input.value,
+    description: input.description,
+  });
+}

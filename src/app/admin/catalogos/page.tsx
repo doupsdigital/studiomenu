@@ -10,7 +10,7 @@ import { usesSubdomainRouting, PRODUCTION_DOMAIN } from '@/lib/public-url';
 /** Campos de billing/agendamento não fazem parte do shape público do
  *  catálogo (`CatalogOrderData`) — extensão só local, pro admin. */
 type AdminCatalog = CatalogOrderData & {
-  plan_tier?: 'catalog' | 'plus';
+  plan_tier?: 'catalog' | 'basico' | 'plus';
   subscription_status?: 'none' | 'ativo' | 'suspenso' | 'cancelado';
 };
 
@@ -106,8 +106,8 @@ export default function AdminCatalogosPage() {
   const buildDeliveryWhatsappUrl = (item: AdminCatalog) => {
     const cleanPhone = normalizeWhatsappBR(item.whatsapp_number);
     const firstName = (item.client_name || '').split(' ')[0];
-    const catalogUrl = buildProfessionalLinks(item).official;
-    const message = `Olá, ${firstName}! ✨\n\nSeu catálogo digital oficial StudioMenu está pronto, calibrado e no ar! 🚀\n\n🔗 *Seu Link Exclusivo:*\n👉 ${catalogUrl}\n\n📌 *O que fazer agora:*\n1. Abra o link no seu celular e confira seu catálogo completo.\n2. Coloque este link na bio do seu Instagram e no seu perfil do WhatsApp Business.\n3. Comece a enviar para suas clientes no momento do agendamento!\n\nQualquer dúvida ou ajuste que precisar, nossa equipe está à sua inteira disposição. Parabéns pelo seu novo posicionamento! 💖✨`;
+    const links = buildProfessionalLinks(item);
+    const message = `Olá, ${firstName}! ✨\n\nSeu catálogo digital oficial StudioMenu está pronto, calibrado e no ar! 🚀\n\n🔗 *Seu Link Exclusivo:*\n👉 ${links.official}\n\n📌 *O que fazer agora:*\n1. Abra o link no seu celular e confira seu catálogo completo.\n2. Coloque este link na bio do seu Instagram e no seu perfil do WhatsApp Business.\n3. Comece a enviar para suas clientes no momento do agendamento!\n\n💎 *Pra gerenciar seu catálogo e ativar recursos extras:*\n👉 ${links.app}\n\nQualquer dúvida ou ajuste que precisar, nossa equipe está à sua inteira disposição. Parabéns pelo seu novo posicionamento! 💖✨`;
     return `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(message)}`;
   };
 
@@ -153,14 +153,18 @@ export default function AdminCatalogosPage() {
 
   const PLAN_BADGE: Record<string, { label: string; className: string }> = {
     catalog: { label: 'Catálogo', className: 'bg-slate-800 text-slate-400 border-slate-700' },
+    'basico-ativo': { label: 'Básico Ativo', className: 'bg-sky-500/10 text-sky-400 border-sky-500/30' },
+    'basico-suspenso': { label: 'Básico Suspenso', className: 'bg-amber-500/10 text-amber-400 border-amber-500/30' },
+    'basico-cancelado': { label: 'Básico Cancelado', className: 'bg-slate-800 text-slate-500 border-slate-700' },
     'plus-ativo': { label: 'Plus Ativo', className: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' },
     'plus-suspenso': { label: 'Plus Suspenso', className: 'bg-amber-500/10 text-amber-400 border-amber-500/30' },
     'plus-cancelado': { label: 'Plus Cancelado', className: 'bg-slate-800 text-slate-500 border-slate-700' },
   };
 
   const getPlanBadge = (item: AdminCatalog) => {
-    if (item.plan_tier !== 'plus') return PLAN_BADGE.catalog;
-    return PLAN_BADGE[`plus-${item.subscription_status || 'none'}`] || PLAN_BADGE['plus-cancelado'];
+    if (item.plan_tier !== 'basico' && item.plan_tier !== 'plus') return PLAN_BADGE.catalog;
+    const key = `${item.plan_tier}-${item.subscription_status || 'none'}`;
+    return PLAN_BADGE[key] || PLAN_BADGE[`${item.plan_tier}-cancelado`];
   };
 
   return (

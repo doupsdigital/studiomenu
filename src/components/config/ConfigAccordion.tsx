@@ -15,7 +15,7 @@ interface ConfigAccordionProps {
   slug: string;
   businessHours: BusinessHoursConfigRow[];
   scheduleBlocks: ScheduleBlockConfigRow[];
-  planTier: 'catalog' | 'plus';
+  planTier: 'catalog' | 'basico' | 'plus';
   subscriptionStatus: 'none' | 'ativo' | 'suspenso' | 'cancelado';
   billingEmail?: string;
   billingCpfCnpj?: string;
@@ -63,10 +63,14 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
   const { permission: pushPermission, ready: pushReady } = usePushNotifications(slug);
   const showNotifications = pushReady && pushPermission !== 'granted' && pushPermission !== 'unsupported';
 
+  // Auto-abre a seção referenciada pelo hash do link — usado pelo upsell do
+  // Plus (`#assinatura`, já existia) e agora também pelos cards de
+  // onboarding pós-pagamento (`#conta`, `#horarios`, Fase 19).
   useEffect(() => {
-    if (window.location.hash === '#assinatura') {
-      setOpen((prev) => ({ ...prev, assinatura: true }));
-      document.getElementById('assinatura')?.scrollIntoView({ block: 'start' });
+    const hash = window.location.hash.slice(1) as SectionKey | '';
+    if (hash === 'assinatura' || hash === 'conta' || hash === 'horarios') {
+      setOpen((prev) => ({ ...prev, [hash]: true }));
+      document.getElementById(hash)?.scrollIntoView({ block: 'start' });
     }
   }, []);
 
@@ -74,16 +78,18 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
 
   return (
     <div className="flex flex-col gap-4">
-      <SectionCard
-        icon={Clock}
-        title="Horários de atendimento"
-        isOpen={open.horarios}
-        onToggle={() => toggle('horarios')}
-        locked={!bookingEnabled}
-        lockedHint="Disponível quando o agendamento automático (StudioMenu+) estiver ativo."
-      >
-        <BusinessHoursEditor slug={slug} initialHours={businessHours} />
-      </SectionCard>
+      <div id="horarios">
+        <SectionCard
+          icon={Clock}
+          title="Horários de atendimento"
+          isOpen={open.horarios}
+          onToggle={() => toggle('horarios')}
+          locked={!bookingEnabled}
+          lockedHint="Disponível quando o agendamento automático (StudioMenu+) estiver ativo."
+        >
+          <BusinessHoursEditor slug={slug} initialHours={businessHours} />
+        </SectionCard>
+      </div>
 
       <SectionCard
         icon={CalendarX}
@@ -121,9 +127,11 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
         </SectionCard>
       </div>
 
-      <SectionCard icon={UserCircle} title="Minha conta" isOpen={open.conta} onToggle={() => toggle('conta')}>
-        <AccountSection slug={slug} hasAccount={Boolean(authUserId)} />
-      </SectionCard>
+      <div id="conta">
+        <SectionCard icon={UserCircle} title="Minha conta" isOpen={open.conta} onToggle={() => toggle('conta')}>
+          <AccountSection slug={slug} hasAccount={Boolean(authUserId)} />
+        </SectionCard>
+      </div>
     </div>
   );
 };

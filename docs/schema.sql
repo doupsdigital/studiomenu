@@ -39,10 +39,14 @@ CREATE TABLE IF NOT EXISTS public.orders (
     categories TEXT[] DEFAULT '{}'::text[],
     -- Agendamento + StudioMenu+ (docs/PLANO_AGENDAMENTO_STUDIOMENU_PLUS.md, Fase 0)
     booking_enabled BOOLEAN DEFAULT false,
-    plan_tier TEXT DEFAULT 'catalog' CHECK (plan_tier IN ('catalog', 'plus')),
+    plan_tier TEXT DEFAULT 'catalog' CHECK (plan_tier IN ('catalog', 'basico', 'plus')),
     subscription_status TEXT DEFAULT 'none' CHECK (subscription_status IN ('none', 'ativo', 'suspenso', 'cancelado')),
     asaas_customer_id TEXT,
     asaas_subscription_id TEXT,
+    -- Tier que uma assinatura Asaas recém-criada/atualizada representa —
+    -- setado no checkout, consumido por activateSubscription() quando o
+    -- pagamento é confirmado (Fase 19, docs/migrations/2026-09-18_fase19_plano_basico.sql)
+    pending_plan_tier TEXT CHECK (pending_plan_tier IN ('basico', 'plus')),
     billing_email TEXT,
     billing_cpf_cnpj TEXT,
     cancellation_notice_hours INTEGER DEFAULT 24,

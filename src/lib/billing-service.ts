@@ -13,23 +13,31 @@ import { sendTelegramMessage } from './telegram';
 export async function activateSubscription(orderId: string): Promise<void> {
   const { data: before } = await supabaseAdmin
     .from('orders')
-    .select('subscription_status, client_name, slug')
+    .select('subscription_status, client_name, slug, pending_plan_tier')
     .eq('id', orderId)
     .single();
 
-  // `booking_enabled` liga junto — sem isso, pagar o Plus não fazia o
-  // agendamento automático funcionar de verdade pro cliente final até o
-  // admin lembrar de ligar manualmente o toggle no painel (achado da
-  // revisão pós-Fase 7, ver docs/PLANO_AGENDAMENTO_STUDIOMENU_PLUS.md).
+  // Qual tier essa confirmação de pagamento é PARA — setado no checkout
+  // antes de criar/atualizar a assinatura no Asaas (Fase 19). Sem
+  // `pending_plan_tier` (dado antigo, ou fluxo legado) assume Plus, único
+  // tier que existia antes dessa fase.
+  const tier = before?.pending_plan_tier === 'basico' ? 'basico' : 'plus';
+
+  // `booking_enabled` liga junto só pro Plus — sem isso, pagar o Plus não
+  // fazia o agendamento automático funcionar de verdade pro cliente final
+  // até o admin lembrar de ligar manualmente o toggle no painel (achado da
+  // revisão pós-Fase 7, ver docs/PLANO_AGENDAMENTO_STUDIOMENU_PLUS.md). O
+  // Básico nunca liga agendamento (só catálogo + edição).
   await supabaseAdmin
     .from('orders')
-    .update({ plan_tier: 'plus', subscription_status: 'ativo', booking_enabled: true })
+    .update({ plan_tier: tier, subscription_status: 'ativo', booking_enabled: tier === 'plus', pending_plan_tier: null })
     .eq('id', orderId);
 
   if (before && before.subscription_status !== 'ativo') {
     const nowStr = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+    const planLabel = tier === 'basico' ? 'StudioMenu Básico' : 'StudioMenu+';
     await sendTelegramMessage(
-      `💳 Nova assinatura StudioMenu+!\n\n👤 ${before.client_name}\n🔗 https://studiomenu.art/c/${before.slug}\n🕒 ${nowStr}`
+      `💳 Nova assinatura ${planLabel}!\n\n👤 ${before.client_name}\n🔗 https://studiomenu.art/c/${before.slug}\n🕒 ${nowStr}`
     );
   }
 }
@@ -39,14 +47,24 @@ export async function setSubscriptionStatus(
   status: 'suspenso' | 'cancelado'
 ): Promise<void> {
   // Cancelamento definitivo desliga `booking_enabled` junto — ela parou de
-  // pagar, o agendamento pro cliente final para de funcionar. Suspensão
-  // (pagamento atrasado, pode ser passageiro) não mexe em `booking_enabled`
+  // pagar, o agendamento pro cliente final para de funcionar. Também limpa
+  // `asaas_subscription_id`/`pending_plan_tier` — sem isso, um cancelamento
+  // que chega só pelo webhook (ex: assinatura excluída direto no painel do
+  // Asaas, sem passar pelo botão "Cancelar" do app) deixava um id de
+  // assinatura morta preso na profissional, e uma futura reassinatura ia
+  // tentar reaproveitar/atualizar uma assinatura que não existe mais no
+  // Asaas (Fase 19, achado pós-implementação do tier Básico). Suspensão
+  // (pagamento atrasado, pode ser passageiro) não mexe em nenhum dos dois
   // de propósito — evita cortar o agendamento de clientes já em andamento
   // por um atraso pontual; o toggle manual do admin continua disponível
   // como via de escape se for preciso agir antes disso.
-  const updates: { subscription_status: string; booking_enabled?: boolean } = { subscription_status: status };
+  const updates: { subscription_status: string; booking_enabled?: boolean; asaas_subscription_id?: null; pending_plan_tier?: null } = {
+    subscription_status: status,
+  };
   if (status === 'cancelado') {
     updates.booking_enabled = false;
+    updates.asaas_subscription_id = null;
+    updates.pending_plan_tier = null;
   }
   await supabaseAdmin.from('orders').update(updates).eq('id', orderId);
 }

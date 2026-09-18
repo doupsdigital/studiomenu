@@ -41,8 +41,10 @@ export async function POST(request: Request) {
     }
 
     await cancelSubscription(order.asaas_subscription_id);
+    // Limpa `asaas_subscription_id`/`pending_plan_tier` também — feito
+    // dentro de `setSubscriptionStatus` (Fase 19), não mais aqui em
+    // separado, pra cobrir igual um cancelamento que chega só pelo webhook.
     await setSubscriptionStatus(order.id, 'cancelado');
-    await supabaseAdmin.from('orders').update({ asaas_subscription_id: null }).eq('id', order.id);
 
     return NextResponse.json({ success: true });
   } catch (error) {

@@ -2,29 +2,38 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { isProfessionalRequestAuthorized } from '@/lib/professional-session';
-import { PLUS_PRICE } from '@/lib/pricing';
+import { PLAN_PRICING, type PayablePlanTier } from '@/lib/pricing';
 import {
   AsaasConfigError,
   AsaasApiError,
   findOrCreateCustomer,
   createSubscription,
+  updateSubscription,
   getFirstSubscriptionPayment,
   getPixQrCode,
 } from '@/lib/asaas';
 
 /** POST /api/billing/checkout
- *  Body: { slug, email, cpf_cnpj }
+ *  Body: { slug, email, cpf_cnpj, plan }
  *  Cria (ou reaproveita) o customer/subscription no Asaas e devolve o Pix
  *  pra pagar. NUNCA escreve `plan_tier`/`subscription_status` aqui — só o
  *  webhook ou o check-payment fazem isso, depois de confirmar o pagamento
- *  de verdade (mesma prevenção antifraude do LashAgenda). */
+ *  de verdade (mesma prevenção antifraude do LashAgenda).
+ *
+ *  Uma profissional só tem UM `asaas_subscription_id` a vida toda — trocar
+ *  de tier (ex: Básico → Plus) ATUALIZA essa mesma assinatura no Asaas
+ *  (`updateSubscription`) em vez de criar uma segunda em paralelo, senão
+ *  ela pagaria os dois planos ao mesmo tempo (Fase 19). */
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { slug, email, cpf_cnpj } = body as { slug?: string; email?: string; cpf_cnpj?: string };
+    const { slug, email, cpf_cnpj, plan } = body as { slug?: string; email?: string; cpf_cnpj?: string; plan?: PayablePlanTier };
 
     if (!slug || !email?.trim() || !cpf_cnpj?.trim()) {
       return NextResponse.json({ success: false, message: 'Preencha e-mail e CPF/CNPJ.' }, { status: 400 });
+    }
+    if (plan !== 'basico' && plan !== 'plus') {
+      return NextResponse.json({ success: false, message: 'Plano inválido.' }, { status: 400 });
     }
 
     const normalizedSlug = slug.toLowerCase().trim();
@@ -47,7 +56,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: 'Muitas tentativas. Aguarde alguns minutos.' }, { status: 429 });
     }
 
-    if (order.plan_tier === 'plus' && order.subscription_status === 'ativo') {
+    if (order.plan_tier === plan && order.subscription_status === 'ativo') {
       return NextResponse.json({ success: true, alreadyActive: true });
     }
 
@@ -56,8 +65,35 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: 'CPF/CNPJ inválido.' }, { status: 400 });
     }
 
-    // Reaproveita uma assinatura já criada (ex: a profissional recarregou a
-    // página no meio do Pix) em vez de criar outra — evita cobrança duplicada.
+    const pricing = PLAN_PRICING[plan];
+
+    // Já tem assinatura Asaas e é um tier DIFERENTE do atual → troca de
+    // plano (ex: Básico → Plus): atualiza valor/descrição em vez de criar
+    // uma assinatura nova, evitando cobrança duplicada.
+    if (order.asaas_subscription_id && order.plan_tier !== plan && order.plan_tier !== 'catalog') {
+      await updateSubscription({ subscriptionId: order.asaas_subscription_id, value: pricing.price, description: pricing.description });
+      await supabaseAdmin.from('orders').update({ pending_plan_tier: plan }).eq('id', order.id);
+
+      const updatedPayment = await getFirstSubscriptionPayment(order.asaas_subscription_id);
+      if (!updatedPayment) {
+        return NextResponse.json(
+          { success: false, message: 'Assinatura atualizada, mas o Pix ainda não ficou pronto. Tente novamente em instantes.' },
+          { status: 202 }
+        );
+      }
+      const updatedQr = await getPixQrCode(updatedPayment.id);
+      return NextResponse.json({
+        success: true,
+        paymentId: updatedPayment.id,
+        pixQrCodeImage: updatedQr.encodedImage,
+        pixKey: updatedQr.payload,
+        expirationDate: updatedQr.expirationDate,
+      });
+    }
+
+    // Reaproveita uma assinatura já criada pro MESMO tier (ex: a
+    // profissional recarregou a página no meio do Pix) em vez de criar
+    // outra — evita cobrança duplicada.
     if (order.asaas_subscription_id) {
       const existingPayment = await getFirstSubscriptionPayment(order.asaas_subscription_id);
       if (existingPayment) {
@@ -81,11 +117,11 @@ export async function POST(request: Request) {
 
     const subscription = await createSubscription({
       customerId: customer.id,
-      value: PLUS_PRICE,
-      description: 'StudioMenu+',
+      value: pricing.price,
+      description: pricing.description,
     });
 
-    await supabaseAdmin.from('orders').update({ asaas_subscription_id: subscription.id }).eq('id', order.id);
+    await supabaseAdmin.from('orders').update({ asaas_subscription_id: subscription.id, pending_plan_tier: plan }).eq('id', order.id);
 
     const payment = await getFirstSubscriptionPayment(subscription.id);
     if (!payment) {
