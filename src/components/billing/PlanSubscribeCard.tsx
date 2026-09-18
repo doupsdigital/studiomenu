@@ -99,6 +99,12 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
           if (pollRef.current) clearInterval(pollRef.current);
           setPolling(false);
           setQr(null);
+          // Invalida o cache de rota AGORA (não só quando ela clicar "Ir
+          // para o Início") — sem isso, o Router Cache do Next guardava a
+          // versão de antes de assinar pra essa URL, e voltar (botão físico
+          // do Android, por ex.) mostrava ela de novo sem o menu embaixo
+          // (achado testando de verdade — Fase 20).
+          router.refresh();
           setSuccess(true);
         }
       } catch {
@@ -128,7 +134,9 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
       }
       if (json.upgraded) {
         // Sem QR pra mostrar (troca de plano ativa na hora, sem cobrança
-        // nova nesse instante — ver checkout/route.ts).
+        // nova nesse instante — ver checkout/route.ts). Mesmo motivo do
+        // polling acima: invalida o cache de rota já aqui.
+        router.refresh();
         setSuccess(true);
         return;
       }
@@ -172,7 +180,10 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
           </ul>
           <button
             type="button"
-            onClick={() => router.push(`/app/${slug}/inicio`)}
+            onClick={() => {
+              router.push(`/app/${slug}/inicio`);
+              router.refresh();
+            }}
             className="w-full py-3 rounded-xl bg-white text-rose-700 text-sm font-bold shadow-sm hover:bg-rose-50 transition-colors"
           >
             Ir para o Início
