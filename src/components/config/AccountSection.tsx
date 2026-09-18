@@ -202,7 +202,7 @@ export const AccountSection: React.FC<AccountSectionProps> = ({ slug, hasAccount
               placeholder="Seu e-mail"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink placeholder:text-ink-faint"
+              className="h-12 rounded-xl bg-surface border border-linen px-3 text-base text-ink placeholder:text-ink-faint"
             />
             <input
               type="password"
@@ -211,7 +211,7 @@ export const AccountSection: React.FC<AccountSectionProps> = ({ slug, hasAccount
               placeholder="Crie uma senha"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink placeholder:text-ink-faint"
+              className="h-12 rounded-xl bg-surface border border-linen px-3 text-base text-ink placeholder:text-ink-faint"
             />
             {error && <p className="text-[13px] text-rose-600">{error}</p>}
             <button

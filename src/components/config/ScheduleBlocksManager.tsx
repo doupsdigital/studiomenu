@@ -143,7 +143,7 @@ export const ScheduleBlocksManager: React.FC<ScheduleBlocksManagerProps> = ({ sl
             placeholder="Motivo (opcional)"
             value={reason}
             onChange={(e) => setReason(e.target.value)}
-            className="h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink placeholder:text-ink-faint"
+            className="h-12 rounded-xl bg-surface border border-linen px-3 text-base text-ink placeholder:text-ink-faint"
           />
 
           <div className="flex gap-2">

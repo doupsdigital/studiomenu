@@ -139,14 +139,14 @@ export const ManualBookingForm: React.FC<ManualBookingFormProps> = ({
               placeholder="Nome da cliente"
               value={clientName}
               onChange={(e) => setClientName(e.target.value)}
-              className="h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink placeholder:text-ink-faint"
+              className="h-12 rounded-xl bg-surface border border-linen px-3 text-base text-ink placeholder:text-ink-faint"
             />
             <input
               type="tel"
               placeholder="(11) 99999-9999"
               value={clientWhatsapp}
               onChange={(e) => setClientWhatsapp(formatPhoneBR(e.target.value))}
-              className="h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink placeholder:text-ink-faint"
+              className="h-12 rounded-xl bg-surface border border-linen px-3 text-base text-ink placeholder:text-ink-faint"
             />
             <textarea
               placeholder="Observação (opcional)"
