@@ -194,7 +194,15 @@ export default async function AgendaPage({ params, searchParams }: AgendaPagePro
       </div>
 
       {!bookingEnabled && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center px-5 py-10">
+        // `fixed` (não `absolute`) de propósito — a grade de horários
+        // desfocada atrás pode ficar bem mais alta que a tela (sem
+        // expediente configurado ainda, a grade cai no intervalo padrão
+        // 8h-20h inteiro), e `absolute inset-0` centralizava em relação a
+        // essa altura toda, jogando o card pra baixo da área visível
+        // (achado testando de verdade). `fixed` centraliza sempre na tela
+        // que está à vista, e os insets de 60px/68px deixam o card livre da
+        // barra de título e do menu inferior (ambos fixos também).
+        <div className="fixed top-[60px] bottom-[68px] left-0 right-0 z-20 flex items-center justify-center px-5">
           <PlusUpsellCard variant="full" slug={slug} />
         </div>
       )}

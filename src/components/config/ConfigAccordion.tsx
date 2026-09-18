@@ -101,6 +101,17 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
     setOpen((prev) => (prev[key] ? { ...prev, [key]: false } : prev));
   }, []);
 
+  // Vira dependência do useMemo abaixo em vez de `showNotifications` puro —
+  // sem isso, `usePushNotifications` resolvendo a permissão (assíncrono,
+  // acontece perto do mount, junto com o tour começando) recalculava
+  // `tourSteps` inteiro (objetos novos) mesmo pra quem só tem Básico, onde
+  // esse valor nem chega a entrar no resultado — mesma classe de bug do
+  // comentário acima, só que disparada por outra coisa mudando (achado
+  // testando: "Minha assinatura" duplicado mesmo sem mexer em nenhum
+  // acordeão). Assim, fica travado em `false` sempre que `!bookingEnabled`,
+  // nunca recalcula à toa.
+  const includeNotifications = bookingEnabled && showNotifications;
+
   // Tour guiado da Config (Fase 20) — um balão por seção, de cima pra baixo.
   // Horários/Bloqueios/Notificações ficam de fora enquanto `!bookingEnabled`
   // (Básico sem Plus): são cards travados, mostrar um balão explicando algo
@@ -134,7 +145,7 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
         ? [
             buildStep('horarios', '#horarios', 'Horários de atendimento', 'Defina os dias e horários em que você atende.'),
             buildStep('bloqueios', '#bloqueios', 'Bloqueios e folgas', 'Bloqueie datas específicas (férias, feriado, etc) sem mexer no seu expediente fixo.'),
-            ...(showNotifications
+            ...(includeNotifications
               ? [buildStep('notificacoes', '#notificacoes', 'Notificações', 'Ative avisos no seu celular pra novos agendamentos.')]
               : []),
           ]
@@ -142,7 +153,7 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
       buildStep('assinatura', '#assinatura', 'Minha assinatura', 'Gerencie seu plano por aqui — assinar, trocar ou cancelar.'),
       buildStep('conta', '#conta', 'Minha conta', 'Crie um acesso com senha pra não depender só do link mágico.'),
     ];
-  }, [bookingEnabled, showNotifications, openSection, closeSection]);
+  }, [bookingEnabled, includeNotifications, openSection, closeSection]);
 
   return (
     <div className="flex flex-col gap-4">
