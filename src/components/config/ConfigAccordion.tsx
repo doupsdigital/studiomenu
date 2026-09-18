@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Clock, CalendarX, CreditCard, UserCircle, Bell } from 'lucide-react';
 import type { Step } from 'react-joyride';
 import { SectionCard } from '@/components/app-shell/SectionCard';
@@ -89,49 +89,60 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
   // Fecha de novo ao sair (menos "Bloqueios", que já é aberta por padrão e
   // continua assim) — pedido explícito do usuário, mesmo comportamento de
   // "abre enquanto explica, fecha ao passar pra próxima" (Fase 20).
-  const openSection = (key: SectionKey) => setOpen((prev) => (prev[key] ? prev : { ...prev, [key]: true }));
-  const closeSection = (key: SectionKey) => {
+  // `useCallback` (referência estável) de propósito: essas funções entram
+  // como parte dos steps do tour (ver `tourSteps` abaixo) — sem estabilidade
+  // de referência, abrir uma seção mudaria `open`, o que recriaria
+  // `tourSteps` inteiro com objetos novos, e o Joyride recebendo um array de
+  // steps "diferente" no meio de uma transição mostrava o balão duplicado
+  // (achado testando de verdade: um em cima, um repetido embaixo).
+  const openSection = useCallback((key: SectionKey) => setOpen((prev) => (prev[key] ? prev : { ...prev, [key]: true })), []);
+  const closeSection = useCallback((key: SectionKey) => {
     if (key === 'bloqueios') return;
     setOpen((prev) => (prev[key] ? { ...prev, [key]: false } : prev));
-  };
-  const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
-
-  // `before`/`after` são hooks do próprio Joyride pra esperar conteúdo
-  // assíncrono/dinâmico ficar pronto antes de medir a posição do balão —
-  // uso certo aqui: abrir a seção MUDA a altura do card, e sem esperar um
-  // instante a posição calculada fica baseada no card ainda fechado.
-  const buildStep = (key: SectionKey, target: string, title: string, content: string): Step => ({
-    id: key,
-    target,
-    title,
-    content,
-    before: async () => {
-      openSection(key);
-      await wait(220);
-    },
-    after: async () => {
-      closeSection(key);
-    },
-  });
+  }, []);
 
   // Tour guiado da Config (Fase 20) — um balão por seção, de cima pra baixo.
   // Horários/Bloqueios/Notificações ficam de fora enquanto `!bookingEnabled`
   // (Básico sem Plus): são cards travados, mostrar um balão explicando algo
   // que ela ainda não pode usar só confunde (achado testando: ela via
-  // "Horários de atendimento" antes mesmo de assinar o Plus).
-  const tourSteps: Step[] = [
-    ...(bookingEnabled
-      ? [
-          buildStep('horarios', '#horarios', 'Horários de atendimento', 'Defina os dias e horários em que você atende.'),
-          buildStep('bloqueios', '#bloqueios', 'Bloqueios e folgas', 'Bloqueie datas específicas (férias, feriado, etc) sem mexer no seu expediente fixo.'),
-          ...(showNotifications
-            ? [buildStep('notificacoes', '#notificacoes', 'Notificações', 'Ative avisos no seu celular pra novos agendamentos.')]
-            : []),
-        ]
-      : []),
-    buildStep('assinatura', '#assinatura', 'Minha assinatura', 'Gerencie seu plano por aqui — assinar, trocar ou cancelar.'),
-    buildStep('conta', '#conta', 'Minha conta', 'Crie um acesso com senha pra não depender só do link mágico.'),
-  ];
+  // "Horários de atendimento" antes mesmo de assinar o Plus). `useMemo` só
+  // recalcula quando o CONJUNTO de seções disponíveis muda de verdade, não a
+  // cada abrir/fechar de acordeão (ver comentário acima).
+  const tourSteps = useMemo<Step[]>(() => {
+    const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+    // `before`/`after` são hooks do próprio Joyride pra esperar conteúdo
+    // assíncrono/dinâmico ficar pronto antes de medir a posição do balão —
+    // uso certo aqui: abrir a seção MUDA a altura do card, e sem esperar um
+    // instante a posição calculada fica baseada no card ainda fechado.
+    const buildStep = (key: SectionKey, target: string, title: string, content: string): Step => ({
+      id: key,
+      target,
+      title,
+      content,
+      before: async () => {
+        openSection(key);
+        await wait(220);
+      },
+      after: async () => {
+        closeSection(key);
+      },
+    });
+
+    return [
+      ...(bookingEnabled
+        ? [
+            buildStep('horarios', '#horarios', 'Horários de atendimento', 'Defina os dias e horários em que você atende.'),
+            buildStep('bloqueios', '#bloqueios', 'Bloqueios e folgas', 'Bloqueie datas específicas (férias, feriado, etc) sem mexer no seu expediente fixo.'),
+            ...(showNotifications
+              ? [buildStep('notificacoes', '#notificacoes', 'Notificações', 'Ative avisos no seu celular pra novos agendamentos.')]
+              : []),
+          ]
+        : []),
+      buildStep('assinatura', '#assinatura', 'Minha assinatura', 'Gerencie seu plano por aqui — assinar, trocar ou cancelar.'),
+      buildStep('conta', '#conta', 'Minha conta', 'Crie um acesso com senha pra não depender só do link mágico.'),
+    ];
+  }, [bookingEnabled, showNotifications, openSection, closeSection]);
 
   return (
     <div className="flex flex-col gap-4">
