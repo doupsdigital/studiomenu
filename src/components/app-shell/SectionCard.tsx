@@ -16,6 +16,13 @@ interface SectionCardProps {
   locked?: boolean;
   /** Legenda mostrada abaixo do cabeçalho só quando `locked`. */
   lockedHint?: string;
+  /** Alvo do tour guiado (Fase 20) — fica no cabeçalho, não no card inteiro:
+   *  o cabeçalho tem altura fixa (não cresce quando a seção abre), então o
+   *  balão sempre aponta pro mesmo lugar de forma previsível, mesmo em
+   *  cards grandes como "Horários de atendimento" (achado testando de
+   *  verdade: apontar pro card inteiro fazia o balão pular de cima pra
+   *  baixo dependendo do tanto de conteúdo aberto). */
+  dataTour?: string;
 }
 
 /** Cartão de acordeão — cabeçalho em gradiente rose (ícone + título +
@@ -23,11 +30,12 @@ interface SectionCardProps {
  *  Configurações do LashAgenda (`SectionCard` de lá), usado aqui pras 3
  *  seções da aba Config. Sem lógica própria além de abrir/fechar — o
  *  conteúdo de cada seção continua sendo o componente que já existia. */
-export const SectionCard: React.FC<SectionCardProps> = ({ icon: Icon, title, isOpen, onToggle, children, locked, lockedHint }) => {
+export const SectionCard: React.FC<SectionCardProps> = ({ icon: Icon, title, isOpen, onToggle, children, locked, lockedHint, dataTour }) => {
   return (
     <div className="bg-surface border border-linen rounded-2xl shadow-sm overflow-hidden">
       <button
         type="button"
+        data-tour={dataTour}
         onClick={locked ? undefined : onToggle}
         aria-disabled={locked}
         className={`w-full px-5 py-5 select-none text-left bg-gradient-to-br from-rose-700 to-rose-500 ${

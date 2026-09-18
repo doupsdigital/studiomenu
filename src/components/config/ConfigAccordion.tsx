@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Clock, CalendarX, CreditCard, UserCircle, Bell } from 'lucide-react';
 import type { Step } from 'react-joyride';
 import { SectionCard } from '@/components/app-shell/SectionCard';
@@ -110,76 +110,55 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
 
   const toggle = (key: SectionKey) => setOpen((prev) => ({ ...prev, [key]: !prev[key] }));
 
-  // Enquanto o tour passa por uma seção fechada, abre ela — senão o balão
-  // aponta pra um cabeçalho vazio, sem o conteúdo que ele está explicando.
-  // Fecha de novo ao sair (menos "Bloqueios", que já é aberta por padrão e
-  // continua assim) — pedido explícito do usuário, mesmo comportamento de
-  // "abre enquanto explica, fecha ao passar pra próxima" (Fase 20).
-  // `useCallback` (referência estável) de propósito: essas funções entram
-  // como parte dos steps do tour (ver `tourSteps` abaixo) — sem estabilidade
-  // de referência, abrir uma seção mudaria `open`, o que recriaria
-  // `tourSteps` inteiro com objetos novos, e o Joyride recebendo um array de
-  // steps "diferente" no meio de uma transição mostrava o balão duplicado
-  // (achado testando de verdade: um em cima, um repetido embaixo).
-  const openSection = useCallback((key: SectionKey) => setOpen((prev) => (prev[key] ? prev : { ...prev, [key]: true })), []);
-  const closeSection = useCallback((key: SectionKey) => {
-    if (key === 'bloqueios') return;
-    setOpen((prev) => (prev[key] ? { ...prev, [key]: false } : prev));
-  }, []);
-
   // Vira dependência do useMemo abaixo em vez de `showNotifications` puro —
   // sem isso, `usePushNotifications` resolvendo a permissão (assíncrono,
   // acontece perto do mount, junto com o tour começando) recalculava
   // `tourSteps` inteiro (objetos novos) mesmo pra quem só tem Básico, onde
-  // esse valor nem chega a entrar no resultado — mesma classe de bug do
-  // comentário acima, só que disparada por outra coisa mudando (achado
-  // testando: "Minha assinatura" duplicado mesmo sem mexer em nenhum
-  // acordeão). Assim, fica travado em `false` sempre que `!bookingEnabled`,
-  // nunca recalcula à toa.
+  // esse valor nem chega a entrar no resultado. Assim, fica travado em
+  // `false` sempre que `!bookingEnabled`, nunca recalcula à toa.
   const includeNotifications = bookingEnabled && showNotifications;
+  const hasAccount = Boolean(authUserId);
 
-  // Tour guiado da Config (Fase 20) — um balão por seção, de cima pra baixo.
+  // Tour guiado da Config (Fase 20) — um balão por seção, de cima pra baixo,
+  // sempre apontando pro CABEÇALHO de cada card (não pro card inteiro, nem
+  // abrindo/fechando a seção durante o tour como numa versão anterior) — o
+  // cabeçalho tem altura fixa, então a posição do balão nunca pula
+  // dependendo do quanto de conteúdo está aberto (achado testando de
+  // verdade: "Horários de atendimento" é um card grande, e ele fazia o
+  // balão ficar impossível de ver quando abria durante o próprio tour).
   // Horários/Bloqueios/Notificações ficam de fora enquanto `!bookingEnabled`
   // (Básico sem Plus): são cards travados, mostrar um balão explicando algo
-  // que ela ainda não pode usar só confunde (achado testando: ela via
-  // "Horários de atendimento" antes mesmo de assinar o Plus). `useMemo` só
-  // recalcula quando o CONJUNTO de seções disponíveis muda de verdade, não a
-  // cada abrir/fechar de acordeão (ver comentário acima).
+  // que ela ainda não pode usar só confunde. O texto de "Minha conta" muda
+  // depois que o acesso já foi criado — apontar pra "crie um acesso" quando
+  // ela já criou não faz sentido.
   const tourSteps = useMemo<Step[]>(() => {
-    const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
-
-    // `before`/`after` são hooks do próprio Joyride pra esperar conteúdo
-    // assíncrono/dinâmico ficar pronto antes de medir a posição do balão —
-    // uso certo aqui: abrir a seção MUDA a altura do card, e sem esperar um
-    // instante a posição calculada fica baseada no card ainda fechado.
-    const buildStep = (key: SectionKey, target: string, title: string, content: string): Step => ({
+    const buildStep = (key: SectionKey, title: string, content: string): Step => ({
       id: key,
-      target,
+      target: `[data-tour="${key}-header"]`,
       title,
       content,
-      before: async () => {
-        openSection(key);
-        await wait(220);
-      },
-      after: async () => {
-        closeSection(key);
-      },
     });
 
     return [
       ...(bookingEnabled
         ? [
-            buildStep('horarios', '#horarios', 'Horários de atendimento', 'Defina os dias e horários em que você atende.'),
-            buildStep('bloqueios', '#bloqueios', 'Bloqueios e folgas', 'Bloqueie datas específicas (férias, feriado, etc) sem mexer no seu expediente fixo.'),
+            buildStep('horarios', 'Horários de atendimento', 'Defina os dias e horários em que você atende.'),
+            buildStep('bloqueios', 'Bloqueios e folgas', 'Bloqueie datas específicas (férias, feriado, etc) sem mexer no seu expediente fixo.'),
             ...(includeNotifications
-              ? [buildStep('notificacoes', '#notificacoes', 'Notificações', 'Ative avisos no seu celular pra novos agendamentos.')]
+              ? [buildStep('notificacoes', 'Notificações', 'Ative avisos no seu celular pra novos agendamentos.')]
               : []),
           ]
         : []),
-      buildStep('assinatura', '#assinatura', 'Minha assinatura', 'Gerencie seu plano por aqui — assinar, trocar ou cancelar.'),
-      buildStep('conta', '#conta', 'Minha conta', 'Crie um acesso com senha pra não depender só do link mágico.'),
+      buildStep('assinatura', 'Minha assinatura', 'Gerencie seu plano por aqui — assinar, trocar ou cancelar.'),
+      buildStep(
+        'conta',
+        'Minha conta',
+        hasAccount
+          ? 'Aqui você pode sair desse dispositivo, se precisar.'
+          : 'Crie um acesso com senha pra não depender só do link mágico.'
+      ),
     ];
-  }, [bookingEnabled, includeNotifications, openSection, closeSection]);
+  }, [bookingEnabled, includeNotifications, hasAccount]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -192,6 +171,7 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
           onToggle={() => toggle('horarios')}
           locked={!bookingEnabled}
           lockedHint="Disponível quando o agendamento automático (StudioMenu+) estiver ativo."
+          dataTour="horarios-header"
         >
           <BusinessHoursEditor slug={slug} initialHours={businessHours} />
         </SectionCard>
@@ -205,6 +185,7 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
           onToggle={() => toggle('bloqueios')}
           locked={!bookingEnabled}
           lockedHint="Disponível quando o agendamento automático (StudioMenu+) estiver ativo."
+          dataTour="bloqueios-header"
         >
           <ScheduleBlocksManager slug={slug} blocks={scheduleBlocks} />
         </SectionCard>
@@ -219,6 +200,7 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
             onToggle={() => toggle('notificacoes')}
             locked={!bookingEnabled}
             lockedHint="Disponível quando o agendamento automático (StudioMenu+) estiver ativo."
+            dataTour="notificacoes-header"
           >
             <NotificationsSection slug={slug} />
           </SectionCard>
@@ -226,7 +208,13 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
       )}
 
       <div id="assinatura">
-        <SectionCard icon={CreditCard} title="Minha assinatura" isOpen={open.assinatura} onToggle={() => toggle('assinatura')}>
+        <SectionCard
+          icon={CreditCard}
+          title="Minha assinatura"
+          isOpen={open.assinatura}
+          onToggle={() => toggle('assinatura')}
+          dataTour="assinatura-header"
+        >
           <SubscriptionSection
             slug={slug}
             planTier={planTier}
@@ -238,8 +226,14 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
       </div>
 
       <div id="conta">
-        <SectionCard icon={UserCircle} title="Minha conta" isOpen={open.conta} onToggle={() => toggle('conta')}>
-          <AccountSection slug={slug} hasAccount={Boolean(authUserId)} />
+        <SectionCard
+          icon={UserCircle}
+          title="Minha conta"
+          isOpen={open.conta}
+          onToggle={() => toggle('conta')}
+          dataTour="conta-header"
+        >
+          <AccountSection slug={slug} hasAccount={hasAccount} />
         </SectionCard>
       </div>
     </div>
