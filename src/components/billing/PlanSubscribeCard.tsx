@@ -93,7 +93,7 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
         setError(json.message || 'Não foi possível iniciar a assinatura.');
         return;
       }
-      if (json.alreadyActive) {
+      if (json.alreadyActive || json.upgraded) {
         router.refresh();
         return;
       }

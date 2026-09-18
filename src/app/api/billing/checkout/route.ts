@@ -3,6 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { isProfessionalRequestAuthorized } from '@/lib/professional-session';
 import { PLAN_PRICING, type PayablePlanTier } from '@/lib/pricing';
+import { activateSubscription } from '@/lib/billing-service';
 import {
   AsaasConfigError,
   AsaasApiError,
@@ -69,26 +70,18 @@ export async function POST(request: Request) {
 
     // Já tem assinatura Asaas e é um tier DIFERENTE do atual → troca de
     // plano (ex: Básico → Plus): atualiza valor/descrição em vez de criar
-    // uma assinatura nova, evitando cobrança duplicada.
+    // uma assinatura nova, evitando cobrança duplicada. Confirmado contra o
+    // sandbox real (Fase 19): um PUT /subscriptions NÃO gera cobrança nova
+    // nem afeta a do ciclo atual (já paga) — o novo valor só vale a partir
+    // do próximo vencimento. Sem pagamento novo pra confirmar, não dá pra
+    // esperar o webhook de sempre; como ela já é assinante paga validada
+    // (não uma desconhecida tentando ganhar acesso de graça), ativa o novo
+    // tier direto aqui.
     if (order.asaas_subscription_id && order.plan_tier !== plan && order.plan_tier !== 'catalog') {
       await updateSubscription({ subscriptionId: order.asaas_subscription_id, value: pricing.price, description: pricing.description });
       await supabaseAdmin.from('orders').update({ pending_plan_tier: plan }).eq('id', order.id);
-
-      const updatedPayment = await getFirstSubscriptionPayment(order.asaas_subscription_id);
-      if (!updatedPayment) {
-        return NextResponse.json(
-          { success: false, message: 'Assinatura atualizada, mas o Pix ainda não ficou pronto. Tente novamente em instantes.' },
-          { status: 202 }
-        );
-      }
-      const updatedQr = await getPixQrCode(updatedPayment.id);
-      return NextResponse.json({
-        success: true,
-        paymentId: updatedPayment.id,
-        pixQrCodeImage: updatedQr.encodedImage,
-        pixKey: updatedQr.payload,
-        expirationDate: updatedQr.expirationDate,
-      });
+      await activateSubscription(order.id);
+      return NextResponse.json({ success: true, upgraded: true });
     }
 
     // Reaproveita uma assinatura já criada pro MESMO tier (ex: a
