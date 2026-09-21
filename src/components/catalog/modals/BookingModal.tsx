@@ -72,7 +72,6 @@ export const BookingModal: React.FC<BookingModalProps> = ({
 
   const [clientName, setClientName] = useState('');
   const [clientWhatsapp, setClientWhatsapp] = useState('');
-  const [clientNotes, setClientNotes] = useState('');
 
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -132,7 +131,6 @@ export const BookingModal: React.FC<BookingModalProps> = ({
           starts_at: selectedSlot.startsAt,
           client_name: clientName.trim(),
           client_whatsapp: clientWhatsapp.trim(),
-          client_notes: clientNotes.trim() || undefined,
         }),
       });
       const json = await res.json();
@@ -311,16 +309,6 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                   value={clientWhatsapp}
                   onChange={(e) => setClientWhatsapp(formatPhoneBR(e.target.value))}
                   autoComplete="tel"
-                />
-              </div>
-
-              <div className="wizard__campo">
-                <span className="wizard__label">Observação (opcional)</span>
-                <textarea
-                  className="wizard__input"
-                  placeholder="Alguma preferência ou detalhe?"
-                  value={clientNotes}
-                  onChange={(e) => setClientNotes(e.target.value)}
                 />
               </div>
 
