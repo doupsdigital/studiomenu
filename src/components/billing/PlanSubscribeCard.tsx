@@ -313,14 +313,6 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
             <p className="text-sm text-ink-soft mt-0.5">{pricing.label} · {copy.subheadline}</p>
           </div>
           <input
-            type="email"
-            required
-            placeholder="Seu e-mail"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="h-12 rounded-xl bg-surface border border-linen px-3 text-base text-ink placeholder:text-ink-faint"
-          />
-          <input
             type="text"
             inputMode="numeric"
             required
@@ -328,6 +320,14 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
             value={cpfCnpj}
             onChange={(e) => setCpfCnpj(formatCpfCnpj(e.target.value))}
             maxLength={18}
+            className="h-12 rounded-xl bg-surface border border-linen px-3 text-base text-ink placeholder:text-ink-faint"
+          />
+          <input
+            type="email"
+            required
+            placeholder="Seu e-mail"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="h-12 rounded-xl bg-surface border border-linen px-3 text-base text-ink placeholder:text-ink-faint"
           />
           {showMethodChoice && (
