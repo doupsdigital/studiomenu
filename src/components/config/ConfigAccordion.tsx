@@ -21,6 +21,7 @@ interface ConfigAccordionProps {
   subscriptionStatus: 'none' | 'ativo' | 'suspenso' | 'cancelado';
   billingEmail?: string;
   billingCpfCnpj?: string;
+  paymentMethod: 'pix' | 'card' | null;
   /** Agendamento automático de fato ligado (Plus ativo ou toggle manual do
    *  admin) — sem isso, Horários e Bloqueios não têm nenhum efeito prático
    *  (a Agenda nem chega a mostrar conteúdo real), então ficam travados. */
@@ -47,6 +48,7 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
   subscriptionStatus,
   billingEmail,
   billingCpfCnpj,
+  paymentMethod,
   bookingEnabled,
   authUserId,
 }) => {
@@ -221,6 +223,7 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
             subscriptionStatus={subscriptionStatus}
             billingEmail={billingEmail}
             billingCpfCnpj={billingCpfCnpj}
+            paymentMethod={paymentMethod}
           />
         </SectionCard>
       </div>

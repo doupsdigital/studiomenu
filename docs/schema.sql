@@ -47,6 +47,8 @@ CREATE TABLE IF NOT EXISTS public.orders (
     -- setado no checkout, consumido por activateSubscription() quando o
     -- pagamento é confirmado (Fase 19, docs/migrations/2026-09-18_fase19_plano_basico.sql)
     pending_plan_tier TEXT CHECK (pending_plan_tier IN ('basico', 'plus')),
+    -- Forma de pagamento da assinatura atual (Fase 21, docs/migrations/2026-09-21_fase21_cartao.sql)
+    payment_method TEXT CHECK (payment_method IN ('pix', 'card')),
     billing_email TEXT,
     billing_cpf_cnpj TEXT,
     cancellation_notice_hours INTEGER DEFAULT 24,

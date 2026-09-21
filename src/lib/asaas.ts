@@ -78,7 +78,12 @@ export interface AsaasPayment {
   value: number;
   customer: string;
   subscription?: string;
+  /** Página de pagamento hospedada pelo Asaas — onde o cartão é digitado
+   *  (nunca passa pelo nosso servidor). */
+  invoiceUrl?: string;
 }
+
+export type AsaasBillingType = 'PIX' | 'CREDIT_CARD';
 
 export interface AsaasPixQrCode {
   encodedImage: string;
@@ -101,11 +106,20 @@ export async function findOrCreateCustomer(input: { name: string; email: string;
   });
 }
 
-export async function createSubscription(input: { customerId: string; value: number; description: string }): Promise<AsaasSubscription> {
+/** `CREDIT_CARD` sem dados de cartão (confirmado no sandbox, Fase 21): o
+ *  primeiro pagamento vem com `invoiceUrl` (página do Asaas onde a cliente
+ *  digita o cartão), e depois de pago o cartão fica guardado na assinatura
+ *  — as cobranças seguintes saem sozinhas. */
+export async function createSubscription(input: {
+  customerId: string;
+  value: number;
+  description: string;
+  billingType?: AsaasBillingType;
+}): Promise<AsaasSubscription> {
   const nextDueDate = new Date().toISOString().slice(0, 10);
   return asaasRequest<AsaasSubscription>('POST', '/subscriptions', {
     customer: input.customerId,
-    billingType: 'PIX',
+    billingType: input.billingType ?? 'PIX',
     value: input.value,
     nextDueDate,
     cycle: 'MONTHLY',
@@ -137,6 +151,17 @@ export async function getPayment(paymentId: string): Promise<AsaasPayment> {
 
 export async function cancelSubscription(subscriptionId: string): Promise<void> {
   await asaasRequest('DELETE', `/subscriptions/${subscriptionId}`);
+}
+
+/** Troca a forma de pagamento de uma assinatura AINDA NÃO PAGA (a cliente
+ *  escolheu Pix, mudou de ideia e quer cartão, ou o contrário) — inclui a
+ *  cobrança pendente (`updatePendingPayments`), senão o primeiro pagamento
+ *  continuaria no método antigo. */
+export async function updateSubscriptionBillingType(input: { subscriptionId: string; billingType: AsaasBillingType }): Promise<AsaasSubscription> {
+  return asaasRequest<AsaasSubscription>('PUT', `/subscriptions/${input.subscriptionId}`, {
+    billingType: input.billingType,
+    updatePendingPayments: true,
+  });
 }
 
 /** Atualiza valor/descrição de uma assinatura existente EM VEZ de criar uma

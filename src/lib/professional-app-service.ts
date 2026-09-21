@@ -11,6 +11,8 @@ export interface ProfessionalOrderSummary {
   subscription_status: 'none' | 'ativo' | 'suspenso' | 'cancelado';
   billing_email?: string;
   billing_cpf_cnpj?: string;
+  /** Forma de pagamento da assinatura atual (Fase 21) — null se nunca assinou. */
+  payment_method: 'pix' | 'card' | null;
   /** Se o agendamento automático está de fato ligado pro cliente final — via
    *  assinatura Plus ativa OU via toggle manual do admin (Fase 6). É essa
    *  flag, não o plano, que decide se a Agenda mostra conteúdo real ou o
@@ -31,7 +33,7 @@ export async function getOrderForProfessionalApp(slug: string): Promise<Professi
 
   const { data, error } = await supabaseAdmin
     .from('orders')
-    .select('id, slug, edit_token, client_name, studio_name, whatsapp_number, plan_tier, subscription_status, billing_email, billing_cpf_cnpj, booking_enabled, auth_user_id')
+    .select('id, slug, edit_token, client_name, studio_name, whatsapp_number, plan_tier, subscription_status, billing_email, billing_cpf_cnpj, payment_method, booking_enabled, auth_user_id')
     .eq('slug', normalizedSlug)
     .single();
 
@@ -50,6 +52,7 @@ export async function getOrderForProfessionalApp(slug: string): Promise<Professi
       : 'none',
     billing_email: data.billing_email || undefined,
     billing_cpf_cnpj: data.billing_cpf_cnpj || undefined,
+    payment_method: data.payment_method === 'card' ? 'card' : data.payment_method === 'pix' ? 'pix' : null,
     booking_enabled: Boolean(data.booking_enabled),
     auth_user_id: data.auth_user_id || null,
   };

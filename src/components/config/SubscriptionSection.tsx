@@ -12,6 +12,7 @@ interface SubscriptionSectionProps {
   subscriptionStatus: 'none' | 'ativo' | 'suspenso' | 'cancelado';
   billingEmail?: string;
   billingCpfCnpj?: string;
+  paymentMethod: 'pix' | 'card' | null;
 }
 
 const TIER_LABEL: Record<PayablePlanTier, string> = { basico: 'StudioMenu Básico', plus: 'StudioMenu+' };
@@ -19,8 +20,15 @@ const TIER_LABEL: Record<PayablePlanTier, string> = { basico: 'StudioMenu Básic
 /** Card "plano X ativo" com botão de cancelar — mesmo visual pro Básico e
  *  pro Plus, só troca o rótulo/preço/texto de aviso (Fase 19: antes só
  *  existia a versão Plus, hardcoded). */
-const ActivePlanCard: React.FC<{ tier: PayablePlanTier; onCancel: () => void; loading: boolean; error: string | null }> = ({
+const ActivePlanCard: React.FC<{
+  tier: PayablePlanTier;
+  paymentMethod: 'pix' | 'card' | null;
+  onCancel: () => void;
+  loading: boolean;
+  error: string | null;
+}> = ({
   tier,
+  paymentMethod,
   onCancel,
   loading,
   error,
@@ -36,7 +44,7 @@ const ActivePlanCard: React.FC<{ tier: PayablePlanTier; onCancel: () => void; lo
         </div>
         <div className="min-w-0">
           <p className="font-serif-pro font-bold text-lg text-rose-800 leading-tight">{TIER_LABEL[tier]} ativo</p>
-          <p className="text-[13px] text-rose-800/70 mt-0.5">Cobrança recorrente via Pix</p>
+          <p className="text-[13px] text-rose-800/70 mt-0.5">Cobrança recorrente {paymentMethod === 'card' ? 'no cartão de crédito' : 'via Pix'}</p>
         </div>
       </div>
 
@@ -97,6 +105,7 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
   subscriptionStatus,
   billingEmail,
   billingCpfCnpj,
+  paymentMethod,
 }) => {
   const router = useRouter();
   const isPlusActive = planTier === 'plus' && subscriptionStatus === 'ativo';
@@ -128,18 +137,18 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
   };
 
   if (isPlusActive) {
-    return <ActivePlanCard tier="plus" onCancel={handleCancel} loading={loading} error={error} />;
+    return <ActivePlanCard tier="plus" paymentMethod={paymentMethod} onCancel={handleCancel} loading={loading} error={error} />;
   }
 
   if (isBasicoActive) {
     return (
       <div className="flex flex-col gap-4">
-        <ActivePlanCard tier="basico" onCancel={handleCancel} loading={loading} error={error} />
+        <ActivePlanCard tier="basico" paymentMethod={paymentMethod} onCancel={handleCancel} loading={loading} error={error} />
         <div id="upgrade-plus">
           <p className="flex items-center gap-1.5 text-sm font-bold text-ink mb-2">
             <Sparkles className="w-4 h-4 text-rose-600" /> Evolua pro StudioMenu+
           </p>
-          <PlanSubscribeCard slug={slug} plan="plus" billingEmail={billingEmail} billingCpfCnpj={billingCpfCnpj} />
+          <PlanSubscribeCard slug={slug} plan="plus" billingEmail={billingEmail} billingCpfCnpj={billingCpfCnpj} showMethodChoice={false} />
         </div>
       </div>
     );
