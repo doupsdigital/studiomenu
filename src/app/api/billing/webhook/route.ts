@@ -3,6 +3,7 @@ import { timingSafeEqual } from 'crypto';
 import { activateSubscription, setSubscriptionStatus, findOrderIdByAsaasIds } from '@/lib/billing-service';
 
 const ACTIVATE_EVENTS = new Set(['PAYMENT_CONFIRMED', 'PAYMENT_RECEIVED']);
+const ACTIVATE_STATUSES = new Set(['CONFIRMED', 'RECEIVED', 'RECEIVED_IN_CASH']);
 const SUSPEND_EVENTS = new Set(['PAYMENT_OVERDUE']);
 const CANCEL_EVENTS = new Set(['PAYMENT_DELETED', 'SUBSCRIPTION_DELETED', 'SUBSCRIPTION_INACTIVATED']);
 
@@ -18,6 +19,7 @@ function isValidWebhookToken(received: string | null): boolean {
 interface AsaasWebhookPayload {
   event: string;
   payment?: {
+    status?: string;
     customer?: string;
     subscription?: string;
   };
@@ -62,7 +64,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true }); // 200 mesmo assim — evita a Asaas insistir num evento que não é nosso
     }
 
-    if (ACTIVATE_EVENTS.has(event)) {
+    // "Recebido em dinheiro" (baixa manual no painel do Asaas, ex: cliente
+    // pagou por fora) vira status `RECEIVED_IN_CASH` — não dependo só do nome
+    // do evento pra ativar, olho também o status da cobrança.
+    if (ACTIVATE_EVENTS.has(event) || (payment?.status && ACTIVATE_STATUSES.has(payment.status))) {
       await activateSubscription(orderId);
     } else if (SUSPEND_EVENTS.has(event)) {
       await setSubscriptionStatus(orderId, 'suspenso');

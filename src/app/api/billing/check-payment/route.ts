@@ -5,7 +5,7 @@ import { isProfessionalRequestAuthorized } from '@/lib/professional-session';
 import { AsaasConfigError, AsaasApiError, getPayment } from '@/lib/asaas';
 import { activateSubscription } from '@/lib/billing-service';
 
-const CONFIRMED_STATUSES = new Set(['CONFIRMED', 'RECEIVED']);
+const CONFIRMED_STATUSES = new Set(['CONFIRMED', 'RECEIVED', 'RECEIVED_IN_CASH']);
 
 /** POST /api/billing/check-payment
  *  Body: { slug, payment_id }
