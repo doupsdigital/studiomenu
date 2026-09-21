@@ -12,6 +12,8 @@ import {
   updateSubscription,
   updateSubscriptionBillingType,
   getFirstSubscriptionPayment,
+  getPayableSubscriptionPayment,
+  getSubscription,
   getPixQrCode,
   type AsaasPayment,
   type AsaasBillingType,
@@ -146,10 +148,33 @@ export async function POST(request: Request) {
       // tier original — trocar só o rótulo aqui ativaria um plano diferente
       // do que ela de fato paga.
       await supabaseAdmin.from('orders').update({ payment_method: method }).eq('id', order.id);
-      const existingPayment = await getFirstSubscriptionPayment(order.asaas_subscription_id);
+
+      // Cobrança que ela pode pagar agora (pendente ou vencida) — não "a
+      // primeira da lista": numa assinatura com vários meses (renovação em
+      // atraso) a primeira pode já estar paga, e o QR dela não serve.
+      const { payment: existingPayment, total } = await getPayableSubscriptionPayment(order.asaas_subscription_id);
       if (existingPayment) {
         return buildPaymentResponse(existingPayment, method);
       }
+
+      // Nunca cai pra "criar assinatura nova" se a antiga ainda existe no
+      // Asaas — seria cobrança em dobro. Só segue pra criar uma nova se a
+      // antiga sumiu de verdade (removida/cancelada no painel sem o app
+      // ficar sabendo).
+      const existingSubscription = await getSubscription(order.asaas_subscription_id);
+      if (existingSubscription && !existingSubscription.deleted) {
+        return NextResponse.json(
+          {
+            success: false,
+            message:
+              total > 0
+                ? 'Sua assinatura não tem nenhuma cobrança em aberto agora. Se o acesso está bloqueado, fale com o suporte.'
+                : 'Assinatura criada, mas a cobrança ainda não ficou pronta. Tente novamente em instantes.',
+          },
+          { status: total > 0 ? 409 : 202 }
+        );
+      }
+      await supabaseAdmin.from('orders').update({ asaas_subscription_id: null, pending_plan_tier: null }).eq('id', order.id);
     }
 
     const customer = await findOrCreateCustomer({ name: order.client_name, email: email.trim(), cpfCnpj: cpfCnpjDigits });

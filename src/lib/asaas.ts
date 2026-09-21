@@ -78,6 +78,7 @@ export interface AsaasPayment {
   value: number;
   customer: string;
   subscription?: string;
+  dueDate?: string;
   /** Página de pagamento hospedada pelo Asaas — onde o cartão é digitado
    *  (nunca passa pelo nosso servidor). */
   invoiceUrl?: string;
@@ -139,6 +140,44 @@ export async function getFirstSubscriptionPayment(subscriptionId: string): Promi
     await sleep(2000);
   }
   return null;
+}
+
+const UNPAID_STATUSES = new Set(['PENDING', 'OVERDUE']);
+
+/** Escolhe, entre as cobranças de uma assinatura, a que ainda dá pra pagar:
+ *  `PENDING`/`OVERDUE`, a de vencimento mais antigo primeiro (quita a dívida
+ *  mais velha antes da atual). Ignora as já pagas/canceladas. */
+export function pickPayablePayment(payments: AsaasPayment[]): AsaasPayment | null {
+  const unpaid = payments.filter((p) => UNPAID_STATUSES.has(p.status));
+  if (unpaid.length === 0) return null;
+  return [...unpaid].sort((a, b) => (a.dueDate || '').localeCompare(b.dueDate || ''))[0];
+}
+
+/** Cobrança que a profissional pode pagar AGORA numa assinatura que já
+ *  existe (ex: Pix vencido de um mês depois da primeira cobrança). O
+ *  `getFirstSubscriptionPayment` acima pega "a primeira que o Asaas listar",
+ *  que numa assinatura com vários meses pode ser uma já paga — QR inútil.
+ *  `total` diz se a assinatura tem alguma cobrança (0 = o Asaas ainda não
+ *  gerou nenhuma, ex: assinatura recém-criada). */
+export async function getPayableSubscriptionPayment(subscriptionId: string): Promise<{ payment: AsaasPayment | null; total: number }> {
+  for (let attempt = 0; attempt < 4; attempt += 1) {
+    const res = await asaasRequest<{ data: AsaasPayment[] }>('GET', `/payments?subscription=${subscriptionId}&limit=100`);
+    const payments = res.data || [];
+    if (payments.length > 0) {
+      return { payment: pickPayablePayment(payments), total: payments.length };
+    }
+    await sleep(2000);
+  }
+  return { payment: null, total: 0 };
+}
+
+export async function getSubscription(subscriptionId: string): Promise<(AsaasSubscription & { deleted?: boolean }) | null> {
+  try {
+    return await asaasRequest<AsaasSubscription & { deleted?: boolean }>('GET', `/subscriptions/${subscriptionId}`);
+  } catch (error) {
+    if (error instanceof AsaasApiError && error.status === 404) return null;
+    throw error;
+  }
 }
 
 export async function getPixQrCode(paymentId: string): Promise<AsaasPixQrCode> {
