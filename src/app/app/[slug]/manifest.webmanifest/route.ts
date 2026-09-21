@@ -22,7 +22,7 @@ export async function GET(_request: Request, { params }: RouteParams) {
       start_url: `/app/${slug}`,
       scope: `/app/${slug}/`,
       display: 'standalone',
-      background_color: '#F7F3EE',
+      background_color: '#F3F5F8',
       theme_color: '#a93259',
       icons: [
         { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },

@@ -34,9 +34,9 @@ module.exports = {
         // aditiva, não mexe em nada existente. Inspirada no fundo creme/cards
         // brancos do LashAgenda (docs/REESTRUTURACAO_VISUAL_APP.md), mas com
         // a cor de destaque continuando a ser `rose` (já definida acima).
-        cream: '#F7F3EE',
+        cream: '#F3F5F8',
         surface: '#FFFFFF',
-        linen: '#EFE4DA',
+        linen: '#E7E9EE',
         ink: {
           DEFAULT: '#2C1810',
           soft: '#6B5D53',
