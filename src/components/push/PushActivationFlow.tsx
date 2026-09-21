@@ -126,13 +126,16 @@ export const PushActivationFlow: React.FC<PushActivationFlowProps> = ({
 
   if (phase === 'confirmed') {
     return (
-      <div className="flex flex-col gap-2">
-        <div className={`flex items-center gap-2 text-[13px] ${textClassName}`}>
-          <CheckCircle2 className="w-4 h-4 shrink-0" />
-          <span>Notificações ativas nesse dispositivo.</span>
-        </div>
-        <button type="button" onClick={runTest} disabled={sendingTest} className={secondaryButtonClassName}>
-          {sendingTest ? 'Enviando...' : 'Enviar notificação de teste'}
+      <div className="flex flex-col items-center text-center gap-1.5">
+        <span className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
+          <CheckCircle2 className="w-6 h-6" />
+        </span>
+        <p className="text-base font-bold text-emerald-700">Notificações ativas!</p>
+        <p className={`text-[15px] leading-snug ${textClassName}`}>Você vai receber um aviso nesse dispositivo sempre que uma cliente agendar.</p>
+        {/* Teste de novo fica discreto (link), não um botão do tamanho do
+         *  principal — o estado agora é "está tudo certo", não "falta testar". */}
+        <button type="button" onClick={runTest} disabled={sendingTest} className="mt-1 text-[15px] font-semibold text-rose-700 underline underline-offset-2 disabled:opacity-50">
+          {sendingTest ? 'Enviando...' : 'Enviar teste de novo'}
         </button>
       </div>
     );
