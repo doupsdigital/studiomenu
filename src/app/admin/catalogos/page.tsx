@@ -107,7 +107,17 @@ export default function AdminCatalogosPage() {
     const cleanPhone = normalizeWhatsappBR(item.whatsapp_number);
     const firstName = (item.client_name || '').split(' ')[0];
     const links = buildProfessionalLinks(item);
-    const message = `Olá, ${firstName}! ✨\n\nSeu catálogo digital oficial StudioMenu está pronto, calibrado e no ar! 🚀\n\n🔗 *Seu Link Exclusivo:*\n👉 ${links.official}\n\n📌 *O que fazer agora:*\n1. Abra o link no seu celular e confira seu catálogo completo.\n2. Coloque este link na bio do seu Instagram e no seu perfil do WhatsApp Business.\n3. Comece a enviar para suas clientes no momento do agendamento!\n\n💎 *Pra gerenciar seu catálogo e ativar recursos extras:*\n👉 ${links.app}\n\nQualquer dúvida ou ajuste que precisar, nossa equipe está à sua inteira disposição. Parabéns pelo seu novo posicionamento! 💖✨`;
+    const message = `Olá, ${firstName}! ✨\n\nSeu catálogo digital oficial StudioMenu está pronto, calibrado e no ar! 🚀\n\n🔗 *Seu Link Exclusivo:*\n👉 ${links.official}\n\n📌 *O que fazer agora:*\n1. Abra o link no seu celular e confira seu catálogo completo.\n2. Coloque este link na bio do seu Instagram e no seu perfil do WhatsApp Business.\n3. Comece a enviar para suas clientes no momento do agendamento!\n\nQualquer dúvida ou ajuste que precisar, nossa equipe está à sua inteira disposição. Parabéns pelo seu novo posicionamento! 💖✨`;
+    return `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(message)}`;
+  };
+
+  /** Segunda mensagem, enviada separada da entrega do catálogo: apresenta o
+   *  app dela (o Link do App abre a tela de primeiro contato, com dicas). */
+  const buildAppWhatsappUrl = (item: AdminCatalog) => {
+    const cleanPhone = normalizeWhatsappBR(item.whatsapp_number);
+    const firstName = (item.client_name || '').split(' ')[0];
+    const links = buildProfessionalLinks(item);
+    const message = `Oi, ${firstName}! ✨\n\nAgora quero te apresentar o *app do seu StudioMenu* 📱\n\nÉ por ele que você:\n• vê e compartilha o link do seu catálogo\n• edita fotos, serviços e preços quando quiser, sem depender de ninguém\n• assina o plano pra manter tudo no ar\n\n👉 *Seu acesso ao app:*\n${links.app}\n\n📌 *Dicas:*\n1. Abra pelo celular. Ao abrir, aparecem umas dicas rápidas te mostrando cada parte.\n2. Esse link é só seu e já te deixa logada, então não compartilhe com ninguém.\n3. Dá pra instalar na tela inicial do celular, como um app de verdade.\n\nQualquer dúvida é só me chamar por aqui! 💖`;
     return `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(message)}`;
   };
 
@@ -405,6 +415,18 @@ export default function AdminCatalogosPage() {
                       <MessageCircle className="w-4 h-4" />
                       <span>Aprovar & Entregar</span>
                     </a>
+
+                    {item.edit_token && (
+                      <a
+                        href={buildAppWhatsappUrl(item)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-emerald-500/40 text-emerald-300 text-sm font-bold flex items-center justify-center gap-2 transition-all"
+                      >
+                        <Smartphone className="w-4 h-4" />
+                        <span>Enviar app por WhatsApp</span>
+                      </a>
+                    )}
 
                     <div className="pt-2 border-t border-slate-800/80 flex items-center justify-end">
                       <button

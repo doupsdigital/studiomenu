@@ -13,7 +13,7 @@ interface FirstContactScreenProps {
 const FIRST_CONTACT_TOUR_STEPS: Step[] = [
   { target: '[data-tour="fc-view"]', title: 'Seu catálogo', content: 'Esse é o link que suas clientes veem — pode colocar na bio do Instagram, WhatsApp, onde quiser.' },
   { target: '[data-tour="fc-edit"]', title: 'Editar quando quiser', content: 'Aqui você atualiza fotos, preços e serviços a qualquer hora, sem precisar de ajuda.' },
-  { target: '[data-tour="fc-subscribe"]', title: 'Assine pra manter tudo ativo', content: 'R$39/mês, sem compromisso — cancele quando quiser. É só preencher e pagar pelo Pix.' },
+  { target: '[data-tour="fc-subscribe"]', title: 'Assine pra manter tudo ativo', content: 'R$39/mês, sem compromisso — cancele quando quiser. É só preencher e pagar por Pix ou cartão de crédito.' },
 ];
 
 /** Primeira tela que a profissional vê ao abrir o link do app, antes de
