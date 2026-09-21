@@ -31,7 +31,7 @@ self.addEventListener('push', (event) => {
   const options = {
     body: data.body || '',
     icon: '/icon-192.png',
-    badge: '/icon-192.png',
+    badge: '/badge-96.png', // silhueta branca com fundo transparente (o Android pinta o ícone da barra de status só com o alfa; um PNG opaco vira quadrado)
     data: { url: data.url || '/' },
   };
 
