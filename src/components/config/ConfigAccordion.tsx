@@ -164,7 +164,11 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
 
   return (
     <div className="flex flex-col gap-4">
-      <ProductTour tourId="config" slug={slug} steps={tourSteps} enabled initialStepId={tourStartHash} />
+      {/* `enabled={pushReady}`: até o navegador responder sobre notificações, a lista
+       *  de passos ainda não é a definitiva (o passo "Notificações" entra/sai
+       *  depois) — começar antes disso usava uma chave de "já vi" diferente da
+       *  que fica gravada no fim, e o tour reaparecia a cada visita (bug). */}
+      <ProductTour tourId="config" slug={slug} steps={tourSteps} enabled={pushReady} initialStepId={tourStartHash} />
       <div id="horarios">
         <SectionCard
           icon={Clock}

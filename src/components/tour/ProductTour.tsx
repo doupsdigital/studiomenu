@@ -30,6 +30,23 @@ interface ProductTourProps {
 const storageKey = (tourId: string, slug: string, steps: Step[]) =>
   `sm_tour_seen_${tourId}_${slug}_${steps.map((s) => String(s.target)).join('|')}`;
 
+/** "Já vi" vale também quando existe um registro de um tour com MAIS passos
+ *  que incluem todos os atuais (superconjunto). O contrário não vale (um tour
+ *  antigo com menos passos não esconde as seções novas — ver `storageKey`).
+ *  Sem isso, uma mudança que só REMOVE um passo (ex: Config sem o card de
+ *  Notificações depois que ela ativa os avisos) reabria o tour inteiro. */
+const isTourSeen = (tourId: string, slug: string, steps: Step[]): boolean => {
+  const prefix = `sm_tour_seen_${tourId}_${slug}_`;
+  const current = steps.map((s) => String(s.target));
+  for (let i = 0; i < window.localStorage.length; i += 1) {
+    const k = window.localStorage.key(i);
+    if (!k || !k.startsWith(prefix)) continue;
+    const seenTargets = new Set(k.slice(prefix.length).split('|'));
+    if (current.every((t) => seenTargets.has(t))) return true;
+  }
+  return false;
+};
+
 /** Tour guiado (balões apontando elementos da tela, um por vez) — reaproveitável
  *  pelas telas do app (primeiro contato/Início/Agenda/Config, Fase 20).
  *  Dispara sozinho na primeira visita e nunca mais, seja completado ou
@@ -52,8 +69,7 @@ export const ProductTour: React.FC<ProductTourProps> = ({ tourId, slug, steps, e
   useEffect(() => {
     if (!enabled || steps.length === 0) return;
     try {
-      const seen = window.localStorage.getItem(key);
-      if (!seen) setRun(true);
+      if (!isTourSeen(tourId, slug, steps)) setRun(true);
     } catch {
       setRun(true);
     }
