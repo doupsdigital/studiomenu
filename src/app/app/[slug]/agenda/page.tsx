@@ -142,7 +142,19 @@ export default async function AgendaPage({ params, searchParams }: AgendaPagePro
   // — só o mês/ano, maior, no lugar do título. Visão Dia inalterada (dia da
   // semana + data completa embaixo).
   const headerTitle = view === 'mes' ? formatMonthLabel(selectedDate) : formatWeekdayLabel(selectedDate);
-  const headerSubtitle = view === 'mes' ? null : formatShortDateLabel(selectedDate);
+  // Hoje/Amanhã/Ontem no subtítulo — o botão "Hoje" não diz em que dia ela
+  // está (só leva pra hoje), então o título precisa dizer. Data curta (sem
+  // ano) nesses casos pra caber ao lado dos botões de navegação.
+  const relativeTag = selectedDate === todayStr ? 'Hoje' : selectedDate === shiftDate(todayStr, 1) ? 'Amanhã' : selectedDate === shiftDate(todayStr, -1) ? 'Ontem' : null;
+  const headerSubtitle =
+    view === 'mes'
+      ? null
+      : relativeTag
+        ? `${relativeTag} · ${new Date(`${selectedDate}T12:00:00Z`).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', timeZone: 'America/Sao_Paulo' })}`
+        : formatShortDateLabel(selectedDate);
+  // Já está em hoje (ou no mês atual, na visão Mês): o botão "Hoje" não tem
+  // pra onde levar — fica esmaecido; em qualquer outro dia ganha destaque.
+  const isAtToday = view === 'mes' ? selectedDate === firstOfMonth(todayStr) : selectedDate === todayStr;
 
   return (
     <>
@@ -165,7 +177,10 @@ export default async function AgendaPage({ params, searchParams }: AgendaPagePro
               </Link>
               <Link
                 href={todayHref}
-                className="px-3 py-1.5 text-sm font-semibold hover:bg-white/20 rounded-md transition-colors text-white/80 hover:text-white"
+                aria-current={isAtToday ? 'date' : undefined}
+                className={`px-3 py-1.5 text-sm font-semibold rounded-md transition-colors ${
+                  isAtToday ? 'text-white/50' : 'bg-white text-rose-700 shadow-sm hover:bg-rose-50'
+                }`}
               >
                 Hoje
               </Link>
