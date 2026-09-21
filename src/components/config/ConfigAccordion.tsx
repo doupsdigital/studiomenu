@@ -60,12 +60,12 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
     notificacoes: false,
   });
 
-  // O card de "Notificações" some da lista quando esse dispositivo já tem
-  // notificação ativada (ou quando o navegador não suporta) — nesses casos
-  // não sobra nenhuma ação útil pra oferecer aqui; o sino no cabeçalho
-  // continua disponível pra reativar/testar de novo quando precisar.
+  // O card de "Notificações" fica sempre na lista (mostra "Notificações
+  // ativas!" quando já está ligado, com link pra testar de novo) — só some
+  // quando o navegador não suporta push. Antes sumia também quando já
+  // ativado; mudou depois que a confirmação "ativas" ficou clara.
   const { permission: pushPermission, ready: pushReady } = usePushNotifications(slug);
-  const showNotifications = pushReady && pushPermission !== 'granted' && pushPermission !== 'unsupported';
+  const showNotifications = pushReady && pushPermission !== 'unsupported';
 
   const [tourStartHash, setTourStartHash] = useState<SectionKey | undefined>(undefined);
 
