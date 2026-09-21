@@ -346,13 +346,26 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
                     role="radio"
                     aria-checked={selected}
                     onClick={() => setMethod(key)}
-                    className={`flex flex-col items-center gap-0.5 rounded-xl border-2 px-3 py-3 transition-colors ${
-                      selected ? 'border-rose-600 bg-rose-50 text-rose-700' : 'border-linen bg-surface text-ink-soft'
+                    className={`relative flex flex-col items-center gap-0.5 rounded-xl border-2 px-3 py-3 transition-colors ${
+                      selected
+                        ? 'border-rose-600 bg-rose-600 text-white shadow-md shadow-rose-600/30'
+                        : 'border-linen bg-surface text-ink-faint'
                     }`}
                   >
+                    {selected && (
+                      <span className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-white text-rose-600 flex items-center justify-center">
+                        <Check className="w-3.5 h-3.5" strokeWidth={3} />
+                      </span>
+                    )}
                     <Icon className="w-5 h-5" />
                     <span className="text-sm font-bold">{label}</span>
-                    <span className={`text-[11px] ${key === 'pix' ? 'font-bold text-emerald-600' : 'text-ink-faint'}`}>{hint}</span>
+                    <span
+                      className={`text-[11px] ${
+                        selected ? 'font-semibold text-white/90' : key === 'pix' ? 'font-bold text-emerald-600' : 'text-ink-faint'
+                      }`}
+                    >
+                      {hint}
+                    </span>
                   </button>
                 );
               })}
