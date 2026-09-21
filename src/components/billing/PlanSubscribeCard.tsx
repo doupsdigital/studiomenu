@@ -232,7 +232,7 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
           <div className="w-14 h-14 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center mx-auto mb-3">
             <copy.icon className="w-7 h-7" />
           </div>
-          <p className="text-[11px] font-bold tracking-widest uppercase text-white/70 mb-1">Parabéns</p>
+          <p className="text-[13px] font-bold tracking-widest uppercase text-white/70 mb-1">Parabéns</p>
           <h3 className="font-serif-pro font-bold text-2xl mb-3">{successCopy.headline}</h3>
           <ul className="text-left mx-auto max-w-[290px] flex flex-col gap-2.5 mb-6">
             {successCopy.benefits.map((benefit) => (
@@ -243,7 +243,7 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
             ))}
           </ul>
           {isUpgrade && (
-            <p className="text-[13px] text-white/80 leading-snug mb-5">
+            <p className="text-sm text-white/80 leading-snug mb-5">
               A partir da próxima mensalidade
               {upgradeNextDue ? ` (${formatShortDate(upgradeNextDue)})` : ''}, o valor passa a ser {pricing.label}.
             </p>
@@ -254,7 +254,7 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
               router.push(`/app/${slug}/inicio`);
               router.refresh();
             }}
-            className="w-full py-3 rounded-xl bg-white text-rose-700 text-sm font-bold shadow-sm hover:bg-rose-50 transition-colors"
+            className="w-full py-3 rounded-xl bg-white text-rose-700 text-[15px] font-bold shadow-sm hover:bg-rose-50 transition-colors"
           >
             Ir para o Início
           </button>
@@ -268,19 +268,19 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
       {qr ? (
         <div className="flex flex-col items-center gap-3">
           <img src={`data:image/png;base64,${qr.image}`} alt="QR Code Pix" className="w-48 h-48 rounded-xl bg-white p-2 shadow-sm" />
-          <p className="text-[13px] text-ink-faint text-center">Escaneie o QR code ou copie o código Pix abaixo.</p>
+          <p className="text-sm text-ink-faint text-center">Escaneie o QR code ou copie o código Pix abaixo.</p>
           <button
             type="button"
             onClick={handleCopyPix}
-            className={`w-full h-11 rounded-xl text-sm font-bold transition-colors ${
+            className={`w-full h-11 rounded-xl text-[15px] font-bold transition-colors ${
               copied ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-600 text-white hover:bg-rose-700'
             }`}
           >
             {copied ? 'Copiado ✓' : 'Copiar código Pix'}
           </button>
-          {polling && <p className="text-[13px] text-ink-faint">Aguardando confirmação do pagamento...</p>}
+          {polling && <p className="text-sm text-ink-faint">Aguardando confirmação do pagamento...</p>}
           {showMethodChoice && (
-            <button type="button" onClick={handleChangeMethod} className="text-[13px] font-semibold text-rose-700 underline underline-offset-2">
+            <button type="button" onClick={handleChangeMethod} className="text-sm font-semibold text-rose-700 underline underline-offset-2">
               Trocar forma de pagamento
             </button>
           )}
@@ -291,29 +291,29 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
             <CreditCard className="w-6 h-6" />
           </div>
           <p className="font-serif-pro font-bold text-lg text-ink">Finalize o pagamento</p>
-          <p className="text-[13px] text-ink-soft">
+          <p className="text-sm text-ink-soft">
             Você vai digitar o cartão numa página segura do Asaas. Quando terminar, volte aqui — a confirmação aparece sozinha.
           </p>
           <a
             href={card.invoiceUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full h-12 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold transition-colors flex items-center justify-center gap-2"
+            className="w-full h-12 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-[15px] font-bold transition-colors flex items-center justify-center gap-2"
           >
             <ExternalLink className="w-4 h-4" />
             Abrir pagamento seguro
           </a>
-          {polling && <p className="text-[13px] text-ink-faint">Aguardando confirmação do pagamento...</p>}
-          {error && <p className="text-[13px] text-rose-600">{error}</p>}
+          {polling && <p className="text-sm text-ink-faint">Aguardando confirmação do pagamento...</p>}
+          {error && <p className="text-sm text-rose-600">{error}</p>}
           <button
             type="button"
             onClick={handleCheckNow}
             disabled={checking}
-            className="w-full h-11 rounded-xl bg-surface border border-rose-200 text-rose-700 text-sm font-bold disabled:opacity-50 transition-colors"
+            className="w-full h-11 rounded-xl bg-surface border border-rose-200 text-rose-700 text-[15px] font-bold disabled:opacity-50 transition-colors"
           >
             {checking ? 'Verificando...' : 'Já paguei, verificar agora'}
           </button>
-          <button type="button" onClick={handleChangeMethod} className="text-[13px] font-semibold text-rose-700 underline underline-offset-2">
+          <button type="button" onClick={handleChangeMethod} className="text-sm font-semibold text-rose-700 underline underline-offset-2">
             Trocar forma de pagamento
           </button>
         </div>
@@ -324,7 +324,7 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
               <copy.icon className="w-6 h-6" />
             </div>
             <p className="font-serif-pro font-bold text-lg text-ink">{copy.headline}</p>
-            <p className="text-sm text-ink-soft mt-0.5">{pricing.label} · {copy.subheadline}</p>
+            <p className="text-[15px] text-ink-soft mt-0.5">{pricing.label} · {copy.subheadline}</p>
           </div>
           <input
             type="text"
@@ -345,7 +345,7 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
             className="h-12 rounded-xl bg-surface border border-linen px-3 text-base text-ink placeholder:text-ink-faint"
           />
           {isUpgrade && (
-            <p className="text-[13px] text-ink-soft text-center leading-snug">
+            <p className="text-sm text-ink-soft text-center leading-snug">
               Você começa a usar agora, sem pagar nada a mais hoje. A partir da próxima mensalidade, o valor passa a ser {pricing.label}.
             </p>
           )}
@@ -377,9 +377,9 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
                       </span>
                     )}
                     <Icon className="w-5 h-5" />
-                    <span className="text-sm font-bold">{label}</span>
+                    <span className="text-[15px] font-bold">{label}</span>
                     <span
-                      className={`text-[11px] ${
+                      className={`text-[13px] ${
                         selected ? 'font-semibold text-white/90' : key === 'pix' ? 'font-bold text-emerald-600' : 'text-ink-faint'
                       }`}
                     >
@@ -390,11 +390,11 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
               })}
             </div>
           )}
-          {error && <p className="text-[13px] text-rose-600">{error}</p>}
+          {error && <p className="text-sm text-rose-600">{error}</p>}
           <button
             type="submit"
             disabled={loading}
-            className="h-11 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold disabled:opacity-50 transition-colors"
+            className="h-11 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-[15px] font-bold disabled:opacity-50 transition-colors"
           >
             {loading
               ? showMethodChoice && method === 'card'

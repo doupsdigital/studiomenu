@@ -21,7 +21,7 @@ export const GradientHeader: React.FC<GradientHeaderProps> = ({ children, classN
         <div className="absolute top-4 right-5 text-white/50 pointer-events-none select-none leading-none text-lg font-light">
           ✦
           <br />
-          <span className="text-sm">✦</span>
+          <span className="text-[15px]">✦</span>
         </div>
       )}
       <div className="relative z-10">{children}</div>

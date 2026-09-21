@@ -159,8 +159,8 @@ export const DayTimeline: React.FC<DayTimelineProps> = ({
         if (item.kind === 'note') {
           return (
             <div key={`note-${index}`} className="rounded-[14px] bg-surface border border-linen px-4 py-5 text-center">
-              <p className="text-[14.5px] font-semibold text-ink">{item.title}</p>
-              <p className="text-[12.5px] text-ink-soft mt-1">{item.hint}</p>
+              <p className="text-base font-semibold text-ink">{item.title}</p>
+              <p className="text-sm text-ink-soft mt-1">{item.hint}</p>
             </div>
           );
         }
@@ -168,7 +168,7 @@ export const DayTimeline: React.FC<DayTimelineProps> = ({
         const bold = item.kind === 'appt' && item.appt.id === highlightId;
         const label = (
           <div
-            className={`w-[46px] shrink-0 pt-0.5 text-xs tabular-nums ${bold ? 'font-semibold text-ink' : 'text-ink-faint'}`}
+            className={`w-[52px] shrink-0 pt-0.5 text-sm tabular-nums ${bold ? 'font-semibold text-ink' : 'text-ink-faint'}`}
           >
             {fmt(item.start)}
           </div>
@@ -183,7 +183,7 @@ export const DayTimeline: React.FC<DayTimelineProps> = ({
                 type="button"
                 onClick={() => onSlotClick(fmt(item.start))}
                 style={{ height: length >= 90 ? 72 : 48 }}
-                className="flex-1 rounded-xl border-[1.5px] border-dashed border-linen flex items-center justify-center text-[12.5px] text-ink-faint hover:bg-rose-50/60 transition-colors"
+                className="flex-1 rounded-xl border-[1.5px] border-dashed border-linen flex items-center justify-center text-sm text-ink-faint hover:bg-rose-50/60 transition-colors"
               >
                 + livre{length >= 60 ? ` · ${fmtDuration(length)}` : ''}
               </button>
@@ -196,7 +196,7 @@ export const DayTimeline: React.FC<DayTimelineProps> = ({
             <div key={`block-${index}`} className="flex gap-2.5">
               {label}
               <div
-                className="flex-1 min-h-[52px] rounded-xl flex items-center px-3.5 text-[12.5px] text-ink-soft"
+                className="flex-1 min-h-[52px] rounded-xl flex items-center px-3.5 text-sm text-ink-soft"
                 style={{ background: 'repeating-linear-gradient(135deg, rgba(44,24,16,0.07) 0 7px, rgba(44,24,16,0.03) 7px 14px)' }}
               >
                 {item.label}
@@ -217,11 +217,11 @@ export const DayTimeline: React.FC<DayTimelineProps> = ({
                 tabIndex={0}
                 onClick={() => onAppointmentClick(appt)}
                 onKeyDown={(e) => e.key === 'Enter' && onAppointmentClick(appt)}
-                className="flex-1 min-h-[48px] rounded-[14px] bg-surface border border-[#F3E6CE] border-l-4 border-l-[#D79A2B] px-3.5 py-2 flex items-center justify-between gap-3 cursor-pointer"
+                className="flex-1 min-h-[56px] rounded-[14px] bg-surface border border-[#F3E6CE] border-l-4 border-l-[#D79A2B] px-3.5 py-2 flex items-center justify-between gap-3 cursor-pointer"
               >
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-ink truncate">{appt.client_name}</p>
-                  <p className="text-[11.5px] text-[#8A6410] truncate">a confirmar · {appt.service_title}</p>
+                  <p className="text-base font-semibold text-ink truncate">{appt.client_name}</p>
+                  <p className="text-sm text-[#8A6410] truncate">a confirmar · {appt.service_title}</p>
                 </div>
                 <button
                   type="button"
@@ -229,7 +229,7 @@ export const DayTimeline: React.FC<DayTimelineProps> = ({
                     e.stopPropagation();
                     onApprove(appt);
                   }}
-                  className="shrink-0 text-[12.5px] font-semibold text-rose-600 py-1 pl-2"
+                  className="shrink-0 text-sm font-bold text-rose-600 py-1 pl-2"
                 >
                   Aceitar
                 </button>
@@ -252,9 +252,9 @@ export const DayTimeline: React.FC<DayTimelineProps> = ({
                 appt.status === 'no_show' ? 'opacity-70' : ''
               }`}
             >
-              <p className="text-[14.5px] font-semibold text-ink">{appt.client_name}</p>
-              <p className="text-[12.5px] text-ink-soft mt-0.5">{appt.service_title}</p>
-              <p className="text-xs text-ink-faint mt-2">
+              <p className="text-[17px] font-semibold text-ink">{appt.client_name}</p>
+              <p className="text-[15px] text-ink-soft mt-0.5">{appt.service_title}</p>
+              <p className="text-sm text-ink-faint mt-2">
                 {meta}
                 {(appt.status === 'completed' || appt.status === 'no_show') && ` · ${STATUS_LABEL[appt.status]}`}
               </p>

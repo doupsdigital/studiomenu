@@ -35,7 +35,7 @@ export default async function ProfessionalAppLayout({ children, params }: AppLay
       <main className="pro-app-shell min-h-screen flex items-center justify-center p-6 bg-cream text-ink text-center">
         <div className="max-w-sm w-full p-8 rounded-3xl bg-surface border border-linen shadow-sm">
           <h1 className="font-serif-pro text-2xl font-bold mb-2">Link inválido ou expirado</h1>
-          <p className="text-xs text-ink-soft leading-relaxed">
+          <p className="text-[13px] text-ink-soft leading-relaxed">
             Peça um novo link de acesso pra quem te enviou o catálogo.
           </p>
         </div>

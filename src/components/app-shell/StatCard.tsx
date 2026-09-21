@@ -35,7 +35,7 @@ export const StatCard: React.FC<StatCardProps> = ({ icon: Icon, label, value, to
     <>
       <Icon className={`absolute -top-3 -right-3 w-16 h-16 ${t.icon} rotate-12 pointer-events-none select-none`} strokeWidth={1.25} />
       <div className="relative z-10 min-w-0">
-        <p className={`text-[11px] font-bold uppercase tracking-wider leading-tight ${t.label}`}>{label}</p>
+        <p className={`text-[13px] font-bold uppercase tracking-wider leading-tight ${t.label}`}>{label}</p>
         <p className={`font-serif-pro font-semibold text-2xl mt-1.5 ${t.value}`}>{value}</p>
       </div>
     </>

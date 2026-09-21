@@ -82,7 +82,7 @@ export const PushActivationFlow: React.FC<PushActivationFlowProps> = ({
 
   if (permission === 'denied') {
     return (
-      <p className={`text-xs leading-relaxed ${textClassName}`}>
+      <p className={`text-[13px] leading-relaxed ${textClassName}`}>
         As notificações estão bloqueadas pro StudioMenu nesse navegador. Pra reativar: menu do navegador → Configurações do site → Notificações → mude pra "Permitir".
       </p>
     );
@@ -91,7 +91,7 @@ export const PushActivationFlow: React.FC<PushActivationFlowProps> = ({
   if (phase === 'confirming') {
     return (
       <div>
-        <p className={`text-xs mb-2 ${textClassName}`}>{sendingTest ? 'Enviando notificação de teste...' : 'Enviamos uma notificação de teste — você recebeu?'}</p>
+        <p className={`text-[13px] mb-2 ${textClassName}`}>{sendingTest ? 'Enviando notificação de teste...' : 'Enviamos uma notificação de teste — você recebeu?'}</p>
         {!sendingTest && (
           <div className="flex gap-2">
             <button type="button" onClick={confirm} className={primaryButtonClassName}>
@@ -109,7 +109,7 @@ export const PushActivationFlow: React.FC<PushActivationFlowProps> = ({
   if (phase === 'troubleshooting') {
     return (
       <div className="flex flex-col gap-2">
-        <div className={`flex items-start gap-2 text-xs leading-relaxed ${textClassName}`}>
+        <div className={`flex items-start gap-2 text-[13px] leading-relaxed ${textClassName}`}>
           <HelpCircle className="w-4 h-4 shrink-0 mt-0.5" />
           <p>
             É comum o celular ter uma permissão separada pro navegador em si. No Android: Configurações → Apps →
@@ -127,7 +127,7 @@ export const PushActivationFlow: React.FC<PushActivationFlowProps> = ({
   if (phase === 'confirmed') {
     return (
       <div className="flex flex-col gap-2">
-        <div className={`flex items-center gap-2 text-xs ${textClassName}`}>
+        <div className={`flex items-center gap-2 text-[13px] ${textClassName}`}>
           <CheckCircle2 className="w-4 h-4 shrink-0" />
           <span>Notificações ativas nesse dispositivo.</span>
         </div>

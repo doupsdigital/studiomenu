@@ -154,7 +154,7 @@ export default async function AgendaPage({ params, searchParams }: AgendaPagePro
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0">
               <h1 className="font-serif-pro font-bold text-2xl leading-tight">{headerTitle}</h1>
-              {headerSubtitle && <p className="text-sm text-white/80 mt-0.5 truncate">{headerSubtitle}</p>}
+              {headerSubtitle && <p className="text-[15px] text-white/80 mt-0.5 truncate">{headerSubtitle}</p>}
             </div>
             <div data-tour="agenda-date-nav" className="flex items-center bg-white/15 backdrop-blur-sm rounded-lg p-0.5 border border-white/20 shrink-0">
               <Link
@@ -165,7 +165,7 @@ export default async function AgendaPage({ params, searchParams }: AgendaPagePro
               </Link>
               <Link
                 href={todayHref}
-                className="px-3 py-1.5 text-[13px] font-semibold hover:bg-white/20 rounded-md transition-colors text-white/80 hover:text-white"
+                className="px-3 py-1.5 text-sm font-semibold hover:bg-white/20 rounded-md transition-colors text-white/80 hover:text-white"
               >
                 Hoje
               </Link>

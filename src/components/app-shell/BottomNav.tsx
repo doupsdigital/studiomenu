@@ -34,7 +34,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ slug }) => {
       <Link
         key={key}
         href={href}
-        className={`flex-1 flex flex-col items-center justify-center gap-1.5 text-xs font-semibold transition-colors ${
+        className={`flex-1 flex flex-col items-center justify-center gap-1.5 text-[13px] font-semibold transition-colors ${
           isActive ? 'text-rose-600' : 'text-ink-faint hover:text-ink-soft'
         }`}
       >

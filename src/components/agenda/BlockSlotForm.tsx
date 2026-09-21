@@ -86,10 +86,10 @@ export const BlockSlotForm: React.FC<BlockSlotFormProps> = ({ slug, defaultDate,
           type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
-          className="h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink"
+          className="h-11 rounded-xl bg-surface border border-linen px-3 text-[15px] text-ink"
         />
 
-        <label className="flex items-center gap-2 text-sm text-ink-soft">
+        <label className="flex items-center gap-2 text-[15px] text-ink-soft">
           <input type="checkbox" checked={allDay} onChange={(e) => setAllDay(e.target.checked)} className="w-4 h-4 accent-rose-600" />
           Bloquear o dia inteiro
         </label>
@@ -100,13 +100,13 @@ export const BlockSlotForm: React.FC<BlockSlotFormProps> = ({ slug, defaultDate,
               type="time"
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
-              className="flex-1 h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink"
+              className="flex-1 h-11 rounded-xl bg-surface border border-linen px-3 text-[15px] text-ink"
             />
             <input
               type="time"
               value={endTime}
               onChange={(e) => setEndTime(e.target.value)}
-              className="flex-1 h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink"
+              className="flex-1 h-11 rounded-xl bg-surface border border-linen px-3 text-[15px] text-ink"
             />
           </div>
         )}
@@ -119,16 +119,16 @@ export const BlockSlotForm: React.FC<BlockSlotFormProps> = ({ slug, defaultDate,
           className="h-12 rounded-xl bg-surface border border-linen px-3 text-base text-ink placeholder:text-ink-faint"
         />
 
-        {error && <p className="text-[13px] text-rose-600">{error}</p>}
+        {error && <p className="text-sm text-rose-600">{error}</p>}
 
         <div className="flex gap-2 mt-1">
-          <button type="button" onClick={onClose} className="flex-1 h-11 rounded-xl bg-linen text-ink-soft text-sm font-bold">
+          <button type="button" onClick={onClose} className="flex-1 h-11 rounded-xl bg-linen text-ink-soft text-[15px] font-bold">
             Cancelar
           </button>
           <button
             type="submit"
             disabled={submitting || (!allDay && (!startTime || !endTime))}
-            className="flex-1 h-11 rounded-xl bg-rose-600 text-white text-sm font-bold disabled:opacity-50"
+            className="flex-1 h-11 rounded-xl bg-rose-600 text-white text-[15px] font-bold disabled:opacity-50"
           >
             {submitting ? 'Bloqueando...' : 'Bloquear'}
           </button>

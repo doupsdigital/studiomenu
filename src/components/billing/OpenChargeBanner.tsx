@@ -149,7 +149,7 @@ export const OpenChargeBanner: React.FC<OpenChargeBannerProps> = ({ slug }) => {
     return (
       <div className="rounded-2xl bg-emerald-50 border border-emerald-200 p-4 flex items-center gap-3 text-emerald-800">
         <CheckCircle2 className="w-6 h-6 shrink-0" />
-        <p className="text-sm font-bold">Pagamento confirmado. Obrigada!</p>
+        <p className="text-[15px] font-bold">Pagamento confirmado. Obrigada!</p>
       </div>
     );
   }
@@ -176,7 +176,7 @@ export const OpenChargeBanner: React.FC<OpenChargeBannerProps> = ({ slug }) => {
         <Icon className={`w-6 h-6 shrink-0 mt-0.5 ${charge.overdue ? 'text-amber-600' : 'text-rose-600'}`} />
         <div className="min-w-0 flex-1">
           <p className="font-serif-pro font-bold text-lg leading-tight">{title}</p>
-          <p className="text-sm mt-0.5 opacity-80">
+          <p className="text-[15px] mt-0.5 opacity-80">
             {charge.billingType === 'card'
               ? `${formatMoney(charge.value)} — abra a cobrança pra pagar com o cartão.`
               : `${formatMoney(charge.value)} — pague o Pix pra manter seu plano em dia.`}
@@ -190,13 +190,13 @@ export const OpenChargeBanner: React.FC<OpenChargeBannerProps> = ({ slug }) => {
           <button
             type="button"
             onClick={handleCopy}
-            className={`w-full h-11 rounded-xl text-sm font-bold transition-colors ${
+            className={`w-full h-11 rounded-xl text-[15px] font-bold transition-colors ${
               copied ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-600 text-white hover:bg-rose-700'
             }`}
           >
             {copied ? 'Copiado ✓' : 'Copiar código Pix'}
           </button>
-          {polling && <p className="text-[13px] opacity-70">Aguardando confirmação do pagamento...</p>}
+          {polling && <p className="text-sm opacity-70">Aguardando confirmação do pagamento...</p>}
         </div>
       ) : charge.billingType === 'card' ? (
         charge.invoiceUrl && (
@@ -204,7 +204,7 @@ export const OpenChargeBanner: React.FC<OpenChargeBannerProps> = ({ slug }) => {
             href={charge.invoiceUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-4 w-full h-11 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold transition-colors flex items-center justify-center gap-2"
+            className="mt-4 w-full h-11 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-[15px] font-bold transition-colors flex items-center justify-center gap-2"
           >
             <ExternalLink className="w-4 h-4" />
             Abrir cobrança
@@ -212,12 +212,12 @@ export const OpenChargeBanner: React.FC<OpenChargeBannerProps> = ({ slug }) => {
         )
       ) : (
         <>
-          {error && <p className="text-[13px] text-rose-600 mt-3">{error}</p>}
+          {error && <p className="text-sm text-rose-600 mt-3">{error}</p>}
           <button
             type="button"
             onClick={handlePay}
             disabled={loadingQr}
-            className="mt-4 w-full h-11 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold disabled:opacity-50 transition-colors"
+            className="mt-4 w-full h-11 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-[15px] font-bold disabled:opacity-50 transition-colors"
           >
             {loadingQr ? 'Gerando Pix...' : 'Pagar agora com Pix'}
           </button>

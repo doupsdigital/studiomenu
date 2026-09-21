@@ -71,7 +71,7 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
 
   return (
     <div className="bg-surface border border-linen rounded-2xl overflow-hidden shadow-sm">
-      <div className="grid grid-cols-7 border-b border-linen bg-rose-50/40 text-center text-[11px] font-bold text-ink-soft py-2.5">
+      <div className="grid grid-cols-7 border-b border-linen bg-rose-50/40 text-center text-[13px] font-bold text-ink-soft py-2.5">
         {WEEKDAY_LABELS.map((d) => (
           <span key={d}>{d}</span>
         ))}
@@ -97,7 +97,7 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
             >
               <div className="flex items-center justify-between">
                 <span
-                  className={`w-5 h-5 flex items-center justify-center rounded-full text-[11px] font-bold shrink-0 ${
+                  className={`w-5 h-5 flex items-center justify-center rounded-full text-[13px] font-bold shrink-0 ${
                     isToday ? 'bg-rose-600 text-white' : isCurrentMonth ? 'text-ink' : 'text-ink-faint'
                   }`}
                 >
@@ -117,14 +117,14 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
                   return (
                     <span
                       key={appt.id}
-                      className={`px-1 py-[1px] rounded text-[9px] leading-tight font-semibold truncate border ${style.border} ${style.bg} ${style.text}`}
+                      className={`px-1 py-[1px] rounded text-xs leading-tight font-semibold truncate border ${style.border} ${style.bg} ${style.text}`}
                     >
                       {time} {appt.client_name.split(' ')[0]}
                     </span>
                   );
                 })}
                 {dayAppts.length > VISIBLE_CHIPS && (
-                  <span className="text-[9px] text-rose-600 font-bold leading-tight">+{dayAppts.length - VISIBLE_CHIPS} mais</span>
+                  <span className="text-xs text-rose-600 font-bold leading-tight">+{dayAppts.length - VISIBLE_CHIPS} mais</span>
                 )}
               </div>
             </button>

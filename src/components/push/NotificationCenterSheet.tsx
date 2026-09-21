@@ -35,11 +35,11 @@ export const NotificationCenterSheet: React.FC<NotificationCenterSheetProps> = (
 
         <div className="rounded-2xl bg-gradient-to-br from-rose-50 to-cream border border-rose-200 p-5">
           <p className="font-serif-pro font-bold text-base text-ink mb-1">Novo agendamento</p>
-          <p className="text-xs text-ink-soft mb-3">Receba um aviso na hora que uma cliente marcar um horário novo.</p>
+          <p className="text-[13px] text-ink-soft mb-3">Receba um aviso na hora que uma cliente marcar um horário novo.</p>
           <PushActivationFlow
             slug={slug}
-            primaryButtonClassName="h-11 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold disabled:opacity-50 transition-colors w-full"
-            secondaryButtonClassName="h-11 px-4 rounded-xl bg-surface border border-linen text-ink text-sm font-bold disabled:opacity-50 transition-colors w-full"
+            primaryButtonClassName="h-11 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-[15px] font-bold disabled:opacity-50 transition-colors w-full"
+            secondaryButtonClassName="h-11 px-4 rounded-xl bg-surface border border-linen text-ink text-[15px] font-bold disabled:opacity-50 transition-colors w-full"
             onConfirmed={onClose}
           />
         </div>

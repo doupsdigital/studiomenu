@@ -33,15 +33,15 @@ export const ApproveModal: React.FC<ApproveModalProps> = ({ appointment, busy, o
         <div className="p-6 space-y-4 overflow-y-auto">
           <div className="bg-rose-50 border border-rose-100 rounded-xl px-4 py-4 space-y-3">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-rose-400">Cliente</p>
-              <p className="font-semibold text-sm text-rose-900 mt-0.5">
+              <p className="text-xs font-bold uppercase tracking-wider text-rose-400">Cliente</p>
+              <p className="font-semibold text-[15px] text-rose-900 mt-0.5">
                 {appointment.client_name} — {dateStr} às {timeStr}
               </p>
             </div>
             <div className="border-t border-rose-100 pt-3">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-rose-400">Serviço(s)</p>
-              <p className="font-semibold text-sm text-rose-900 mt-0.5">{appointment.service_title}</p>
-              {appointment.client_notes && <p className="text-rose-700 italic text-xs mt-1">&quot;{appointment.client_notes}&quot;</p>}
+              <p className="text-xs font-bold uppercase tracking-wider text-rose-400">Serviço(s)</p>
+              <p className="font-semibold text-[15px] text-rose-900 mt-0.5">{appointment.service_title}</p>
+              {appointment.client_notes && <p className="text-rose-700 italic text-[13px] mt-1">&quot;{appointment.client_notes}&quot;</p>}
             </div>
           </div>
 
@@ -50,7 +50,7 @@ export const ApproveModal: React.FC<ApproveModalProps> = ({ appointment, busy, o
               type="button"
               onClick={() => onConfirm(true)}
               disabled={busy}
-              className="flex items-center justify-center gap-2 w-full py-3 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white rounded-xl text-sm font-semibold transition-colors"
+              className="flex items-center justify-center gap-2 w-full py-3 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white rounded-xl text-[15px] font-semibold transition-colors"
             >
               <CheckCircle className="w-4 h-4" />
               {busy ? 'Confirmando...' : 'Confirmar e enviar pelo WhatsApp'}
@@ -59,7 +59,7 @@ export const ApproveModal: React.FC<ApproveModalProps> = ({ appointment, busy, o
               type="button"
               onClick={() => onConfirm(false)}
               disabled={busy}
-              className="flex items-center justify-center gap-2 w-full py-3 bg-rose-600 hover:bg-rose-800 disabled:opacity-60 text-white rounded-xl text-sm font-semibold transition-colors"
+              className="flex items-center justify-center gap-2 w-full py-3 bg-rose-600 hover:bg-rose-800 disabled:opacity-60 text-white rounded-xl text-[15px] font-semibold transition-colors"
             >
               <CheckCircle className="w-4 h-4" />
               {busy ? 'Confirmando...' : 'Confirmar sem enviar'}
@@ -68,7 +68,7 @@ export const ApproveModal: React.FC<ApproveModalProps> = ({ appointment, busy, o
               type="button"
               onClick={onClose}
               disabled={busy}
-              className="w-full py-3 border border-linen hover:bg-cream text-ink-soft rounded-xl text-sm font-semibold transition-colors"
+              className="w-full py-3 border border-linen hover:bg-cream text-ink-soft rounded-xl text-[15px] font-semibold transition-colors"
             >
               Voltar
             </button>

@@ -121,14 +121,14 @@ export const ProductTour: React.FC<ProductTourProps> = ({ tourId, slug, steps, e
         tooltipTitle: {
           fontFamily: "'Fraunces', Georgia, serif",
           fontWeight: 700,
-          fontSize: 19,
+          fontSize: 20,
           color: '#2C1810',
           marginBottom: 6,
           textAlign: 'left',
         },
         tooltipContent: {
           fontFamily: "'Jost', system-ui, -apple-system, sans-serif",
-          fontSize: 14,
+          fontSize: 15,
           lineHeight: 1.5,
           color: '#6B5D53',
           padding: '0 0 8px',
@@ -143,7 +143,7 @@ export const ProductTour: React.FC<ProductTourProps> = ({ tourId, slug, steps, e
           color: '#ffffff',
           borderRadius: 12,
           fontWeight: 700,
-          fontSize: 14,
+          fontSize: 15,
           padding: '10px 18px',
         },
         buttonBack: {

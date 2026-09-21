@@ -138,7 +138,7 @@ export const AccountSection: React.FC<AccountSectionProps> = ({ slug, hasAccount
       type="button"
       onClick={handleLogout}
       disabled={loggingOut}
-      className="w-full h-11 mt-4 rounded-xl border border-linen text-ink-soft text-sm font-bold disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+      className="w-full h-11 mt-4 rounded-xl border border-linen text-ink-soft text-[15px] font-bold disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
     >
       <LogOut className="w-4 h-4" />
       {loggingOut ? 'Saindo...' : 'Sair desse dispositivo'}
@@ -155,7 +155,7 @@ export const AccountSection: React.FC<AccountSectionProps> = ({ slug, hasAccount
             </div>
             <div className="min-w-0">
               <p className="font-serif-pro font-bold text-lg text-rose-800 leading-tight">Acesso configurado</p>
-              <p className="text-[13px] text-rose-800/70 mt-0.5">
+              <p className="text-sm text-rose-800/70 mt-0.5">
                 {justLinkedGoogle && 'Conta Google vinculada com sucesso. '}
                 Você não depende mais do link de acesso — entre quando quiser em studiomenu.art/entrar, com seu e-mail e senha (ou Google).
               </p>
@@ -175,21 +175,21 @@ export const AccountSection: React.FC<AccountSectionProps> = ({ slug, hasAccount
             <KeyRound className="w-6 h-6" />
           </div>
           <p className="font-serif-pro font-bold text-lg text-ink">Crie um acesso com senha</p>
-          <p className="text-sm text-ink-soft mt-0.5">Pra entrar direto, sem precisar do link mágico toda vez.</p>
+          <p className="text-[15px] text-ink-soft mt-0.5">Pra entrar direto, sem precisar do link mágico toda vez.</p>
         </div>
 
         {needsConfirmation ? (
           <div className="flex flex-col gap-3">
-            <p className="text-[13px] text-ink-soft text-center leading-relaxed">
+            <p className="text-sm text-ink-soft text-center leading-relaxed">
               Enviamos um e-mail de confirmação pra <strong>{email}</strong>. Depois de confirmar, toque no botão
               abaixo.
             </p>
-            {error && <p className="text-[13px] text-rose-600 text-center">{error}</p>}
+            {error && <p className="text-sm text-rose-600 text-center">{error}</p>}
             <button
               type="button"
               onClick={handleAlreadyConfirmed}
               disabled={loading !== null}
-              className="h-11 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold disabled:opacity-50 transition-colors"
+              className="h-11 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-[15px] font-bold disabled:opacity-50 transition-colors"
             >
               {loading === 'password' ? 'Verificando...' : 'Já confirmei'}
             </button>
@@ -213,11 +213,11 @@ export const AccountSection: React.FC<AccountSectionProps> = ({ slug, hasAccount
               onChange={(e) => setPassword(e.target.value)}
               className="h-12 rounded-xl bg-surface border border-linen px-3 text-base text-ink placeholder:text-ink-faint"
             />
-            {error && <p className="text-[13px] text-rose-600">{error}</p>}
+            {error && <p className="text-sm text-rose-600">{error}</p>}
             <button
               type="submit"
               disabled={loading !== null}
-              className="h-11 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold disabled:opacity-50 transition-colors"
+              className="h-11 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-[15px] font-bold disabled:opacity-50 transition-colors"
             >
               {loading === 'password' ? 'Criando...' : 'Criar acesso'}
             </button>
@@ -226,7 +226,7 @@ export const AccountSection: React.FC<AccountSectionProps> = ({ slug, hasAccount
 
         <div className="flex items-center gap-3 my-4">
           <div className="h-px bg-rose-200 flex-1" />
-          <span className="text-[11px] text-ink-faint">ou</span>
+          <span className="text-[13px] text-ink-faint">ou</span>
           <div className="h-px bg-rose-200 flex-1" />
         </div>
 
@@ -234,7 +234,7 @@ export const AccountSection: React.FC<AccountSectionProps> = ({ slug, hasAccount
           type="button"
           onClick={handleGoogleLink}
           disabled={loading !== null}
-          className="w-full h-11 rounded-xl bg-surface border border-linen text-ink text-sm font-bold disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+          className="w-full h-11 rounded-xl bg-surface border border-linen text-ink text-[15px] font-bold disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
         >
           {loading === 'google' ? (
             'Redirecionando...'

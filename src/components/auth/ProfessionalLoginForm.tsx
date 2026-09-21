@@ -80,7 +80,7 @@ export function ProfessionalLoginForm() {
             <LogIn className="w-6 h-6" />
           </div>
           <h1 className="font-serif-pro font-bold text-2xl text-ink">Entrar</h1>
-          <p className="text-xs text-ink-soft mt-1">Acesse o painel do seu catálogo StudioMenu</p>
+          <p className="text-[13px] text-ink-soft mt-1">Acesse o painel do seu catálogo StudioMenu</p>
         </div>
 
         <form onSubmit={handlePasswordLogin} className="flex flex-col gap-3">
@@ -93,7 +93,7 @@ export function ProfessionalLoginForm() {
               placeholder="Seu e-mail"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full h-11 rounded-xl bg-cream border border-linen pl-9 pr-3 text-sm text-ink placeholder:text-ink-faint"
+              className="w-full h-11 rounded-xl bg-cream border border-linen pl-9 pr-3 text-[15px] text-ink placeholder:text-ink-faint"
             />
           </div>
           <div className="relative">
@@ -104,16 +104,16 @@ export function ProfessionalLoginForm() {
               placeholder="Sua senha"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full h-11 rounded-xl bg-cream border border-linen pl-9 pr-3 text-sm text-ink placeholder:text-ink-faint"
+              className="w-full h-11 rounded-xl bg-cream border border-linen pl-9 pr-3 text-[15px] text-ink placeholder:text-ink-faint"
             />
           </div>
 
-          {error && <p className="text-xs text-rose-600">{error}</p>}
+          {error && <p className="text-[13px] text-rose-600">{error}</p>}
 
           <button
             type="submit"
             disabled={loading !== null}
-            className="h-11 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold disabled:opacity-50 transition-colors"
+            className="h-11 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-[15px] font-bold disabled:opacity-50 transition-colors"
           >
             {loading === 'password' ? 'Entrando...' : 'Entrar'}
           </button>
@@ -121,7 +121,7 @@ export function ProfessionalLoginForm() {
 
         <div className="flex items-center gap-3">
           <div className="h-px bg-linen flex-1" />
-          <span className="text-[11px] text-ink-faint">ou</span>
+          <span className="text-[13px] text-ink-faint">ou</span>
           <div className="h-px bg-linen flex-1" />
         </div>
 
@@ -129,7 +129,7 @@ export function ProfessionalLoginForm() {
           type="button"
           onClick={handleGoogleLogin}
           disabled={loading !== null}
-          className="w-full h-11 rounded-xl bg-cream border border-linen text-ink text-sm font-bold disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+          className="w-full h-11 rounded-xl bg-cream border border-linen text-ink text-[15px] font-bold disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
         >
           {loading === 'google' ? (
             'Redirecionando...'
@@ -141,7 +141,7 @@ export function ProfessionalLoginForm() {
           )}
         </button>
 
-        <p className="text-[11px] text-ink-faint text-center leading-relaxed">
+        <p className="text-[13px] text-ink-faint text-center leading-relaxed">
           Ainda não tem login? Peça o link mágico de acesso pra quem te enviou o catálogo e ative o login em
           Configurações.
         </p>

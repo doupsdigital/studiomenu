@@ -55,7 +55,7 @@ export const PageTitleBar: React.FC<PageTitleBarProps> = ({ title, icon, slug })
             <button
               type="button"
               onClick={promptInstall}
-              className="flex items-center gap-1.5 h-8 pl-2.5 pr-3 rounded-full bg-rose-50 text-rose-700 text-xs font-bold"
+              className="flex items-center gap-1.5 h-8 pl-2.5 pr-3 rounded-full bg-rose-50 text-rose-700 text-[13px] font-bold"
             >
               <Download className="w-3.5 h-3.5" />
               Instalar

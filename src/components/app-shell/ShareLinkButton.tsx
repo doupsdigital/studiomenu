@@ -37,7 +37,7 @@ export const ShareLinkButton: React.FC<ShareLinkButtonProps> = ({ slug }) => {
     <button
       type="button"
       onClick={handleCopy}
-      className="inline-flex items-center gap-2 px-6 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-full text-sm font-bold shadow-sm transition-colors"
+      className="inline-flex items-center gap-2 px-6 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-full text-[15px] font-bold shadow-sm transition-colors"
     >
       {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
       {copied ? 'Link copiado!' : 'Copiar Link Público'}

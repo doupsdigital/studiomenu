@@ -37,7 +37,7 @@ export const PlusUpsellCard: React.FC<PlusUpsellCardProps> = ({ variant, slug })
         <div className="w-14 h-14 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center mx-auto mb-3">
           <Crown className="w-7 h-7" />
         </div>
-        <p className="text-[11px] font-bold tracking-widest uppercase text-white/70 mb-1">Desbloqueie</p>
+        <p className="text-[13px] font-bold tracking-widest uppercase text-white/70 mb-1">Desbloqueie</p>
         <h3 className="font-serif-pro font-bold text-2xl mb-3">StudioMenu+</h3>
 
         <ul className="text-left mx-auto max-w-[290px] flex flex-col gap-2.5 mb-5">
@@ -51,7 +51,7 @@ export const PlusUpsellCard: React.FC<PlusUpsellCardProps> = ({ variant, slug })
 
         <Link
           href={`/app/${slug}/config#upgrade-plus`}
-          className="block w-full py-3 rounded-xl bg-white text-rose-700 text-sm font-bold shadow-sm hover:bg-rose-50 transition-colors"
+          className="block w-full py-3 rounded-xl bg-white text-rose-700 text-[15px] font-bold shadow-sm hover:bg-rose-50 transition-colors"
         >
           Assinar por {PLUS_PRICE_LABEL}
         </Link>

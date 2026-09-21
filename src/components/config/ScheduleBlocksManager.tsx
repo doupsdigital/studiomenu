@@ -91,7 +91,7 @@ export const ScheduleBlocksManager: React.FC<ScheduleBlocksManagerProps> = ({ sl
         <button
           type="button"
           onClick={() => setShowForm((v) => !v)}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-rose-100 text-rose-600 text-sm font-bold"
+          className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-rose-100 text-rose-600 text-[15px] font-bold"
         >
           <Plus className="w-4 h-4" /> Novo bloqueio
         </button>
@@ -105,18 +105,18 @@ export const ScheduleBlocksManager: React.FC<ScheduleBlocksManagerProps> = ({ sl
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
               placeholder="Início"
-              className="flex-1 min-w-0 h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink"
+              className="flex-1 min-w-0 h-11 rounded-xl bg-surface border border-linen px-3 text-[15px] text-ink"
             />
             <input
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
               placeholder="Fim"
-              className="flex-1 min-w-0 h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink"
+              className="flex-1 min-w-0 h-11 rounded-xl bg-surface border border-linen px-3 text-[15px] text-ink"
             />
           </div>
 
-          <label className="flex items-center gap-2.5 text-sm text-ink-soft">
+          <label className="flex items-center gap-2.5 text-[15px] text-ink-soft">
             <input type="checkbox" checked={allDay} onChange={(e) => setAllDay(e.target.checked)} className="w-5 h-5 accent-rose-600" />
             Dia(s) inteiro(s)
           </label>
@@ -127,13 +127,13 @@ export const ScheduleBlocksManager: React.FC<ScheduleBlocksManagerProps> = ({ sl
                 type="time"
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
-                className="flex-1 min-w-0 h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink"
+                className="flex-1 min-w-0 h-11 rounded-xl bg-surface border border-linen px-3 text-[15px] text-ink"
               />
               <input
                 type="time"
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
-                className="flex-1 min-w-0 h-11 rounded-xl bg-surface border border-linen px-3 text-sm text-ink"
+                className="flex-1 min-w-0 h-11 rounded-xl bg-surface border border-linen px-3 text-[15px] text-ink"
               />
             </div>
           )}
@@ -147,13 +147,13 @@ export const ScheduleBlocksManager: React.FC<ScheduleBlocksManagerProps> = ({ sl
           />
 
           <div className="flex gap-2">
-            <button type="button" onClick={() => setShowForm(false)} className="flex-1 h-11 rounded-xl bg-linen text-ink-soft text-sm font-bold">
+            <button type="button" onClick={() => setShowForm(false)} className="flex-1 h-11 rounded-xl bg-linen text-ink-soft text-[15px] font-bold">
               Cancelar
             </button>
             <button
               type="submit"
               disabled={submitting || !startDate || !endDate}
-              className="flex-1 h-11 rounded-xl bg-rose-600 text-white text-sm font-bold disabled:opacity-50"
+              className="flex-1 h-11 rounded-xl bg-rose-600 text-white text-[15px] font-bold disabled:opacity-50"
             >
               {submitting ? 'Criando...' : 'Criar bloqueio'}
             </button>
@@ -161,17 +161,17 @@ export const ScheduleBlocksManager: React.FC<ScheduleBlocksManagerProps> = ({ sl
         </form>
       )}
 
-      {error && <p className="text-[13px] text-rose-600 mb-2">{error}</p>}
+      {error && <p className="text-sm text-rose-600 mb-2">{error}</p>}
 
       {blocks.length === 0 ? (
-        <p className="text-sm text-ink-faint py-4 text-center">Nenhum bloqueio cadastrado.</p>
+        <p className="text-[15px] text-ink-faint py-4 text-center">Nenhum bloqueio cadastrado.</p>
       ) : (
         <div className="flex flex-col gap-2">
           {blocks.map((b) => (
             <div key={b.id} className="rounded-2xl bg-cream border border-linen p-3.5 flex items-center justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-sm font-bold text-ink">{formatBlockLabel(b)}</p>
-                {b.reason && <p className="text-[13px] text-ink-faint truncate mt-1">{b.reason}</p>}
+                <p className="text-[15px] font-bold text-ink">{formatBlockLabel(b)}</p>
+                {b.reason && <p className="text-sm text-ink-faint truncate mt-1">{b.reason}</p>}
               </div>
               <button
                 type="button"

@@ -32,14 +32,14 @@ export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order })
     <main className="max-w-md mx-auto px-5 pt-8 pb-6 flex flex-col gap-4">
       <div className="text-center mb-2">
         <h1 className="font-serif-pro font-bold text-2xl text-ink">Olá, {firstName}! ✨</h1>
-        <p className="text-sm text-ink-soft mt-1.5">Seu catálogo digital já está pronto.</p>
+        <p className="text-[15px] text-ink-soft mt-1.5">Seu catálogo digital já está pronto.</p>
       </div>
 
       <ViewCatalogCard slug={order.slug} dataTour="fc-view" />
       <EditCatalogCard slug={order.slug} dataTour="fc-edit" />
 
       <div className="mt-2" data-tour="fc-subscribe">
-        <p className="text-sm text-ink-soft text-center mb-3">
+        <p className="text-[15px] text-ink-soft text-center mb-3">
           Pra manter seu catálogo no ar e continuar editando quando quiser, assine o plano abaixo — sem compromisso, cancele quando quiser.
         </p>
         <PlanSubscribeCard slug={order.slug} plan="basico" billingEmail={order.billing_email} billingCpfCnpj={order.billing_cpf_cnpj} />

@@ -72,7 +72,7 @@ export const BusinessHoursEditor: React.FC<BusinessHoursEditorProps> = ({ slug, 
     <div className="flex flex-col gap-2.5">
       {days.map((day, weekday) => (
         <div key={weekday} className="rounded-xl border border-linen bg-cream/50 p-3">
-          <label className="flex items-center gap-2.5 text-sm font-semibold text-ink">
+          <label className="flex items-center gap-2.5 text-[15px] font-semibold text-ink">
             <input
               type="checkbox"
               checked={day.open}
@@ -87,29 +87,29 @@ export const BusinessHoursEditor: React.FC<BusinessHoursEditorProps> = ({ slug, 
                 type="time"
                 value={day.start_time}
                 onChange={(e) => updateDay(weekday, { start_time: e.target.value })}
-                className="h-11 min-w-0 flex-1 rounded-lg bg-surface border border-linen px-2 text-sm text-ink"
+                className="h-11 min-w-0 flex-1 rounded-lg bg-surface border border-linen px-2 text-[15px] text-ink"
               />
-              <span className="shrink-0 text-[13px] text-ink-faint">até</span>
+              <span className="shrink-0 text-sm text-ink-faint">até</span>
               <input
                 type="time"
                 value={day.end_time}
                 onChange={(e) => updateDay(weekday, { end_time: e.target.value })}
-                className="h-11 min-w-0 flex-1 rounded-lg bg-surface border border-linen px-2 text-sm text-ink"
+                className="h-11 min-w-0 flex-1 rounded-lg bg-surface border border-linen px-2 text-[15px] text-ink"
               />
             </div>
           ) : (
-            <p className="mt-1.5 pl-[30px] text-sm text-ink-faint">Fechado</p>
+            <p className="mt-1.5 pl-[30px] text-[15px] text-ink-faint">Fechado</p>
           )}
         </div>
       ))}
 
-      {error && <p className="text-[13px] text-rose-600">{error}</p>}
+      {error && <p className="text-sm text-rose-600">{error}</p>}
 
       <button
         type="button"
         onClick={handleSave}
         disabled={saving}
-        className="mt-1 h-11 rounded-xl bg-rose-600 text-white text-sm font-bold disabled:opacity-50"
+        className="mt-1 h-11 rounded-xl bg-rose-600 text-white text-[15px] font-bold disabled:opacity-50"
       >
         {saving ? 'Salvando...' : saved ? 'Salvo ✓' : 'Salvar horários'}
       </button>

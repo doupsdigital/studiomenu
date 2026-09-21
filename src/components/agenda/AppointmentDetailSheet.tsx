@@ -72,22 +72,22 @@ export const AppointmentDetailSheet: React.FC<AppointmentDetailSheetProps> = ({
           <X className="w-4 h-4" />
         </button>
 
-        <span className={`inline-block px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide mb-3 ${STATUS_BADGE[appointment.status]}`}>
+        <span className={`inline-block px-2.5 py-1 rounded-full text-[13px] font-bold uppercase tracking-wide mb-3 ${STATUS_BADGE[appointment.status]}`}>
           {STATUS_LABEL[appointment.status]}
         </span>
 
         <h3 className="font-serif-pro text-xl font-bold text-ink mb-1">{appointment.service_title}</h3>
-        <p className="text-sm text-ink-soft mb-4 capitalize">
+        <p className="text-[15px] text-ink-soft mb-4 capitalize">
           {dateLabel} às {time} · {appointment.duration_minutes}min
         </p>
 
         <div className="rounded-xl bg-cream p-4 mb-5 flex flex-col gap-1">
-          <p className="text-[15px] text-ink font-bold">{appointment.client_name}</p>
-          <p className="text-[13px] text-ink-soft flex items-center gap-1.5">
+          <p className="text-base text-ink font-bold">{appointment.client_name}</p>
+          <p className="text-sm text-ink-soft flex items-center gap-1.5">
             <MessageCircle className="w-3.5 h-3.5" /> {appointment.client_whatsapp}
           </p>
-          {appointment.client_notes && <p className="text-[13px] text-ink-faint italic mt-1">{appointment.client_notes}</p>}
-          {appointment.price_snapshot && <p className="text-[13px] text-ink-soft mt-1">Investimento: {appointment.price_snapshot}</p>}
+          {appointment.client_notes && <p className="text-sm text-ink-faint italic mt-1">{appointment.client_notes}</p>}
+          {appointment.price_snapshot && <p className="text-sm text-ink-soft mt-1">Investimento: {appointment.price_snapshot}</p>}
         </div>
 
         {appointment.status === 'pending' && (
@@ -96,7 +96,7 @@ export const AppointmentDetailSheet: React.FC<AppointmentDetailSheetProps> = ({
               type="button"
               disabled={busy}
               onClick={() => onApprove(appointment)}
-              className="flex-1 h-11 rounded-xl bg-emerald-600 text-white text-sm font-bold disabled:opacity-50 flex items-center justify-center gap-1.5"
+              className="flex-1 h-11 rounded-xl bg-emerald-600 text-white text-[15px] font-bold disabled:opacity-50 flex items-center justify-center gap-1.5"
             >
               <Check className="w-4 h-4" /> Aprovar
             </button>
@@ -104,7 +104,7 @@ export const AppointmentDetailSheet: React.FC<AppointmentDetailSheetProps> = ({
               type="button"
               disabled={busy}
               onClick={() => onReject(appointment)}
-              className="flex-1 h-11 rounded-xl border border-red-300 text-red-600 text-sm font-bold disabled:opacity-50"
+              className="flex-1 h-11 rounded-xl border border-red-300 text-red-600 text-[15px] font-bold disabled:opacity-50"
             >
               Recusar
             </button>
@@ -118,7 +118,7 @@ export const AppointmentDetailSheet: React.FC<AppointmentDetailSheetProps> = ({
                 type="button"
                 disabled={busy}
                 onClick={() => onComplete(appointment)}
-                className="flex-1 h-11 rounded-xl bg-emerald-600 text-white text-sm font-bold disabled:opacity-50 flex items-center justify-center gap-1.5"
+                className="flex-1 h-11 rounded-xl bg-emerald-600 text-white text-[15px] font-bold disabled:opacity-50 flex items-center justify-center gap-1.5"
               >
                 <CheckCircle2 className="w-4 h-4" /> Concluir
               </button>
@@ -126,7 +126,7 @@ export const AppointmentDetailSheet: React.FC<AppointmentDetailSheetProps> = ({
                 type="button"
                 disabled={busy}
                 onClick={() => onNoShow(appointment)}
-                className="flex-1 h-11 rounded-xl bg-red-600 text-white text-sm font-bold disabled:opacity-50 flex items-center justify-center gap-1.5"
+                className="flex-1 h-11 rounded-xl bg-red-600 text-white text-[15px] font-bold disabled:opacity-50 flex items-center justify-center gap-1.5"
               >
                 <XCircle className="w-4 h-4" /> Marcar falta
               </button>
@@ -135,7 +135,7 @@ export const AppointmentDetailSheet: React.FC<AppointmentDetailSheetProps> = ({
               type="button"
               disabled={busy}
               onClick={() => onCancelConfirmed(appointment)}
-              className="w-full h-10 rounded-xl bg-gray-200 hover:bg-gray-300 text-gray-700 text-[13px] font-bold disabled:opacity-50 transition-colors"
+              className="w-full h-10 rounded-xl bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm font-bold disabled:opacity-50 transition-colors"
             >
               Cancelar agendamento
             </button>

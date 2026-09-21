@@ -12,7 +12,7 @@ function CallbackFallback() {
     <main className="min-h-screen bg-cream text-ink flex items-center justify-center p-6">
       <div className="max-w-sm w-full p-8 rounded-3xl bg-surface border border-linen shadow-sm text-center space-y-3">
         <Loader2 className="w-8 h-8 text-rose-600 animate-spin mx-auto" />
-        <p className="text-sm text-ink-soft">Confirmando login com Google...</p>
+        <p className="text-[15px] text-ink-soft">Confirmando login com Google...</p>
       </div>
     </main>
   );
@@ -105,13 +105,13 @@ function EntrarCallbackContent() {
         {status === 'loading' ? (
           <>
             <Loader2 className="w-8 h-8 text-rose-600 animate-spin mx-auto" />
-            <p className="text-sm text-ink-soft">Confirmando login com Google...</p>
+            <p className="text-[15px] text-ink-soft">Confirmando login com Google...</p>
           </>
         ) : (
           <>
             <XCircle className="w-8 h-8 text-rose-600 mx-auto" />
-            <p className="text-sm text-ink-soft leading-relaxed">{message}</p>
-            <a href="/entrar" className="inline-flex items-center gap-1 text-xs font-bold text-rose-600 mt-2">
+            <p className="text-[15px] text-ink-soft leading-relaxed">{message}</p>
+            <a href="/entrar" className="inline-flex items-center gap-1 text-[13px] font-bold text-rose-600 mt-2">
               <CheckCircle2 className="w-3.5 h-3.5" /> Voltar pra tela de entrar
             </a>
           </>

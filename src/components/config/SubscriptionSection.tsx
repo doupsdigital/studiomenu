@@ -44,20 +44,20 @@ const ActivePlanCard: React.FC<{
         </div>
         <div className="min-w-0">
           <p className="font-serif-pro font-bold text-lg text-rose-800 leading-tight">{TIER_LABEL[tier]} ativo</p>
-          <p className="text-[13px] text-rose-800/70 mt-0.5">Cobrança recorrente {paymentMethod === 'card' ? 'no cartão de crédito' : 'via Pix'}</p>
+          <p className="text-sm text-rose-800/70 mt-0.5">Cobrança recorrente {paymentMethod === 'card' ? 'no cartão de crédito' : 'via Pix'}</p>
         </div>
       </div>
 
       <div className="bg-surface rounded-xl px-4 py-3 mb-4 border border-rose-200/60">
-        <p className="text-[11px] font-bold uppercase tracking-wider text-rose-700/70 mb-0.5">Mensalidade</p>
+        <p className="text-[13px] font-bold uppercase tracking-wider text-rose-700/70 mb-0.5">Mensalidade</p>
         <p className="font-serif-pro font-bold text-lg text-rose-800 whitespace-nowrap">{pricing.label}</p>
       </div>
 
-      {error && <p className="text-[13px] text-rose-600 mb-3">{error}</p>}
+      {error && <p className="text-sm text-rose-600 mb-3">{error}</p>}
 
       {confirming ? (
         <div className="rounded-xl bg-surface border border-rose-200/60 p-4">
-          <p className="text-[13px] text-ink-soft mb-3">
+          <p className="text-sm text-ink-soft mb-3">
             Cancelar sua assinatura do {TIER_LABEL[tier]}?{' '}
             {tier === 'plus' ? 'Você perde acesso à agenda automática.' : 'Seu catálogo deixa de fazer parte do plano pago.'}
           </p>
@@ -66,7 +66,7 @@ const ActivePlanCard: React.FC<{
               type="button"
               onClick={() => setConfirming(false)}
               disabled={loading}
-              className="flex-1 h-11 rounded-xl bg-linen text-ink-soft text-sm font-bold disabled:opacity-50"
+              className="flex-1 h-11 rounded-xl bg-linen text-ink-soft text-[15px] font-bold disabled:opacity-50"
             >
               Voltar
             </button>
@@ -74,7 +74,7 @@ const ActivePlanCard: React.FC<{
               type="button"
               onClick={onCancel}
               disabled={loading}
-              className="flex-1 h-11 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold disabled:opacity-50 transition-colors"
+              className="flex-1 h-11 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-[15px] font-bold disabled:opacity-50 transition-colors"
             >
               {loading ? 'Cancelando...' : 'Sim, cancelar'}
             </button>
@@ -85,7 +85,7 @@ const ActivePlanCard: React.FC<{
           type="button"
           onClick={() => setConfirming(true)}
           disabled={loading}
-          className="w-full h-11 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold disabled:opacity-50 transition-colors"
+          className="w-full h-11 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-[15px] font-bold disabled:opacity-50 transition-colors"
         >
           Cancelar assinatura
         </button>
@@ -145,7 +145,7 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
       <div className="flex flex-col gap-4">
         <ActivePlanCard tier="basico" paymentMethod={paymentMethod} onCancel={handleCancel} loading={loading} error={error} />
         <div id="upgrade-plus">
-          <p className="flex items-center gap-1.5 text-sm font-bold text-ink mb-2">
+          <p className="flex items-center gap-1.5 text-[15px] font-bold text-ink mb-2">
             <Sparkles className="w-4 h-4 text-rose-600" /> Evolua pro StudioMenu+
           </p>
           <PlanSubscribeCard slug={slug} plan="plus" billingEmail={billingEmail} billingCpfCnpj={billingCpfCnpj} showMethodChoice={false} />
@@ -165,7 +165,7 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
       {(subscriptionStatus === 'suspenso' || subscriptionStatus === 'cancelado') && (
         <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-xl p-3 text-amber-700">
           <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
-          <p className="text-[13px]">
+          <p className="text-sm">
             {subscriptionStatus === 'suspenso'
               ? 'Sua assinatura está suspensa (pagamento em atraso).'
               : 'Sua assinatura foi cancelada.'}{' '}

@@ -80,10 +80,10 @@ export default async function InicioPage({ params }: InicioPageProps) {
         <h1 className="font-serif-pro font-bold text-3xl">
           {greeting}, {firstName}!
         </h1>
-        <p className="text-sm text-white/70 mt-1.5 italic">Bem-vinda ao seu Studio! ✨</p>
+        <p className="text-[15px] text-white/70 mt-1.5 italic">Bem-vinda ao seu Studio! ✨</p>
         {isPlusAtivo && (
           <div className="flex justify-end">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 mt-3 rounded-full bg-white/15 backdrop-blur-sm text-xs font-bold tracking-wide">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 mt-3 rounded-full bg-white/15 backdrop-blur-sm text-[13px] font-bold tracking-wide">
               <Crown className="w-3.5 h-3.5" />
               PLUS
             </span>
@@ -117,7 +117,7 @@ export default async function InicioPage({ params }: InicioPageProps) {
         <Share2 className="absolute -top-3 -right-3 w-24 h-24 text-rose-300/50 rotate-12 pointer-events-none select-none" strokeWidth={1.25} />
         <div className="relative z-10">
           <h2 className="font-serif-pro font-bold text-xl text-rose-800 mb-1.5">Compartilhe seu Catálogo</h2>
-          <p className="text-sm text-rose-800/70 mb-4 max-w-xs mx-auto">
+          <p className="text-[15px] text-rose-800/70 mb-4 max-w-xs mx-auto">
             Envie esse link pra suas clientes verem seus serviços e preços, e agendarem sozinhas se o agendamento automático estiver ativo.
           </p>
           <ShareLinkButton slug={order.slug} />

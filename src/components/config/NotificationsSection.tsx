@@ -21,13 +21,13 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({ slug
           <Bell className="w-6 h-6" />
         </div>
         <p className="font-serif-pro font-bold text-lg text-ink">Notificações push</p>
-        <p className="text-sm text-ink-soft mt-0.5">Receba um aviso nesse dispositivo quando uma cliente agendar.</p>
+        <p className="text-[15px] text-ink-soft mt-0.5">Receba um aviso nesse dispositivo quando uma cliente agendar.</p>
       </div>
 
       <PushActivationFlow
         slug={slug}
-        primaryButtonClassName="h-11 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold disabled:opacity-50 transition-colors w-full"
-        secondaryButtonClassName="h-11 px-4 rounded-xl bg-surface border border-linen text-ink text-sm font-bold disabled:opacity-50 transition-colors w-full"
+        primaryButtonClassName="h-11 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-[15px] font-bold disabled:opacity-50 transition-colors w-full"
+        secondaryButtonClassName="h-11 px-4 rounded-xl bg-surface border border-linen text-ink text-[15px] font-bold disabled:opacity-50 transition-colors w-full"
       />
     </div>
   );
