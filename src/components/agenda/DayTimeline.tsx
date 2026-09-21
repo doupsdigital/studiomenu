@@ -124,7 +124,9 @@ export const DayTimeline: React.FC<DayTimelineProps> = ({
 
       let cursor = window.start;
       for (const b of busy) {
-        if (b.start > cursor) pushFree(cursor, b.start);
+        // `Math.min(..., window.end)`: agendamento/bloqueio depois do fim do
+        // expediente não pode "abrir" um horário livre fora dele.
+        if (b.start > cursor) pushFree(cursor, Math.min(b.start, window.end));
         cursor = Math.max(cursor, b.end);
       }
       if (window.end > cursor) pushFree(cursor, window.end);
