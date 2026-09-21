@@ -8,6 +8,7 @@ import { getWeekdayForDate } from '@/lib/scheduling/availability';
 import { PlusUpsellCard } from '@/components/app-shell/PlusUpsellCard';
 import { GradientHeader } from '@/components/app-shell/GradientHeader';
 import { PageTitleBar } from '@/components/app-shell/PageTitleBar';
+import { MarkAgendaVisited } from '@/components/app-shell/MarkAgendaVisited';
 import { AgendaClient } from '@/components/agenda/AgendaClient';
 
 interface AgendaPageProps {
@@ -146,6 +147,7 @@ export default async function AgendaPage({ params, searchParams }: AgendaPagePro
   return (
     <>
       <PageTitleBar title="Agenda" icon={<Calendar className="w-5 h-5 text-ink-soft" />} slug={slug} />
+      {bookingEnabled && <MarkAgendaVisited slug={slug} />}
       <main className="relative max-w-md mx-auto px-5 pt-6 pb-6 flex flex-col gap-5">
       <div className={bookingEnabled ? 'flex flex-col gap-5' : 'flex flex-col gap-5 pointer-events-none select-none blur-sm opacity-60'}>
         <GradientHeader showSparkles={false}>

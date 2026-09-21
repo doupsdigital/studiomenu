@@ -1,62 +1,46 @@
-import type { LucideIcon } from 'lucide-react';
-import { KeyRound, Clock, CalendarDays } from 'lucide-react';
-
-export interface OnboardingCardDef {
+export interface OnboardingChecklistItem {
   id: string;
-  icon: LucideIcon;
-  title: string;
-  description: string;
-  ctaHref: string;
-  ctaLabel: string;
+  label: string;
+  href: string;
+  /** Já feito, segundo o que o servidor sabe (banco). */
+  done: boolean;
+  /** Não existe dado no banco pra saber se foi feito — o "feito" é uma marca
+   *  guardada no aparelho (`localStorage`), resolvida no cliente. */
+  clientTracked?: boolean;
 }
 
-interface OnboardingCardDefsInput {
+interface OnboardingChecklistInput {
   slug: string;
   planTier: 'catalog' | 'basico' | 'plus';
   subscriptionStatus: 'none' | 'ativo' | 'suspenso' | 'cancelado';
   hasAccount: boolean;
+  /** Ela já salvou horários de atendimento (`business_hours` tem alguma linha). */
+  hoursDone: boolean;
 }
 
-/** Quais cards de "próximo passo" existem pra essa profissional agora — fonte
- *  única de verdade, usada tanto por `OnboardingCardStack` (renderiza os
- *  cards) quanto pelo tour guiado do Início (`InicioTour`, Fase 20), que
- *  precisa saber exatamente os mesmos passos pra apontar um balão em cada
- *  um. Duplicar essa condição nos dois lugares seria garantia de dessincronia
- *  assim que um dos dois mudasse sem o outro acompanhar. */
-export function getOnboardingCardDefs({ slug, planTier, subscriptionStatus, hasAccount }: OnboardingCardDefsInput): OnboardingCardDef[] {
-  const cards: OnboardingCardDef[] = [];
+/** Chave da marca "já conheceu a agenda" (escrita por `MarkAgendaVisited`,
+ *  lida pelo checklist do Início). */
+export const agendaVisitedKey = (slug: string) => `sm_agenda_visited_${slug}`;
 
-  // Já pagou algo (Básico ou Plus), ainda não criou login real.
-  if (planTier !== 'catalog' && !hasAccount) {
-    cards.push({
-      id: 'criar-conta',
-      icon: KeyRound,
-      title: 'Crie um acesso com senha',
-      description: 'Assim você não depende só do link mágico pra entrar no seu app.',
-      ctaHref: `/app/${slug}/config#conta`,
-      ctaLabel: 'Criar acesso',
-    });
-  }
+/** Itens do checklist "Deixe seu studio pronto" do Início — fonte única de
+ *  verdade, usada tanto por `OnboardingCardStack` (renderiza o card) quanto
+ *  pelo tour guiado do Início (`InicioTour`), que precisa saber se o card vai
+ *  existir pra apontar um balão nele. O item "Catálogo publicado" (sempre
+ *  marcado, só pra ela já começar com algo pronto) é adicionado pelo card, não
+ *  entra aqui. Ordem: horários → agenda → acesso com senha. */
+export function getOnboardingChecklistItems({ slug, planTier, subscriptionStatus, hasAccount, hoursDone }: OnboardingChecklistInput): OnboardingChecklistItem[] {
+  const items: OnboardingChecklistItem[] = [];
 
-  // Plus ativo — próximos passos pra agendamento funcionar de verdade.
+  // Plus ativo — passos pra agendamento funcionar de verdade.
   if (planTier === 'plus' && subscriptionStatus === 'ativo') {
-    cards.push({
-      id: 'horarios',
-      icon: Clock,
-      title: 'Defina seus horários de atendimento',
-      description: 'Sem isso, suas clientes ainda não conseguem agendar sozinhas.',
-      ctaHref: `/app/${slug}/config#horarios`,
-      ctaLabel: 'Configurar horários',
-    });
-    cards.push({
-      id: 'ver-agenda',
-      icon: CalendarDays,
-      title: 'Conheça sua agenda',
-      description: 'Veja como ficam os agendamentos confirmados e pendentes.',
-      ctaHref: `/app/${slug}/agenda`,
-      ctaLabel: 'Ver agenda',
-    });
+    items.push({ id: 'horarios', label: 'Definir horários de atendimento', href: `/app/${slug}/config#horarios`, done: hoursDone });
+    items.push({ id: 'ver-agenda', label: 'Conhecer sua agenda', href: `/app/${slug}/agenda`, done: false, clientTracked: true });
   }
 
-  return cards;
+  // Já pagou algo (Básico ou Plus): criar login real.
+  if (planTier !== 'catalog') {
+    items.push({ id: 'criar-conta', label: 'Criar acesso com senha', href: `/app/${slug}/config#conta`, done: hasAccount });
+  }
+
+  return items;
 }

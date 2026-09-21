@@ -2,6 +2,7 @@ import React from 'react';
 import { notFound } from 'next/navigation';
 import { getOrderForProfessionalApp } from '@/lib/professional-app-service';
 import { getAppointmentsForDay, getPendingAppointments } from '@/lib/scheduling/agenda-service';
+import { getBusinessHours } from '@/lib/scheduling/config-service';
 import { GradientHeader } from '@/components/app-shell/GradientHeader';
 import { StatCard } from '@/components/app-shell/StatCard';
 import { ViewCatalogCard } from '@/components/app-shell/ViewCatalogCard';
@@ -60,10 +61,13 @@ export default async function InicioPage({ params }: InicioPageProps) {
   // ligado via toggle manual do admin sem ela ser Plus — Fase 6).
   const schedulingLive = order.booking_enabled;
 
-  const [todayAppointments, pendingAppointments] = await Promise.all([
+  const [todayAppointments, pendingAppointments, businessHours] = await Promise.all([
     getAppointmentsForDay(order.id, todayInSaoPaulo()),
     getPendingAppointments(order.id),
+    // Só o checklist de "próximos passos" do Plus usa isso (item de horários).
+    isPlusAtivo ? getBusinessHours(order.id) : Promise.resolve([]),
   ]);
+  const hoursDone = businessHours.length > 0;
 
   const greeting = getGreeting();
   const firstName = order.client_name.split(' ')[0];
@@ -130,13 +134,14 @@ export default async function InicioPage({ params }: InicioPageProps) {
        *  aparece no aviso lá no topo (Fase 21). */}
       {!isPlusAtivo && order.subscription_status !== 'suspenso' && <PlusUpsellCard variant="card" slug={slug} />}
 
-      <OnboardingCardStack slug={slug} planTier={order.plan_tier} subscriptionStatus={order.subscription_status} hasAccount={Boolean(order.auth_user_id)} />
+      <OnboardingCardStack slug={slug} planTier={order.plan_tier} subscriptionStatus={order.subscription_status} hasAccount={Boolean(order.auth_user_id)} hoursDone={hoursDone} />
 
       <InicioTour
         slug={slug}
         planTier={order.plan_tier}
         subscriptionStatus={order.subscription_status}
         hasAccount={Boolean(order.auth_user_id)}
+        hoursDone={hoursDone}
         schedulingLive={schedulingLive}
       />
       </main>
