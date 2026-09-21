@@ -85,7 +85,7 @@ export async function POST(request: Request) {
 
     const { data: order, error: orderErr } = await supabaseAdmin
       .from('orders')
-      .select('id, client_name, plan_tier, subscription_status, asaas_customer_id, asaas_subscription_id, payment_method')
+      .select('id, client_name, plan_tier, subscription_status, asaas_customer_id, asaas_subscription_id, payment_method, billing_price_override')
       .eq('slug', normalizedSlug)
       .single();
 
@@ -109,6 +109,13 @@ export async function POST(request: Request) {
 
     const pricing = PLAN_PRICING[plan];
 
+    // Preço reduzido só pra teste real em produção (ex: R$5 no catálogo de
+    // teste) — definido manualmente no banco, nunca pela tela. Só vale se
+    // estiver entre o mínimo do Asaas (R$5) e o preço de tabela: nunca cobra
+    // MAIS que o preço do plano, mesmo se o dado for editado errado.
+    const override = order.billing_price_override === null ? null : Number(order.billing_price_override);
+    const price = override !== null && Number.isFinite(override) && override >= 5 && override <= pricing.price ? override : pricing.price;
+
     // Já tem assinatura Asaas e é um tier DIFERENTE do atual → troca de
     // plano (ex: Básico → Plus): atualiza valor/descrição em vez de criar
     // uma assinatura nova, evitando cobrança duplicada. Confirmado contra o
@@ -119,7 +126,7 @@ export async function POST(request: Request) {
     // (não uma desconhecida tentando ganhar acesso de graça), ativa o novo
     // tier direto aqui.
     if (order.asaas_subscription_id && order.plan_tier !== plan && order.plan_tier !== 'catalog') {
-      await updateSubscription({ subscriptionId: order.asaas_subscription_id, value: pricing.price, description: pricing.description });
+      await updateSubscription({ subscriptionId: order.asaas_subscription_id, value: price, description: pricing.description });
       await supabaseAdmin.from('orders').update({ pending_plan_tier: plan }).eq('id', order.id);
       await activateSubscription(order.id);
       return NextResponse.json({ success: true, upgraded: true });
@@ -154,7 +161,7 @@ export async function POST(request: Request) {
 
     const subscription = await createSubscription({
       customerId: customer.id,
-      value: pricing.price,
+      value: price,
       description: pricing.description,
       billingType: BILLING_TYPE[method],
     });

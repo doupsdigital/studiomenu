@@ -49,6 +49,8 @@ CREATE TABLE IF NOT EXISTS public.orders (
     pending_plan_tier TEXT CHECK (pending_plan_tier IN ('basico', 'plus')),
     -- Forma de pagamento da assinatura atual (Fase 21, docs/migrations/2026-09-21_fase21_cartao.sql)
     payment_method TEXT CHECK (payment_method IN ('pix', 'card')),
+    -- Preço reduzido só pra teste real em produção (Fase 21, docs/migrations/2026-09-21_fase21_preco_teste.sql)
+    billing_price_override NUMERIC(10,2) CHECK (billing_price_override IS NULL OR billing_price_override >= 5),
     billing_email TEXT,
     billing_cpf_cnpj TEXT,
     cancellation_notice_hours INTEGER DEFAULT 24,
