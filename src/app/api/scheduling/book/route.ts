@@ -113,9 +113,15 @@ export async function POST(request: Request) {
     // Só agendamentos feitos pela cliente (origin 'catalog', sempre o caso
     // nesta rota) disparam push — a profissional já sabe dos que ela mesma
     // cria manualmente pelo app.
+    // Dia e hora sempre no fuso de São Paulo (o servidor roda em UTC) — é o
+    // dado que ela mais precisa pra decidir aceitar sem abrir o app.
+    const weekday = startsAtDate.toLocaleDateString('pt-BR', { weekday: 'short', timeZone: 'America/Sao_Paulo' }).replace('.', '');
+    const dayMonth = startsAtDate.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'America/Sao_Paulo' });
+    const time = startsAtDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
+
     await sendPushToOrder(order.id, {
-      title: 'Novo agendamento!',
-      body: `${client_name} quer marcar ${service.title}.`,
+      title: '📅 Novo agendamento',
+      body: `${client_name.trim()} · ${service.title} · ${weekday}, ${dayMonth} às ${time}`,
       url: `/app/${slug.toLowerCase().trim()}/agenda#pendentes`,
     });
 
