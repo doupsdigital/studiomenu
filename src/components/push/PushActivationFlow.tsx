@@ -40,7 +40,7 @@ export const PushActivationFlow: React.FC<PushActivationFlowProps> = ({
   textClassName = 'text-ink-soft',
   onConfirmed,
 }) => {
-  const { permission, subscribing, subscribe, sendTest } = usePushNotifications(slug);
+  const { permission, subscribed, subscribing, subscribe, sendTest } = usePushNotifications(slug);
   const [phase, setPhase] = useState<Phase>('idle');
   const [sendingTest, setSendingTest] = useState(false);
 
@@ -50,11 +50,18 @@ export const PushActivationFlow: React.FC<PushActivationFlowProps> = ({
   // (abrir a Central de notificações nesse cabeçalho de novo, entrar em
   // Config) ele "esquecia" que já tinha sido ativado antes e mostrava o
   // convite de novo, mesmo já ativo.
+  // "Ativo" = permissão concedida E inscrição ainda existente neste aparelho.
+  // Se a inscrição sumiu (ex: "Cancelar inscrição" da notificação do Chrome)
+  // ou a permissão foi revogada, sai do "confirmado" e volta a oferecer
+  // "Ativar notificações" — antes ficava dizendo "ativas" sem estar.
+  const isActive = permission === 'granted' && subscribed !== false;
   useEffect(() => {
-    if (permission === 'granted') {
+    if (isActive) {
       setPhase((prev) => (prev === 'idle' || prev === 'activating' ? 'confirmed' : prev));
+    } else {
+      setPhase((prev) => (prev === 'confirmed' ? 'idle' : prev));
     }
-  }, [permission]);
+  }, [isActive]);
 
   const confirm = () => {
     setPhase('confirmed');

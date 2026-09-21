@@ -29,11 +29,13 @@ interface PageTitleBarProps {
  *  sino que abre a Central de notificações. */
 export const PageTitleBar: React.FC<PageTitleBarProps> = ({ title, icon, slug }) => {
   const { canInstall, isInstalled, promptInstall } = useInstallPrompt();
-  const { permission } = usePushNotifications(slug);
+  const { permission, subscribed } = usePushNotifications(slug);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   // Só chama atenção pro sino enquanto a notificação ainda não foi decidida
   // (nem ativada, nem recusada) — some assim que a profissional resolver.
-  const needsActivation = permission === 'default';
+  // Também quando a permissão continua concedida mas a inscrição sumiu (ex:
+  // "Cancelar inscrição" da notificação do Chrome) — o sino volta a chamar.
+  const needsActivation = permission === 'default' || (permission === 'granted' && subscribed === false);
 
   return (
     <>

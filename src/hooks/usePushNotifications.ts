@@ -28,12 +28,46 @@ export function usePushNotifications(slug: string) {
   // em seguida) enquanto essa checagem inicial não termina.
   const [ready, setReady] = useState(false);
   const [subscribing, setSubscribing] = useState(false);
+  // Existe mesmo uma inscrição de push neste aparelho? `null` = ainda não sei
+  // (ou o service worker ainda não registrou). Só `Notification.permission`
+  // não basta: o botão "Cancelar inscrição" que o Chrome do Android põe nas
+  // notificações remove a inscrição sem avisar o app (achado testando).
+  const [subscribed, setSubscribed] = useState<boolean | null>(null);
 
-  useEffect(() => {
+  // Relê permissão + inscrição — no mount e toda vez que o app volta pro
+  // primeiro plano (a mudança acontece fora do app, na barra de notificações).
+  const refresh = useCallback(async () => {
     const supported = typeof window !== 'undefined' && 'Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window;
     setPermission(supported ? Notification.permission : 'unsupported');
     setReady(true);
+    if (!supported || Notification.permission !== 'granted') {
+      setSubscribed(false);
+      return;
+    }
+    try {
+      const registration = await navigator.serviceWorker.getRegistration();
+      if (!registration) {
+        setSubscribed(null);
+        return;
+      }
+      setSubscribed(Boolean(await registration.pushManager.getSubscription()));
+    } catch {
+      setSubscribed(null);
+    }
   }, []);
+
+  useEffect(() => {
+    refresh();
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') refresh();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', refresh);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', refresh);
+    };
+  }, [refresh]);
 
   const subscribe = useCallback(async (): Promise<boolean> => {
     const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
@@ -57,6 +91,7 @@ export function usePushNotifications(slug: string) {
         body: JSON.stringify({ slug, subscription: subscription.toJSON() }),
       });
       const json = await res.json();
+      if (json.success) setSubscribed(true);
       return Boolean(json.success);
     } catch (error) {
       console.error('[usePushNotifications] Falha ao assinar:', error);
@@ -81,5 +116,5 @@ export function usePushNotifications(slug: string) {
     }
   }, [slug]);
 
-  return { permission, ready, subscribing, subscribe, sendTest };
+  return { permission, ready, subscribed, subscribing, subscribe, sendTest };
 }
