@@ -79,6 +79,7 @@ export interface AsaasPayment {
   customer: string;
   subscription?: string;
   dueDate?: string;
+  billingType?: string;
   /** Página de pagamento hospedada pelo Asaas — onde o cartão é digitado
    *  (nunca passa pelo nosso servidor). */
   invoiceUrl?: string;
@@ -169,6 +170,14 @@ export async function getPayableSubscriptionPayment(subscriptionId: string): Pro
     await sleep(2000);
   }
   return { payment: null, total: 0 };
+}
+
+/** Cobrança em aberto (pendente/vencida) de uma assinatura, SEM esperar nem
+ *  tentar de novo se não houver — pra checagem rápida a cada abertura do
+ *  app (aviso "pague sua mensalidade"), não pro fluxo de assinar. */
+export async function getOpenSubscriptionCharge(subscriptionId: string): Promise<AsaasPayment | null> {
+  const res = await asaasRequest<{ data: AsaasPayment[] }>('GET', `/payments?subscription=${subscriptionId}&limit=100`);
+  return pickPayablePayment(res.data || []);
 }
 
 export async function getSubscription(subscriptionId: string): Promise<(AsaasSubscription & { deleted?: boolean }) | null> {

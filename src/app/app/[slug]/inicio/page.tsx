@@ -11,6 +11,7 @@ import { ShareLinkButton } from '@/components/app-shell/ShareLinkButton';
 import { PageTitleBar } from '@/components/app-shell/PageTitleBar';
 import { FirstContactScreen } from '@/components/app-shell/FirstContactScreen';
 import { OnboardingCardStack } from '@/components/app-shell/OnboardingCardStack';
+import { OpenChargeBanner } from '@/components/billing/OpenChargeBanner';
 import { InicioTour } from '@/components/tour/InicioTour';
 import { CalendarDays, Clock, Share2, Crown, Home } from 'lucide-react';
 
@@ -85,6 +86,8 @@ export default async function InicioPage({ params }: InicioPageProps) {
           </div>
         )}
       </GradientHeader>
+
+      <OpenChargeBanner slug={slug} />
 
       {/* Só fazem sentido com o agendamento de fato funcionando — senão
        *  ficam sempre zerados, sem nenhuma ação possível por trás. */}
