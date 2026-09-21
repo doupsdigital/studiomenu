@@ -38,6 +38,9 @@ const PLAN_COPY: Record<PayablePlanTier, { icon: LucideIcon; headline: string; s
   plus: { icon: Crown, headline: 'Assine o StudioMenu+', subheadline: 'libere o agendamento automático' },
 };
 
+const formatShortDate = (iso: string) =>
+  new Date(`${iso}T12:00:00`).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+
 /** Copy do modal de "parabéns" pós-assinatura — mostrado tanto quando ela
  *  assina pela primeira vez (Básico, via QR/polling) quanto quando troca de
  *  plano (Básico → Plus, ativação direta, sem QR). */
@@ -74,6 +77,9 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
   const copy = PLAN_COPY[plan];
   const pricing = PLAN_PRICING[plan];
   const successCopy = SUCCESS_COPY[plan];
+  /** Sem seletor de método = troca de plano de quem já é assinante (Básico →
+   *  Plus): ativa na hora, o novo valor só vale na próxima mensalidade. */
+  const isUpgrade = !showMethodChoice;
 
   const [email, setEmail] = useState(billingEmail || '');
   const [cpfCnpj, setCpfCnpj] = useState(formatCpfCnpj(billingCpfCnpj || ''));
@@ -86,6 +92,7 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
   const [polling, setPolling] = useState(false);
   const [copied, setCopied] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [upgradeNextDue, setUpgradeNextDue] = useState<string | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -188,6 +195,7 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
         // Sem QR pra mostrar (troca de plano ativa na hora, sem cobrança
         // nova nesse instante — ver checkout/route.ts). Mesmo motivo do
         // polling acima: sem refresh adiantado, só no clique do botão.
+        setUpgradeNextDue(typeof json.nextDueDate === 'string' ? json.nextDueDate : null);
         setSuccess(true);
         return;
       }
@@ -234,6 +242,12 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
               </li>
             ))}
           </ul>
+          {isUpgrade && (
+            <p className="text-[13px] text-white/80 leading-snug mb-5">
+              A partir da próxima mensalidade
+              {upgradeNextDue ? ` (${formatShortDate(upgradeNextDue)})` : ''}, o valor passa a ser {pricing.label}.
+            </p>
+          )}
           <button
             type="button"
             onClick={() => {
@@ -330,6 +344,11 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
             onChange={(e) => setEmail(e.target.value)}
             className="h-12 rounded-xl bg-surface border border-linen px-3 text-base text-ink placeholder:text-ink-faint"
           />
+          {isUpgrade && (
+            <p className="text-[13px] text-ink-soft text-center leading-snug">
+              Você começa a usar agora, sem pagar nada a mais hoje. A partir da próxima mensalidade, o valor passa a ser {pricing.label}.
+            </p>
+          )}
           {showMethodChoice && (
             <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Forma de pagamento">
               {(

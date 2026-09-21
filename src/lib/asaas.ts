@@ -70,6 +70,8 @@ export interface AsaasCustomer {
 export interface AsaasSubscription {
   id: string;
   status: string;
+  /** Data (YYYY-MM-DD) da próxima cobrança da assinatura. */
+  nextDueDate?: string;
 }
 
 export interface AsaasPayment {

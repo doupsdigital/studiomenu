@@ -128,10 +128,12 @@ export async function POST(request: Request) {
     // (não uma desconhecida tentando ganhar acesso de graça), ativa o novo
     // tier direto aqui.
     if (order.asaas_subscription_id && order.plan_tier !== plan && order.plan_tier !== 'catalog') {
-      await updateSubscription({ subscriptionId: order.asaas_subscription_id, value: price, description: pricing.description });
+      const updated = await updateSubscription({ subscriptionId: order.asaas_subscription_id, value: price, description: pricing.description });
       await supabaseAdmin.from('orders').update({ pending_plan_tier: plan }).eq('id', order.id);
       await activateSubscription(order.id);
-      return NextResponse.json({ success: true, upgraded: true });
+      // `nextDueDate` só alimenta o aviso "a partir de dd/mm o valor passa a
+      // ser X" no modal de sucesso — se o Asaas não devolver, o aviso sai sem data.
+      return NextResponse.json({ success: true, upgraded: true, nextDueDate: updated.nextDueDate ?? null });
     }
 
     // Reaproveita uma assinatura já criada e ainda não paga (ex: a
