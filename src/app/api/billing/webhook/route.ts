@@ -21,6 +21,11 @@ interface AsaasWebhookPayload {
     customer?: string;
     subscription?: string;
   };
+  /** Eventos `SUBSCRIPTION_*` trazem os dados aqui, não em `payment`. */
+  subscription?: {
+    id?: string;
+    customer?: string;
+  };
 }
 
 /** POST /api/billing/webhook
@@ -36,19 +41,24 @@ export async function POST(request: Request) {
     }
 
     const body = (await request.json()) as AsaasWebhookPayload;
-    const { event, payment } = body;
+    const { event, payment, subscription } = body;
 
-    if (!event || !payment) {
-      return NextResponse.json({ success: true }); // evento sem payment (ex: teste) — nada a fazer
+    // Eventos de cobrança (`PAYMENT_*`) trazem `payment`; eventos da própria
+    // assinatura (`SUBSCRIPTION_*`, ex: removida no painel do Asaas) trazem
+    // `subscription` — antes só `payment` era lido, então cancelar a
+    // assinatura direto no painel nunca chegava no app (achado no teste real
+    // em produção, Fase 21).
+    const subscriptionId = payment?.subscription ?? subscription?.id;
+    const customerId = payment?.customer ?? subscription?.customer;
+
+    if (!event || (!payment && !subscription)) {
+      return NextResponse.json({ success: true }); // evento sem dados (ex: teste) — nada a fazer
     }
 
-    const orderId = await findOrderIdByAsaasIds({
-      subscriptionId: payment.subscription,
-      customerId: payment.customer,
-    });
+    const orderId = await findOrderIdByAsaasIds({ subscriptionId, customerId });
 
     if (!orderId) {
-      console.warn('[API Billing Webhook] Nenhum pedido encontrado pra', payment.subscription || payment.customer);
+      console.warn('[API Billing Webhook] Nenhum pedido encontrado pra', subscriptionId || customerId);
       return NextResponse.json({ success: true }); // 200 mesmo assim — evita a Asaas insistir num evento que não é nosso
     }
 
