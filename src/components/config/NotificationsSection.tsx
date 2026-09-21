@@ -29,13 +29,6 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({ slug
         primaryButtonClassName="h-11 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-[15px] font-bold disabled:opacity-50 transition-colors w-full"
         secondaryButtonClassName="h-11 px-4 rounded-xl bg-surface border border-linen text-ink text-[15px] font-bold disabled:opacity-50 transition-colors w-full"
       />
-
-      {/* O Chrome do Android põe um botão "Cancelar inscrição" na notificação
-       *  expandida (não dá pra remover, é do sistema) — se ela tocar nele sem
-       *  querer, as notificações param; aqui ela descobre como voltar. */}
-      <p className="text-sm text-ink-soft leading-snug text-center mt-4">
-        Parou de receber os avisos? Se você tocou em &ldquo;Cancelar inscrição&rdquo; numa notificação, é só ativar de novo por aqui.
-      </p>
     </div>
   );
 };
