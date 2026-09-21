@@ -40,10 +40,10 @@ export const PlusUpsellCard: React.FC<PlusUpsellCardProps> = ({ variant, slug })
         <p className="text-[11px] font-bold tracking-widest uppercase text-white/70 mb-1">Desbloqueie</p>
         <h3 className="font-serif-pro font-bold text-2xl mb-3">StudioMenu+</h3>
 
-        <ul className="text-left mx-auto max-w-[230px] flex flex-col gap-1.5 mb-5">
+        <ul className="text-left mx-auto max-w-[290px] flex flex-col gap-2.5 mb-5">
           {BENEFITS.map((benefit) => (
-            <li key={benefit} className="flex items-start gap-2 text-[13px] text-white/90 leading-snug">
-              <Check className="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-300" />
+            <li key={benefit} className="flex items-start gap-2.5 text-base text-white leading-snug">
+              <Check className="w-4 h-4 mt-1 shrink-0 text-emerald-300" strokeWidth={3} />
               {benefit}
             </li>
           ))}
