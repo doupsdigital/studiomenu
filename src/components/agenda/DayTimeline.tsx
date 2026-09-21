@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import type { AgendaAppointment } from '@/lib/scheduling/agenda-service';
 import type { BusinessHoursConfigRow, ScheduleBlockConfigRow } from '@/lib/scheduling/config-service';
 import { localDateTimeToUTC } from '@/lib/scheduling/availability';
+import { CheckCircle2, XCircle } from 'lucide-react';
 import { STATUS_LABEL } from './status-styles';
 
 interface DayTimelineProps {
@@ -240,7 +241,12 @@ export const DayTimeline: React.FC<DayTimelineProps> = ({
           );
         }
 
-        const accent = appt.status === 'completed' ? 'border-l-blue-500' : appt.status === 'no_show' ? 'border-l-red-500' : 'border-l-rose-600';
+        const tone =
+          appt.status === 'completed'
+            ? 'bg-blue-50 border-blue-200 border-l-blue-500'
+            : appt.status === 'no_show'
+              ? 'bg-red-50 border-red-200 border-l-red-500 opacity-70'
+              : 'bg-surface border-linen border-l-rose-600';
         const meta = [range, appt.price_snapshot].filter(Boolean).join(' · ');
         return (
           <div key={appt.id} className="flex gap-2.5">
@@ -250,16 +256,29 @@ export const DayTimeline: React.FC<DayTimelineProps> = ({
               tabIndex={0}
               onClick={() => onAppointmentClick(appt)}
               onKeyDown={(e) => e.key === 'Enter' && onAppointmentClick(appt)}
-              className={`flex-1 min-h-[88px] rounded-[14px] bg-surface border border-linen border-l-4 ${accent} px-3.5 py-3 cursor-pointer ${
-                appt.status === 'no_show' ? 'opacity-70' : ''
-              }`}
+              className={`relative overflow-hidden flex-1 min-h-[88px] rounded-[14px] border border-l-4 ${tone} px-3.5 py-3 cursor-pointer`}
             >
-              <p className="text-[17px] font-semibold text-ink">{appt.client_name}</p>
-              <p className="text-[15px] text-ink-soft mt-0.5">{appt.service_title}</p>
-              <p className="text-sm text-ink-faint mt-2">
-                {meta}
-                {(appt.status === 'completed' || appt.status === 'no_show') && ` · ${STATUS_LABEL[appt.status]}`}
-              </p>
+              {/* Marca d'água grande e translúcida no meio (concluído/falta) —
+               *  dá pra ver o status batendo o olho, atrás do texto (mesma
+               *  ideia da grade antiga). */}
+              {appt.status === 'completed' && (
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <CheckCircle2 className="w-16 h-16 text-blue-600/20" />
+                </div>
+              )}
+              {appt.status === 'no_show' && (
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <XCircle className="w-16 h-16 text-red-600/20" />
+                </div>
+              )}
+              <div className="relative">
+                <p className="text-[17px] font-semibold text-ink">{appt.client_name}</p>
+                <p className="text-[15px] text-ink-soft mt-0.5">{appt.service_title}</p>
+                <p className="text-sm text-ink-faint mt-2">
+                  {meta}
+                  {(appt.status === 'completed' || appt.status === 'no_show') && ` · ${STATUS_LABEL[appt.status]}`}
+                </p>
+              </div>
             </div>
           </div>
         );
