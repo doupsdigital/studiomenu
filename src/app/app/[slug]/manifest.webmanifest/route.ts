@@ -27,6 +27,11 @@ export async function GET(_request: Request, { params }: RouteParams) {
       icons: [
         { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },
         { src: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+        // Silhueta branca sobre fundo transparente: no app instalado (WebAPK) o
+        // Android usa esse ícone como o ícone pequeno das notificações — o
+        // `badge` do service worker só vale pro navegador, não pro app
+        // instalado (sem isso aparecia um quadrado genérico).
+        { src: '/badge-96.png', sizes: '96x96', type: 'image/png', purpose: 'monochrome' },
       ],
     },
     { headers: { 'Content-Type': 'application/manifest+json' } }
