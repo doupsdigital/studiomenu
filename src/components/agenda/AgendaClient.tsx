@@ -2,13 +2,13 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CalendarPlus, Lock, Clock, ChevronDown } from 'lucide-react';
+import { CalendarPlus, Lock, ChevronDown } from 'lucide-react';
 import type { Step } from 'react-joyride';
 import { ProductTour } from '@/components/tour/ProductTour';
 import { AppointmentRow } from './AppointmentRow';
 import { ManualBookingForm } from './ManualBookingForm';
 import { BlockSlotForm } from './BlockSlotForm';
-import { DayTimeGrid } from './DayTimeGrid';
+import { DayTimeline } from './DayTimeline';
 import { MonthCalendar } from './MonthCalendar';
 import { AppointmentDetailSheet } from './AppointmentDetailSheet';
 import { ApproveModal } from './ApproveModal';
@@ -41,7 +41,7 @@ const AGENDA_TOUR_STEPS: Step[] = [
   { target: '[data-tour="agenda-block"]', title: 'Trancar horário', content: 'Bloqueie um horário ou o dia inteiro (folga, compromisso, etc).' },
   { target: '[data-tour="agenda-view-toggle"]', title: 'Dia ou Mês', content: 'Troque entre a visão de um dia só e a visão do mês inteiro.' },
   { target: '#pendentes', title: 'Aguardando confirmação', content: 'Agendamentos que ainda esperam sua aprovação aparecem aqui.' },
-  { target: '[data-tour="agenda-day-grid"]', title: 'Sua grade de horários', content: 'Toque num horário livre pra agendar, ou num agendamento existente pra ver os detalhes.' },
+  { target: '[data-tour="agenda-day-grid"]', title: 'Seu dia', content: 'Toque num horário livre pra agendar, ou num agendamento existente pra ver os detalhes.' },
 ];
 
 interface SuccessInfo {
@@ -323,24 +323,21 @@ export const AgendaClient: React.FC<AgendaClientProps> = ({
       {/* Diferente do LashAgenda (que esconde o painel inteiro quando zera),
        *  aqui ele fica sempre visível com o contador em 0 — decisão do
        *  usuário, pra não sumir da tela sem explicação (Fase 9). */}
-      <div id="pendentes" className="bg-surface border border-amber-200 rounded-2xl shadow-sm overflow-hidden">
+      <div id="pendentes" className="bg-[#FFF8EC] border border-[#F3E6CE] rounded-[14px] overflow-hidden">
         <button
           type="button"
           onClick={() => setPendingOpen((v) => !v)}
-          className="w-full flex items-center justify-between px-5 py-4 hover:bg-amber-50/50 transition-colors"
+          className="w-full flex items-center gap-2.5 px-3.5 py-3 text-left"
         >
-          <div className="flex items-center gap-3">
-            <Clock className="w-4 h-4 text-amber-500" />
-            <span className="font-serif-pro font-semibold text-base text-ink">Aguardando confirmação</span>
-            <span className="bg-amber-100 text-amber-700 border border-amber-200 text-xs font-bold px-2 py-0.5 rounded-full">
-              {pendingAppointments.length}
-            </span>
-          </div>
-          <ChevronDown className={`w-4 h-4 text-ink-soft transition-transform ${pendingOpen ? 'rotate-180' : ''}`} />
+          <span className="w-2 h-2 rounded-full bg-[#D79A2B] shrink-0" />
+          <span className="flex-1 text-[13px] text-[#6B5528]">
+            {pendingAppointments.length === 0 ? 'Nenhum aguardando confirmação' : `${pendingAppointments.length} aguardando confirmação`}
+          </span>
+          <span className="text-[12.5px] font-semibold text-[#8A6410]">{pendingOpen ? 'Ocultar' : 'Ver'}</span>
         </button>
 
         {pendingOpen && (
-          <div className="border-t border-amber-100 divide-y divide-linen">
+          <div className="border-t border-[#F3E6CE] divide-y divide-linen bg-surface">
             {pendingAppointments.length > 0 ? (
               pendingAppointments.map((a) => (
                 <AppointmentRow key={a.id} appointment={a} onApprove={setApproveAppointment} onReject={setRejectAppointment} />
@@ -393,13 +390,15 @@ export const AgendaClient: React.FC<AgendaClientProps> = ({
           onDayClick={(dateStr) => router.push(`/app/${slug}/agenda?date=${dateStr}`)}
         />
       ) : (
-        <DayTimeGrid
+        <DayTimeline
           dateStr={selectedDate}
+          todayStr={todayStr}
           appointments={dayAppointments}
           businessHours={businessHours}
           scheduleBlocks={scheduleBlocks}
           onSlotClick={handleSlotClick}
           onAppointmentClick={setDetailAppointment}
+          onApprove={setApproveAppointment}
         />
       )}
 
