@@ -85,12 +85,12 @@ Ordem de decisão:
 Resposta: Pix `{ success, method:'pix', paymentId, pixQrCodeImage, pixKey, expirationDate }`; cartão `{ success, method:'card', paymentId, invoiceUrl }`.
 
 ### 5.2 `POST /api/billing/check-payment`
-Body `{ slug, payment_id }`. Confirma que o pagamento pertence ao catálogo, e se `CONFIRMED`/`RECEIVED` chama `activateSubscription`. É o "polling" da tela (a cada 5 s, até 5 min) — segunda via, junto do webhook.
+Body `{ slug, payment_id }`. Confirma que o pagamento pertence ao catálogo, e se o status for `CONFIRMED`/`RECEIVED`/`RECEIVED_IN_CASH` chama `activateSubscription` (`RECEIVED_IN_CASH` = baixa manual "recebi em dinheiro" no painel do Asaas, ex: cliente pagou por fora — ver 5.5.1). É o "polling" da tela (a cada 5 s, até 5 min) — segunda via, junto do webhook.
 
 ### 5.3 `POST /api/billing/webhook` (`src/app/api/billing/webhook/route.ts`)
 Header obrigatório `asaas-access-token` = `ASAAS_WEBHOOK_SECRET` (senão 401). Resolve o pedido por `subscription`/`customer`:
 - **Eventos `PAYMENT_*` trazem o objeto `payment`; eventos `SUBSCRIPTION_*` trazem `subscription`** (o webhook lê os dois — bug corrigido em produção: antes ignorava `SUBSCRIPTION_*`).
-- `PAYMENT_CONFIRMED`/`PAYMENT_RECEIVED` → `activateSubscription`.
+- `PAYMENT_CONFIRMED`/`PAYMENT_RECEIVED` → `activateSubscription`. Também ativa se `payment.status` for `CONFIRMED`/`RECEIVED`/`RECEIVED_IN_CASH`, **independente do nome do evento** (não sei qual evento o Asaas manda na baixa manual — ver 5.5.1).
 - `PAYMENT_OVERDUE` → `suspenso` (**não** corta acesso nem `booking_enabled`).
 - `PAYMENT_DELETED`/`SUBSCRIPTION_DELETED`/`SUBSCRIPTION_INACTIVATED` → `cancelado` + `booking_enabled=false` + limpa `asaas_subscription_id`/`pending_plan_tier`.
 - Sempre responde 200 para eventos que não são nossos (evita o Asaas insistir/penalizar).
@@ -100,6 +100,9 @@ Body `{ slug, withQr? }`. **Só lê** do Asaas (nunca ativa nada). Devolve `{ op
 
 ### 5.5 `POST /api/billing/cancel`
 Botão "Cancelar assinatura" do app (cancela no Asaas e atualiza o pedido). Cancelar **direto no painel do Asaas** também funciona (webhook `SUBSCRIPTION_DELETED`).
+
+### 5.5.1 Pagamento por fora (baixa manual "recebido em dinheiro")
+Achado em produção (2026-09-21): no Asaas de produção não dá pra "aprovar" cobrança como no sandbox; a alternativa é marcar **"recebida em dinheiro"**, que gera status `RECEIVED_IN_CASH` — que o código não reconhecia (só `CONFIRMED`/`RECEIVED`), então a assinatura **não ativava** e a tela ficava em "Aguardando confirmação". Corrigido (commit `bbc742c`) em `check-payment` (novo status aceito) e no `webhook` (ativa pelo status da cobrança também). **Não testado com uma baixa manual real depois do fix** e o nome do evento que o Asaas dispara nesse caso não foi confirmado. Atenção operacional: dar baixa manual **libera o acesso** — só usar quando o dinheiro realmente entrou.
 
 ### 5.6 `src/lib/asaas.ts` (wrapper)
 `createSubscription({customerId,value,description,billingType?})`, `updateSubscription`, `updateSubscriptionBillingType`, `getFirstSubscriptionPayment` (com retry, uso na criação), `getPayableSubscriptionPayment`, `getOpenSubscriptionCharge`, `pickPayablePayment` (pura), `getSubscription` (404 → `null`), `getPixQrCode`, `getPayment`, `cancelSubscription`. Autenticação por header `access_token`.
@@ -114,12 +117,18 @@ Botão "Cancelar assinatura" do app (cancela no Asaas e atualiza o pedido). Canc
 - **Pix**: QR + "Copiar código Pix" + polling → modal de sucesso.
 - **Cartão**: tela "Finalize o pagamento" com **"Abrir pagamento seguro"** (link `target=_blank` pro `invoiceUrl` — evita bloqueio de pop-up no celular), polling, botão **"Já paguei, verificar agora"** e **"Trocar forma de pagamento"** (volta ao formulário; reenviar com outro método atualiza a mesma assinatura).
 - Limitação conhecida: **não há retorno automático** do Asaas pro app após pagar no cartão (o `callback.successUrl` exige um domínio cadastrado na conta Asaas — não usado). Por isso o polling + botão manual.
+- **Troca Básico → Plus (assinante ativa, `showMethodChoice=false`)**: ativa na hora, **sem cobrança nova** — o `PUT` só muda o valor da assinatura, valendo a partir da próxima mensalidade (a do mês atual já foi paga). Decisão consciente (simplicidade; risco pequeno de usar o Plus o resto do mês pagando só R$39). Alternativa descartada por ora: cobrar a diferença agora. Como a cliente pode estranhar a cobrança maior depois, há **aviso**: no card ("Você começa a usar agora, sem pagar nada a mais hoje. A partir da próxima mensalidade, o valor passa a ser R$ 69,90/mês.") e no modal de sucesso (com a data, `nextDueDate` devolvido pelo `PUT` no checkout; sem data se o Asaas não devolver). Commit `aed9f6b`.
 - **Modal de sucesso** (Básico/Plus): benefícios em fonte 16px. `router.refresh()` só no clique de "Ir para o Início" (chamar antes desmonta o modal — bug já visto).
 
 ### 6.2 `src/components/billing/OpenChargeBanner.tsx` (no Início)
 Consulta `open-charge` ao abrir. **Pix**: card "Sua mensalidade vence em DD/MM" (rosa) ou "venceu" (âmbar) + valor + "Pagar agora com Pix" (QR, copia e cola, polling `check-payment`, vira "Pagamento confirmado" e dá `router.refresh()`). **Cartão**: só aparece se **vencida** ("Não conseguimos cobrar seu cartão" + "Abrir cobrança"); em dia, o Asaas cobra sozinho. Sem cobrança em aberto ou erro → não renderiza nada.
 
-### 6.3 Outros
+### 6.3 Experiência de primeiro contato e envio ao cliente (2026-09-21, commit `f4d2694`)
+- O **Link do App** (`/api/professional/login?slug=…&token=<edit_token>`) já existe pra todo catálogo (o `edit_token` é gerado na criação, manual ou pelo agente) e aparece no card do admin (`admin/catalogos`). É **o mesmo app** de sempre: valida o token, grava cookie de 90 dias e cai em `/app/<slug>` → enquanto `plan_tier = 'catalog'` mostra a tela de primeiro contato (`FirstContactScreen`: ver catálogo, editar, assinar, com tour de 3 dicas na 1ª visita por aparelho); depois de pagar, o mesmo link mostra o Início completo. O token é a "senha" da cliente.
+- Dica 3 do tour passou a citar "Pix ou cartão de crédito".
+- Admin: a mensagem de **"Aprovar & Entregar"** agora leva só o catálogo; novo botão **"Enviar app por WhatsApp"** (não aprova nada) abre uma segunda mensagem apresentando o app com o Link do App. Fluxo pretendido: 1º link do catálogo, depois o do app. **Pendente de confirmar:** que o botão de instalar (PWA) aparece pra ela na tela de primeiro contato (a mensagem promete instalar na tela inicial).
+
+### 6.4 Outros
 - `SubscriptionSection.tsx`: "Cobrança recorrente via Pix" / "no cartão de crédito" (lê `payment_method`); 3 estados (Plus ativo, Básico ativo + oferta de upgrade, sem plano).
 - `inicio/page.tsx`: quem está `suspenso` **não** vê o card "Assinar o Plus".
 - `PlusUpsellCard`: benefícios em fonte 16px.
@@ -204,6 +213,9 @@ Comportamentos conhecidos / decisões:
 - Cliente em atraso **mantém acesso** até o dono cancelar (decisão do dono).
 - Trocar de cartão pra Pix (ou inverso) **depois de já ser assinante ativa** não foi implementado.
 - Sem retorno automático do Asaas após pagar no cartão (depende de domínio cadastrado na conta).
+- Pagamento por fora (baixa manual "recebido em dinheiro") ativa o plano — ver 5.5.1 (fix não retestado com baixa real).
+- Troca Básico → Plus não cobra a diferença no mês corrente — ver 6.1.
+- O catálogo de teste `teste-manual-fase19` fica em produção **com assinatura real no Asaas de produção**; ao "voltar pro Básico" só o banco é alterado (o valor da assinatura no Asaas pode continuar em R$ 69,90).
 
 ---
 
@@ -236,6 +248,8 @@ src/app/api/billing/open-charge/route.ts                 cobrança em aberto (5.
 src/app/api/billing/cancel/route.ts                      cancelamento pelo app
 src/components/billing/PlanSubscribeCard.tsx             seletor Pix/Cartão + fluxos (6.1)
 src/components/billing/OpenChargeBanner.tsx              aviso de mensalidade (6.2)
+src/components/app-shell/FirstContactScreen.tsx          primeiro contato + tour (6.3)
+src/app/admin/catalogos/page.tsx                         links + botões de WhatsApp (6.3)
 src/components/config/SubscriptionSection.tsx            "Minha assinatura"
 src/components/app-shell/PlusUpsellCard.tsx              upsell do Plus
 src/app/app/[slug]/inicio/page.tsx                       Início (banner, upsell condicional)
