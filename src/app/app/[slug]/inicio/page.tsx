@@ -125,7 +125,10 @@ export default async function InicioPage({ params }: InicioPageProps) {
        *  (Fase 15). O upsell fica sempre visível pra quem não é Plus, mesmo
        *  que o agendamento já esteja ligado manualmente via admin — o
        *  objetivo é sempre incentivar a assinatura de verdade. */}
-      {!isPlusAtivo && <PlusUpsellCard variant="card" slug={slug} />}
+      {/* Suspensa (mensalidade em atraso): oferecer "Assinar o Plus" aqui só
+       *  confunde — o que ela precisa é pagar a cobrança em aberto, que já
+       *  aparece no aviso lá no topo (Fase 21). */}
+      {!isPlusAtivo && order.subscription_status !== 'suspenso' && <PlusUpsellCard variant="card" slug={slug} />}
 
       <OnboardingCardStack slug={slug} planTier={order.plan_tier} subscriptionStatus={order.subscription_status} hasAccount={Boolean(order.auth_user_id)} />
 
