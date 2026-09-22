@@ -8,7 +8,10 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: '/',
     scope: '/',
     display: 'standalone',
-    background_color: '#F7F3EE',
+    // Cor média das bordas do ícone (icon-512.png) — é essa cor que aparece
+    // atrás do ícone na splash screen que o Android monta sozinho, não a cor
+    // de fundo do app em si (ver app/[slug]/manifest.webmanifest/route.ts).
+    background_color: '#F8E7E7',
     theme_color: '#a93259',
     icons: [
       { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },

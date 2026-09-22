@@ -22,7 +22,12 @@ export async function GET(_request: Request, { params }: RouteParams) {
       start_url: `/app/${slug}`,
       scope: `/app/${slug}/`,
       display: 'standalone',
-      background_color: '#F3F5F8',
+      // Cor média das bordas do ícone (icon-512.png) — não o cinza-claro do
+      // app em si. É essa cor que aparece atrás do ícone na splash screen
+      // que o Android monta sozinho ao abrir o app instalado; com o cinza
+      // do app, dava pra ver a borda do ícone como um quadrado flutuando
+      // (achado testando de verdade, Fase 21).
+      background_color: '#F8E7E7',
       theme_color: '#a93259',
       icons: [
         { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },
