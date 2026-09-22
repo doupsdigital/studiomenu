@@ -1,39 +1,39 @@
-# 🌸 LashMenu — Plataforma de Catálogos Digitais de Alta Conversão
+# 🌸 StudioMenu — Catálogo digital + agendamento para profissionais de beleza
 
-> Ecossistema unificado para Lash Designers: Catálogos digitais interativos de alto padrão, formulário de personalização instantânea e infraestrutura de vendas automatizada.
+> SaaS (`studiomenu.art`) de catálogo digital interativo para lash designers, nail designers,
+> esteticistas e studios multi-serviço, com agendamento automático opcional
+> (**StudioMenu Básico** R$ 39/mês, **StudioMenu+** R$ 69,90/mês).
 
----
-
-## 📁 Estrutura de Diretórios do Projeto
-
-```
-📁 lashmenu-vendas/
-│
-├── 📁 docs/                   # Central de documentação, regras e estratégia (ver docs/README.md)
-│   ├── 📁 arquitetura/        # Diretrizes técnicas, isolamento de produção e Supabase
-│   ├── 📁 marketing/          # Planos comerciais, automação de anúncios e funis
-│   └── 📁 estrategia/         # Visão geral de produto e carreira
-│
-├── 📁 modelos/                # Modelos Oficiais de Catálogo (Mosaico e Clássico com Suporte Dual Rosé/Luxury)
-│   ├── 📁 mosaico/            # Modelo Mosaico (Dual Theme Rosé 🌸 / Luxury 👑)
-│   └── 📁 classico/           # Modelo Clássico (Dual Theme Rosé 🌸 / Luxury 👑)
-│
-├── 📁 catalogo/               # Motor de roteamento por subdomínio e catalog-injector.js
-├── 📁 clientes/               # Catálogos estáticos / Ejeção VIP Concierge
-├── 📁 admin/                  # Painel administrativo e editor de procedimentos
-├── 📁 formulario/             # Formulário de onboarding e personalização do catálogo
-├── 📁 vendas/                 # Landing pages oficiais (LPA, LPB, V0, vídeos e funis)
-├── 📁 api/                    # Serverless functions (notificações e webhooks)
-├── 📁 criativos/              # Mídias e criativos de marketing (ChatGPT, Claude, Vídeos)
-├── 📁 scripts/                # Scripts Python de automação de campanhas Meta Ads
-│
-├── 📄 index.html              # Hub Operacional & Roteador Global
-├── 📄 server.js               # Servidor local de desenvolvimento
-├── 📄 vercel.json             # Regras de roteamento de produção
-└── 📄 .gitignore
-```
+**Novo por aqui? Leia primeiro [`docs/atual/ESTADO_ATUAL.md`](docs/atual/ESTADO_ATUAL.md)** — é
+o documento com garantia de refletir o estado atual do produto, da stack e da estrutura de
+pastas. Este README é só a vitrine do repositório.
 
 ---
 
-## 🛡️ Regras de Isolamento de Produção
-Antes de realizar alterações no projeto, consulte o guia oficial em [`docs/arquitetura/ARQUITETURA_ISOLAMENTO_PRODUCAO.md`](file:///docs/arquitetura/ARQUITETURA_ISOLAMENTO_PRODUCAO.md).
+## Stack
+
+Next.js 16 (App Router, TypeScript) na Vercel · Supabase (Postgres + Storage) · Asaas (cobrança
+recorrente via Pix/cartão) · PWA com push notifications.
+
+## Estrutura (resumo)
+
+```
+studiomenu/
+├── src/
+│   ├── app/            # rotas: catálogo público (c/[slug]), app da profissional (app/[slug]),
+│   │                   #   admin, form de onboarding, api/
+│   ├── components/     # catalog/, agenda/, config/, app-shell/, billing/, admin/, ...
+│   └── lib/            # supabase-admin, catalog-service, asaas, billing-service, scheduling/, ...
+├── docs/atual/          # estado atual do projeto (ler primeiro)
+├── docs/historico/       # registro por Fase — rastreabilidade, não é fonte de verdade do presente
+├── referencias-externas/ # projetos de terceiros usados só como referência de UX
+└── legacy/               # site estático LashMenu pré-Next.js — arquivo histórico, não editar
+```
+
+Detalhes completos (fluxos, workflow de git/deploy, pendências reais) em
+[`docs/atual/ESTADO_ATUAL.md`](docs/atual/ESTADO_ATUAL.md).
+
+## Workflow
+
+Trabalho sempre em `desenv` (deploy de Preview com chaves sandbox do Asaas). `main` é produção
+(`studiomenu.art`), protegida — só recebe mudanças via Pull Request depois de aprovadas.
