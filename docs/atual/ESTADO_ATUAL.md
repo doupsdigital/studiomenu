@@ -17,6 +17,12 @@ designer, estética, studios multi-serviço), com agendamento automático opcion
 código do LashMenu estático vive isolado em `legacy/` (não é lido pelo app) e a documentação
 dessa fase antiga está em `docs/historico/`.
 
+**Por que o pivô pra multi-nicho:** durante a validação comercial do LashMenu (tráfego pago,
+funil de vendas), ficou claro que a maioria das profissionais que chegavam no funil não fazia só
+procedimentos de lash — muitas têm estúdio próprio ou atuam em várias frentes (unhas, estética,
+depilação). Limitar o posicionamento só a lash designers deixava de fora boa parte do mercado de
+beleza — daí o StudioMenu.
+
 Dois planos pagos (cobrança recorrente via Asaas), mais um catálogo estático gratuito de base:
 
 | Plano | Preço | O que dá |
@@ -185,7 +191,10 @@ Asaas → agenda bloqueada.
   `FASE23_...md`) ou está registrada no handoff geral (`HANDOFF_2026-09-18_FASE19-20.md`).
 - **Schema do banco:** `docs/schema.sql` (sempre a versão atual; migrações individuais ficam em
   `docs/historico/migrations/` só como log).
-- **Visão de negócio, posicionamento, nichos:** `docs/estrategia/VISAO_E_ROADMAP_STUDIOMENU.md`.
+- **Visão de negócio, posicionamento, nichos:** resumida na seção 1 deste documento (o
+  documento antigo de visão/roadmap foi removido em 2026-09-22 por estar desatualizado e
+  ativamente enganoso — roadmap mostrava o agendamento automático como "futuro" quando já
+  estava em produção há tempos).
 - **Marketing/tráfego pago:** `docs/marketing/`.
 
 **Regra pra qualquer chat/agente:** nunca tratar um documento de `docs/historico/` como
