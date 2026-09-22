@@ -9,8 +9,8 @@
 - **[`atual/`](atual/)** — estado atual do projeto (produto, stack, estrutura, pendências reais). Pequeno, curado, sempre verificado contra o código.
 - **[`historico/`](historico/)** — registro de como cada funcionalidade foi construída, Fase por Fase (handoffs, roteiros de teste, auditorias, planos antigos). Rastreabilidade, não é fonte de verdade sobre o presente.
 - **[`schema.sql`](schema.sql)** — schema atual do banco de dados Supabase.
-- **[`marketing/`](marketing/)** — planejamento de tráfego pago e automação de anúncios.
 
 ## Fora de `docs/`
 
+- **`marketing/`** — tráfego pago: scripts de automação de Ads, prospecção de leads, criativos. Nada de código do produto, mas também não é documentação — por isso mora fora de `docs/`.
 - **`legacy/`** — site estático LashMenu pré-Next.js. Arquivo histórico, não editar.

@@ -81,10 +81,16 @@ studiomenu/
 ├── docs/
 │   ├── atual/                           — ESTE documento + o que for permanentemente atual
 │   ├── historico/                       — registro por Fase (rastreabilidade — não é instrução)
-│   ├── estrategia/, marketing/          — visão de negócio e planos comerciais (não técnicos)
 │   └── schema.sql                       — schema atual do banco (fonte de verdade da estrutura de dados)
+├── marketing/                            — tudo de marketing/tráfego pago, fora do app (não é código do produto):
+│   ├── scripts/                         — automação de campanhas Meta Ads (Python)
+│   ├── prospeccao/                      — scraping de leads via Apify (Python) — não confundir com
+│   │                                    —   `src/app/admin/prospeccao/`, a tela do CRM dentro do app
+│   ├── criativos/                       — imagens/vídeos de anúncios
+│   └── mkt-oldfiles/                    — planos/documentos antigos de marketing (LashMenu)
 ├── legacy/                               — site estático LashMenu pré-Next.js — arquivo histórico, não é lido pelo app em nenhuma hipótese, não editar
-├── scripts/                              — `check-integrity.js` (roda no pre-commit), scripts de automação de marketing
+├── scripts/                              — só ferramentas de dev: `check-integrity.js` (roda no pre-commit),
+│                                        —   `create_test_client.js`, `criar_catalogo.py`
 └── middleware.ts                         — roteamento por subdomínio
 ```
 
@@ -194,7 +200,7 @@ Asaas → agenda bloqueada.
   documento antigo de visão/roadmap foi removido em 2026-09-22 por estar desatualizado e
   ativamente enganoso — roadmap mostrava o agendamento automático como "futuro" quando já
   estava em produção há tempos).
-- **Marketing/tráfego pago:** `docs/marketing/`.
+- **Marketing/tráfego pago:** `marketing/` (na raiz do projeto, fora de `docs/`).
 
 **Regra pra qualquer chat/agente:** nunca tratar um documento de `docs/historico/` como
 descrição do estado atual sem verificar contra o código real — várias decisões registradas lá
