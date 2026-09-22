@@ -19,7 +19,15 @@ export const CTASection: React.FC<CTASectionProps> = ({
   const instagramHandle = data.instagram_handle ? (data.instagram_handle.startsWith('@') ? data.instagram_handle : `@${data.instagram_handle}`) : '@instagram';
   const instagramUrl = data.instagram_handle ? `https://instagram.com/${data.instagram_handle.replace('@', '')}` : '#';
 
-  const footerBg = data.cta_bg_url || data.final_screen_bg_url || data.cover_media_url || 'https://lashmenu.com/modelos/mosaico/assets/img/Footer.png';
+  // Sem `cover_media_url` nessa cadeia de propósito (bug real, 2026-09-22):
+  // catálogos criados fora do fluxo normal (sem preset de nicho, ex: dados de
+  // teste) ficam com `cta_bg_url`/`final_screen_bg_url` nulos — com o cover
+  // na cadeia, trocar a foto de capa também mudava essa tela sem a
+  // profissional pedir isso ou ter como perceber. Agora, sem foto dedicada
+  // pra essa tela, cai direto no fallback genérico (a mesma foto que os
+  // catálogos criados pelo fluxo normal e sem imagem custom pra essa tela já
+  // usam — decide junto com fotos que ela nem editou, nunca copia a capa).
+  const footerBg = data.cta_bg_url || data.final_screen_bg_url || 'https://lashmenu.com/modelos/mosaico/assets/img/Footer.png';
 
   return (
     <section className="secao-contato is-visible" id="contato" data-screen-label="Contato">
