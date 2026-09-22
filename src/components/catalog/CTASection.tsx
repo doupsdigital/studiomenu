@@ -27,7 +27,13 @@ export const CTASection: React.FC<CTASectionProps> = ({
   // pra essa tela, cai direto no fallback genérico (a mesma foto que os
   // catálogos criados pelo fluxo normal e sem imagem custom pra essa tela já
   // usam — decide junto com fotos que ela nem editou, nunca copia a capa).
-  const footerBg = data.cta_bg_url || data.final_screen_bg_url || 'https://lashmenu.com/modelos/mosaico/assets/img/Footer.png';
+  //
+  // ATUALIZAÇÃO (2026-09-22): HeaderCover.tsx agora lê ESTA cadeia (via
+  // `cta_bg_url`/`final_screen_bg_url`) como fallback da própria capa, quando
+  // `cover_media_url`/`avatar_url` também estão vazios — de propósito, pedido
+  // da usuária. É seguro porque é via de mão única: a capa pode herdar dessa
+  // tela, mas o inverso (esta linha aqui) continua nunca lendo `cover_media_url`.
+  const footerBg = data.cta_bg_url || data.final_screen_bg_url || '/modelos/mosaico/assets/img/Footer.png';
 
   return (
     <section className="secao-contato is-visible" id="contato" data-screen-label="Contato">

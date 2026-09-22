@@ -22,8 +22,21 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
   const wspText = encodeURIComponent(`Olá! Vim pelo seu catálogo digital e gostaria de tirar uma dúvida.`);
   const wspUrl = `https://wa.me/${data.whatsapp_number}?text=${wspText}`;
 
-  // Se não houver foto de capa especificada, usamos o asset original do modelo
-  const heroImage = data.cover_media_url || data.avatar_url || 'https://lashmenu.com/modelos/mosaico/assets/img/Hero.png';
+  // Se a profissional não mandou foto de capa, cai pra trás na mesma foto que
+  // a tela final (Contato) já usa — via a cadeia dela (cta_bg_url >
+  // final_screen_bg_url), NUNCA o contrário: a tela final (CTASection.tsx)
+  // não lê `cover_media_url` de propósito (bug real, 2026-09-22 — comentário
+  // lá explica). Herdar nessa direção é seguro porque não é bidirecional: só
+  // a capa cai pra trás na tela final, a tela final nunca cai pra trás na
+  // capa. Se nenhuma das duas foi definida, cai no asset genérico do modelo
+  // (local, não mais externo — a URL de lashmenu.com quebrava sem aviso se o
+  // domínio antigo saísse do ar).
+  const heroImage =
+    data.cover_media_url ||
+    data.avatar_url ||
+    data.cta_bg_url ||
+    data.final_screen_bg_url ||
+    '/modelos/mosaico/assets/img/Hero.png';
   const isClassico = data.layout_model === 'classico' || heroImage.toLowerCase().includes('classico');
   const objectPosition = isClassico ? '45% 18%' : 'center 18%';
 
