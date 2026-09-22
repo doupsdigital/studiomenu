@@ -118,14 +118,39 @@ partir do próximo ciclo).
 
 ## 5. Workflow de Git e deploy
 
-- **`main`** — produção (`studiomenu.art`, chaves reais do Asaas). Protegida por ruleset no
-  GitHub: **nenhum push direto é aceito**, nem de admin — toda mudança entra por Pull Request
-  vindo de `desenv`.
-- **`desenv`** — branch de trabalho. Deploy automático na Vercel como Preview, com chaves
-  **sandbox** do Asaas — é onde qualquer mudança é testada antes de virar PR pra `main`.
+- **`main`** — produção (`studiomenu.art`, chaves reais do Asaas). **Sem trava técnica** — o
+  repositório é privado, e o GitHub só oferece proteção de branch (rulesets) de graça em
+  repositório público ou no plano pago (GitHub Pro); a usuária optou por não pagar e manter
+  privado. Chegou a existir um ruleset bloqueando push direto (2026-09-22), mas ele parou de
+  aplicar silenciosamente assim que o repositório virou privado — **descoberto na prática**, um
+  push de teste direto na `main` passou quando devia ter sido recusado. Foi então removido de
+  propósito, pra não passar falsa sensação de segurança. **A partir de agora, a única coisa que
+  impede um push/merge indevido na `main` é nunca fazer isso sem autorização explícita da usuária
+  pra aquela mudança específica** — ver regra reforçada na memória `feedback_dev_rules`.
+- **`desenv`** — branch de trabalho, o padrão pra qualquer tarefa nova (não precisa pedir pra
+  "mudar de branch" — é sempre aqui, a não ser que a usuária diga o contrário). Deploy automático
+  na Vercel como Preview, com chaves **sandbox** do Asaas.
 - Banco de dados de desenvolvimento (Supabase separado do de produção) — **ainda não existe,
   é o próximo passo** (ver pendências abaixo). Até lá, testes de banco rodam no Supabase de
   produção, só em catálogos de teste (sempre resetados depois).
+
+**Ciclo de uma mudança, do começo ao fim:**
+1. Trabalha e testa (`tsc`/`check-integrity.js`) na `desenv`, push.
+2. Passa o link de Preview da `desenv` pra usuária testar (inclusive no celular).
+3. Só depois da aprovação explícita dela, abre PR `desenv → main` e mescla.
+4. Vira produção de verdade em `studiomenu.art` a partir daí.
+
+**O link de Preview é sempre este** (muda só se a branch `desenv` for renomeada de novo):
+`https://studiomenu-git-desenv-doupsdigital-s-projects.vercel.app` — formato padrão da Vercel
+pra qualquer branch sem domínio próprio (`<projeto>-git-<branch>-<conta>.vercel.app`), diferente
+de `studiomenu.art`, que é o domínio customizado plugado especificamente na Produção. Pode pedir
+login da Vercel na primeira vez (Vercel Authentication ativa nesse ambiente, de propósito).
+
+**Ressalva importante:** `docs/historico/` existe só na `desenv`, nunca na `main` (decisão
+deliberada de limpeza). Por isso, promover uma mudança pra `main` **não é um merge automático de
+tudo** — é preciso levar só o que é código/produto (e `docs/atual/`, se tiver mudado), deixando
+`docs/historico/` de fora. Na prática isso não pesa porque commits de código (`feat:`/`fix:`) já
+ficam separados de commits de documentação (`docs:`) por hábito.
 
 ---
 
