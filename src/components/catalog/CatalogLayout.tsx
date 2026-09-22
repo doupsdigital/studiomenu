@@ -459,8 +459,11 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
             setActiveModal('procedure');
           }}
           onOpenAddCatModal={() => setActiveModal('category')}
-          bookingEnabled={!isEditMode && Boolean(catalogState.booking_enabled)}
-          onRequestBooking={!isEditMode && catalogState.booking_enabled ? setBookingItem : undefined}
+          // `agenda_paused` (Fase 23): ela pausou o agendamento automático
+          // temporariamente — cliente final cai no WhatsApp, como se fosse
+          // Básico, sem nenhum outro efeito (a Agenda dela continua normal).
+          bookingEnabled={!isEditMode && Boolean(catalogState.booking_enabled) && !catalogState.agenda_paused}
+          onRequestBooking={!isEditMode && catalogState.booking_enabled && !catalogState.agenda_paused ? setBookingItem : undefined}
         />
 
         {/* Seção Orientações */}

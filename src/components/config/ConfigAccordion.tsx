@@ -1,12 +1,13 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { Clock, CalendarX, CreditCard, UserCircle, Bell } from 'lucide-react';
+import { Clock, CalendarX, PauseCircle, CreditCard, UserCircle, Bell } from 'lucide-react';
 import type { Step } from 'react-joyride';
 import { SectionCard } from '@/components/app-shell/SectionCard';
 import { ProductTour } from '@/components/tour/ProductTour';
 import { BusinessHoursEditor } from './BusinessHoursEditor';
 import { ScheduleBlocksManager } from './ScheduleBlocksManager';
+import { AgendaPauseSection } from './AgendaPauseSection';
 import { SubscriptionSection } from './SubscriptionSection';
 import { AccountSection } from './AccountSection';
 import { NotificationsSection } from './NotificationsSection';
@@ -26,12 +27,14 @@ interface ConfigAccordionProps {
    *  admin) — sem isso, Horários e Bloqueios não têm nenhum efeito prático
    *  (a Agenda nem chega a mostrar conteúdo real), então ficam travados. */
   bookingEnabled: boolean;
+  /** Ela mesma pausou o agendamento automático temporariamente (Fase 23). */
+  agendaPaused: boolean;
   /** Conta do Supabase Auth já vinculada pro login real (Fase 17) — null
    *  enquanto a profissional só entra pelo link mágico. */
   authUserId: string | null;
 }
 
-type SectionKey = 'horarios' | 'bloqueios' | 'assinatura' | 'conta' | 'notificacoes';
+type SectionKey = 'horarios' | 'bloqueios' | 'pausar' | 'assinatura' | 'conta' | 'notificacoes';
 
 /** Acordeão da aba Config — 3 seções que já existiam (`BusinessHoursEditor`,
  *  `ScheduleBlocksManager`, `SubscriptionSection`), agora dentro de
@@ -50,11 +53,13 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
   billingCpfCnpj,
   paymentMethod,
   bookingEnabled,
+  agendaPaused,
   authUserId,
 }) => {
   const [open, setOpen] = useState<Record<SectionKey, boolean>>({
     horarios: false,
     bloqueios: true,
+    pausar: false,
     assinatura: false,
     conta: false,
     notificacoes: false,
@@ -91,6 +96,7 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
       conta: 'conta',
       horarios: 'horarios',
       bloqueios: 'bloqueios',
+      pausar: 'pausar',
       notificacoes: 'notificacoes',
     };
     const key = sectionForHash[hash];
@@ -146,6 +152,7 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
         ? [
             buildStep('horarios', 'Horários de atendimento', 'Defina os dias e horários em que você atende.'),
             buildStep('bloqueios', 'Bloqueios e folgas', 'Bloqueie datas específicas (férias, feriado, etc) sem mexer no seu expediente fixo.'),
+            buildStep('pausar', 'Desligar Agenda', 'Pause o agendamento automático quando precisar — suas clientes voltam a combinar horário pelo WhatsApp.'),
             ...(includeNotifications
               ? [buildStep('notificacoes', 'Notificações', 'Ative avisos no seu celular pra novos agendamentos.')]
               : []),
@@ -194,6 +201,20 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
           dataTour="bloqueios-header"
         >
           <ScheduleBlocksManager slug={slug} blocks={scheduleBlocks} />
+        </SectionCard>
+      </div>
+
+      <div id="pausar">
+        <SectionCard
+          icon={PauseCircle}
+          title="Desligar Agenda"
+          isOpen={open.pausar}
+          onToggle={() => toggle('pausar')}
+          locked={!bookingEnabled}
+          lockedHint="Disponível quando o agendamento automático (StudioMenu+) estiver ativo."
+          dataTour="pausar-header"
+        >
+          <AgendaPauseSection slug={slug} initialPaused={agendaPaused} />
         </SectionCard>
       </div>
 

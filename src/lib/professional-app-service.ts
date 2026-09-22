@@ -26,6 +26,10 @@ export interface ProfessionalOrderSummary {
   /** Qual plano aparece em destaque na tela de primeiro contato (Fase 22) —
    *  'plus' pra venda focada em agendamento automático. */
   first_offer_tier: 'basico' | 'plus';
+  /** Ela mesma pausou o agendamento automático temporariamente (Fase 23) —
+   *  só afeta o catálogo público (cliente final cai no WhatsApp); a Agenda
+   *  dela dentro do app continua acessível normalmente. */
+  agenda_paused: boolean;
 }
 
 /** Busca os dados que o app da profissional (`/app/[slug]`) precisa — um
@@ -36,7 +40,7 @@ export async function getOrderForProfessionalApp(slug: string): Promise<Professi
 
   const { data, error } = await supabaseAdmin
     .from('orders')
-    .select('id, slug, edit_token, client_name, studio_name, whatsapp_number, plan_tier, subscription_status, billing_email, billing_cpf_cnpj, payment_method, booking_enabled, auth_user_id, first_offer_tier')
+    .select('id, slug, edit_token, client_name, studio_name, whatsapp_number, plan_tier, subscription_status, billing_email, billing_cpf_cnpj, payment_method, booking_enabled, auth_user_id, first_offer_tier, agenda_paused')
     .eq('slug', normalizedSlug)
     .single();
 
@@ -59,5 +63,6 @@ export async function getOrderForProfessionalApp(slug: string): Promise<Professi
     booking_enabled: Boolean(data.booking_enabled),
     auth_user_id: data.auth_user_id || null,
     first_offer_tier: data.first_offer_tier === 'plus' ? 'plus' : 'basico',
+    agenda_paused: Boolean(data.agenda_paused),
   };
 }

@@ -29,7 +29,7 @@ export async function GET(request: Request) {
 
     const { data: order, error: orderErr } = await supabaseAdmin
       .from('orders')
-      .select('id, booking_enabled')
+      .select('id, booking_enabled, agenda_paused')
       .eq('slug', slug)
       .single();
 
@@ -37,7 +37,9 @@ export async function GET(request: Request) {
       return NextResponse.json({ success: false, message: 'Catálogo não encontrado.' }, { status: 404 });
     }
 
-    if (!order.booking_enabled) {
+    // `agenda_paused` (Fase 23): ela pausou temporariamente — mesmo efeito
+    // de não ter o agendamento automático ligado, sem mexer em `booking_enabled`.
+    if (!order.booking_enabled || order.agenda_paused) {
       return NextResponse.json({ success: false, message: 'Agendamento automático não está ativo pra este catálogo.' }, { status: 400 });
     }
 

@@ -53,6 +53,10 @@ export interface CatalogOrderData {
   /** Se true, o botão "agendar" do catálogo abre o wizard de horários reais
    *  em vez de redirecionar direto pro WhatsApp (agendamento automático). */
   booking_enabled?: boolean;
+  /** Ela mesma pausou o agendamento automático temporariamente (Fase 23) —
+   *  com `booking_enabled = true` mas isso em `true`, o catálogo se comporta
+   *  como se não tivesse o StudioMenu+ (WhatsApp em vez do wizard). */
+  agenda_paused?: boolean;
   categories?: string[];
   procedures: ProcedureItem[];
   instructions?: CatalogInstructions;

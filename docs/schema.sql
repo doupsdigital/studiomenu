@@ -58,6 +58,10 @@ CREATE TABLE IF NOT EXISTS public.orders (
     -- docs/migrations/2026-09-22_fase22_oferta_plus.sql) — venda focada em
     -- agendamento, sem forçar passar pelo Básico primeiro.
     first_offer_tier TEXT NOT NULL DEFAULT 'basico' CHECK (first_offer_tier IN ('basico', 'plus')),
+    -- Pausa do agendamento automático pela própria profissional (Fase 23,
+    -- docs/migrations/2026-09-22_fase23_pausar_agenda.sql) — só afeta o que a
+    -- cliente final vê no catálogo público, nunca o acesso dela à Agenda.
+    agenda_paused BOOLEAN NOT NULL DEFAULT false,
     -- Login real da profissional (docs/PLANO_PRODUCAO_V1.md, Fase 17): vínculo
     -- 1:1 opcional com uma conta do Supabase Auth. NULL até ela "reivindicar"
     -- o login (continua entrando só pelo link mágico até lá).

@@ -34,6 +34,7 @@ export default async function ConfigPage({ params }: ConfigPageProps) {
           billingCpfCnpj={order.billing_cpf_cnpj}
           paymentMethod={order.payment_method}
           bookingEnabled={order.booking_enabled}
+          agendaPaused={order.agenda_paused}
           authUserId={order.auth_user_id}
         />
       </main>
