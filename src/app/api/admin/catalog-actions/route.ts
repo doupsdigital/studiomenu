@@ -8,18 +8,20 @@ export async function PATCH(request: Request) {
   }
 
   try {
-    const { id, status, booking_enabled } = (await request.json()) as {
+    const { id, status, booking_enabled, first_offer_tier } = (await request.json()) as {
       id: string;
       status?: string;
       booking_enabled?: boolean;
+      first_offer_tier?: 'basico' | 'plus';
     };
-    if (!id || (status === undefined && booking_enabled === undefined)) {
-      return NextResponse.json({ success: false, message: 'id e status/booking_enabled são obrigatórios.' }, { status: 400 });
+    if (!id || (status === undefined && booking_enabled === undefined && first_offer_tier === undefined)) {
+      return NextResponse.json({ success: false, message: 'id e status/booking_enabled/first_offer_tier são obrigatórios.' }, { status: 400 });
     }
 
-    const updates: { status?: string; booking_enabled?: boolean } = {};
+    const updates: { status?: string; booking_enabled?: boolean; first_offer_tier?: 'basico' | 'plus' } = {};
     if (status !== undefined) updates.status = status;
     if (booking_enabled !== undefined) updates.booking_enabled = booking_enabled;
+    if (first_offer_tier !== undefined) updates.first_offer_tier = first_offer_tier;
 
     const { error } = await supabaseAdmin.from('orders').update(updates).eq('id', id);
     if (error) {

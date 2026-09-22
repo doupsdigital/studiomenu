@@ -25,6 +25,7 @@ export async function POST(request: Request) {
     const proceduresRaw = (formData.get('procedures') as string) || '[]';
     const coverFile = formData.get('coverFile') as File | null;
     const aiAdaptCover = formData.get('aiAdaptCover') === '1';
+    const firstOfferTier = formData.get('firstOfferTier') === 'plus' ? 'plus' : 'basico';
 
     if (!clientName || !whatsappNumber) {
       return NextResponse.json({ success: false, message: 'Nome e WhatsApp são obrigatórios.' }, { status: 400 });
@@ -104,6 +105,7 @@ export async function POST(request: Request) {
           layoutModel: layoutModel as LayoutModel,
           themeVariant: themeVariant as ThemeVariant,
           coverUrl,
+          firstOfferTier,
         })
       )
       .select()

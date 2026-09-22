@@ -45,6 +45,9 @@ export default function CriarComIAPage() {
 
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [aiAdaptCover, setAiAdaptCover] = useState(false);
+  // Fase 22: venda focada em agendamento — a tela de primeiro contato dela
+  // já abre oferecendo o Plus, sem passar pelo Básico.
+  const [sellPlusDirect, setSellPlusDirect] = useState(false);
   const [menuFiles, setMenuFiles] = useState<File[]>([]);
   const [procedures, setProcedures] = useState<ProcedureItem[]>([]);
 
@@ -137,6 +140,7 @@ export default function CriarComIAPage() {
       fd.append('procedures', JSON.stringify(procedures));
       if (coverFile) fd.append('coverFile', await compressImageFile(coverFile));
       fd.append('aiAdaptCover', aiAdaptCover ? '1' : '0');
+      fd.append('firstOfferTier', sellPlusDirect ? 'plus' : 'basico');
 
       const res = await fetch('/api/admin/finalize-catalog', {
         method: 'POST',
@@ -278,6 +282,10 @@ export default function CriarComIAPage() {
               )}
             </div>
 
+            {sellPlusDirect && (
+              <p className="text-center text-xs font-semibold text-rose-400">👑 Vai oferecer o Plus direto pra essa cliente</p>
+            )}
+
             <button
               type="button"
               onClick={handleCreateCatalog}
@@ -350,6 +358,30 @@ export default function CriarComIAPage() {
                 className="w-full bg-transparent py-3.5 pr-3.5 text-base text-white focus:outline-none"
               />
             </div>
+          </div>
+
+          <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-950 border border-slate-800">
+            <div className="pr-3">
+              <p className="text-sm font-semibold text-slate-300">Vender o Plus direto</p>
+              <p className="text-xs text-slate-500 mt-0.5">
+                {sellPlusDirect
+                  ? 'Ela vai ver a assinatura do Plus em destaque (agendamento automático), com opção de trocar pro Básico.'
+                  : 'Ela começa pelo Básico, como sempre — pode virar Plus depois, dentro do app.'}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setSellPlusDirect((v) => !v)}
+              className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${
+                sellPlusDirect ? 'bg-rose-500' : 'bg-slate-700'
+              }`}
+            >
+              <span
+                className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${
+                  sellPlusDirect ? 'translate-x-[18px]' : 'translate-x-[3px]'
+                }`}
+              />
+            </button>
           </div>
 
           <div>

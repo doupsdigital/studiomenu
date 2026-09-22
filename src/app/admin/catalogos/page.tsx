@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { CatalogOrderData } from '@/types/catalog';
 import { normalizeWhatsappBR } from '@/lib/format';
 import Link from 'next/link';
-import { ArrowLeft, Sparkles, ExternalLink, Search, RefreshCw, Scissors, Plus, Trash2, MessageCircle, Phone, Clock, Smartphone, CalendarClock, Globe } from 'lucide-react';
+import { ArrowLeft, Sparkles, ExternalLink, Search, RefreshCw, Scissors, Plus, Trash2, MessageCircle, Phone, Clock, Smartphone, CalendarClock, Globe, Crown } from 'lucide-react';
 import { usesSubdomainRouting, PRODUCTION_DOMAIN } from '@/lib/public-url';
 
 /** Campos de billing/agendamento não fazem parte do shape público do
@@ -12,6 +12,7 @@ import { usesSubdomainRouting, PRODUCTION_DOMAIN } from '@/lib/public-url';
 type AdminCatalog = CatalogOrderData & {
   plan_tier?: 'catalog' | 'basico' | 'plus';
   subscription_status?: 'none' | 'ativo' | 'suspenso' | 'cancelado';
+  first_offer_tier?: 'basico' | 'plus';
 };
 
 export default function AdminCatalogosPage() {
@@ -107,7 +108,12 @@ export default function AdminCatalogosPage() {
     const cleanPhone = normalizeWhatsappBR(item.whatsapp_number);
     const firstName = (item.client_name || '').split(' ')[0];
     const links = buildProfessionalLinks(item);
-    const message = `Olá, ${firstName}! ✨\n\nSeu catálogo digital oficial StudioMenu está pronto, calibrado e no ar! 🚀\n\n🔗 *Seu Link Exclusivo:*\n👉 ${links.official}\n\n📌 *O que fazer agora:*\n1. Abra o link no seu celular e confira seu catálogo completo.\n2. Coloque este link na bio do seu Instagram e no seu perfil do WhatsApp Business.\n3. Comece a enviar para suas clientes no momento do agendamento!\n\nQualquer dúvida ou ajuste que precisar, nossa equipe está à sua inteira disposição. Parabéns pelo seu novo posicionamento! 💖✨`;
+    // Fase 22: catálogo marcado pra vender o Plus direto entra com o
+    // agendamento automático como assunto principal, não o catálogo em si.
+    const message =
+      item.first_offer_tier === 'plus'
+        ? `Olá, ${firstName}! ✨\n\nSeu catálogo digital StudioMenu está pronto — e com ele você já pode liberar o *agendamento automático*: suas clientes escolhem o dia e o horário sozinhas, sem trocar mensagem com você. 📅\n\n🔗 *Seu Link Exclusivo:*\n👉 ${links.official}\n\n📌 *O que fazer agora:*\n1. Abra o link no seu celular e confira seu catálogo completo.\n2. Coloque este link na bio do seu Instagram e no seu perfil do WhatsApp Business.\n3. Pra ativar o agendamento automático, é só assinar — te mando o acesso em seguida.\n\nQualquer dúvida ou ajuste que precisar, nossa equipe está à sua inteira disposição. Parabéns pelo seu novo posicionamento! 💖✨`
+        : `Olá, ${firstName}! ✨\n\nSeu catálogo digital oficial StudioMenu está pronto, calibrado e no ar! 🚀\n\n🔗 *Seu Link Exclusivo:*\n👉 ${links.official}\n\n📌 *O que fazer agora:*\n1. Abra o link no seu celular e confira seu catálogo completo.\n2. Coloque este link na bio do seu Instagram e no seu perfil do WhatsApp Business.\n3. Comece a enviar para suas clientes no momento do agendamento!\n\nQualquer dúvida ou ajuste que precisar, nossa equipe está à sua inteira disposição. Parabéns pelo seu novo posicionamento! 💖✨`;
     return `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(message)}`;
   };
 
@@ -158,6 +164,32 @@ export default function AdminCatalogosPage() {
     } catch (e) {
       console.error('Erro ao atualizar booking_enabled:', e);
       showToast('❌ Erro ao atualizar agendamento automático.');
+    }
+  };
+
+  /** Fase 22: qual plano aparece em destaque na tela de primeiro contato
+   *  dela — 'plus' pra venda focada em agendamento. Não ativa nada sozinho,
+   *  só muda o que a tela oferece antes de ela assinar. */
+  const toggleFirstOfferTier = async (item: AdminCatalog) => {
+    if (!item.id) return;
+    const next = item.first_offer_tier === 'plus' ? 'basico' : 'plus';
+    try {
+      const res = await fetch('/api/admin/catalog-actions', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ id: item.id, first_offer_tier: next }),
+      });
+      const result = await res.json();
+      if (!result.success) {
+        showToast('❌ Erro ao atualizar a oferta inicial.');
+        return;
+      }
+      showToast(next === 'plus' ? '👑 Vai oferecer o Plus direto agora.' : '📋 Voltou a oferecer o Básico primeiro.');
+      fetchCatalogs();
+    } catch (e) {
+      console.error('Erro ao atualizar first_offer_tier:', e);
+      showToast('❌ Erro ao atualizar a oferta inicial.');
     }
   };
 
@@ -381,6 +413,23 @@ export default function AdminCatalogosPage() {
                       <CalendarClock className="w-3.5 h-3.5" />
                       Agendamento automático: {item.booking_enabled ? 'Ligado' : 'Desligado'}
                     </button>
+
+                    {/* Só faz sentido enquanto ela ainda não assinou nada — depois
+                     *  disso a tela de primeiro contato nem existe mais pro link
+                     *  dela, então o toggle não teria efeito nenhum. */}
+                    {(!item.plan_tier || item.plan_tier === 'catalog') && (
+                      <button
+                        onClick={() => toggleFirstOfferTier(item)}
+                        className={`mt-2 w-full px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 border transition-all ${
+                          item.first_offer_tier === 'plus'
+                            ? 'bg-amber-500/20 border-amber-500/60 text-amber-300'
+                            : 'bg-white/5 border-slate-700 text-slate-400'
+                        }`}
+                      >
+                        <Crown className="w-3.5 h-3.5" />
+                        Oferta inicial: {item.first_offer_tier === 'plus' ? 'Plus direto' : 'Básico (padrão)'}
+                      </button>
+                    )}
                   </div>
 
                   <div className="space-y-2">

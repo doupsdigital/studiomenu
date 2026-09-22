@@ -86,6 +86,10 @@ export interface OrderInsertInput {
   themeVariant: ThemeVariant;
   coverUrl: string;
   avatarUrl?: string;
+  /** Qual plano aparece em destaque na tela de primeiro contato dela (Fase
+   *  22) — 'plus' pra venda focada em agendamento automático, sem passar
+   *  pelo Básico. Padrão 'basico' (o de sempre). */
+  firstOfferTier?: 'basico' | 'plus';
 }
 
 /** Monta o payload completo pra criar um catálogo novo. Os campos "de
@@ -115,6 +119,7 @@ export function buildOrderInsertPayload(input: OrderInsertInput) {
     pre_care: preset.instructions?.pre_care || [],
     post_care: preset.instructions?.post_care || [],
     categories: [] as string[],
+    first_offer_tier: input.firstOfferTier || 'basico',
   };
 }
 

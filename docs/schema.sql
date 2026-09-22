@@ -54,6 +54,10 @@ CREATE TABLE IF NOT EXISTS public.orders (
     billing_email TEXT,
     billing_cpf_cnpj TEXT,
     cancellation_notice_hours INTEGER DEFAULT 24,
+    -- Qual plano aparece em destaque na tela de primeiro contato (Fase 22,
+    -- docs/migrations/2026-09-22_fase22_oferta_plus.sql) — venda focada em
+    -- agendamento, sem forçar passar pelo Básico primeiro.
+    first_offer_tier TEXT NOT NULL DEFAULT 'basico' CHECK (first_offer_tier IN ('basico', 'plus')),
     -- Login real da profissional (docs/PLANO_PRODUCAO_V1.md, Fase 17): vínculo
     -- 1:1 opcional com uma conta do Supabase Auth. NULL até ela "reivindicar"
     -- o login (continua entrando só pelo link mágico até lá).
