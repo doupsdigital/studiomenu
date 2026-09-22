@@ -5,6 +5,7 @@ import { isAdminRequestAuthorized } from '@/lib/admin-session';
 import { buildOrderInsertPayload, buildServicesPayload, resolveProfessionalSlug } from '@/lib/order-payload';
 import { isAllowedImageType } from '@/lib/file-validation';
 import { adaptCoverToPortrait } from '@/lib/cover-image-ai';
+import { optimizeImage } from '@/lib/image-optimize';
 
 const MAX_COVER_SIZE = 8 * 1024 * 1024; // 8MB
 
@@ -60,16 +61,23 @@ export async function POST(request: Request) {
 
       let buffer: Buffer = Buffer.from(await coverFile.arrayBuffer());
       let contentType = coverFile.type;
-      let fileExt = coverFile.name.split('.').pop() || 'jpg';
 
       const adapted = aiAdaptCover ? await adaptCoverToPortrait(buffer, coverFile.type) : null;
       if (adapted) {
         buffer = adapted.buffer;
         contentType = adapted.contentType;
-        fileExt = contentType.split('/').pop() || fileExt;
       }
 
-      const fileName = `${finalSlug}/${Date.now()}_cover.${fileExt}`;
+      // Sem etapa de compressão no navegador nesse fluxo (é o admin subindo,
+      // não o editor da profissional) — aqui é a única otimização que essa
+      // capa recebe. Roda depois da IA de propósito: a resposta dela vem em
+      // PNG grande (1024x1536), e comprimir antes só pra IA reprocessar de
+      // novo seria trabalho em dobro.
+      const optimized = await optimizeImage(buffer, contentType);
+      buffer = optimized.buffer;
+      contentType = optimized.contentType;
+
+      const fileName = `${finalSlug}/${Date.now()}_cover.${optimized.ext}`;
 
       const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
         .from('catalog-assets')
