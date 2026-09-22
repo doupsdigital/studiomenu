@@ -83,7 +83,6 @@ studiomenu/
 │   ├── historico/                       — registro por Fase (rastreabilidade — não é instrução)
 │   ├── estrategia/, marketing/          — visão de negócio e planos comerciais (não técnicos)
 │   └── schema.sql                       — schema atual do banco (fonte de verdade da estrutura de dados)
-├── referencias-externas/                — projetos de terceiros usados só como referência de design/UX (ex: LashAgenda) — não fazem parte do StudioMenu, nunca são importados pelo app
 ├── legacy/                               — site estático LashMenu pré-Next.js — arquivo histórico, não é lido pelo app em nenhuma hipótese, não editar
 ├── scripts/                              — `check-integrity.js` (roda no pre-commit), scripts de automação de marketing
 └── middleware.ts                         — roteamento por subdomínio

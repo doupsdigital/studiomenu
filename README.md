@@ -26,7 +26,6 @@ studiomenu/
 │   └── lib/            # supabase-admin, catalog-service, asaas, billing-service, scheduling/, ...
 ├── docs/atual/          # estado atual do projeto (ler primeiro)
 ├── docs/historico/       # registro por Fase — rastreabilidade, não é fonte de verdade do presente
-├── referencias-externas/ # projetos de terceiros usados só como referência de UX
 └── legacy/               # site estático LashMenu pré-Next.js — arquivo histórico, não editar
 ```
 

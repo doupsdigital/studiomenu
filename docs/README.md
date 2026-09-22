@@ -13,5 +13,4 @@
 
 ## Fora de `docs/`
 
-- **`referencias-externas/`** — projetos de terceiros guardados só como referência de design/UX (ex: LashAgenda). Não fazem parte do StudioMenu.
 - **`legacy/`** — site estático LashMenu pré-Next.js. Arquivo histórico, não editar.
