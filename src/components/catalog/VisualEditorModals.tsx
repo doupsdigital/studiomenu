@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { CatalogOrderData, ProcedureItem } from '@/types/catalog';
+import { compressImageFile } from '@/lib/image-compress';
 import { CoverModal } from './modals/CoverModal';
 import { ProcedureModal } from './modals/ProcedureModal';
 import { SocialModal } from './modals/SocialModal';
@@ -211,13 +212,17 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
     });
   }, [catalogData]);
 
-  // Upload de Imagem para Supabase Storage
+  // Upload de Imagem para Supabase Storage — comprime no navegador antes de
+  // enviar (capa maior que a foto de um procedimento, pois ocupa a tela
+  // inteira no topo do catálogo). A rota de upload comprime de novo no
+  // servidor, então isso aqui é sobre velocidade de envio, não segurança.
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, target: 'cover' | 'proc') => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const rawFile = e.target.files?.[0];
+    if (!rawFile) return;
 
     setIsUploading(true);
     try {
+      const file = await compressImageFile(rawFile, { maxDimension: target === 'cover' ? 1600 : 1000 });
       const formData = new FormData();
       formData.append('file', file);
       formData.append('slug', catalogData.slug);

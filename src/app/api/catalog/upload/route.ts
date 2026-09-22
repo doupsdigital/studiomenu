@@ -1,6 +1,32 @@
 import { NextResponse } from 'next/server';
+import sharp from 'sharp';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { isAllowedImageType } from '@/lib/file-validation';
+
+/** Redimensiona/reconverte pra WebP no servidor — rede de segurança atrás da
+ *  compressão que já roda no navegador (`compressImageFile`): garante que
+ *  nenhuma imagem grande entra no Storage mesmo se o cliente pular essa
+ *  etapa (upload direto pela API, navegador sem suporte a canvas grande,
+ *  etc). GIF passa direto (pode ser animado — `sharp` achataria pro 1º
+ *  frame). Qualquer falha aqui devolve o buffer original: melhor subir sem
+ *  comprimir do que travar o upload da profissional. */
+async function optimizeImage(buffer: Buffer, contentType: string): Promise<{ buffer: Buffer; contentType: string; ext: string }> {
+  if (contentType === 'image/gif') {
+    return { buffer, contentType, ext: 'gif' };
+  }
+  try {
+    const optimized = await sharp(buffer)
+      .rotate() // aplica a orientação EXIF (fotos de celular) antes de medir/redimensionar
+      .resize({ width: 1600, height: 1600, fit: 'inside', withoutEnlargement: true })
+      .webp({ quality: 82 })
+      .toBuffer();
+    return { buffer: optimized, contentType: 'image/webp', ext: 'webp' };
+  } catch (error) {
+    console.warn('[API Catalog Upload] Falha ao otimizar, usando original:', error);
+    const ext = contentType === 'image/png' ? 'png' : contentType === 'image/webp' ? 'webp' : 'jpg';
+    return { buffer, contentType, ext };
+  }
+}
 
 export async function POST(request: Request) {
   try {
@@ -38,14 +64,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: 'Não autorizado para upload neste catálogo.' }, { status: 403 });
     }
 
-    const fileExt = file.name.split('.').pop() || 'png';
-    const fileName = `${slug}/${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
-    const buffer = Buffer.from(await file.arrayBuffer());
+    const rawBuffer = Buffer.from(await file.arrayBuffer());
+    const { buffer, contentType, ext } = await optimizeImage(rawBuffer, file.type);
+    const fileName = `${slug}/${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${ext}`;
 
     const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
       .from('catalog-assets')
       .upload(fileName, buffer, {
-        contentType: file.type,
+        contentType,
         upsert: true,
       });
 
