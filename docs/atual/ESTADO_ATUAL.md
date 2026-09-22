@@ -118,9 +118,15 @@ partir do próximo ciclo).
 
 ## 5. Workflow de Git e deploy
 
-- **`main`** — produção (`studiomenu.art`, chaves reais do Asaas). Protegida por ruleset no
-  GitHub: **nenhum push direto é aceito**, nem de admin — toda mudança entra por Pull Request
-  vindo de `desenv`.
+- **`main`** — produção (`studiomenu.art`, chaves reais do Asaas). **Sem trava técnica** — o
+  repositório é privado, e o GitHub só oferece proteção de branch (rulesets) de graça em
+  repositório público ou no plano pago (GitHub Pro); a usuária optou por não pagar e manter
+  privado. Chegou a existir um ruleset bloqueando push direto (2026-09-22), mas ele parou de
+  aplicar silenciosamente assim que o repositório virou privado — **descoberto na prática**, um
+  push de teste direto na `main` passou quando devia ter sido recusado. Foi então removido de
+  propósito, pra não passar falsa sensação de segurança. **A partir de agora, a única coisa que
+  impede um push/merge indevido na `main` é nunca fazer isso sem autorização explícita da usuária
+  pra aquela mudança específica** — ver regra reforçada na memória `feedback_dev_rules`.
 - **`desenv`** — branch de trabalho, o padrão pra qualquer tarefa nova (não precisa pedir pra
   "mudar de branch" — é sempre aqui, a não ser que a usuária diga o contrário). Deploy automático
   na Vercel como Preview, com chaves **sandbox** do Asaas.
