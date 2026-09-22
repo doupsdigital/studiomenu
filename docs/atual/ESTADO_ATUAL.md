@@ -154,8 +154,16 @@ partir do próximo ciclo).
 **Ciclo de uma mudança, do começo ao fim:**
 1. Trabalha e testa (`tsc`/`check-integrity.js`) na `desenv`, push.
 2. Passa o link de Preview da `desenv` pra usuária testar (inclusive no celular).
-3. Só depois da aprovação explícita dela, abre PR `desenv → main` e mescla.
+3. Só depois da aprovação explícita dela, abre PR pra `main` (normalmente numa branch nova
+   cherry-picked a partir de `main`, não `desenv` inteira — ver ressalva do `docs/historico/`
+   abaixo) e ela mesma clica em "Merge pull request".
 4. Vira produção de verdade em `studiomenu.art` a partir daí.
+
+**Por que ainda usar PR sem a trava técnica (pergunta real da usuária, 2026-09-22):** o Git em si
+permitiria um `push` direto na `main` sem nada impedir. O PR continua por escolha, não por
+obrigação do GitHub — é o jeito de manter a usuária como o último passo antes de produção (ela
+precisa clicar em Merge de verdade, não só responder "pode" no chat), com registro visível de
+cada promoção. Confirmado com ela que é assim que ela quer continuar.
 
 **O link de Preview é sempre este** (muda só se a branch `desenv` for renomeada de novo):
 `https://studiomenu-git-desenv-doupsdigital-s-projects.vercel.app` — formato padrão da Vercel
