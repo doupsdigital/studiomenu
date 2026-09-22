@@ -141,9 +141,15 @@ partir do próximo ciclo).
 - **`desenv`** — branch de trabalho, o padrão pra qualquer tarefa nova (não precisa pedir pra
   "mudar de branch" — é sempre aqui, a não ser que a usuária diga o contrário). Deploy automático
   na Vercel como Preview, com chaves **sandbox** do Asaas.
-- Banco de dados de desenvolvimento (Supabase separado do de produção) — **ainda não existe,
-  é o próximo passo** (ver pendências abaixo). Até lá, testes de banco rodam no Supabase de
-  produção, só em catálogos de teste (sempre resetados depois).
+- **Banco de dados de desenvolvimento** (Supabase separado do de produção, projeto `studiomenu-dev`)
+  — criado em 2026-09-22. As variáveis `NEXT_PUBLIC_SUPABASE_URL`/`NEXT_PUBLIC_SUPABASE_ANON_KEY`/
+  `SUPABASE_SERVICE_ROLE_KEY` do ambiente **Preview** na Vercel apontam pra ele — só a `main`
+  (Produção) continua usando o banco real. Schema aplicado via `docs/schema.sql` (mesmo arquivo
+  de sempre). **Toda migração nova precisa rodar nos dois projetos** — no SQL Editor do
+  `studiomenu-dev` primeiro (pra testar), depois no de produção (pra valer). Catálogos de teste já
+  semeados nele: `dev-catalogo-simples` (gratuito) e `dev-catalogo-plus` (StudioMenu+ ativo,
+  agenda configurada, pronto pra testar o agendamento automático sem precisar passar pelo Asaas).
+  As chaves ficam em `.env.dev.local` (fora do Git) na máquina de trabalho.
 
 **Ciclo de uma mudança, do começo ao fim:**
 1. Trabalha e testa (`tsc`/`check-integrity.js`) na `desenv`, push.
@@ -168,13 +174,14 @@ ficam separados de commits de documentação (`docs:`) por hábito.
 ## 6. Pendências reais conhecidas (não resolvidas, não são só ideia)
 
 **Do lado do produto/negócio (ação da usuária, não é código):**
-1. Reativar a Vercel Authentication do ambiente de Preview (foi desligada pra facilitar testes).
-2. Remover o webhook antigo `studiomenu` (penalizado) no Asaas — manter só `studiomenu2`.
-3. Conferir as notificações do Asaas (e-mail/antecedência de cobrança do Pix).
-4. Definir regras de cancelamento/reembolso (inclui direito de arrependimento de 7 dias), nota
+1. Remover o webhook antigo `studiomenu` (penalizado) no Asaas — manter só `studiomenu2`.
+2. Conferir as notificações do Asaas (e-mail/antecedência de cobrança do Pix).
+3. Definir regras de cancelamento/reembolso (inclui direito de arrependimento de 7 dias), nota
    fiscal e taxas na margem.
-5. Ao abrir CNPJ: converter a conta Asaas, testar com valor baixo, só então reavaliar Pix Automático.
-6. Construir o banco de dados de desenvolvimento no Supabase (planejado, ainda não feito).
+4. Ao abrir CNPJ: converter a conta Asaas, testar com valor baixo, só então reavaliar Pix Automático.
+
+(Vercel Authentication do Preview: confirmado ativo em 2026-09-22 — item antigo desta lista
+dizia o contrário, estava desatualizado. Banco de desenvolvimento: concluído, ver seção 5.)
 
 **Testado com dinheiro real:** Pix Básico, upgrade pro Plus, webhook, cancelamento pelo painel
 Asaas → agenda bloqueada.
