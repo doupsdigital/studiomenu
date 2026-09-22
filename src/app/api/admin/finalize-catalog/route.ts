@@ -73,7 +73,7 @@ export async function POST(request: Request) {
 
       const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
         .from('catalog-assets')
-        .upload(fileName, new Uint8Array(buffer), { contentType, upsert: true });
+        .upload(fileName, new Uint8Array(buffer), { contentType, upsert: true, cacheControl: '31536000' });
 
       if (uploadError) {
         console.error('[Finalize Catalog] Erro no upload da capa:', uploadError);

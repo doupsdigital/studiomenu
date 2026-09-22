@@ -46,6 +46,7 @@ export const InstructionsSection: React.FC<InstructionsSectionProps> = ({
           src={bgImage}
           alt="Orientações"
           className="secao-orientacoes__foto"
+          loading="lazy"
         />
       </div>
       <div className="secao-orientacoes__scrim"></div>

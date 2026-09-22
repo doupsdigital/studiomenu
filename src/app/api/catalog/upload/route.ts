@@ -73,6 +73,12 @@ export async function POST(request: Request) {
       .upload(fileName, buffer, {
         contentType,
         upsert: true,
+        // Nome do arquivo já é único por upload (timestamp + sufixo aleatório
+        // — nunca sobrescreve o mesmo caminho), então é seguro pedir pro
+        // navegador guardar por 1 ano: nunca existe uma versão "velha" pra
+        // mostrar por engano, e visitas seguintes ao catálogo (ou a troca de
+        // uma foto por outra) não baixam essa imagem de novo.
+        cacheControl: '31536000',
       });
 
     if (uploadError) {

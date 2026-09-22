@@ -36,6 +36,7 @@ export const CTASection: React.FC<CTASectionProps> = ({
           src={footerBg}
           alt={data.client_name}
           className="secao-contato__foto"
+          loading="lazy"
         />
       </div>
       <div className="secao-contato__scrim"></div>

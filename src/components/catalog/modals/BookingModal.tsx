@@ -208,7 +208,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       <div className="modal-detalhe__backdrop" onClick={onClose} />
       <div className="modal-detalhe__sheet">
         <div className="modal__foto-wrap">
-          <img src={service.image_url || fallbackImage} alt={service.title} className="modal__foto" />
+          <img src={service.image_url || fallbackImage} alt={service.title} className="modal__foto" loading="lazy" />
           <div className="modal__scrim" />
           <button type="button" className="modal__fechar" aria-label="Fechar" onClick={onClose}>
             ✕

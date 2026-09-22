@@ -78,6 +78,7 @@ export const ProcedureDetailModal: React.FC<ProcedureDetailModalProps> = ({
             src={item.image_url || fallbackImage}
             alt={item.title}
             className="modal__foto"
+            loading="lazy"
           />
           <div className="modal__scrim" />
           <button
