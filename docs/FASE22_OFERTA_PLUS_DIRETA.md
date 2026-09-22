@@ -1,6 +1,6 @@
 # Fase 22 — Oferta do Plus direto (venda focada em agendamento)
 
-> **Para o novo chat / Claude:** este documento cobre a Fase 22 (2026-09-22), implementada sobre a Fase 21 (`docs/FASE21_PAGAMENTOS_CARTAO_PIX_RENOVACAO.md`, que continua valendo pra tudo de cobrança/Pix/cartão). Estado: **implementado, `tsc` limpo, aguardando o usuário rodar a migração no Supabase antes de testar de ponta a ponta.**
+> **Para o novo chat / Claude:** este documento cobre a Fase 22 (2026-09-22), implementada sobre a Fase 21 (`docs/FASE21_PAGAMENTOS_CARTAO_PIX_RENOVACAO.md`, que continua valendo pra tudo de cobrança/Pix/cartão). Estado: **implementado, testado de ponta a ponta no sandbox (os 2 cenários) pela usuária, e concluído.**
 
 ---
 
@@ -52,7 +52,7 @@ ALTER TABLE public.orders
     CHECK (first_offer_tier IN ('basico', 'plus'));
 ```
 
-**Ainda não rodada em produção** — o usuário precisa rodar no SQL Editor do Supabase antes de qualquer teste (mesmo padrão de todas as fases anteriores). `docs/schema.sql` já está atualizado.
+**Rodada em produção** (banco compartilhado entre preview e produção, mesmo padrão de todas as fases anteriores). `docs/schema.sql` já está atualizado.
 
 ---
 
@@ -75,17 +75,16 @@ Nada mudou em: `src/app/api/billing/checkout/route.ts`, `src/lib/asaas.ts`, webh
 
 ---
 
-## 5. Estado atual, pendências e como testar
+## 5. Estado atual e como foi testado
 
-**Implementado e com `tsc` limpo. Não testado de ponta a ponta ainda** — falta:
+**Migração rodada em produção** (Supabase compartilhado entre preview e produção). **Testado de ponta a ponta pela usuária, no sandbox (preview), nos 2 cenários — confirmado funcionando:**
 
-1. **O usuário rodar a migração** (seção 3) no Supabase.
-2. **Criar (ou converter) um catálogo de teste com `first_offer_tier = 'plus'`** — pelo toggle do admin (criação nova) ou pelo botão "Oferta inicial" na lista (catálogo existente, ainda em `plan_tier = 'catalog'`). O catálogo de teste padrão (`teste-manual-fase19`) está com `plan_tier = 'plus'` há várias fases, então precisaria de um reset completo (cancela a assinatura sandbox, zera `plan_tier`) pra servir esse teste — não fiz isso sem pedido explícito, porque é uma operação destrutiva (mesmo script de reset das fases anteriores, documentado em `HANDOFF_2026-09-18_FASE19-20.md` seção 7).
-3. **Roteiro de teste depois disso:**
-   - Abrir o link do app de um catálogo `first_offer_tier = 'plus'`, `plan_tier = 'catalog'` → a tela deve abrir com o Plus em destaque (R$69,90), não o Básico.
-   - Tocar no link "Prefiro começar só com o catálogo" → card troca pro Básico (R$39), sem reload.
-   - Assinar o Plus direto (Pix sandbox) → confirmar que ativa como Plus de verdade (`plan_tier = 'plus'`, `booking_enabled = true`), sem nenhuma passagem por Básico no banco.
-   - Assinar o Básico depois de ter trocado pra ele → confirmar que ativa como Básico normalmente.
-   - Conferir que um catálogo `first_offer_tier = 'basico'` (o padrão, qualquer catálogo já existente) continua com a tela idêntica a antes — nenhuma regressão visual pra quem não está nessa campanha.
+Dois catálogos de teste novos (não reaproveitei o `teste-manual-fase19`, que já estava em Plus ativo há várias fases): `teste-oferta-plus` (`first_offer_tier = 'plus'`) e `teste-oferta-basico` (`first_offer_tier = 'basico'`), cada um com 3 serviços agendáveis (`duration_minutes` preenchido) e expediente seg-sáb 08h-18h, pra também dar pra testar o agendamento automático, não só a assinatura.
+
+- **Cenário Plus direto:** tela abriu com o Plus em destaque; o link "Prefiro começar só com o catálogo" trocou o card pro Básico sem reload, e o link de volta funcionou; assinar o Plus direto ativou como Plus de verdade, sem nenhuma passagem por Básico; agendamento automático funcionando no catálogo público.
+- **Cenário Básico primeiro:** tela idêntica ao comportamento de sempre (sem nenhum link de trocar de plano) — confirmada a ausência de regressão pra quem não está nessa campanha.
+- **Toggle "Oferta inicial" na lista do admin:** confirmado que só aparece enquanto o catálogo está em `plan_tier = 'catalog'` (some depois que ela assina; reaparece se a assinatura for removida/resetada).
+
+Depois do teste, as duas assinaturas de sandbox foram canceladas de verdade no Asaas e os dois catálogos voltaram pro estado "nunca assinou nada" (mesmo script de reset da Fase 19/20, `HANDOFF_2026-09-18_FASE19-20.md` seção 7) — ficam guardados pra reaproveitar em testes futuros, mesmo padrão do `teste-manual-fase19`.
 
 **Decisão pendente, fora de código:** quanto cobrar pela criação do catálogo (o serviço de montagem, via WhatsApp/Kiwify) pra esse público — é independente da assinatura mensal dentro do app e não foi mexido aqui.
