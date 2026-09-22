@@ -1,5 +1,5 @@
 /** Preços dos planos pagos — fonte única de verdade, não hardcoded em
- *  vários arquivos (decisão registrada em docs/PLANO_AGENDAMENTO_STUDIOMENU_PLUS.md,
+ *  vários arquivos (decisão registrada em docs/historico/PLANO_AGENDAMENTO_STUDIOMENU_PLUS.md,
  *  ampliada na Fase 19 pro tier Básico). */
 export const BASICO_PRICE = 39;
 export const BASICO_PRICE_LABEL = 'R$ 39/mês';

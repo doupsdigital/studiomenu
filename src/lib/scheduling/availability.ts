@@ -1,6 +1,6 @@
 /**
  * Motor de disponibilidade do agendamento automático (Fase 1 do plano em
- * docs/PLANO_AGENDAMENTO_STUDIOMENU_PLUS.md). Função pura: recebe os dados já
+ * docs/historico/PLANO_AGENDAMENTO_STUDIOMENU_PLUS.md). Função pura: recebe os dados já
  * carregados do banco (horários de atendimento, bloqueios, agendamentos
  * existentes) e devolve os horários livres pra uma data + duração de serviço.
  *

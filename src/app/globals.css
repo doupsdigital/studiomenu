@@ -26,7 +26,7 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Tipografia do app da profissional (/app/[slug], docs/REESTRUTURACAO_VISUAL_APP.md)
+/* Tipografia do app da profissional (/app/[slug], docs/historico/REESTRUTURACAO_VISUAL_APP.md)
    — usa as fontes que o projeto já carrega (linha 1 deste arquivo), não as
    classes `font-serif`/`font-sans` do Tailwind (essas apontam pra Playfair
    Display/Inter, que não estão carregadas em lugar nenhum do projeto). */

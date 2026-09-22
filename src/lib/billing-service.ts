@@ -36,7 +36,7 @@ export async function activateSubscription(orderId: string): Promise<void> {
   // `booking_enabled` liga junto só pro Plus — sem isso, pagar o Plus não
   // fazia o agendamento automático funcionar de verdade pro cliente final
   // até o admin lembrar de ligar manualmente o toggle no painel (achado da
-  // revisão pós-Fase 7, ver docs/PLANO_AGENDAMENTO_STUDIOMENU_PLUS.md). O
+  // revisão pós-Fase 7, ver docs/historico/PLANO_AGENDAMENTO_STUDIOMENU_PLUS.md). O
   // Básico nunca liga agendamento (só catálogo + edição).
   await supabaseAdmin
     .from('orders')

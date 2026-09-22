@@ -35,7 +35,7 @@ function getSaoPauloDateStr(iso: string): string {
  *  de agendamentos (chips coloridos por status) e um cadeado quando o dia
  *  inteiro está fechado (sem expediente configurado pra aquele dia da semana
  *  ou coberto por um bloqueio de dia inteiro). Mesma estrutura do LashAgenda
- *  (ver docs/REESTRUTURACAO_VISUAL_APP.md, Fase 11) — clicar num dia navega
+ *  (ver docs/historico/REESTRUTURACAO_VISUAL_APP.md, Fase 11) — clicar num dia navega
  *  pra visão diária daquela data, em vez de abrir o formulário de novo
  *  agendamento direto como a referência faz (mais natural aqui, já que o
  *  "Dia" é a visão de trabalho de verdade). */

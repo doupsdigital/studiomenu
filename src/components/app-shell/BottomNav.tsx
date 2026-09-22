@@ -14,7 +14,7 @@ const SIDE_TAB_RIGHT = { key: 'config', label: 'Config', icon: Settings } as con
 
 /** Navegação inferior do app da profissional — Início à esquerda, Config à
  *  direita, e um botão central elevado pra Agenda, mesmo padrão do `TabBar`
- *  do LashAgenda (docs/REESTRUTURACAO_VISUAL_APP.md, Fase 1). O Catálogo
+ *  do LashAgenda (docs/historico/REESTRUTURACAO_VISUAL_APP.md, Fase 1). O Catálogo
  *  saiu da tabbar — agora só se chega lá pelo card de destaque no Início. */
 export const BottomNav: React.FC<BottomNavProps> = ({ slug }) => {
   const pathname = usePathname();

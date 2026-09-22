@@ -63,7 +63,7 @@ export async function POST(request: Request) {
     // só procedimentos novos (id provisório do cliente) geram INSERT com id
     // novo; só o que foi de fato removido no editor é apagado. Isso existe
     // pra não quebrar agendamentos que referenciam order_services.id (ver
-    // docs/PLANO_AGENDAMENTO_STUDIOMENU_PLUS.md, Fase 0) — antes, o id de
+    // docs/historico/PLANO_AGENDAMENTO_STUDIOMENU_PLUS.md, Fase 0) — antes, o id de
     // todo procedimento mudava a cada save, mesmo sem edição nenhuma nele.
     if (Array.isArray(catalogData.procedures)) {
       const rows = buildServicesPayload(catalogData.procedures, orderId);

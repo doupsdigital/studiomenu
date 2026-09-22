@@ -16,7 +16,7 @@ export interface ProfessionalOrderSummary {
   /** Se o agendamento automático está de fato ligado pro cliente final — via
    *  assinatura Plus ativa OU via toggle manual do admin (Fase 6). É essa
    *  flag, não o plano, que decide se a Agenda mostra conteúdo real ou o
-   *  upsell (ver docs/PLANO_AGENDAMENTO_STUDIOMENU_PLUS.md, achado da
+   *  upsell (ver docs/historico/PLANO_AGENDAMENTO_STUDIOMENU_PLUS.md, achado da
    *  revisão pós-Fase 7). */
   booking_enabled: boolean;
   /** Conta do Supabase Auth vinculada pro login real (Fase 17), se a
