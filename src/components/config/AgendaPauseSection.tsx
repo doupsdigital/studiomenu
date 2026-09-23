@@ -54,8 +54,8 @@ export const AgendaPauseSection: React.FC<AgendaPauseSectionProps> = ({ slug, in
           Pause o agendamento automático temporariamente
         </p>
         <p className="text-sm text-ink-soft leading-relaxed">
-          Suas clientes voltam a combinar horário com você pelo WhatsApp (é assim que funciona no StudioMenu Básico) — útil
-          pra férias, imprevistos ou qualquer folga. Você continua vendo e gerenciando sua agenda normalmente por aqui.
+          Suas clientes voltam a combinar horário com você pelo WhatsApp — útil pra férias, imprevistos ou qualquer folga.
+          Você continua vendo e gerenciando sua agenda normalmente por aqui.
         </p>
       </div>
 
