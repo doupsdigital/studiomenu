@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { CatalogOrderData } from '@/types/catalog';
 import { normalizeWhatsappBR } from '@/lib/format';
 import Link from 'next/link';
-import { ArrowLeft, Sparkles, ExternalLink, Search, RefreshCw, Scissors, Plus, Trash2, MessageCircle, Phone, Clock, Smartphone, CalendarClock, Globe, Crown } from 'lucide-react';
+import { ArrowLeft, Sparkles, ExternalLink, Search, RefreshCw, Scissors, Plus, Trash2, MessageCircle, Phone, Clock, Smartphone, CalendarClock, Globe, Crown, ChevronDown } from 'lucide-react';
 import { usesSubdomainRouting, PRODUCTION_DOMAIN } from '@/lib/public-url';
 
 /** Campos de billing/agendamento não fazem parte do shape público do
@@ -21,6 +21,19 @@ export default function AdminCatalogosPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [catalogToDelete, setCatalogToDelete] = useState<AdminCatalog | null>(null);
+  // Card começa "fechado" (só o essencial pro dia-a-dia) — links e ações
+  // raras (copiar link mágico/app, oferta inicial, excluir) ficam atrás
+  // desse toggle. Pedido pra reduzir a poluição visual, 2026-09-23.
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+
+  const toggleExpanded = (id: string) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -125,6 +138,14 @@ export default function AdminCatalogosPage() {
     const links = buildProfessionalLinks(item);
     const message = `Oi, ${firstName}! ✨\n\nAgora quero te apresentar o *app do seu StudioMenu* 📱\n\nÉ por ele que você:\n• vê e compartilha o link do seu catálogo\n• edita fotos, serviços e preços quando quiser, sem depender de ninguém\n• assina o plano pra manter tudo no ar\n\n👉 *Seu acesso ao app:*\n${links.app}\n\n📌 *Dicas:*\n1. Abra pelo celular. Ao abrir, aparecem umas dicas rápidas te mostrando cada parte.\n2. Esse link é só seu e já te deixa logada, então não compartilhe com ninguém.\n3. Dá pra instalar na tela inicial do celular, como um app de verdade.\n\nQualquer dúvida é só me chamar por aqui! 💖`;
     return `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(message)}`;
+  };
+
+  /** Botão de WhatsApp sempre visível no card — abre a conversa direto, sem
+   *  mensagem pré-pronta de entrega/app (aquelas são ações pontuais, essa é
+   *  o "preciso falar com ela agora" do dia-a-dia). */
+  const buildContactWhatsappUrl = (item: AdminCatalog) => {
+    const cleanPhone = normalizeWhatsappBR(item.whatsapp_number);
+    return `https://api.whatsapp.com/send?phone=${cleanPhone}`;
   };
 
   /** Os 3 links que a profissional pode receber, todos no mesmo formato de
@@ -285,10 +306,12 @@ export default function AdminCatalogosPage() {
                     minute: '2-digit',
                   })
                 : null;
+              const cardKey = item.id || item.slug || '';
+              const isExpanded = expandedIds.has(cardKey);
 
               return (
                 <div
-                  key={item.id || item.slug}
+                  key={cardKey}
                   className="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between space-y-4 hover:border-slate-700 transition-all shadow-xl"
                 >
                   <div>
@@ -319,92 +342,23 @@ export default function AdminCatalogosPage() {
                       {item.studio_name || item.client_name}
                     </h2>
                     <div className="flex items-center gap-2 mt-1 flex-wrap">
-                      <p className="text-sm text-slate-400">Por {item.client_name}</p>
+                      <p className="text-sm text-slate-300">Por {item.client_name}</p>
                       {dateStr && (
-                        <span className="flex items-center gap-1 text-xs text-slate-500">
+                        <span className="flex items-center gap-1 text-xs text-slate-400">
                           <Clock className="w-3.5 h-3.5" />
                           {dateStr}
                         </span>
                       )}
                     </div>
 
-                    <div className="mt-2.5 flex items-center gap-2 text-sm text-slate-400">
-                      <Phone className="w-4 h-4 text-slate-500" />
+                    <div className="mt-2.5 flex items-center gap-2 text-sm text-slate-200">
+                      <Phone className="w-4 h-4 text-slate-400" />
                       <span>{item.whatsapp_number || 'WhatsApp não informado'}</span>
                     </div>
 
-                    <div className="mt-2.5 text-xs text-slate-500 uppercase font-mono">
-                      {item.layout_model || 'mosaico'} / {item.theme_variant || 'rose'}
-                    </div>
-
-                    <div className="mt-3.5 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 space-y-1.5">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold uppercase tracking-wider text-rose-300 flex items-center gap-1.5">
-                          <Globe className="w-3.5 h-3.5" />
-                          Link Oficial do Catálogo
-                        </span>
-                        <button
-                          onClick={() => {
-                            navigator.clipboard.writeText(buildProfessionalLinks(item).official);
-                            showToast('🌐 Link Oficial copiado!');
-                          }}
-                          className="text-xs text-rose-300 hover:text-rose-200 font-bold underline flex items-center gap-1"
-                        >
-                          Copiar Link
-                        </button>
-                      </div>
-                      <p className="text-xs font-mono text-rose-200/80 truncate">
-                        {item.slug}.{PRODUCTION_DOMAIN}
-                      </p>
-                      <p className="text-[11px] text-rose-300/60">É esse que ela divulga: bio, WhatsApp, etc.</p>
-                    </div>
-
-                    <div className="mt-2 p-3 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1.5">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Link Mágico da Cliente</span>
-                        {item.edit_token && (
-                          <button
-                            onClick={() => {
-                              navigator.clipboard.writeText(buildProfessionalLinks(item).edit);
-                              showToast('🔗 Link Mágico de Edição copiado!');
-                            }}
-                            className="text-xs text-rose-400 hover:text-rose-300 font-bold underline flex items-center gap-1"
-                          >
-                            Copiar Link
-                          </button>
-                        )}
-                      </div>
-                      <p className="text-xs font-mono text-slate-400 truncate">
-                        {item.slug}.{PRODUCTION_DOMAIN}{item.edit_token ? `?edit=${item.edit_token.substring(0, 8)}...` : ''}
-                      </p>
-                    </div>
-
-                    {item.edit_token && (
-                      <div className="mt-2 p-3 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1.5">
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                            <Smartphone className="w-3.5 h-3.5" />
-                            Link do App
-                          </span>
-                          <button
-                            onClick={() => {
-                              navigator.clipboard.writeText(buildProfessionalLinks(item).app);
-                              showToast('📱 Link do App copiado!');
-                            }}
-                            className="text-xs text-rose-400 hover:text-rose-300 font-bold underline flex items-center gap-1"
-                          >
-                            Copiar Link
-                          </button>
-                        </div>
-                        <p className="text-xs font-mono text-slate-400 truncate">
-                          {item.slug}.{PRODUCTION_DOMAIN}/api/professional/login?slug={item.slug}&token={item.edit_token.substring(0, 8)}...
-                        </p>
-                      </div>
-                    )}
-
                     <button
                       onClick={() => toggleBookingEnabled(item)}
-                      className={`mt-2 w-full px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 border transition-all ${
+                      className={`mt-3.5 w-full px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 border transition-all ${
                         item.booking_enabled
                           ? 'bg-rose-500/20 border-rose-500/60 text-rose-300'
                           : 'bg-white/5 border-slate-700 text-slate-400'
@@ -413,23 +367,6 @@ export default function AdminCatalogosPage() {
                       <CalendarClock className="w-3.5 h-3.5" />
                       Agendamento automático: {item.booking_enabled ? 'Ligado' : 'Desligado'}
                     </button>
-
-                    {/* Só faz sentido enquanto ela ainda não assinou nada — depois
-                     *  disso a tela de primeiro contato nem existe mais pro link
-                     *  dela, então o toggle não teria efeito nenhum. */}
-                    {(!item.plan_tier || item.plan_tier === 'catalog') && (
-                      <button
-                        onClick={() => toggleFirstOfferTier(item)}
-                        className={`mt-2 w-full px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 border transition-all ${
-                          item.first_offer_tier === 'plus'
-                            ? 'bg-amber-500/20 border-amber-500/60 text-amber-300'
-                            : 'bg-white/5 border-slate-700 text-slate-400'
-                        }`}
-                      >
-                        <Crown className="w-3.5 h-3.5" />
-                        Oferta inicial: {item.first_offer_tier === 'plus' ? 'Plus direto' : 'Básico (padrão)'}
-                      </button>
-                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -455,38 +392,151 @@ export default function AdminCatalogosPage() {
                     </div>
 
                     <a
-                      href={buildDeliveryWhatsappUrl(item)}
+                      href={buildContactWhatsappUrl(item)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      onClick={() => approveAndDeliver(item)}
-                      className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:opacity-95 text-white text-sm font-bold flex items-center justify-center gap-2 shadow-lg transition-all"
+                      className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-emerald-500/30 text-emerald-300 text-sm font-bold flex items-center justify-center gap-2 transition-all"
                     >
                       <MessageCircle className="w-4 h-4" />
-                      <span>Aprovar & Entregar</span>
+                      <span>WhatsApp</span>
                     </a>
 
-                    {item.edit_token && (
+                    {/* Some depois de aprovado — o badge "Aprovado" já confirma
+                     *  a entrega; reenviar o app (se precisar) fica na área
+                     *  expansível, junto das outras ações raras. */}
+                    {isPending && (
                       <a
-                        href={buildAppWhatsappUrl(item)}
+                        href={buildDeliveryWhatsappUrl(item)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-emerald-500/40 text-emerald-300 text-sm font-bold flex items-center justify-center gap-2 transition-all"
+                        onClick={() => approveAndDeliver(item)}
+                        className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:opacity-95 text-white text-sm font-bold flex items-center justify-center gap-2 shadow-lg transition-all"
                       >
-                        <Smartphone className="w-4 h-4" />
-                        <span>Enviar app por WhatsApp</span>
+                        <MessageCircle className="w-4 h-4" />
+                        <span>Aprovar & Entregar</span>
                       </a>
                     )}
 
-                    <div className="pt-2 border-t border-slate-800/80 flex items-center justify-end">
-                      <button
-                        onClick={() => setCatalogToDelete(item)}
-                        className="p-2 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-all flex items-center gap-1.5 text-xs font-semibold"
-                        title="Excluir Catálogo"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                        <span>Excluir Catálogo</span>
-                      </button>
-                    </div>
+                    <button
+                      onClick={() => toggleExpanded(cardKey)}
+                      className="w-full py-2 flex items-center justify-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-slate-200 transition-all"
+                    >
+                      <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                      <span>{isExpanded ? 'Ocultar links e mais opções' : 'Mostrar links e mais opções'}</span>
+                    </button>
+
+                    {isExpanded && (
+                      <div className="space-y-2 pt-1">
+                        <div className="text-xs text-slate-400 uppercase font-mono">
+                          {item.layout_model || 'mosaico'} / {item.theme_variant || 'rose'}
+                        </div>
+
+                        <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 space-y-1.5">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold uppercase tracking-wider text-rose-300 flex items-center gap-1.5">
+                              <Globe className="w-3.5 h-3.5" />
+                              Link Oficial do Catálogo
+                            </span>
+                            <button
+                              onClick={() => {
+                                navigator.clipboard.writeText(buildProfessionalLinks(item).official);
+                                showToast('🌐 Link Oficial copiado!');
+                              }}
+                              className="text-xs text-rose-300 hover:text-rose-200 font-bold underline flex items-center gap-1"
+                            >
+                              Copiar Link
+                            </button>
+                          </div>
+                          <p className="text-xs font-mono text-rose-200/80 truncate">
+                            {item.slug}.{PRODUCTION_DOMAIN}
+                          </p>
+                          <p className="text-[11px] text-rose-300/60">É esse que ela divulga: bio, WhatsApp, etc.</p>
+                        </div>
+
+                        <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1.5">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold uppercase tracking-wider text-slate-300">Link Mágico da Cliente</span>
+                            {item.edit_token && (
+                              <button
+                                onClick={() => {
+                                  navigator.clipboard.writeText(buildProfessionalLinks(item).edit);
+                                  showToast('🔗 Link Mágico de Edição copiado!');
+                                }}
+                                className="text-xs text-rose-400 hover:text-rose-300 font-bold underline flex items-center gap-1"
+                              >
+                                Copiar Link
+                              </button>
+                            )}
+                          </div>
+                          <p className="text-xs font-mono text-slate-300 truncate">
+                            {item.slug}.{PRODUCTION_DOMAIN}{item.edit_token ? `?edit=${item.edit_token.substring(0, 8)}...` : ''}
+                          </p>
+                        </div>
+
+                        {item.edit_token && (
+                          <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1.5">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                                <Smartphone className="w-3.5 h-3.5" />
+                                Link do App
+                              </span>
+                              <button
+                                onClick={() => {
+                                  navigator.clipboard.writeText(buildProfessionalLinks(item).app);
+                                  showToast('📱 Link do App copiado!');
+                                }}
+                                className="text-xs text-rose-400 hover:text-rose-300 font-bold underline flex items-center gap-1"
+                              >
+                                Copiar Link
+                              </button>
+                            </div>
+                            <p className="text-xs font-mono text-slate-300 truncate">
+                              {item.slug}.{PRODUCTION_DOMAIN}/api/professional/login?slug={item.slug}&token={item.edit_token.substring(0, 8)}...
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Só faz sentido enquanto ela ainda não assinou nada — depois
+                         *  disso a tela de primeiro contato nem existe mais pro link
+                         *  dela, então o toggle não teria efeito nenhum. */}
+                        {(!item.plan_tier || item.plan_tier === 'catalog') && (
+                          <button
+                            onClick={() => toggleFirstOfferTier(item)}
+                            className={`w-full px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 border transition-all ${
+                              item.first_offer_tier === 'plus'
+                                ? 'bg-amber-500/20 border-amber-500/60 text-amber-300'
+                                : 'bg-white/5 border-slate-700 text-slate-400'
+                            }`}
+                          >
+                            <Crown className="w-3.5 h-3.5" />
+                            Oferta inicial: {item.first_offer_tier === 'plus' ? 'Plus direto' : 'Básico (padrão)'}
+                          </button>
+                        )}
+
+                        {item.edit_token && (
+                          <a
+                            href={buildAppWhatsappUrl(item)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-emerald-500/40 text-emerald-300 text-sm font-bold flex items-center justify-center gap-2 transition-all"
+                          >
+                            <Smartphone className="w-4 h-4" />
+                            <span>Enviar app por WhatsApp</span>
+                          </a>
+                        )}
+
+                        <div className="pt-2 border-t border-slate-800/80 flex items-center justify-end">
+                          <button
+                            onClick={() => setCatalogToDelete(item)}
+                            className="p-2 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-all flex items-center gap-1.5 text-xs font-semibold"
+                            title="Excluir Catálogo"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            <span>Excluir Catálogo</span>
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               );
