@@ -97,11 +97,26 @@ export default async function CatalogPage({ params, searchParams }: CatalogPageP
   const { edit_token: _editToken, ...publicCatalog } = catalog;
 
   return (
-    <CatalogLayout
-      data={publicCatalog}
-      isEditMode={isEditAuthorized}
-      editToken={edit || ''}
-      isNewCatalog={isEditAuthorized && isNew === '1'}
-    />
+    <>
+      {/* Resíduo do flash de tema Luxury→Rosé (bug real, 2026-09-23 — o fix
+       *  anterior em CatalogLayout.tsx resolveu o conteúdo do catálogo em
+       *  si, mas o fundo do próprio <html>/<body> — por trás/ao redor do
+       *  catálogo — continuava dependendo do useEffect lá, então ainda
+       *  piscava por uma fração de segundo antes do JS rodar). Esse
+       *  componente É Server Component (sabe `catalog.theme_variant` no
+       *  servidor), então um <style> aqui sai pronto no HTML, sem
+       *  depender de JavaScript nenhum — zero espaço pra flash. Só
+       *  precisa existir pro Luxury: o Rosé já é o fundo padrão do body
+       *  em globals.css, não tem nada pra sobrescrever. */}
+      {catalog.theme_variant === 'luxury' && (
+        <style>{`html, body { background: #0a0807; color: #f3efe9; }`}</style>
+      )}
+      <CatalogLayout
+        data={publicCatalog}
+        isEditMode={isEditAuthorized}
+        editToken={edit || ''}
+        isNewCatalog={isEditAuthorized && isNew === '1'}
+      />
+    </>
   );
 }
