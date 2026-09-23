@@ -39,19 +39,31 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
     '/modelos/mosaico/assets/img/Hero.webp';
   // Duas coisas diferentes que estavam misturadas numa variável só (bug
   // real reportado, 2026-09-23 — "mulher deslocada pra direita" no
-  // catálogo de exemplo Nail): o recorte horizontal da foto (`45% 18%`)
-  // foi calibrado pra foto específica classico/Hero.webp (mulher enquadrada
-  // mais à esquerda) — não faz sentido nenhum pra a foto genérica
-  // mosaico/Hero.webp (mulher centralizada), que é o que qualquer catálogo
-  // acaba usando quando não tem foto própria, INDEPENDENTE do layout
-  // escolhido (o preset do Nail, por ex., aponta pra mosaico/Hero mesmo
-  // quando o layout escolhido é Clássico). Então o recorte tem que decidir
-  // pela FOTO carregada, não pelo layout. Já o `hero--classico` (variação
-  // do Ken Burns/moldura do template) continua sendo por layout mesmo —
-  // isso sim é uma escolha de design do template, não da foto.
+  // catálogo de exemplo Nail): o recorte horizontal da foto foi calibrado
+  // pra foto específica classico/Hero.webp (mulher enquadrada mais à
+  // esquerda) — não faz sentido nenhum pra a foto genérica mosaico/Hero.webp
+  // (mulher centralizada), que é o que qualquer catálogo acaba usando
+  // quando não tem foto própria, INDEPENDENTE do layout escolhido (o preset
+  // do Nail, por ex., aponta pra mosaico/Hero mesmo quando o layout
+  // escolhido é Clássico). Então o recorte tem que decidir pela FOTO
+  // carregada, não pelo layout. Já o `hero--classico` (variação do Ken
+  // Burns/moldura do template) continua sendo por layout mesmo — isso sim é
+  // uma escolha de design do template, não da foto.
+  //
+  // Valor do recorte (`-20% 18%`) CORRIGIDO de volta, 2026-09-23: no
+  // primeiro fix eu troquei pra `45% 18%`, achando (por um comentário CSS
+  // antigo) que era o valor "de verdade" calibrado pra essa foto — mas
+  // `45% 18%` nunca tinha sido o que aparecia pra ninguém de verdade: o
+  // CSS antigo tinha DOIS valores conflitantes pro mesmo caso (`45% 18%` E,
+  // mais abaixo no arquivo, um `-20% 18%` que sempre vencia por vir depois
+  // — é esse `-20%` que qualquer catálogo Clássico mostrou de verdade nos
+  // últimos meses). Ao "limpar" o CSS duplicado eu troquei pelo valor
+  // errado (o que nunca rodou) em vez do que realmente estava em produção
+  // — regressão real, achada testando o showroom. `-20% 18%` de volta,
+  // agora só pra foto certa (não mais pro Nail).
   const isClassicoLayout = data.layout_model === 'classico';
   const isClassicoPhoto = heroImage.toLowerCase().includes('classico');
-  const objectPosition = isClassicoPhoto ? '45% 18%' : 'center 18%';
+  const objectPosition = isClassicoPhoto ? '-20% 18%' : 'center 18%';
 
   const handleCoverClick = () => {
     onOpenCoverModal?.();
