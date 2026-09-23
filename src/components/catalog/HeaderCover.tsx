@@ -37,15 +37,28 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
     data.cta_bg_url ||
     data.final_screen_bg_url ||
     '/modelos/mosaico/assets/img/Hero.webp';
-  const isClassico = data.layout_model === 'classico' || heroImage.toLowerCase().includes('classico');
-  const objectPosition = isClassico ? '45% 18%' : 'center 18%';
+  // Duas coisas diferentes que estavam misturadas numa variável só (bug
+  // real reportado, 2026-09-23 — "mulher deslocada pra direita" no
+  // catálogo de exemplo Nail): o recorte horizontal da foto (`45% 18%`)
+  // foi calibrado pra foto específica classico/Hero.webp (mulher enquadrada
+  // mais à esquerda) — não faz sentido nenhum pra a foto genérica
+  // mosaico/Hero.webp (mulher centralizada), que é o que qualquer catálogo
+  // acaba usando quando não tem foto própria, INDEPENDENTE do layout
+  // escolhido (o preset do Nail, por ex., aponta pra mosaico/Hero mesmo
+  // quando o layout escolhido é Clássico). Então o recorte tem que decidir
+  // pela FOTO carregada, não pelo layout. Já o `hero--classico` (variação
+  // do Ken Burns/moldura do template) continua sendo por layout mesmo —
+  // isso sim é uma escolha de design do template, não da foto.
+  const isClassicoLayout = data.layout_model === 'classico';
+  const isClassicoPhoto = heroImage.toLowerCase().includes('classico');
+  const objectPosition = isClassicoPhoto ? '45% 18%' : 'center 18%';
 
   const handleCoverClick = () => {
     onOpenCoverModal?.();
   };
 
   return (
-    <section className={`hero is-visible ${isClassico ? 'hero--classico' : ''}`} id="hero" data-screen-label="Capa">
+    <section className={`hero is-visible ${isClassicoLayout ? 'hero--classico' : ''}`} id="hero" data-screen-label="Capa">
       {/* 1. Foto de Fundo Ken Burns */}
       <div className="hero__foto-wrap">
         <img
