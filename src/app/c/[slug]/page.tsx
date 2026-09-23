@@ -28,7 +28,12 @@ export async function generateMetadata({ params }: CatalogPageProps): Promise<Me
 
   const title = `${catalog.studio_name || catalog.client_name} — Catálogo Exclusivo`;
   const description = `${catalog.hero_phrase} · Procedimentos, valores e agendamento online.`;
-  const image = catalog.cover_media_url || catalog.avatar_url || 'https://lashmenu.com/modelos/mosaico/assets/img/Hero.png';
+  // Precisa ser URL absoluta (é lida por crawlers externos pra gerar o
+  // preview de link do WhatsApp/Facebook, não pelo navegador da visitante —
+  // path relativo não funciona aqui). Domínio antigo trocado pelo real
+  // (achado investigando o bug de carregamento lento de imagens, 2026-09-23
+  // — apontava pro `lashmenu.com`, que não existe mais).
+  const image = catalog.cover_media_url || catalog.avatar_url || 'https://studiomenu.art/modelos/mosaico/assets/img/Hero.webp';
 
   return {
     title: title,
