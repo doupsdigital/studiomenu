@@ -76,14 +76,18 @@ export default async function InicioPage({ params }: InicioPageProps) {
     <>
       <PageTitleBar title="Início" icon={<Home className="w-5 h-5 text-ink-soft" />} slug={slug} />
       <main className="max-w-md mx-auto px-5 pt-6 pb-6 flex flex-col gap-4">
-      <GradientHeader>
+      {/* pt-5 pb-5 (em vez do p-6 padrão do GradientHeader, que também é
+       *  usado no cabeçalho da Agenda — não dava pra reduzir ali sem afetar
+       *  essa outra tela) + badge PLUS mais compacto (mt-2/py-1 em vez de
+       *  mt-3/py-1.5): pedido pra diminuir a altura desse cartão, 2026-09-23. */}
+      <GradientHeader className="pt-5 pb-5">
         <h1 className="font-serif-pro font-bold text-3xl">
           {greeting}, {firstName}!
         </h1>
         <p className="text-[15px] text-white/70 mt-1.5 italic">Bem-vinda ao seu Studio! ✨</p>
         {isPlusAtivo && (
           <div className="flex justify-end">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 mt-3 rounded-full bg-white/15 backdrop-blur-sm text-[13px] font-bold tracking-wide">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 mt-2 rounded-full bg-white/15 backdrop-blur-sm text-[13px] font-bold tracking-wide">
               <Crown className="w-3.5 h-3.5" />
               PLUS
             </span>
