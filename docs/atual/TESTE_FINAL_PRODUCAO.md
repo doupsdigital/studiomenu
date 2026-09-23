@@ -82,42 +82,89 @@ era erro meu no teste) — corrigido conferindo o código da rota antes de repet
 
 ## Parte 2 — Seu roteiro de teste (visual, UX, "sentir" o produto)
 
-Sugestão de ordem, mas siga como preferir. Marque o que for testando.
+**Concluída em 2026-09-23** — rodada inteira testada pela usuária, no celular de verdade (iPhone
+e Android), direto em produção. Vários bugs reais apareceram (lista completa na seção
+"Bugs encontrados" abaixo) — todos investigados, corrigidos, promovidos pra `main` via PR e
+reconfirmados em produção depois do fix. Esse round está oficialmente fechado; qualquer coisa
+nova a partir daqui é tratada como ajuste pontual avulso, não mais parte desta rodada.
 
 ### Em cada um dos 4 catálogos públicos (link da tabela acima)
-- [ ] Capa, cores do tema (Rosé/Luxury), tipografia — Mosaico e Clássico representados (2 de cada)
-- [ ] Grade de procedimentos, filtro por categoria, modal de detalhes de cada serviço
-- [ ] O serviço "Sob Consulta" do Studio (Alongamento em Gel + Esmaltação) — não deve abrir o
+- [X] Capa, cores do tema (Rosé/Luxury), tipografia — Mosaico e Clássico representados (2 de cada)
+- [X] Grade de procedimentos, filtro por categoria, modal de detalhes de cada serviço
+- [X] O serviço "Sob Consulta" do Studio (Alongamento em Gel + Esmaltação) — não deve abrir o
       wizard de agendamento, só o contato normal
-- [ ] Tela de Orientações (antes/depois) e tela final de Contato — **no Studio, a foto da capa
+- [X] Tela de Orientações (antes/depois) e tela final de Contato — **no Studio, a foto da capa
       deve ser a mesma da tela final** (é o fallback novo, veja se ficou bom visualmente)
-- [ ] Botão de agendar (wizard) — tente marcar um horário de verdade em cada um dos 4, em dias/
+- [X] Botão de agendar (wizard) — tente marcar um horário de verdade em cada um dos 4, em dias/
       horários diferentes dos já ocupados
-- [ ] No Nail, tente agendar bem perto de um horário já bloqueado (almoço 28/09, 12h-13h) e no dia
+- [X] No Nail, tente agendar bem perto de um horário já bloqueado (almoço 28/09, 12h-13h) e no dia
       todo bloqueado do Lash (25/09) — confirme que o sistema recusa/não oferece esses horários
 
 ### No app da profissional (link "entrar" da tabela acima), em cada um dos 4
-- [ ] **Início**: checklist de onboarding, avisos
-- [ ] **Agenda (visão Dia)**: os cards de diferentes status (confirmado, pendente, concluído,
+- [X] **Início**: checklist de onboarding, avisos
+- [X] **Agenda (visão Dia)**: os cards de diferentes status (confirmado, pendente, concluído,
       falta, cancelado) — confira se as cores/ícones batem com o que cada status deveria mostrar
-- [ ] **Agenda (visão Mês)**: navegue até o mês que vem (tem 1 agendamento pendente no Nail lá)
-- [ ] **Agenda**: confira o dia lotado da Estética (quase o expediente inteiro ocupado) e o dia do
+- [X] **Agenda (visão Mês)**: navegue até o mês que vem (tem 1 agendamento pendente no Nail lá)
+- [X] **Agenda**: confira o dia lotado da Estética (quase o expediente inteiro ocupado) e o dia do
       Studio com um intervalo grande no meio — os horários livres aparecem certos?
-- [ ] **Config → Horários/Bloqueios**: os bloqueios semeados aparecem certos (folga do Lash,
+- [X] **Config → Horários/Bloqueios**: os bloqueios semeados aparecem certos (folga do Lash,
       almoço do Nail)?
-- [ ] **Config → Desligar Agenda**: teste ligar e desligar você mesma (eu já testei via API, mas
+- [X] **Config → Desligar Agenda**: teste ligar e desligar você mesma (eu já testei via API, mas
       vale testar pela tela de verdade)
-- [ ] **Config → Notificações**: ative push num desses catálogos e confirme que chega no celular
+- [X] **Config → Notificações**: ative push num desses catálogos e confirme que chega no celular
       quando alguém agenda pelo catálogo público (esse eu não consigo testar sozinho)
-- [ ] **Config → Minha assinatura / Minha conta**: aparência geral, mesmo sem uma assinatura Asaas
+- [X] **Config → Minha assinatura / Minha conta**: aparência geral, mesmo sem uma assinatura Asaas
       real por trás desses 4 catálogos de exemplo
 
 ### Geral
-- [ ] Testar em pelo menos um catálogo pelo celular de verdade (não só navegador desktop)
-- [ ] Qualquer coisa que parecer estranha, mesmo sem certeza se é bug — anota aqui embaixo
+- [X] Testar em pelo menos um catálogo pelo celular de verdade (não só navegador desktop)
+- [X] Qualquer coisa que parecer estranha, mesmo sem certeza se é bug — anota aqui embaixo
 
 ---
 
-## Bugs encontrados (preencher conforme for achando)
+## Bugs encontrados (todos corrigidos e reconfirmados em produção)
 
-_(nada registrado até agora — nem na Parte 1 nem na Parte 2)_
+Achados pela usuária testando no celular (iPhone e Android), investigados e corrigidos um a um,
+cada um promovido pra `main` via PR própria e reconfirmado em produção depois do fix.
+
+**App da profissional / iOS:**
+- Tabbar (Início/Agenda/Config) flutuando sobre o conteúdo ao rolar a tela na Safari — falha
+  conhecida do WebKit com `position: fixed`, corrigida forçando a barra pra própria camada gráfica.
+- Card de agendamento pendente estourava o padding direito com nome de serviço longo (texto não
+  truncava, empurrava o botão "Aceitar" pra fora da tela).
+- Splash screen ao abrir o app instalado: não existia (Safari não lê o manifest pra isso, exige
+  tags próprias) — implementada, e mais 2 rodadas de fix até ficar 100% (não aparecia no Modo
+  Escuro; depois, viewport duplicado + tag de compatibilidade antiga faltando).
+- Botão "Instalar" só existia pro Chrome/Android (dependia de um evento exclusivo dele) — agora
+  aparece também no iPhone, abrindo um passo a passo manual em vez do diálogo nativo (que o iOS
+  não tem).
+
+**Carregamento de imagens:**
+- Catálogos demorando pra carregar / tela preta antes das fotos aparecerem: as fotos **padrão**
+  de todo catálogo novo (capa, grade, orientações) nunca tinham sido comprimidas — convertidas
+  pra WebP, 94% menores (39MB → 2,3MB no total).
+- Consequência direta do fix acima: capa da Estética sumindo (404) — o Windows não diferencia
+  maiúscula de minúscula em nome de arquivo, e `Hero.webp`/`hero.webp` colidiram na conversão.
+  Corrigido recuperando o arquivo certo e dando nomes definitivamente distintos.
+- Outra consequência: foto do layout Clássico (Nail) deslocada pra esquerda — regressão ao
+  corrigir o bug acima, uma segunda rodada trocou pelo valor de recorte errado. Corrigido de vez.
+
+**Visual dos catálogos:**
+- Flash do tema Rosé aparecendo por uma fração de segundo em catálogos Luxury antes de trocar pro
+  tema certo — 2 rodadas até eliminar de vez (conteúdo do catálogo primeiro, depois o resíduo no
+  fundo do `<html>`/`<body>`).
+- Modal de detalhes de procedimento sem Investimento/Duração em Nail/Estética/Studio (só campos
+  customizados) — não era decisão documentada, era uma regra que só o preset do Lash seguia.
+  Padronizado nos 4 nichos.
+- Botão "Agendar [nome do serviço]" quebrando linha em nomes compridos — texto fixo agora
+  ("Agendar agora"), nome do serviço já aparece no título do modal.
+
+**Showroom (`/c/showcase/[niche]`):**
+- Painel "Personalizar" começava fechado — agora abre já expandido.
+
+**Config:**
+- Texto de "Desligar Agenda" reescrito (tinha ficado um parágrafo só, sem hierarquia visual).
+- Texto de "Minha conta" (depois de configurar acesso) reescrito mais claro, com
+  `studiomenu.art/entrar` virando link de verdade, clicável.
+- Novo card "Suporte e dúvidas" (não é bug — funcionalidade nova pedida durante os testes):
+  WhatsApp direto com a StudioMenu, último item do acordeão, colapsado por padrão.
