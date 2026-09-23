@@ -444,8 +444,11 @@ body[data-theme="luxury"] .lm-cover-edit-btn,
   -webkit-tap-highlight-color: transparent !important;
 }
 
-html[data-theme="luxury"] .lm-btn-add-service,
-body[data-theme="luxury"] .lm-btn-add-service {
+/* Sem prefixo de elemento (mesmo motivo do fix em catalog-theme.css,
+   2026-09-22/23): casa com qualquer ancestral com o atributo, não só
+   html/body — o wrapper do catálogo (CatalogLayout.tsx) já carrega isso
+   desde o SSR. */
+[data-theme="luxury"] .lm-btn-add-service {
   background: rgba(255, 255, 255, 0.08) !important;
   border: 2px dashed #e5a9b8 !important;
   color: #e5a9b8 !important;

@@ -162,7 +162,18 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
     showToast('🔄 Modelo alterado!');
   };
 
-  // Sincronizar data-theme no <body> para ativar as regras CSS do tema Luxury/Rosé
+  // Sincronizar data-theme no <html>/<body> — complementa o `data-theme` já
+  // colocado direto no JSX do wrapper (abaixo), que é o que realmente evita
+  // o "pisca" (bug real reportado, 2026-09-23): esse aqui só via useEffect
+  // rodava depois do primeiro paint, então a primeira pintura da tela SEMPRE
+  // usava as cores padrão (Rosé, por não ter nenhum data-theme ainda) antes
+  // de trocar pra Luxury — visível como um flash rápido de rosa em qualquer
+  // catálogo Luxury. O wrapper resolve isso pra quase tudo (é ancestral de
+  // todo o conteúdo real do catálogo), mas html/body em si só um componente
+  // de servidor conseguiria setar sem esse useEffect — mantido só pra cobrir
+  // a cor de fundo do html/body fora do wrapper (ex: bounce de overscroll no
+  // iOS), que segue tendo esse mesmo atraso residual (bem mais raro/sutil
+  // que o flash de conteúdo que motivou o fix).
   useEffect(() => {
     const theme = catalogState.theme_variant || 'rose';
     document.body.setAttribute('data-theme', theme);
@@ -364,7 +375,18 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
   };
 
   return (
-    <div className={`mosaico-wrapper ${isLuxury ? 'theme-luxury' : 'theme-rose'}`}>
+    // `data-theme` direto aqui (não só via useEffect acima) é o que
+    // elimina o flash de verdade: como isLuxury já vem da prop `data`
+    // (conhecida no servidor), esse atributo já sai certo no HTML que o
+    // Next manda de cara — as regras `[data-theme="luxury"] { ... }` de
+    // catalog-theme.css/scheduling-wizard.css casam com QUALQUER
+    // ancestral que tenha o atributo, não precisam ser especificamente
+    // <html>/<body>, então esse div (ancestral de toda a tela real do
+    // catálogo) já resolve pra praticamente tudo.
+    <div
+      className={`mosaico-wrapper ${isLuxury ? 'theme-luxury' : 'theme-rose'}`}
+      data-theme={isLuxury ? 'luxury' : 'rose'}
+    >
       {/* 0. TOAST DE FEEDBACK DAS EDIÇÕES LOCAIS */}
       {isEditMode && toastMessage && <div className="lm-inline-toast">{toastMessage}</div>}
 
