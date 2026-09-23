@@ -45,7 +45,17 @@ export const BottomNav: React.FC<BottomNavProps> = ({ slug }) => {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-surface border-t border-linen pb-[env(safe-area-inset-bottom)]">
+    <nav
+      className="fixed bottom-0 left-0 right-0 z-40 bg-surface border-t border-linen pb-[env(safe-area-inset-bottom)]"
+      // Falha conhecida e antiga do WebKit/Safari no iOS: `position: fixed`
+      // pode "descolar" da borda da tela e flutuar sobre o conteúdo durante
+      // a animação de recolher/mostrar a barra de ferramentas do Safari ao
+      // rolar a página (reportado no iPhone, 2026-09-23). Forçar essa barra
+      // pra própria camada gráfica (GPU) evita que o Safari recalcule a
+      // posição errado nessa animação — mitigação padrão pra esse bug do
+      // WebKit, não muda nada visualmente nem depende de lógica nossa.
+      style={{ transform: 'translateZ(0)', WebkitBackfaceVisibility: 'hidden' }}
+    >
       <div className="max-w-md mx-auto relative flex items-stretch h-[68px]">
         {/* Sem coluna reservada pro botão central — ele já é posicionado de
          *  forma absoluta por cima, então as 2 abas dividem a largura toda

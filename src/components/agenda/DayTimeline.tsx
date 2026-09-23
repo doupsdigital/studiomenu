@@ -220,7 +220,17 @@ export const DayTimeline: React.FC<DayTimelineProps> = ({
                 tabIndex={0}
                 onClick={() => onAppointmentClick(appt)}
                 onKeyDown={(e) => e.key === 'Enter' && onAppointmentClick(appt)}
-                className="flex-1 min-h-[56px] rounded-[14px] bg-surface border border-[#F3E6CE] border-l-4 border-l-[#D79A2B] px-3.5 py-2 flex items-center justify-between gap-3 cursor-pointer"
+                // `overflow-hidden` aqui não é só estético: sem ele, esse card
+                // (que é item flexível na linha externa — horário + card — e
+                // ao mesmo tempo container flexível dos próprios filhos) não
+                // reduz de largura quando o texto é longo (ex.: nome de
+                // serviço combinado tipo "Combo Lash + Sobrancelha VIP") —
+                // ele estoura pra fora do padding direito e empurra o botão
+                // "Aceitar" pra fora da tela, em vez de truncar com "...".
+                // Bug real reportado no app (2026-09-23). O card de
+                // confirmado/concluído/falta logo abaixo já tinha essa mesma
+                // proteção — só faltava aqui.
+                className="flex-1 min-h-[56px] rounded-[14px] overflow-hidden bg-surface border border-[#F3E6CE] border-l-4 border-l-[#D79A2B] px-3.5 py-2 flex items-center justify-between gap-3 cursor-pointer"
               >
                 <div className="min-w-0">
                   <p className="text-base font-semibold text-ink truncate">{appt.client_name}</p>
