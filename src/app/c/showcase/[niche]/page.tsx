@@ -58,6 +58,11 @@ export default function ShowcasePage({ params }: { params: Promise<{ niche: stri
         onChangeLayout={setLayoutModel}
         onChangeTheme={setThemeVariant}
         onCoverScreen={onCoverScreen}
+        // Começa aberto no showroom de propósito (pedido, 2026-09-23) — é
+        // o link que ela manda pra cliente testar os modelos, então o
+        // controle de tema/layout precisa já estar visível de cara, não
+        // escondido atrás de um toque.
+        defaultOpen
       />
 
       {/* Renderização do Catálogo Real — mesmo componente usado nos catálogos de clientes.
