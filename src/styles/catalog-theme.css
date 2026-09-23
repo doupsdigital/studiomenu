@@ -1935,14 +1935,19 @@ html[data-theme="luxury"], body[data-theme="luxury"] {
    O seletor de tema atual é o painel "Personalizar" (React), sem CSS. */
 
 /* Bloco `.hero--classico .hero__foto { object-position: -20% 18% !important }`
-   removido daqui (bug real, 2026-09-23 — "mulher deslocada pra direita" no
-   catálogo de exemplo Nail): era um segundo `!important` pro mesmo seletor
-   da regra lá em cima (linha ~377), vindo depois no arquivo — então sempre
-   vencia a cascata e travava TODO catálogo de layout Clássico nesse recorte
-   errado, sem nenhuma lógica por trás do valor -20% (nem comentário
-   explicando de onde veio). A regra de cima já não define mais
-   object-position nenhum (ver comentário lá) — decisão passou a ser só do
-   JS, por foto carregada, não por layout. */
+   removido daqui, 2026-09-23. Era um segundo `!important` pro mesmo seletor
+   da regra lá em cima (linha ~377), vindo depois no arquivo — sempre vencia
+   a cascata. CORREÇÃO (mesmo dia): esse `-20%` NÃO era um valor órfão sem
+   sentido como eu achei na hora — era o valor que estava rodando de
+   verdade pra QUALQUER catálogo Clássico há meses (por vencer a cascata),
+   e é o certo pra foto específica classico/Hero.webp (mulher enquadrada à
+   esquerda na imagem). O bug real (mulher deslocada no Nail) era só de
+   ESCOPO — esse `-20%` sendo aplicado por LAYOUT (a qualquer catálogo
+   Clássico) em vez de por FOTO (só quando a foto é mesmo essa) —, não do
+   valor em si. Removido daqui porque a decisão passou a ser só do JS
+   (HeaderCover.tsx, `isClassicoPhoto`), que preserva o valor `-20% 18%`
+   mas agora só pra foto certa — object-position nenhum fica mais definido
+   aqui (ver comentário na regra de cima). */
 
 /* ==========================================================================
    SUPORTE AO MODELO CLÁSSICO (LISTA EDITORIAL) - ROSÉ & LUXURY
