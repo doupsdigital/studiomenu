@@ -34,7 +34,13 @@ export const BottomNav: React.FC<BottomNavProps> = ({ slug }) => {
       <Link
         key={key}
         href={href}
-        className={`flex-1 flex flex-col items-center justify-center gap-1.5 text-[13px] font-semibold transition-colors ${
+        // `active:` (CSS :active, dispara no touchstart em <a> real, sem
+        // precisar de JS) dá um retorno visual NA HORA do toque — antes de
+        // qualquer coisa da navegação em si acontecer. Resolve a sensação
+        // de "cliquei mas não sei se registrou" (bug real reportado,
+        // 2026-09-23), que a tela de loading.tsx de cada aba sozinha não
+        // cobre (essa só aparece depois que a navegação já começou).
+        className={`flex-1 flex flex-col items-center justify-center gap-1.5 text-[13px] font-semibold transition duration-150 active:scale-95 active:opacity-60 ${
           isActive ? 'text-rose-600' : 'text-ink-faint hover:text-ink-soft'
         }`}
       >
@@ -67,7 +73,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ slug }) => {
         {/* Botão central em destaque — Agenda */}
         <Link
           href={`/app/${slug}/agenda`}
-          className={`absolute left-1/2 -translate-x-1/2 -top-6 w-16 h-16 rounded-full flex items-center justify-center text-white shadow-lg shadow-rose-600/30 border-4 border-surface transition-colors ${
+          className={`absolute left-1/2 -translate-x-1/2 -top-6 w-16 h-16 rounded-full flex items-center justify-center text-white shadow-lg shadow-rose-600/30 border-4 border-surface transition duration-150 active:scale-90 ${
             isAgendaActive ? 'bg-rose-700' : 'bg-rose-600'
           }`}
         >
