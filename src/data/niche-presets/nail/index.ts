@@ -29,9 +29,9 @@ export const nailPreset: CatalogOrderData = {
       is_highlight: true,
       image_url: '/modelos/nail/assets/img/alongamento-em-gel.webp',
       specs: [
-        ['Efeito', 'Natural e Elegante'],
+        ['Investimento', 'R$ 220,00'],
+        ['Duração', '2h30min'],
         ['Durabilidade', '20 a 25 dias'],
-        ['Técnica', 'Gel no Molde Fixo'],
       ],
     },
     {
@@ -43,9 +43,9 @@ export const nailPreset: CatalogOrderData = {
       category: 'Blindagem',
       image_url: '/modelos/nail/assets/img/banho-de-gel.webp',
       specs: [
-        ['Efeito', 'Fortalecimento Nativo'],
+        ['Investimento', 'R$ 130,00'],
+        ['Duração', '1h30min'],
         ['Durabilidade', 'Até 20 dias'],
-        ['Técnica', 'Blindagem com Gel'],
       ],
     },
     {
@@ -57,9 +57,9 @@ export const nailPreset: CatalogOrderData = {
       category: 'Manutenção',
       image_url: '/modelos/nail/assets/img/manutencao-de-gel.webp',
       specs: [
+        ['Investimento', 'R$ 140,00'],
+        ['Duração', '1h45min'],
         ['Intervalo', 'Até 25 dias'],
-        ['Reposição', 'Gel de Construção'],
-        ['Acabamento', 'Nivelamento & Brilho'],
       ],
     },
     {
@@ -72,9 +72,9 @@ export const nailPreset: CatalogOrderData = {
       badge: 'Tendência',
       image_url: '/modelos/nail/assets/img/nail-art.webp',
       specs: [
+        ['Investimento', 'R$ 40,00'],
+        ['Duração', '30min'],
         ['Estilo', 'Encapsulada / Francesa'],
-        ['Durabilidade', 'Até a manutenção'],
-        ['Acabamento', 'Design Exclusivo'],
       ],
     },
   ],

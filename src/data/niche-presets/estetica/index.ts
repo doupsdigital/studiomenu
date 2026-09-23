@@ -29,8 +29,8 @@ export const esteticaPreset: CatalogOrderData = {
       is_highlight: true,
       image_url: '/modelos/estetica/assets/img/limpeza-de-pele.webp',
       specs: [
-        ['Indicação', 'Todos os tipos de pele'],
-        ['Duração', '1h 45min'],
+        ['Investimento', 'R$ 190,00'],
+        ['Duração', '1h45min'],
         ['Tecnologia', 'Esfoliação Ultrassônica & LED'],
       ],
     },
@@ -43,9 +43,9 @@ export const esteticaPreset: CatalogOrderData = {
       category: 'Estética Facial',
       image_url: '/modelos/estetica/assets/img/peeling-quimico.webp',
       specs: [
-        ['Indicação', 'Manchas, acne e linhas de expressão'],
+        ['Investimento', 'R$ 210,00'],
+        ['Duração', '1h'],
         ['Sessões', 'Recomendado 3 a 5 sessões'],
-        ['Recuperação', 'Descalvamento leve (3-5 dias)'],
       ],
     },
     {
@@ -57,8 +57,8 @@ export const esteticaPreset: CatalogOrderData = {
       category: 'Estética Corporal',
       image_url: '/modelos/estetica/assets/img/drenagem-linfatica.webp',
       specs: [
-        ['Técnica', 'Manobras manuais suaves'],
-        ['Benefício', 'Redução de retenção e toxinas'],
+        ['Investimento', 'R$ 160,00'],
+        ['Duração', '1h'],
         ['Frequência', '1 a 2 vezes por semana'],
       ],
     },
@@ -71,8 +71,8 @@ export const esteticaPreset: CatalogOrderData = {
       category: 'Depilação',
       image_url: '/modelos/estetica/assets/img/depilacao-a-laser.webp',
       specs: [
-        ['Tecnologia', 'Laser de Díodo Indolor'],
-        ['Indicação', 'Remoção duradoura dos pelos'],
+        ['Investimento', 'R$ 120,00'],
+        ['Duração', '30min'],
         ['Sessão', 'Avulsa / Pacotes disponíveis'],
       ],
     },
