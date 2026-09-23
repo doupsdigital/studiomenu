@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { CheckCircle2, KeyRound, LogOut } from 'lucide-react';
 import { supabaseBrowser } from '@/lib/supabase-browser';
 import { GoogleIcon } from '@/components/auth/GoogleIcon';
@@ -155,9 +156,18 @@ export const AccountSection: React.FC<AccountSectionProps> = ({ slug, hasAccount
             </div>
             <div className="min-w-0">
               <p className="font-serif-pro font-bold text-lg text-rose-800 leading-tight">Acesso configurado</p>
+              {/* Reescrito mais claro/informativo, e com o endereço virando
+               *  link de verdade (bug real reportado, 2026-09-23 — antes
+               *  era só texto, não dava pra tocar) — separa em duas frases
+               *  curtas (o que mudou / como entrar) em vez de uma só longa. */}
               <p className="text-sm text-rose-800/70 mt-0.5">
-                {justLinkedGoogle && 'Conta Google vinculada com sucesso. '}
-                Você não depende mais do link de acesso — entre quando quiser em studiomenu.art/entrar, com seu e-mail e senha (ou Google).
+                {justLinkedGoogle && 'Conta Google vinculada com sucesso! '}
+                Você não depende mais do link mágico pra acessar. Da próxima vez, é só entrar direto com seu e-mail e senha
+                (ou Google) em{' '}
+                <Link href="/entrar" className="font-semibold text-rose-800 underline underline-offset-2">
+                  studiomenu.art/entrar
+                </Link>
+                .
               </p>
             </div>
           </div>
