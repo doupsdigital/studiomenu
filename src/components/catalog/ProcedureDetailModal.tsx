@@ -106,13 +106,20 @@ export const ProcedureDetailModal: React.FC<ProcedureDetailModalProps> = ({
           </div>
 
           <div className="modal__acoes">
+            {/* Texto fixo, sem o nome do serviço (bug real reportado,
+             *  2026-09-23): nome já aparece bem visível no título do modal
+             *  logo acima — repetir ali dentro do botão era redundante e,
+             *  pra nomes longos ("Alongamento em Gel + Esmaltação"), estourava
+             *  a altura fixa do botão (48px) e quebrava numa segunda linha
+             *  apertada. Texto curto nunca quebra, não importa o tamanho do
+             *  nome do serviço. */}
             {canBook ? (
               <button
                 type="button"
                 className="modal__cta"
                 onClick={() => onBook?.(item)}
               >
-                Agendar {item.title} →
+                Agendar agora →
               </button>
             ) : (
               <a
@@ -121,7 +128,7 @@ export const ProcedureDetailModal: React.FC<ProcedureDetailModalProps> = ({
                 rel="noopener noreferrer"
                 className="modal__cta"
               >
-                Agendar {item.title} →
+                Agendar agora →
               </a>
             )}
             {onNext && (
