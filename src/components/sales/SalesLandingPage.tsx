@@ -1,52 +1,22 @@
-'use client';
-
-type LandingVariant = 'lpb' | 'lpa';
-
-interface SalesLandingPageProps {
-  variant: LandingVariant;
-}
+import Link from 'next/link';
+import { BASICO_PRICE_LABEL, PLUS_PRICE_LABEL } from '@/lib/pricing';
 
 const WHATSAPP_NUMBER = '5562991083435';
 
-const PALETTES: Record<
-  LandingVariant,
-  {
-    bg: string;
-    bgAlt: string;
-    card: string;
-    text: string;
-    textMuted: string;
-    accent: string;
-    accentSoft: string;
-    accentText: string;
-    serif: string;
-    badgeLabel: string;
-  }
-> = {
-  lpb: {
-    bg: '#faf8f5',
-    bgAlt: '#f4f0ea',
-    card: '#ffffff',
-    text: '#1a1220',
-    textMuted: '#7a6b78',
-    accent: '#c84b72',
-    accentSoft: '#fbedf2',
-    accentText: '#ffffff',
-    serif: "'Cormorant Garamond', Georgia, serif",
-    badgeLabel: 'Versão Principal · Glamour Rosé',
-  },
-  lpa: {
-    bg: '#f6f0e8',
-    bgAlt: '#ece3d7',
-    card: '#ffffff',
-    text: '#221b16',
-    textMuted: '#5e5147',
-    accent: '#9c6c44',
-    accentSoft: 'rgba(156, 108, 68, 0.12)',
-    accentText: '#ffffff',
-    serif: "'Cormorant Garamond', Georgia, serif",
-    badgeLabel: 'Versão Editorial · Nude & Champagne',
-  },
+/** Paleta idêntica à LP original do LashMenu (`legacy/vendas/lpb`) — pedido
+ *  explícito pra recuperar exatamente esse layout/tema, que se perdeu numa
+ *  reescrita anterior (2026-09-23). Só copy/preços/CTAs mudam pro StudioMenu
+ *  de hoje (multi-nicho, assinatura mensal), não o visual. */
+const PALETTE = {
+  bg: '#faf8f5',
+  bgAlt: '#f4f0ea',
+  card: '#ffffff',
+  text: '#1a1220',
+  textMuted: '#7a6b78',
+  accent: '#c84b72',
+  accentSoft: '#fbedf2',
+  accentText: '#ffffff',
+  serif: "'Cormorant Garamond', Georgia, serif",
 };
 
 const TESTIMONIALS = [
@@ -61,8 +31,8 @@ function whatsappLink(text: string) {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
 }
 
-export function SalesLandingPage({ variant }: SalesLandingPageProps) {
-  const p = PALETTES[variant];
+export function SalesLandingPage() {
+  const p = PALETTE;
 
   return (
     <div style={{ background: p.bg, color: p.text, fontFamily: "'Jost', system-ui, sans-serif" }} className="min-h-screen">
@@ -90,19 +60,19 @@ export function SalesLandingPage({ variant }: SalesLandingPageProps) {
             </h2>
 
             <p className="text-sm leading-relaxed mb-6" style={{ color: p.textMuted }}>
-              Chega de enviar tabelas em PDF pesadas que ninguém abre no celular ou digitar mensagens longas de preços. Entregamos seu catálogo 100% pronto com seu nome, fotos e valores em até 24h.
+              Chega de enviar tabelas em PDF pesadas que ninguém abre no celular ou digitar mensagens longas de preços. Seu catálogo pronto em poucos minutos, com seu nome, fotos e valores — pra Lash, Nails, Estética ou qualquer estúdio de beleza.
             </p>
 
-            <a
-              href="#oferta"
+            <Link
+              href="/form"
               className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full font-bold text-sm shadow-lg transition-transform hover:scale-105"
               style={{ background: p.accent, color: p.accentText }}
             >
-              Ver Oferta & Modelos
+              Criar Meu Catálogo Agora
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M5 12h14m-7-7 7 7-7 7" />
               </svg>
-            </a>
+            </Link>
 
             <p className="text-[11px] mt-4" style={{ color: p.textMuted }}>
               👇 Teste a experiência real do catálogo rolando a tela do celular ao lado:
@@ -117,7 +87,7 @@ export function SalesLandingPage({ variant }: SalesLandingPageProps) {
             >
               <div className="w-full h-full rounded-[2rem] overflow-hidden bg-white">
                 <iframe
-                  src="/c/showcase/lash"
+                  src="/c/exemplolash"
                   title="Prévia ao vivo do catálogo StudioMenu"
                   className="w-full h-full border-0"
                   style={{ colorScheme: 'normal' }}
@@ -186,78 +156,70 @@ export function SalesLandingPage({ variant }: SalesLandingPageProps) {
             <h2 className="text-2xl font-bold mb-1" style={{ fontFamily: p.serif }}>
               Escolha o Plano Ideal para o Seu Estúdio
             </h2>
-            <p className="text-xs" style={{ color: p.textMuted }}>Sem mensalidade · Pagamento único com acesso vitalício</p>
+            <p className="text-xs" style={{ color: p.textMuted }}>Sem contrato de fidelidade · Cancele quando quiser</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {/* Essencial */}
+            {/* Básico */}
             <div className="rounded-2xl p-6 border" style={{ borderColor: '#e5d9d9', background: p.card }}>
               <span
                 className="inline-block px-2.5 py-1 rounded-full text-[10px] font-bold mb-3"
                 style={{ background: p.bgAlt, color: p.textMuted }}
               >
-                📱 VOCÊ PERSONALIZA
+                📱 SEU CATÁLOGO NO AR
               </span>
-              <h3 className="text-lg font-bold mb-1">Plano Essencial</h3>
+              <h3 className="text-lg font-bold mb-1">StudioMenu Básico</h3>
               <p className="text-xs mb-4" style={{ color: p.textMuted }}>
-                Para quem quer liberdade para cadastrar e alterar seus preços no seu tempo pelo celular.
+                Catálogo digital com seu nome, fotos e preços, sempre no ar — edite pelo celular quando quiser.
               </p>
               <div className="mb-4">
-                <div className="text-[10px] line-through" style={{ color: p.textMuted }}>De R$ 197,00 por:</div>
-                <div className="text-3xl font-bold">R$ 149<span className="text-base font-normal">,00</span></div>
-                <div className="text-[10px]" style={{ color: p.textMuted }}>à vista no PIX ou parcelado no cartão</div>
+                <div className="text-3xl font-bold">{BASICO_PRICE_LABEL}</div>
               </div>
               <ul className="space-y-2 text-xs mb-5" style={{ color: p.text }}>
-                <li>✓ Link exclusivo para a bio do seu Instagram</li>
-                <li>✓ Gerador de Catálogo simples no celular</li>
-                <li>✓ Altere preços e fotos sempre que quiser</li>
-                <li>✓ Pagamento único sem nenhuma mensalidade</li>
+                <li>✓ Catálogo online sempre no ar</li>
+                <li>✓ Link profissional pra bio do Instagram/WhatsApp</li>
+                <li>✓ Edite fotos, preços e serviços quando quiser</li>
+                <li>✓ Cliente agenda direto pelo seu WhatsApp</li>
               </ul>
-              <a
-                href={whatsappLink('Olá! Quero garantir o StudioMenu no Plano Essencial (R$ 149) 📱')}
-                target="_blank"
-                rel="noopener noreferrer"
-                id="cta-essencial"
+              <Link
+                href="/form"
+                id="cta-basico"
                 className="w-full flex items-center justify-center gap-2 py-3 rounded-full font-bold text-xs text-white"
-                style={{ background: '#25d366' }}
+                style={{ background: p.accent }}
               >
-                PLANO ESSENCIAL (R$ 149)
-              </a>
+                COMEÇAR NO BÁSICO
+              </Link>
             </div>
 
-            {/* VIP */}
+            {/* Plus */}
             <div className="rounded-2xl p-6 border-2 relative" style={{ borderColor: p.accent, background: p.accentSoft }}>
               <span
                 className="inline-block px-2.5 py-1 rounded-full text-[10px] font-bold mb-3"
                 style={{ background: p.accent, color: p.accentText }}
               >
-                ⭐ MAIS POPULAR · ZERO TRABALHO
+                ⭐ MAIS POPULAR
               </span>
-              <h3 className="text-lg font-bold mb-1">VIP Feito por Nós</h3>
+              <h3 className="text-lg font-bold mb-1">StudioMenu+</h3>
               <p className="text-xs mb-4" style={{ color: p.textMuted }}>
-                Nossa equipe faz 100% da formatação e entrega seu catálogo pronto em 24h. Você não precisa fazer nada!
+                Tudo do Básico, com agendamento automático — a cliente escolhe o dia e horário sozinha.
               </p>
               <div className="mb-4">
-                <div className="text-[10px] line-through" style={{ color: p.textMuted }}>De R$ 297,00 por:</div>
-                <div className="text-3xl font-bold">R$ 189<span className="text-base font-normal">,00</span></div>
-                <div className="text-[10px]" style={{ color: p.textMuted }}>à vista no PIX ou parcelado no cartão</div>
+                <div className="text-3xl font-bold">{PLUS_PRICE_LABEL}</div>
               </div>
               <ul className="space-y-2 text-xs mb-5" style={{ color: p.text }}>
-                <li>✓ <strong>Tudo do Plano Essencial incluso</strong></li>
-                <li>✓ <strong>Formatação 100% feita por nossa equipe</strong></li>
-                <li>✓ <strong>Entrega expressa pronta em até 24h</strong></li>
-                <li>✓ Acesso liberado para você editar quando quiser</li>
+                <li>✓ <strong>Tudo do StudioMenu Básico incluso</strong></li>
+                <li>✓ <strong>Clientes agendam sozinhas, a qualquer hora</strong></li>
+                <li>✓ Agenda organizada com horários reais</li>
+                <li>✓ Menos ida e volta pelo WhatsApp</li>
               </ul>
-              <a
-                href={whatsappLink('Olá! Quero garantir o StudioMenu no Plano VIP Feito por Vocês (R$ 189) 👑')}
-                target="_blank"
-                rel="noopener noreferrer"
-                id="cta-custom"
+              <Link
+                href="/form"
+                id="cta-plus"
                 className="w-full flex items-center justify-center gap-2 py-3 rounded-full font-bold text-xs text-white shadow-lg"
-                style={{ background: '#25d366' }}
+                style={{ background: p.accent }}
               >
-                PLANO VIP (R$ 189)
-              </a>
+                COMEÇAR NO PLUS
+              </Link>
             </div>
           </div>
         </section>
@@ -271,7 +233,8 @@ export function SalesLandingPage({ variant }: SalesLandingPageProps) {
         <p className="text-[10px] mt-1" style={{ color: p.textMuted }}>© 2026 · Todos os direitos reservados</p>
       </footer>
 
-      {/* Botão Flutuante de WhatsApp */}
+      {/* Botão Flutuante de WhatsApp — contato de pré-venda, não fechamento
+       *  de um plano específico (o CTA de venda de verdade é o /form). */}
       <a
         href={whatsappLink('Olá! Vi o StudioMenu no site e gostaria de saber mais informações! 😊')}
         target="_blank"
