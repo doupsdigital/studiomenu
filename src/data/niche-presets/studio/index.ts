@@ -29,9 +29,9 @@ export const studioPreset: CatalogOrderData = {
       is_highlight: true,
       image_url: '/modelos/studio/assets/img/combo-vip.webp',
       specs: [
+        ['Investimento', 'R$ 230,00'],
+        ['Duração', '2h30min'],
         ['Incluso', 'Volume Brasileiro + Sobrancelha Henna'],
-        ['Duração', '2h 30min'],
-        ['Vantagem', 'Atendimento completo integrado'],
       ],
     },
     {
@@ -43,9 +43,9 @@ export const studioPreset: CatalogOrderData = {
       category: 'Nails & Gel',
       image_url: '/modelos/studio/assets/img/alongamento-em-gel.webp',
       specs: [
-        ['Técnica', 'Gel no Molde + Esmaltação em Gel'],
+        ['Investimento', 'R$ 210,00'],
+        ['Duração', '2h'],
         ['Durabilidade', 'Até 30 dias'],
-        ['Acabamento', 'Resistência & Brilho Intenso'],
       ],
     },
     {
@@ -57,9 +57,9 @@ export const studioPreset: CatalogOrderData = {
       category: 'Estética',
       image_url: '/modelos/studio/assets/img/limpeza-de-pele.webp',
       specs: [
+        ['Investimento', 'R$ 190,00'],
+        ['Duração', '1h30min'],
         ['Tecnologia', 'Extração + LED Fototerapia'],
-        ['Indicação', 'Renovação e Desintoxicação Facial'],
-        ['Duração', '1h 30min'],
       ],
     },
     {
@@ -71,9 +71,9 @@ export const studioPreset: CatalogOrderData = {
       category: 'Hair Studio',
       image_url: '/modelos/studio/assets/img/escova-modeladora.webp',
       specs: [
-        ['Procedimento', 'Lavagem + Reconstrução + Escova'],
-        ['Indicado', 'Todos os tipos de cabelo'],
+        ['Investimento', 'R$ 130,00'],
         ['Duração', '1h'],
+        ['Procedimento', 'Lavagem + Reconstrução + Escova'],
       ],
     },
   ],

@@ -43,11 +43,21 @@ export const AgendaPauseSection: React.FC<AgendaPauseSectionProps> = ({ slug, in
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-[15px] text-ink-soft leading-relaxed">
-        Pause o agendamento automático temporariamente. Suas clientes voltam a combinar horário com você pelo WhatsApp, como no
-        StudioMenu Básico — útil pra férias, imprevistos ou qualquer folga. Você continua vendo e gerenciando sua agenda
-        normalmente por aqui.
-      </p>
+      {/* Antes era um parágrafo só, sem nenhuma hierarquia visual — texto
+       *  chapado, difícil de escanear rápido (bug real reportado,
+       *  2026-09-23). Frase de efeito primeiro (o que acontece), detalhe
+       *  depois (como funciona) — mesmo padrão de "título forte + legenda"
+       *  já usado no resto da Config (ex: cartão "Crie um acesso com
+       *  senha" da Minha conta). */}
+      <div className="flex flex-col gap-1">
+        <p className="text-[15px] font-bold text-ink leading-snug">
+          Pause o agendamento automático temporariamente
+        </p>
+        <p className="text-sm text-ink-soft leading-relaxed">
+          Suas clientes voltam a combinar horário com você pelo WhatsApp — útil pra férias, imprevistos ou qualquer folga.
+          Você continua vendo e gerenciando sua agenda normalmente por aqui.
+        </p>
+      </div>
 
       <button
         type="button"
