@@ -6,8 +6,14 @@ import { CatalogLayout } from '@/components/catalog/CatalogLayout';
 import { StylePickerPanel } from '@/components/catalog/StylePickerPanel';
 import { nichePresetsMap } from '@/data/niche-presets';
 
-export default function ShowcasePage({ params }: { params: Promise<{ niche: string }> }) {
+interface ShowcasePageProps {
+  params: Promise<{ niche: string }>;
+  searchParams: Promise<{ picker?: string }>;
+}
+
+export default function ShowcasePage({ params, searchParams }: ShowcasePageProps) {
   const { niche: nicheParam } = use(params);
+  const { picker } = use(searchParams);
   const niche = nicheParam as NicheType;
   const basePreset = nichePresetsMap[niche];
 
@@ -58,11 +64,13 @@ export default function ShowcasePage({ params }: { params: Promise<{ niche: stri
         onChangeLayout={setLayoutModel}
         onChangeTheme={setThemeVariant}
         onCoverScreen={onCoverScreen}
-        // Começa aberto no showroom de propósito (pedido, 2026-09-23) — é
-        // o link que ela manda pra cliente testar os modelos, então o
+        // Começa aberto no showroom por padrão (pedido, 2026-09-23) — é o
+        // link que ela manda pra cliente testar os modelos, então o
         // controle de tema/layout precisa já estar visível de cara, não
-        // escondido atrás de um toque.
-        defaultOpen
+        // escondido atrás de um toque. `?picker=closed` só existe pro
+        // mockup de celular da home (`SalesLandingPage.tsx`) — ali o
+        // painel de customização só atrapalharia, é só uma prévia.
+        defaultOpen={picker !== 'closed'}
       />
 
       {/* Renderização do Catálogo Real — mesmo componente usado nos catálogos de clientes.

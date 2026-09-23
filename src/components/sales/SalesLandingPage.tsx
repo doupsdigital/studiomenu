@@ -90,7 +90,7 @@ export function SalesLandingPage() {
                   <div className="lp-testdrive-phone">
                     <div className="lp-testdrive-notch" />
                     <div className="lp-testdrive-screen-scaler">
-                      <iframe src="/c/exemplolash" title="Prévia ao vivo do catálogo StudioMenu" />
+                      <iframe src="/c/showcase/lash?picker=closed" title="Prévia ao vivo do catálogo StudioMenu" />
                     </div>
                   </div>
 
