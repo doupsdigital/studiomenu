@@ -298,42 +298,67 @@
   margin: 0 auto;
 }
 
+/* Moldura de verdade de iPhone: a tela recua `--lp-bezel` de cada lado (o
+ *  cálculo original do LashMenu preenchia o retângulo do celular 100% até
+ *  a borda, sem sobra nenhuma pra mostrar a cor de fundo do aparelho — só
+ *  dava pra ver um fiapo da moldura nos 4 cantos arredondados; reportado
+ *  como "sem bordas de iPhone, parece, ou está muito fina", 2026-09-23).
+ *  Escala em X e Y calculada separadamente (mesmo truque do
+ *  `.showroom-phone` mais abaixo no arquivo original) pra preencher a
+ *  área da tela exatamente, mesmo com a proporção não batendo 100% com a
+ *  do iframe 390×844. */
 .lp-testdrive-phone {
+  --lp-phone-w: 245px;
+  --lp-phone-h: 530px;
+  --lp-bezel: 11px;
+  --lp-screen-w: calc(var(--lp-phone-w) - var(--lp-bezel) * 2);
+  --lp-screen-h: calc(var(--lp-phone-h) - var(--lp-bezel) * 2);
+  --lp-base-w: 390px;
+  --lp-base-h: 844px;
+
   position: relative;
-  width: 245px;
+  width: var(--lp-phone-w);
   max-width: 65vw;
-  height: 530px;
-  background: #110e10;
-  border-radius: 36px;
-  overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  height: var(--lp-phone-h);
+  background: linear-gradient(155deg, #2a2426 0%, #110e10 45%);
+  border-radius: 38px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35), 0 0 0 1.5px rgba(255, 255, 255, 0.08) inset;
   margin: 0 auto;
 }
 
 .lp-testdrive-notch {
   position: absolute;
-  top: 0;
+  top: var(--lp-bezel, 11px);
   left: 50%;
   transform: translateX(-50%);
-  width: 75px;
-  height: 13px;
+  width: 74px;
+  height: 14px;
   background: #000000;
-  border-bottom-left-radius: 10px;
-  border-bottom-right-radius: 10px;
+  border-radius: 8px;
   z-index: 100;
   pointer-events: none;
+}
+
+.lp-testdrive-screen {
+  position: absolute;
+  top: var(--lp-bezel, 11px);
+  left: var(--lp-bezel, 11px);
+  width: var(--lp-screen-w);
+  height: var(--lp-screen-h);
+  border-radius: 26px;
+  overflow: hidden;
+  background: #f2cad5;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4) inset;
 }
 
 .lp-testdrive-screen-scaler {
   position: absolute;
   top: 0;
   left: 0;
-  width: 390px;
-  height: 844px;
+  width: var(--lp-base-w);
+  height: var(--lp-base-h);
   transform-origin: 0 0;
-  transform: scale(0.6282);
-  border-radius: 36px;
-  overflow: hidden;
+  transform: scale(calc(var(--lp-screen-w) / var(--lp-base-w)), calc(var(--lp-screen-h) / var(--lp-base-h)));
   background: #f2cad5;
 }
 
@@ -348,8 +373,7 @@
 }
 
 @media (min-width: 600px) {
-  .lp-testdrive-phone { width: 310px; height: 671px; }
-  .lp-testdrive-screen-scaler { transform: scale(0.7948); }
+  .lp-testdrive-phone { --lp-phone-w: 310px; --lp-phone-h: 671px; --lp-bezel: 13px; }
 }
 
 .lp-phone-scroll-indicator {
