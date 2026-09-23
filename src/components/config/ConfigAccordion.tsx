@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { Clock, CalendarX, PauseCircle, CreditCard, UserCircle, Bell } from 'lucide-react';
+import { Clock, CalendarX, PauseCircle, CreditCard, UserCircle, Bell, LifeBuoy } from 'lucide-react';
 import type { Step } from 'react-joyride';
 import { SectionCard } from '@/components/app-shell/SectionCard';
 import { ProductTour } from '@/components/tour/ProductTour';
@@ -11,6 +11,7 @@ import { AgendaPauseSection } from './AgendaPauseSection';
 import { SubscriptionSection } from './SubscriptionSection';
 import { AccountSection } from './AccountSection';
 import { NotificationsSection } from './NotificationsSection';
+import { SupportSection } from './SupportSection';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import type { BusinessHoursConfigRow, ScheduleBlockConfigRow } from '@/lib/scheduling/config-service';
 
@@ -34,7 +35,7 @@ interface ConfigAccordionProps {
   authUserId: string | null;
 }
 
-type SectionKey = 'horarios' | 'bloqueios' | 'pausar' | 'assinatura' | 'conta' | 'notificacoes';
+type SectionKey = 'horarios' | 'bloqueios' | 'pausar' | 'assinatura' | 'conta' | 'notificacoes' | 'suporte';
 
 /** Acordeão da aba Config — 3 seções que já existiam (`BusinessHoursEditor`,
  *  `ScheduleBlocksManager`, `SubscriptionSection`), agora dentro de
@@ -63,6 +64,7 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
     assinatura: false,
     conta: false,
     notificacoes: false,
+    suporte: false,
   });
 
   // O card de "Notificações" fica sempre na lista (mostra "Notificações
@@ -98,6 +100,7 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
       bloqueios: 'bloqueios',
       pausar: 'pausar',
       notificacoes: 'notificacoes',
+      suporte: 'suporte',
     };
     const key = sectionForHash[hash];
     if (key) {
@@ -166,6 +169,7 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
           ? 'Aqui você pode sair desse dispositivo, se precisar.'
           : 'Crie um acesso com senha pra não depender só do link mágico.'
       ),
+      buildStep('suporte', 'Suporte e dúvidas', 'Teve alguma dúvida ou travou em algo? Fala com a gente por aqui.'),
     ];
   }, [bookingEnabled, includeNotifications, hasAccount]);
 
@@ -262,6 +266,22 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
           dataTour="conta-header"
         >
           <AccountSection slug={slug} hasAccount={hasAccount} />
+        </SectionCard>
+      </div>
+
+      {/* Última seção de propósito (pedido, 2026-09-23) — suporte direto por
+       *  WhatsApp com a StudioMenu, não com a cliente dela. Colapsado por
+       *  padrão, mesmo padrão de todas as outras: nada fixo/flutuante
+       *  poluindo o dia a dia do app. */}
+      <div id="suporte">
+        <SectionCard
+          icon={LifeBuoy}
+          title="Suporte e dúvidas"
+          isOpen={open.suporte}
+          onToggle={() => toggle('suporte')}
+          dataTour="suporte-header"
+        >
+          <SupportSection />
         </SectionCard>
       </div>
     </div>
