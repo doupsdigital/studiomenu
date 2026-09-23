@@ -36,7 +36,7 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
     data.avatar_url ||
     data.cta_bg_url ||
     data.final_screen_bg_url ||
-    '/modelos/mosaico/assets/img/Hero.png';
+    '/modelos/mosaico/assets/img/Hero.webp';
   const isClassico = data.layout_model === 'classico' || heroImage.toLowerCase().includes('classico');
   const objectPosition = isClassico ? '45% 18%' : 'center 18%';
 

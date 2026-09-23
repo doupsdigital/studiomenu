@@ -57,7 +57,7 @@ export async function getCatalogBySlug(slug: string): Promise<CatalogOrderData |
           category: 'Extensão de Cílios',
           badge: 'Mais Pedido',
           is_highlight: true,
-          image_url: '/modelos/mosaico/assets/img/volume-brasileiro.png',
+          image_url: '/modelos/mosaico/assets/img/volume-brasileiro.webp',
         },
         {
           id: 'egipcio',
@@ -68,7 +68,7 @@ export async function getCatalogBySlug(slug: string): Promise<CatalogOrderData |
           category: 'Extensão de Cílios',
           badge: '',
           is_highlight: false,
-          image_url: '/modelos/mosaico/assets/img/volume-egipcio.png',
+          image_url: '/modelos/mosaico/assets/img/volume-egipcio.webp',
         },
         {
           id: 'lifting',
@@ -79,7 +79,7 @@ export async function getCatalogBySlug(slug: string): Promise<CatalogOrderData |
           category: 'Cuidados & Curvatura',
           badge: '',
           is_highlight: false,
-          image_url: '/modelos/mosaico/assets/img/lash-lifting.png',
+          image_url: '/modelos/mosaico/assets/img/lash-lifting.webp',
         },
         {
           id: 'henna',
@@ -90,7 +90,7 @@ export async function getCatalogBySlug(slug: string): Promise<CatalogOrderData |
           category: 'Sobrancelhas',
           badge: '',
           is_highlight: false,
-          image_url: '/modelos/mosaico/assets/img/sobrancelha-henna.jpg',
+          image_url: '/modelos/mosaico/assets/img/sobrancelha-henna.webp',
         },
       ];
     }

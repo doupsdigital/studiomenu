@@ -18,8 +18,8 @@ export default function DemoPage() {
     layout_model: layoutModel,
     theme_variant: themeVariant,
     client_name: basePreset.client_name,
-    cover_media_url: layoutModel === 'classico' ? '/modelos/classico/assets/img/Hero.png' : '/modelos/mosaico/assets/img/Hero.png',
-    avatar_url: layoutModel === 'classico' ? '/modelos/classico/assets/img/Hero.png' : '/modelos/mosaico/assets/img/Hero.png',
+    cover_media_url: layoutModel === 'classico' ? '/modelos/classico/assets/img/Hero.webp' : '/modelos/mosaico/assets/img/Hero.webp',
+    avatar_url: layoutModel === 'classico' ? '/modelos/classico/assets/img/Hero.webp' : '/modelos/mosaico/assets/img/Hero.webp',
   };
 
   return (

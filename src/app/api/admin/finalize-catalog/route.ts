@@ -50,7 +50,7 @@ export async function POST(request: Request) {
     }
     const finalSlug = slugResult.slug;
 
-    let coverUrl = layoutModel === 'classico' ? '/modelos/classico/assets/img/Hero.png' : '/modelos/mosaico/assets/img/Hero.png';
+    let coverUrl = layoutModel === 'classico' ? '/modelos/classico/assets/img/Hero.webp' : '/modelos/mosaico/assets/img/Hero.webp';
 
     if (coverFile) {
       if (!isAllowedImageType(coverFile.type)) {

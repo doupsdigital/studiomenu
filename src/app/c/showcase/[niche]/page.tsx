@@ -46,8 +46,8 @@ export default function ShowcasePage({ params }: { params: Promise<{ niche: stri
     ...basePreset,
     layout_model: layoutModel,
     theme_variant: themeVariant,
-    cover_media_url: layoutModel === 'classico' ? '/modelos/classico/assets/img/Hero.png' : '/modelos/mosaico/assets/img/Hero.png',
-    avatar_url: layoutModel === 'classico' ? '/modelos/classico/assets/img/Hero.png' : '/modelos/mosaico/assets/img/Hero.png',
+    cover_media_url: layoutModel === 'classico' ? '/modelos/classico/assets/img/Hero.webp' : '/modelos/mosaico/assets/img/Hero.webp',
+    avatar_url: layoutModel === 'classico' ? '/modelos/classico/assets/img/Hero.webp' : '/modelos/mosaico/assets/img/Hero.webp',
   };
 
   return (
