@@ -6,17 +6,17 @@ export const lashPreset: CatalogOrderData = {
   studio_name: 'Studio Mariana Alves',
   hero_phrase: 'A arte de transformar o seu olhar — leveza incomparável, precisão e elegância.',
   bio_description: 'Especialista em Cílios, Lash Lifting e Visagismo do Olhar.',
-  cover_media_url: '/modelos/mosaico/assets/img/Hero.png',
-  avatar_url: '/modelos/mosaico/assets/img/Hero.png',
+  cover_media_url: '/modelos/mosaico/assets/img/Hero.webp',
+  avatar_url: '/modelos/mosaico/assets/img/Hero.webp',
   niche: 'lash',
   layout_model: 'mosaico',
   theme_variant: 'rose',
   whatsapp_number: '5562991083435',
   instagram_handle: '@marianaalves.lash',
   address: 'São Paulo',
-  instructions_bg_url: '/modelos/mosaico/assets/img/hero.jpg',
-  final_screen_bg_url: '/modelos/mosaico/assets/img/Footer.png',
-  cta_bg_url: '/modelos/mosaico/assets/img/Footer.png',
+  instructions_bg_url: '/modelos/mosaico/assets/img/hero.webp',
+  final_screen_bg_url: '/modelos/mosaico/assets/img/Footer.webp',
+  cta_bg_url: '/modelos/mosaico/assets/img/Footer.webp',
   procedures: [
     {
       id: 'brasileiro',
@@ -27,7 +27,7 @@ export const lashPreset: CatalogOrderData = {
       category: 'Extensão de Cílios',
       badge: 'Mais Pedido',
       is_highlight: true,
-      image_url: '/modelos/mosaico/assets/img/volume-brasileiro.png',
+      image_url: '/modelos/mosaico/assets/img/volume-brasileiro.webp',
       specs: [
         ['Investimento', 'R$ 150'],
         ['Duração', '1h30'],
@@ -41,7 +41,7 @@ export const lashPreset: CatalogOrderData = {
       price: 'R$ 120',
       duration: '1h30',
       category: 'Extensão de Cílios',
-      image_url: '/modelos/mosaico/assets/img/classico-fio-a-fio.png',
+      image_url: '/modelos/mosaico/assets/img/classico-fio-a-fio.webp',
       specs: [
         ['Investimento', 'R$ 120'],
         ['Duração', '1h30'],
@@ -55,7 +55,7 @@ export const lashPreset: CatalogOrderData = {
       price: 'R$ 160',
       duration: '1h30',
       category: 'Extensão de Cílios',
-      image_url: '/modelos/mosaico/assets/img/volume-egipcio.png',
+      image_url: '/modelos/mosaico/assets/img/volume-egipcio.webp',
       specs: [
         ['Investimento', 'R$ 160'],
         ['Duração', '1h30'],
@@ -69,7 +69,7 @@ export const lashPreset: CatalogOrderData = {
       price: 'R$ 160',
       duration: '1h45',
       category: 'Extensão de Cílios',
-      image_url: '/modelos/mosaico/assets/img/volume-hibrido.png',
+      image_url: '/modelos/mosaico/assets/img/volume-hibrido.webp',
       specs: [
         ['Investimento', 'R$ 160'],
         ['Duração', '1h45'],
@@ -83,7 +83,7 @@ export const lashPreset: CatalogOrderData = {
       price: 'R$ 190',
       duration: '2h00',
       category: 'Extensão de Cílios',
-      image_url: '/modelos/mosaico/assets/img/volume-russo.png',
+      image_url: '/modelos/mosaico/assets/img/volume-russo.webp',
       specs: [
         ['Investimento', 'R$ 190'],
         ['Duração', '2h00'],
@@ -99,7 +99,7 @@ export const lashPreset: CatalogOrderData = {
       category: 'Extensão de Cílios',
       badge: 'Densidade Máxima',
       is_highlight: true,
-      image_url: '/modelos/mosaico/assets/img/mega-volume.png',
+      image_url: '/modelos/mosaico/assets/img/mega-volume.webp',
       specs: [
         ['Investimento', 'R$ 240'],
         ['Duração', '2h30'],
@@ -116,7 +116,7 @@ export const lashPreset: CatalogOrderData = {
       category: 'Sobrancelhas',
       badge: 'Visagismo Facial',
       is_highlight: true,
-      image_url: '/modelos/mosaico/assets/img/design-sobrancelha.jpg',
+      image_url: '/modelos/mosaico/assets/img/design-sobrancelha.webp',
       specs: [
         ['Investimento', 'R$ 60'],
         ['Duração', '45 minutos'],
@@ -130,7 +130,7 @@ export const lashPreset: CatalogOrderData = {
       price: 'R$ 80',
       duration: '50min',
       category: 'Sobrancelhas',
-      image_url: '/modelos/mosaico/assets/img/sobrancelha-henna.jpg',
+      image_url: '/modelos/mosaico/assets/img/sobrancelha-henna.webp',
       specs: [
         ['Investimento', 'R$ 80'],
         ['Duração', '50 minutos'],
@@ -144,7 +144,7 @@ export const lashPreset: CatalogOrderData = {
       price: 'R$ 50',
       duration: '30min',
       category: 'Especiais & Cuidados',
-      image_url: '/modelos/mosaico/assets/img/remocao.png',
+      image_url: '/modelos/mosaico/assets/img/remocao.webp',
       specs: [
         ['Investimento', 'R$ 50'],
         ['Duração', '30 minutos'],
@@ -157,7 +157,7 @@ export const lashPreset: CatalogOrderData = {
       price: 'Guia',
       duration: 'Diário',
       category: 'Especiais & Cuidados',
-      image_url: '/modelos/mosaico/assets/img/cuidados.jpg',
+      image_url: '/modelos/mosaico/assets/img/cuidados.webp',
       specs: [
         ['Investimento', 'Guia Informativo Gratuito'],
         ['Duração', 'Rotina Diária'],

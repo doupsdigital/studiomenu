@@ -44,7 +44,7 @@ export async function POST(request: Request) {
     const finalSlug = slugResult.slug;
 
     const coverUrl =
-      layoutModel === 'classico' ? '/modelos/classico/assets/img/Hero.png' : '/modelos/mosaico/assets/img/Hero.png';
+      layoutModel === 'classico' ? '/modelos/classico/assets/img/Hero.webp' : '/modelos/mosaico/assets/img/Hero.webp';
 
     const { data: orderData, error: orderErr } = await supabaseAdmin
       .from('orders')

@@ -33,7 +33,7 @@ export const CTASection: React.FC<CTASectionProps> = ({
   // `cover_media_url`/`avatar_url` também estão vazios — de propósito, pedido
   // da usuária. É seguro porque é via de mão única: a capa pode herdar dessa
   // tela, mas o inverso (esta linha aqui) continua nunca lendo `cover_media_url`.
-  const footerBg = data.cta_bg_url || data.final_screen_bg_url || '/modelos/mosaico/assets/img/Footer.png';
+  const footerBg = data.cta_bg_url || data.final_screen_bg_url || '/modelos/mosaico/assets/img/Footer.webp';
 
   return (
     <section className="secao-contato is-visible" id="contato" data-screen-label="Contato">

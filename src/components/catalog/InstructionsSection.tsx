@@ -12,7 +12,7 @@ export const InstructionsSection: React.FC<InstructionsSectionProps> = ({
   bgUrl,
   coverUrl,
 }) => {
-  const defaultBg = '/modelos/mosaico/assets/img/hero.jpg';
+  const defaultBg = '/modelos/mosaico/assets/img/hero.webp';
   // Evita repetir a mesma foto da capa na tela de orientações — comparação
   // direta de URL, não por nome de arquivo (que já causou falso positivo
   // com qualquer fundo cujo caminho terminasse em "hero.png").
