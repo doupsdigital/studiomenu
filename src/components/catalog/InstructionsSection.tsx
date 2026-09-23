@@ -12,7 +12,13 @@ export const InstructionsSection: React.FC<InstructionsSectionProps> = ({
   bgUrl,
   coverUrl,
 }) => {
-  const defaultBg = '/modelos/mosaico/assets/img/hero.webp';
+  // Nome próprio (não é mais "hero.webp") de propósito: reaproveitar o
+  // mesmo nome (só diferindo na capitalização de "Hero.webp", a foto da
+  // capa) quebrou de verdade em produção (2026-09-23) — Windows não
+  // distingue maiúscula de minúscula no sistema de arquivos, então ao
+  // gerar os dois .webp na mesma pasta um sobrescreveu o outro sem avisar,
+  // e só o build do servidor (Linux, sensível a maiúscula) expôs o 404.
+  const defaultBg = '/modelos/mosaico/assets/img/orientacoes-bg.webp';
   // Evita repetir a mesma foto da capa na tela de orientações — comparação
   // direta de URL, não por nome de arquivo (que já causou falso positivo
   // com qualquer fundo cujo caminho terminasse em "hero.png").

@@ -377,7 +377,15 @@ button {
 .hero--classico .hero__foto {
   animation: heroKenBurnsClassico 7s ease-in-out infinite alternate !important;
   -webkit-animation: heroKenBurnsClassico 7s ease-in-out infinite alternate !important;
-  object-position: 45% 18% !important;
+  /* Sem object-position fixo aqui de propósito (bug real, 2026-09-23 —
+     "mulher deslocada" no catálogo de exemplo Nail): o recorte horizontal
+     certo depende de QUAL FOTO está carregada (calibrado pra foto
+     específica classico/Hero.webp), não do layout escolhido — um catálogo
+     Clássico pode perfeitamente estar usando a foto genérica mosaico/Hero
+     (é o que o preset do Nail faz). Isso agora é decidido só no JS
+     (HeaderCover.tsx, `isClassicoPhoto`) via `style={{ objectPosition }}`
+     — um `!important` aqui sempre venceria o inline style e travaria o
+     recorte errado pra qualquer foto que não seja a específica. */
 }
 
 .hero__scrim {
@@ -1919,11 +1927,15 @@ body[data-theme="luxury"] .mosaico-app {
    renderiza .theme-switcher-widget/.theme-switcher-btn/.has-theme-switcher.
    O seletor de tema atual é o painel "Personalizar" (React), sem CSS. */
 
-.hero--classico .hero__foto,
-.hero--classico img.hero__foto,
-body[data-theme="luxury"] .hero--classico .hero__foto {
-  object-position: -20% 18% !important;
-}
+/* Bloco `.hero--classico .hero__foto { object-position: -20% 18% !important }`
+   removido daqui (bug real, 2026-09-23 — "mulher deslocada pra direita" no
+   catálogo de exemplo Nail): era um segundo `!important` pro mesmo seletor
+   da regra lá em cima (linha ~377), vindo depois no arquivo — então sempre
+   vencia a cascata e travava TODO catálogo de layout Clássico nesse recorte
+   errado, sem nenhuma lógica por trás do valor -20% (nem comentário
+   explicando de onde veio). A regra de cima já não define mais
+   object-position nenhum (ver comentário lá) — decisão passou a ser só do
+   JS, por foto carregada, não por layout. */
 
 /* ==========================================================================
    SUPORTE AO MODELO CLÁSSICO (LISTA EDITORIAL) - ROSÉ & LUXURY

@@ -14,7 +14,7 @@ export const lashPreset: CatalogOrderData = {
   whatsapp_number: '5562991083435',
   instagram_handle: '@marianaalves.lash',
   address: 'São Paulo',
-  instructions_bg_url: '/modelos/mosaico/assets/img/hero.webp',
+  instructions_bg_url: '/modelos/mosaico/assets/img/orientacoes-bg.webp',
   final_screen_bg_url: '/modelos/mosaico/assets/img/Footer.webp',
   cta_bg_url: '/modelos/mosaico/assets/img/Footer.webp',
   procedures: [
