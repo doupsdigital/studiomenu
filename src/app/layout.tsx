@@ -14,6 +14,14 @@ import { InstallPromptProvider } from "@/components/app-shell/InstallPromptProvi
 // partir do SE 2ª geração/6s; aparelhos mais antigos ficam sem splash mas
 // continuam funcionando normalmente, só sem o visual). Só retrato — o app
 // não foi desenhado pra paisagem.
+//
+// Pegadinha real (reproduzida num iPhone 11 em Modo Escuro, 2026-09-23): o
+// Safari ignora qualquer `apple-touch-startup-image` cujo media query não
+// declare `prefers-color-scheme` explicitamente quando o aparelho está no
+// Modo Escuro — mesmo a imagem batendo em tamanho, ele cai no preto padrão
+// dele em vez de usá-la. Por isso cada tamanho abaixo gera DUAS tags (claro
+// e escuro) apontando pra mesma imagem — o app não tem tema escuro próprio,
+// então a splash é sempre a mesma independente do Modo Escuro do sistema.
 const APPLE_SPLASH_DEVICES = [
   { cssW: 375, cssH: 667, dpr: 2, file: '750x1334' }, // iPhone SE 2/3ª, 6/6s/7/8
   { cssW: 414, cssH: 896, dpr: 2, file: '828x1792' }, // iPhone 11, XR
@@ -34,10 +42,14 @@ export const metadata: Metadata = {
     capable: true,
     title: 'StudioMenu',
     statusBarStyle: 'default',
-    startupImage: APPLE_SPLASH_DEVICES.map((d) => ({
-      url: `/splash/apple-splash-${d.file}.png`,
-      media: `(device-width: ${d.cssW}px) and (device-height: ${d.cssH}px) and (-webkit-device-pixel-ratio: ${d.dpr}) and (orientation: portrait)`,
-    })),
+    startupImage: APPLE_SPLASH_DEVICES.flatMap((d) => {
+      const base = `(device-width: ${d.cssW}px) and (device-height: ${d.cssH}px) and (-webkit-device-pixel-ratio: ${d.dpr}) and (orientation: portrait)`;
+      const url = `/splash/apple-splash-${d.file}.png`;
+      return [
+        { url, media: `${base} and (prefers-color-scheme: light)` },
+        { url, media: `${base} and (prefers-color-scheme: dark)` },
+      ];
+    }),
   },
 };
 
