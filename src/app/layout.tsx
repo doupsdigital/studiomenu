@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { InstallPromptProvider } from "@/components/app-shell/InstallPromptProvider";
 
@@ -51,6 +51,30 @@ export const metadata: Metadata = {
       ];
     }),
   },
+  // O Next 16 só gera a tag nova `mobile-web-app-capable` — a Safari
+  // reconhece essa há bem menos tempo que a antiga, específica da Apple
+  // (`apple-mobile-web-app-capable`), que existe desde que "Adicionar à
+  // Tela de Início" existe. Sem ela, a Safari pode não tratar o app como
+  // "capaz" de tela cheia/splash em versões de iOS mais antigas — mantendo
+  // as duas cobre tanto o padrão novo quanto o comportamento histórico.
+  other: {
+    'apple-mobile-web-app-capable': 'yes',
+  },
+};
+
+// Substitui a tag <meta name="viewport"> que estava escrita à mão no `<head>`
+// abaixo — tínhamos as DUAS ao mesmo tempo (a nossa + a que o Next gera
+// sozinho por padrão quando não existe esse export), o que é um bug real:
+// com duas tags de viewport, qual delas cada navegador usa não é garantido
+// pela spec, e a Safari é conhecida por ser sensível a isso justamente no
+// algoritmo que casa a splash screen com o aparelho (investigando o bug de
+// splash preta no iPhone 11, 2026-09-23). Esse export é o jeito correto do
+// Next App Router declarar viewport — gera uma única tag, sem duplicidade.
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({
@@ -61,7 +85,6 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
