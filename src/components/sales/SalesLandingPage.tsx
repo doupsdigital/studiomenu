@@ -256,7 +256,7 @@ export function SalesLandingPage() {
                   <div className="lp-tier-price-main">
                     <span className="lp-tier-currency">R$</span>
                     <span className="lp-tier-val">69</span>
-                    <span className="lp-tier-cents">,{String(PLUS_PRICE).split('.')[1] ?? '90'}</span>
+                    <span className="lp-tier-cents">,{PLUS_PRICE.toFixed(2).split('.')[1]}</span>
                   </div>
                   <div className="lp-tier-price-sub">por mês</div>
                 </div>
