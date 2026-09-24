@@ -84,7 +84,7 @@ export function SalesLandingPage() {
 
                 <div className="lp-hero-actions">
                   <a
-                    href={whatsappLink('Olá! Vi a página do StudioMenu e quero criar meu catálogo digital 😊 (vim pelo botão "Criar Meu Catálogo Agora" da home)')}
+                    href={whatsappLink('Olá! Quero saber como funciona o StudioMenu e criar meu catálogo digital 😊')}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="lp-btn lp-btn--primary"
@@ -260,7 +260,7 @@ export function SalesLandingPage() {
                 </ul>
 
                 <a
-                  href={whatsappLink('Olá! Quero assinar o StudioMenu Básico (R$ 39,90/mês) — vim pelo botão da home (catálogo).')}
+                  href={whatsappLink('Olá! Quero saber como funciona o StudioMenu Básico.')}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="lp-btn lp-btn--whatsapp"
@@ -292,7 +292,7 @@ export function SalesLandingPage() {
                 </ul>
 
                 <a
-                  href={whatsappLink('Olá! Quero assinar o StudioMenu+ (R$ 69,90/mês) — vim pelo botão da home (catálogo).')}
+                  href={whatsappLink('Olá! Quero saber como funciona o StudioMenu+.')}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="lp-btn lp-btn--whatsapp"

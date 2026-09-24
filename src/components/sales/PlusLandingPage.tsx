@@ -82,7 +82,7 @@ export function PlusLandingPage() {
 
                 <div className="lp-hero-actions">
                   <a
-                    href={whatsappLink('Olá! Vi a página de Agendamento Automático do StudioMenu e quero ativar isso no meu studio! 😊 (vim pelo botão do topo da página de agendamento)')}
+                    href={whatsappLink('Olá! Vi que dá pra automatizar o agendamento das minhas clientes no StudioMenu e quero saber mais! 😊')}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="lp-btn lp-btn--primary"
@@ -258,7 +258,7 @@ export function PlusLandingPage() {
                 </ul>
 
                 <a
-                  href={whatsappLink('Olá! Quero assinar o StudioMenu Básico (R$ 39,90/mês) — vim pela página de agendamento automático (/plus).')}
+                  href={whatsappLink('Olá! Quero saber como funciona o StudioMenu Básico — vocês têm agendamento automático?')}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="lp-btn lp-btn--whatsapp"
@@ -290,7 +290,7 @@ export function PlusLandingPage() {
                 </ul>
 
                 <a
-                  href={whatsappLink('Olá! Quero ativar o StudioMenu+ com agendamento automático (R$ 69,90/mês) — vim pela página de agendamento (/plus).')}
+                  href={whatsappLink('Olá! Quero saber como funciona o agendamento automático do StudioMenu+.')}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="lp-btn lp-btn--whatsapp"
