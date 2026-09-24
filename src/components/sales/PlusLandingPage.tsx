@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { BASICO_PRICE, PLUS_PRICE } from '@/lib/pricing';
 
 const WHATSAPP_NUMBER = '5562991083435';
@@ -82,12 +81,17 @@ export function PlusLandingPage() {
                 </p>
 
                 <div className="lp-hero-actions">
-                  <Link href="/form" className="lp-btn lp-btn--primary">
+                  <a
+                    href={whatsappLink('Olá! Vi que dá pra automatizar o agendamento das minhas clientes no StudioMenu e quero saber mais! 😊')}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="lp-btn lp-btn--primary"
+                  >
                     Ativar Minha Agenda Automática
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
                       <path d="M5 12h14m-7-7 7 7-7 7" />
                     </svg>
-                  </Link>
+                  </a>
                 </div>
 
                 <p className="lp-hero-swipe-hint">👇 Escolha um serviço na segunda tela do catálogo, clique em Agendar e veja o agendamento automático funcionando:</p>
@@ -253,9 +257,14 @@ export function PlusLandingPage() {
                   <li>{CHECK_ICON}<span>Cliente ainda agenda pelo WhatsApp</span></li>
                 </ul>
 
-                <Link href="/form" className="lp-btn lp-btn--whatsapp">
+                <a
+                  href={whatsappLink('Olá! Quero saber como funciona o StudioMenu Básico — vocês têm agendamento automático?')}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="lp-btn lp-btn--whatsapp"
+                >
                   COMEÇAR NO BÁSICO
-                </Link>
+                </a>
               </div>
 
               {/* Plus */}
@@ -280,9 +289,14 @@ export function PlusLandingPage() {
                   <li>{CHECK_ICON}<span>Tudo do StudioMenu Básico incluso</span></li>
                 </ul>
 
-                <Link href="/form" className="lp-btn lp-btn--whatsapp">
+                <a
+                  href={whatsappLink('Olá! Quero saber como funciona o agendamento automático do StudioMenu+.')}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="lp-btn lp-btn--whatsapp"
+                >
                   ATIVAR AGENDAMENTO AGORA
-                </Link>
+                </a>
               </div>
             </div>
           </div>
@@ -301,9 +315,12 @@ export function PlusLandingPage() {
         </div>
       </footer>
 
-      {/* Botão Flutuante de WhatsApp — contato de pré-venda genérico, não
-       *  fechamento de um plano específico (o CTA de venda de verdade é o
-       *  /form). */}
+      {/* Botão Flutuante de WhatsApp — contato genérico ("tenho dúvidas"),
+       *  diferente dos CTAs específicos de cada plano acima (cada um com
+       *  sua própria mensagem, pra ela saber de onde a cliente veio e qual
+       *  plano/página gerou o contato — pedido explícito: no começo das
+       *  vendas ela mesma monta os catálogos, então todo CTA vai pro
+       *  WhatsApp dela em vez do formulário self-service, 2026-09-24). */}
       <div className="lp-sticky-wa-bar">
         <a href={whatsappLink('Olá! Vi a página do StudioMenu+ e gostaria de saber mais sobre o agendamento automático! 😊')} target="_blank" rel="noopener noreferrer" className="lp-sticky-wa-btn">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
