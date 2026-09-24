@@ -127,7 +127,9 @@ export default async function InicioPage({ params }: InicioPageProps) {
         <div className="relative z-10">
           <h2 className="font-serif-pro font-bold text-xl text-rose-800 mb-1.5">Compartilhe seu Catálogo</h2>
           <p className="text-[15px] text-rose-800/70 mb-4 max-w-xs mx-auto">
-            Envie esse link pra suas clientes verem seus serviços e preços, e agendarem sozinhas se o agendamento automático estiver ativo.
+            {schedulingLive
+              ? 'Envie esse link pra suas clientes verem seus serviços e preços, e agendarem sozinhas.'
+              : 'Envie esse link pra suas clientes verem seus serviços e preços e agendarem pelo WhatsApp.'}
           </p>
           <ShareLinkButton slug={order.slug} />
         </div>
