@@ -18,10 +18,14 @@ const STEPS: Step[] = ['beneficios', 'demo', 'cta'];
 /** Onboarding em tela cheia do StudioMenu+, aberto pelo "Conheça" do
  *  `PlusUpsellCard` — 3 telas (benefícios → demo do agendamento automático
  *  com o catálogo real da cliente → assinar), no lugar do link direto de
- *  antes pra `/config#upgrade-plus` (2026-09-24). */
+ *  antes pra `/config#upgrade-plus` (2026-09-24).
+ *
+ *  Sempre no tema "rose" (independente do `theme_variant` real do catálogo
+ *  dela) — pedido explícito, 2026-09-24: a paleta do app em si (topbar,
+ *  cards, menu) é sempre rose, e um modal luxury (escuro) por cima destoava
+ *  do resto da tela. */
 export const PlusOnboardingModal: React.FC<PlusOnboardingModalProps> = ({ slug, catalog, onClose }) => {
   const [step, setStep] = useState<Step>('beneficios');
-  const isLuxury = catalog.theme_variant === 'luxury';
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -41,7 +45,7 @@ export const PlusOnboardingModal: React.FC<PlusOnboardingModalProps> = ({ slug, 
 
   return (
     <div
-      data-theme={isLuxury ? 'luxury' : 'rose'}
+      data-theme="rose"
       className="fixed inset-0 z-50 flex flex-col bg-cream"
       role="dialog"
       aria-modal="true"
