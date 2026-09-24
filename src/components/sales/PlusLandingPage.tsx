@@ -90,7 +90,7 @@ export function PlusLandingPage() {
                   </Link>
                 </div>
 
-                <p className="lp-hero-swipe-hint">👇 Toque em &quot;Agendar agora&quot; num serviço e veja o agendamento automático funcionando:</p>
+                <p className="lp-hero-swipe-hint">👇 Escolha um serviço na segunda tela do catálogo, clique em Agendar e veja o agendamento automático funcionando:</p>
               </div>
 
               {/* Mockup: catálogo real embutido, com agendamento automático de verdade pra testar */}
