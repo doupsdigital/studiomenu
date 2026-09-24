@@ -4,6 +4,7 @@ import { isProfessionalRequestAuthorized } from '@/lib/professional-session';
 import { getOrderForProfessionalApp } from '@/lib/professional-app-service';
 import { ServiceWorkerRegister } from '@/components/app-shell/ServiceWorkerRegister';
 import { BottomNav } from '@/components/app-shell/BottomNav';
+import { WelcomeOnboarding } from '@/components/app-shell/WelcomeOnboarding';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -53,6 +54,7 @@ export default async function ProfessionalAppLayout({ children, params }: AppLay
   return (
     <div className={`pro-app-shell min-h-screen bg-cream text-ink font-body-pro ${showNav ? 'pb-20' : ''}`}>
       <ServiceWorkerRegister />
+      {order && <WelcomeOnboarding slug={slug} planTier={order.plan_tier} />}
       {children}
       {showNav && <BottomNav slug={slug} />}
     </div>
