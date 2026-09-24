@@ -28,8 +28,13 @@ export const PlusBenefitsScreen: React.FC<PlusBenefitsScreenProps> = ({ onNext }
 
       <ul className="text-left w-full flex flex-col gap-3 mb-8">
         {BENEFITS.map((benefit) => (
-          <li key={benefit} className="flex items-start gap-3 text-[15px] text-ink leading-snug bg-rose-50 border border-rose-100 rounded-xl px-4 py-3">
-            <Check className="w-4 h-4 mt-0.5 shrink-0 text-rose-600" strokeWidth={3} />
+          <li
+            key={benefit}
+            className="flex items-center gap-3 text-[15px] font-semibold text-ink leading-snug bg-white border border-rose-200 rounded-xl px-4 py-3.5 shadow-sm"
+          >
+            <span className="w-6 h-6 rounded-full bg-rose-600 text-white flex items-center justify-center shrink-0">
+              <Check className="w-3.5 h-3.5" strokeWidth={3} />
+            </span>
             {benefit}
           </li>
         ))}
