@@ -5,9 +5,20 @@ import { CheckCircle } from 'lucide-react';
 import { ProcedureItem } from '@/types/catalog';
 import '@/styles/scheduling-wizard.css';
 
+interface BookedFake {
+  time: string;
+  dateLabel: string;
+}
+
 interface FakeBookingModalProps {
   service: ProcedureItem;
   onClose: () => void;
+  /** Onboarding do StudioMenu+ dentro do app (2026-09-24): quando definido,
+   *  ao escolher um horário chama isso em vez de mostrar a tela de sucesso
+   *  interna — quem chamou assume a confirmação (no caso, uma prévia da
+   *  Agenda de verdade). Sem esse prop (showroom público, mockups das
+   *  landing pages), comportamento idêntico a hoje. */
+  onBooked?: (booked: BookedFake) => void;
 }
 
 /** Simulação 100% local do agendamento automático — usada no showroom
@@ -22,11 +33,6 @@ interface FakeBookingModalProps {
  *  real — ver `CatalogLayout.tsx`, prop `demoBookingOnly`. */
 const FAKE_TIMES = ['09:00', '10:30', '12:00', '14:00', '15:30', '17:00'];
 const DAYS_AHEAD = 6;
-
-interface BookedFake {
-  time: string;
-  dateLabel: string;
-}
 
 function toDateKey(d: Date): string {
   return d.toLocaleDateString('en-CA');
@@ -62,7 +68,7 @@ function formatPrice(val: string): string {
   return `R$ ${val}`;
 }
 
-export const FakeBookingModal: React.FC<FakeBookingModalProps> = ({ service, onClose }) => {
+export const FakeBookingModal: React.FC<FakeBookingModalProps> = ({ service, onClose, onBooked }) => {
   const days = useState(() => buildNextDays(DAYS_AHEAD))[0];
   const [selectedDate, setSelectedDate] = useState<string>(days[0].key);
   const [booked, setBooked] = useState<BookedFake | null>(null);
@@ -149,7 +155,14 @@ export const FakeBookingModal: React.FC<FakeBookingModalProps> = ({ service, onC
                 key={time}
                 type="button"
                 className="wizard__slot"
-                onClick={() => setBooked({ time, dateLabel: formatDateLabel(selectedDate) })}
+                onClick={() => {
+                  const info = { time, dateLabel: formatDateLabel(selectedDate) };
+                  if (onBooked) {
+                    onBooked(info);
+                  } else {
+                    setBooked(info);
+                  }
+                }}
               >
                 {time}
               </button>
