@@ -32,7 +32,7 @@ const SCALE_Y = SCREEN_H / BASE_H;
  *  sendo o `ViewCatalogCard` logo abaixo. */
 export const CatalogReadyPreview: React.FC<CatalogReadyPreviewProps> = ({ slug }) => {
   return (
-    <div className="flex flex-col items-center gap-3 py-1">
+    <div className="flex flex-col items-center gap-3 -mt-2 pb-1">
       <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-rose-100 text-rose-700 text-base font-bold">
         ✨ Seu catálogo digital já está pronto
       </span>
