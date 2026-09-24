@@ -13,6 +13,8 @@ interface PlusDemoScreenProps {
   onNext: () => void;
 }
 
+const STEPS = ['Escolha um serviço', "Toque em 'Agendar agora'", 'Escolha o dia e o horário'];
+
 /** Tela 2 do onboarding do StudioMenu+: demonstra o agendamento automático
  *  funcionando com o catálogo REAL da profissional (não um preset genérico
  *  de exemplo) — mesmo mecanismo de simulação local do showroom público
@@ -56,16 +58,23 @@ export const PlusDemoScreen: React.FC<PlusDemoScreenProps> = ({ catalog, onNext 
         </p>
       ) : (
         <>
-          <div className="w-full rounded-2xl bg-gradient-to-br from-rose-600 to-rose-500 text-white px-5 py-4 mb-5 shadow-lg shadow-rose-600/20 flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0">
-              <MousePointerClick className="w-6 h-6" />
+          <div className="w-full rounded-2xl bg-gradient-to-br from-rose-600 to-rose-500 text-white px-5 py-5 mb-5 shadow-lg shadow-rose-600/20">
+            <div className="flex items-center gap-3.5 mb-4">
+              <div className="w-11 h-11 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0">
+                <MousePointerClick className="w-6 h-6" />
+              </div>
+              <p className="font-bold text-[17px] leading-snug">Toque num serviço abaixo</p>
             </div>
-            <div>
-              <p className="font-bold text-[15px] leading-snug">Toque num serviço abaixo</p>
-              <p className="text-[13px] text-white/85 leading-snug mt-0.5">
-                Veja o agendamento automático funcionando do jeito que suas clientes vão ver.
-              </p>
-            </div>
+            <ol className="flex flex-col gap-2.5">
+              {STEPS.map((step, i) => (
+                <li key={step} className="flex items-start gap-2.5 text-[16px] leading-snug">
+                  <span className="w-5 h-5 rounded-full bg-white/25 flex items-center justify-center text-[12px] font-bold shrink-0 mt-0.5">
+                    {i + 1}
+                  </span>
+                  {step}
+                </li>
+              ))}
+            </ol>
           </div>
 
           <div className="mosaico__grid w-full mb-6">
