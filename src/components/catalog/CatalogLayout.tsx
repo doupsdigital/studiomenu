@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useMemo, useEffect, useState } from 'react';
+import type { Step } from 'react-joyride';
 import { CatalogOrderData, ProcedureItem, ThemeVariant, LayoutModel } from '@/types/catalog';
 import { HeaderCover } from './HeaderCover';
 import { ProcedureGrid } from './ProcedureGrid';
@@ -11,6 +12,7 @@ import { VisualEditorModals } from './VisualEditorModals';
 import { NewCatalogWelcomeOverlay } from './NewCatalogWelcomeOverlay';
 import { BookingModal } from './modals/BookingModal';
 import { FakeBookingModal } from './modals/FakeBookingModal';
+import { ProductTour } from '@/components/tour/ProductTour';
 
 import '@/styles/visual-editor.css';
 
@@ -367,6 +369,46 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
     return Array.from(set);
   }, [catalogState.categories, catalogState.procedures]);
 
+  // Tour guiado do editor visual (2026-09-24) — primeira vez que ela abre
+  // `/app/[slug]/catalogo`, explica o que dá pra editar e como. Passo de
+  // editar/excluir serviço só entra se já existir pelo menos um (a barra de
+  // ações só existe dentro de cada card — sem nenhum serviço, não há nada
+  // pra apontar).
+  //
+  // `skipScroll: true` na maioria dos passos: o editor rola dentro do seu
+  // próprio contêiner (`.mosaico-app`, `overflow-y: auto` próprio, não a
+  // página inteira) — o cálculo de posição do react-joyride pra esse caso
+  // ("custom scroll parent") é bem menos confiável que o de rolagem normal
+  // de página (achado calibrando `scrollOffset` sem sucesso consistente).
+  // Capa/nome já ficam visíveis assim que o editor abre (sem rolar nada), e
+  // tema/salvar ficam numa barra `position: fixed` (sempre visíveis,
+  // independente da rolagem) — nenhum dos dois precisa de rolagem
+  // nenhuma, então pular ela de propósito evita o problema todo em vez de
+  // tentar acertar um número de offset. Só o passo de editar/excluir um
+  // serviço (que pode estar em qualquer posição da lista) continua rolando
+  // de verdade.
+  const catalogEditorSteps = useMemo<Step[]>(() => {
+    const steps: Step[] = [
+      { target: '[data-tour="cat-cover"]', title: 'Troque a foto de capa', content: 'Toque aqui pra escolher uma nova foto de capa do seu catálogo.', skipScroll: true },
+      { target: '[data-tour="cat-text"]', title: 'Textos editáveis', content: 'Toque em qualquer texto marcado (nome, frase) pra editar direto na tela.', skipScroll: true },
+    ];
+    if (catalogState.procedures.length > 0) {
+      steps.push({
+        target: '[data-tour="cat-edit-proc"]',
+        title: 'Editar ou excluir um serviço',
+        content: 'Toque em ✏️ pra editar ou 🗑️ pra excluir, direto no card do serviço.',
+      });
+    }
+    steps.push(
+      // Passo "cat-add-proc" (Adicionar novos serviços) removido — o botão
+      // fica logo depois da lista de procedimentos, e o balão nunca ficou
+      // bem posicionado ali antes de descobrirmos o `skipScroll` (2026-09-24).
+      { target: '[data-tour="cat-theme"]', title: 'Personalize tema e layout', content: 'Esses botões trocam a paleta de cores e o modelo da grade (Mosaico/Clássico).', skipScroll: true },
+      { target: '[data-tour="cat-save"]', title: 'Não esqueça de salvar', content: 'As mudanças só valem pra cliente final depois de tocar aqui.', skipScroll: true }
+    );
+    return steps;
+  }, [catalogState.procedures.length]);
+
   // Reordenar categoria (setas ‹ › nos chips de filtro, modo edição).
   // Usa a lista `categories` completa (não só catalogState.categories) pra
   // funcionar mesmo com categorias "implícitas" (que só existem porque um
@@ -407,6 +449,13 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
           editToken={editToken}
           onClose={() => setShowWelcomeOverlay(false)}
         />
+      )}
+
+      {/* 0.6 TOUR GUIADO DO EDITOR VISUAL (SÓ NA PRIMEIRA VEZ) — espera o
+       *  overlay de boas-vindas acima fechar antes de começar, se os dois
+       *  algum dia coexistirem na mesma rota. */}
+      {isEditMode && (
+        <ProductTour tourId="catalogo" slug={catalogState.slug} steps={catalogEditorSteps} enabled={!showWelcomeOverlay} scrollOffset={20} />
       )}
 
       {/* 1. CONTROLES DO EDITOR VISUAL IN-PLACE (BARRA INFERIOR E TOP STATUS) */}
