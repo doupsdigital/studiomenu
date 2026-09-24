@@ -1,6 +1,7 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
 import { getOrderForProfessionalApp } from '@/lib/professional-app-service';
+import { getCatalogBySlug } from '@/lib/catalog-service';
 import { getAppointmentsForDay, getPendingAppointments } from '@/lib/scheduling/agenda-service';
 import { getBusinessHours } from '@/lib/scheduling/config-service';
 import { GradientHeader } from '@/components/app-shell/GradientHeader';
@@ -60,12 +61,17 @@ export default async function InicioPage({ params }: InicioPageProps) {
   // fato funcionando pro cliente final, não o plano diretamente (pode estar
   // ligado via toggle manual do admin sem ela ser Plus — Fase 6).
   const schedulingLive = order.booking_enabled;
+  // Mesma condição de exibição do card de upsell logo abaixo — só busca o
+  // catálogo completo (com procedures) quando ele de fato vai aparecer, pra
+  // não pagar essa consulta extra em quem já é Plus.
+  const showPlusUpsell = !isPlusAtivo && order.subscription_status !== 'suspenso';
 
-  const [todayAppointments, pendingAppointments, businessHours] = await Promise.all([
+  const [todayAppointments, pendingAppointments, businessHours, plusUpsellCatalog] = await Promise.all([
     getAppointmentsForDay(order.id, todayInSaoPaulo()),
     getPendingAppointments(order.id),
     // Só o checklist de "próximos passos" do Plus usa isso (item de horários).
     isPlusAtivo ? getBusinessHours(order.id) : Promise.resolve([]),
+    showPlusUpsell ? getCatalogBySlug(slug) : Promise.resolve(null),
   ]);
   const hoursDone = businessHours.length > 0;
 
@@ -136,7 +142,7 @@ export default async function InicioPage({ params }: InicioPageProps) {
       {/* Suspensa (mensalidade em atraso): oferecer "Assinar o Plus" aqui só
        *  confunde — o que ela precisa é pagar a cobrança em aberto, que já
        *  aparece no aviso lá no topo (Fase 21). */}
-      {!isPlusAtivo && order.subscription_status !== 'suspenso' && <PlusUpsellCard variant="card" slug={slug} />}
+      {showPlusUpsell && <PlusUpsellCard variant="card" slug={slug} catalog={plusUpsellCatalog} />}
 
       <OnboardingCardStack slug={slug} planTier={order.plan_tier} subscriptionStatus={order.subscription_status} hasAccount={Boolean(order.auth_user_id)} hoursDone={hoursDone} />
 
