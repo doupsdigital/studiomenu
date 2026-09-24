@@ -6,6 +6,7 @@ import { CatalogOrderData, ProcedureItem } from '@/types/catalog';
 import { ProcedureCard } from '@/components/catalog/ProcedureCard';
 import { ProcedureDetailModal } from '@/components/catalog/ProcedureDetailModal';
 import { FakeBookingModal } from '@/components/catalog/modals/FakeBookingModal';
+import { AgendaPreviewScreen } from './AgendaPreviewScreen';
 import '@/styles/scheduling-wizard.css';
 
 interface PlusDemoScreenProps {
@@ -44,6 +45,7 @@ export const PlusDemoScreen: React.FC<PlusDemoScreenProps> = ({ catalog, onNext 
 
   const [selectedProcedure, setSelectedProcedure] = useState<ProcedureItem | null>(null);
   const [bookingItem, setBookingItem] = useState<ProcedureItem | null>(null);
+  const [agendaPreview, setAgendaPreview] = useState<{ service: ProcedureItem; time: string; dateLabel: string } | null>(null);
 
   return (
     <div className="flex flex-col items-center px-6 pt-6 pb-8 max-w-sm mx-auto w-full">
@@ -107,7 +109,25 @@ export const PlusDemoScreen: React.FC<PlusDemoScreenProps> = ({ catalog, onNext 
         />
       )}
 
-      {bookingItem && <FakeBookingModal service={bookingItem} onClose={() => setBookingItem(null)} />}
+      {bookingItem && (
+        <FakeBookingModal
+          service={bookingItem}
+          onClose={() => setBookingItem(null)}
+          onBooked={(info) => {
+            setAgendaPreview({ service: bookingItem, ...info });
+            setBookingItem(null);
+          }}
+        />
+      )}
+
+      {agendaPreview && (
+        <AgendaPreviewScreen
+          service={agendaPreview.service}
+          time={agendaPreview.time}
+          dateLabel={agendaPreview.dateLabel}
+          onContinue={onNext}
+        />
+      )}
     </div>
   );
 };
