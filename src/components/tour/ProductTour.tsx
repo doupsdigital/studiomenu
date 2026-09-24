@@ -18,6 +18,11 @@ interface ProductTourProps {
    *  scroll que o link já tinha feito). Ignorado se não bater com nenhum
    *  step. */
   initialStepId?: string;
+  /** Chamado só quando ela CONCLUI o tour de verdade (clica em "Concluir"
+   *  no último passo) — não quando pula ("Pular" também fecha o tour, mas
+   *  não é a mesma intenção). Usado pelo `primeiro-contato` pra voltar o
+   *  scroll pro topo e destacar o próximo passo esperado. */
+  onFinish?: () => void;
 }
 
 /** Inclui os alvos dos steps na chave — de propósito. Sem isso, um tour já
@@ -61,7 +66,7 @@ const isTourSeen = (tourId: string, slug: string, steps: Step[]): boolean => {
  *  (`tailwind.config.js`: rose-600 `#b04e6c`, `ink` `#2C1810`, fontes
  *  Fraunces/Jost de `globals.css`, não as `font-serif`/`font-sans` padrão
  *  do Tailwind que não estão carregadas aqui). */
-export const ProductTour: React.FC<ProductTourProps> = ({ tourId, slug, steps, enabled, initialStepId }) => {
+export const ProductTour: React.FC<ProductTourProps> = ({ tourId, slug, steps, enabled, initialStepId, onFinish }) => {
   const [run, setRun] = useState(false);
 
   const key = storageKey(tourId, slug, steps);
@@ -83,6 +88,7 @@ export const ProductTour: React.FC<ProductTourProps> = ({ tourId, slug, steps, e
       } catch {
         // localStorage indisponível (modo privado, etc.) — só não persiste entre sessões.
       }
+      if (data.status === STATUS.FINISHED) onFinish?.();
     }
   };
 
