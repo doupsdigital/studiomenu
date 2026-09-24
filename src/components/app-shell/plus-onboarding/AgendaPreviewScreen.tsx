@@ -29,7 +29,7 @@ export const AgendaPreviewScreen: React.FC<AgendaPreviewScreenProps> = ({ servic
   const endTime = `${String(Math.floor(endTotal / 60) % 24).padStart(2, '0')}:${String(endTotal % 60).padStart(2, '0')}`;
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-cream" role="dialog" aria-modal="true" aria-label="Prévia da sua agenda">
+    <div className="fixed inset-0 z-50 flex flex-col bg-rose-200" role="dialog" aria-modal="true" aria-label="Prévia da sua agenda">
       <div className="flex-1 overflow-y-auto flex flex-col items-center justify-center px-6 py-8 max-w-sm mx-auto w-full text-center">
         <div className="w-full rounded-2xl bg-surface border border-rose-100 shadow-sm px-6 py-6 mb-4">
           <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-4">
