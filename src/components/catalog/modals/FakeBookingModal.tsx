@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { CheckCircle } from 'lucide-react';
 import { ProcedureItem } from '@/types/catalog';
 import '@/styles/scheduling-wizard.css';
@@ -8,16 +8,6 @@ import '@/styles/scheduling-wizard.css';
 interface FakeBookingModalProps {
   service: ProcedureItem;
   onClose: () => void;
-  /** Onboarding do StudioMenu+ dentro do app (Fase 2026-09-24): quando
-   *  definido, escolhe o primeiro horário sozinha depois desse tempo (ms),
-   *  pra "se explicar sozinha" antes da profissional tocar em algo. Sem
-   *  esse prop (showroom público, mockups das landing pages), comportamento
-   *  idêntico a hoje — nenhum dos 3 usos atuais passa isso. */
-  autopilotDelayMs?: number;
-  onAutoBooked?: () => void;
-  /** Avisa quem chamou que a profissional tocou em algo de verdade (dia ou
-   *  horário), pra cancelar o autoplay do onboarding imediatamente. */
-  onUserInteract?: () => void;
 }
 
 /** Simulação 100% local do agendamento automático — usada no showroom
@@ -72,28 +62,10 @@ function formatPrice(val: string): string {
   return `R$ ${val}`;
 }
 
-export const FakeBookingModal: React.FC<FakeBookingModalProps> = ({
-  service,
-  onClose,
-  autopilotDelayMs,
-  onAutoBooked,
-  onUserInteract,
-}) => {
+export const FakeBookingModal: React.FC<FakeBookingModalProps> = ({ service, onClose }) => {
   const days = useState(() => buildNextDays(DAYS_AHEAD))[0];
   const [selectedDate, setSelectedDate] = useState<string>(days[0].key);
   const [booked, setBooked] = useState<BookedFake | null>(null);
-  const onAutoBookedRef = useRef(onAutoBooked);
-  onAutoBookedRef.current = onAutoBooked;
-
-  useEffect(() => {
-    if (!autopilotDelayMs) return;
-    const timer = setTimeout(() => {
-      setBooked({ time: FAKE_TIMES[0], dateLabel: formatDateLabel(selectedDate) });
-      onAutoBookedRef.current?.();
-    }, autopilotDelayMs);
-    return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autopilotDelayMs]);
 
   const fallbackImage = 'https://images.unsplash.com/photo-1583001809873-a1284d563391?auto=format&fit=crop&w=400&q=80';
 
@@ -162,10 +134,7 @@ export const FakeBookingModal: React.FC<FakeBookingModalProps> = ({
                 key={d.key}
                 type="button"
                 className={`wizard__dia-chip ${selectedDate === d.key ? 'is-ativo' : ''}`}
-                onClick={() => {
-                  onUserInteract?.();
-                  setSelectedDate(d.key);
-                }}
+                onClick={() => setSelectedDate(d.key)}
               >
                 <span>{d.weekday}</span>
                 <strong>{d.day}</strong>
@@ -180,10 +149,7 @@ export const FakeBookingModal: React.FC<FakeBookingModalProps> = ({
                 key={time}
                 type="button"
                 className="wizard__slot"
-                onClick={() => {
-                  onUserInteract?.();
-                  setBooked({ time, dateLabel: formatDateLabel(selectedDate) });
-                }}
+                onClick={() => setBooked({ time, dateLabel: formatDateLabel(selectedDate) })}
               >
                 {time}
               </button>
