@@ -147,9 +147,14 @@ partir do próximo ciclo).
   (Produção) continua usando o banco real. Schema aplicado via `docs/schema.sql` (mesmo arquivo
   de sempre). **Toda migração nova precisa rodar nos dois projetos** — no SQL Editor do
   `studiomenu-dev` primeiro (pra testar), depois no de produção (pra valer). Catálogos de teste já
-  semeados nele: `dev-catalogo-simples` (gratuito) e `dev-catalogo-plus` (StudioMenu+ ativo,
-  agenda configurada, pronto pra testar o agendamento automático sem precisar passar pelo Asaas).
-  As chaves ficam em `.env.dev.local` (fora do Git) na máquina de trabalho.
+  semeados nele: `dev-catalogo-simples` (gratuito), `dev-catalogo-plus` (StudioMenu+ ativo,
+  agenda configurada, pronto pra testar o agendamento automático sem precisar passar pelo Asaas) e
+  `dev-catalogo-basico` (StudioMenu Básico ativo, `booking_enabled=false`, serviços de propósito
+  sem `duration_minutes` — pra testar o onboarding do StudioMenu+ e seu fallback local de
+  agendamento, 2026-09-24). Login direto em qualquer um deles via
+  `/api/professional/login?slug=<slug>&token=<edit_token>` (o mesmo link mágico de sempre; os
+  `edit_token` de cada um ficam só no banco de dev, não neste doc). As chaves ficam em
+  `.env.dev.local` (fora do Git) na máquina de trabalho.
 
 **Ciclo de uma mudança, do começo ao fim:**
 1. Trabalha e testa (`tsc`/`check-integrity.js`) na `desenv`, push.
