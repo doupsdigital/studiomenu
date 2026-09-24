@@ -30,7 +30,18 @@ function whatsappLink(text: string) {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
 }
 
+/** Separa em parte inteira + centavos pro card de preço (o "R$" e o
+ *  número grande são um span, os centavos outro span menor — mesmo
+ *  recorte visual da `lpb` original). */
+function priceParts(price: number): { whole: string; cents: string } {
+  const [whole, cents] = price.toFixed(2).split('.');
+  return { whole, cents };
+}
+
 export function SalesLandingPage() {
+  const basicoParts = priceParts(BASICO_PRICE);
+  const plusParts = priceParts(PLUS_PRICE);
+
   return (
     <div className="lp-lashmenu">
       {/* Barra de Anúncio / Prova Social */}
@@ -231,7 +242,8 @@ export function SalesLandingPage() {
                 <div className="lp-tier-price-box">
                   <div className="lp-tier-price-main">
                     <span className="lp-tier-currency">R$</span>
-                    <span className="lp-tier-val">{BASICO_PRICE}</span>
+                    <span className="lp-tier-val">{basicoParts.whole}</span>
+                    <span className="lp-tier-cents">,{basicoParts.cents}</span>
                   </div>
                   <div className="lp-tier-price-sub">por mês</div>
                 </div>
@@ -257,8 +269,8 @@ export function SalesLandingPage() {
                 <div className="lp-tier-price-box">
                   <div className="lp-tier-price-main">
                     <span className="lp-tier-currency">R$</span>
-                    <span className="lp-tier-val">69</span>
-                    <span className="lp-tier-cents">,{PLUS_PRICE.toFixed(2).split('.')[1]}</span>
+                    <span className="lp-tier-val">{plusParts.whole}</span>
+                    <span className="lp-tier-cents">,{plusParts.cents}</span>
                   </div>
                   <div className="lp-tier-price-sub">por mês</div>
                 </div>
