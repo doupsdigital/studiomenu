@@ -14,10 +14,10 @@ const AVATARS = ['/landing/avatar-lash-1.webp', '/landing/avatar-lash-2.webp', '
 
 const TESTIMONIALS = [
   { name: 'Mariana A.', avatar: AVATARS[0], quote: 'Parei de mandar PDF no Canva. Minhas clientes amaram o link na bio!' },
-  { name: 'Camila R.', avatar: AVATARS[1], quote: 'Ninguém mais pede desconto. Valorizou muito o meu estúdio!' },
+  { name: 'Camila R.', avatar: AVATARS[1], quote: 'Ninguém mais pede desconto. Valorizou muito o meu studio!' },
   { name: 'Juliana S.', avatar: AVATARS[2], quote: 'Entregaram tudo pronto no meu WhatsApp em menos de 24 horas!' },
   { name: 'Fernanda M.', avatar: AVATARS[0], quote: 'As clientes leem os cuidados pós e já agendam muito mais rápido.' },
-  { name: 'Beatriz K.', avatar: AVATARS[1], quote: 'Melhor investimento do ano pro meu estúdio. Pagou-se no 1º dia!' },
+  { name: 'Beatriz K.', avatar: AVATARS[1], quote: 'Melhor investimento do ano pro meu studio. Pagou-se no 1º dia!' },
 ];
 
 const CHECK_ICON = (
@@ -55,7 +55,7 @@ export function SalesLandingPage() {
             </div>
             <div className="lp-topbar-stars">★★★★★</div>
             <span className="lp-announcement-text">
-              <strong>4.9/5</strong> · Mais de <strong>350+ Estúdios de Beleza</strong> já usam
+              <strong>4.9/5</strong> · Mais de <strong>350+ Studios de Beleza</strong> já usam
             </span>
           </div>
         </div>
@@ -71,16 +71,16 @@ export function SalesLandingPage() {
                   <h1 className="lp-hero-brand-h1">
                     Studio<em>Menu</em>
                   </h1>
-                  <p className="lp-hero-brand-tagline">Catálogo Digital para Estúdios de Beleza</p>
+                  <p className="lp-hero-brand-tagline">Catálogo Digital para Studios de Beleza</p>
                 </div>
 
                 <h2 className="lp-hero-title">
-                  Diga adeus ao PDF do Canva e transforme sua tabela de preços em um{' '}
-                  <span className="lp-text-gradient">Catálogo Digital Interativo.</span>
+                  Chega de PDF do Canva. Seu{' '}
+                  <span className="lp-text-gradient">Catálogo Digital Interativo</span>, pronto em minutos.
                 </h2>
 
                 <p className="lp-hero-subtitle">
-                  Chega de enviar tabelas em PDF pesadas que ninguém abre no celular ou digitar mensagens longas de preços. Seu catálogo pronto em poucos minutos, com seu nome, fotos e valores — pra Lash, Nails, Estética ou qualquer estúdio de beleza.
+                  Fotos, preços e seu nome — num link só, pra Lash, Nails, Estética ou qualquer studio de beleza.
                 </p>
 
                 <div className="lp-hero-actions">
@@ -228,7 +228,7 @@ export function SalesLandingPage() {
         <section id="oferta" className="lp-pricing-section">
           <div className="lp-container">
             <div className="lp-pricing-header-title">
-              <h2 className="lp-section-title">Escolha o Plano Ideal para o Seu Estúdio</h2>
+              <h2 className="lp-section-title">Escolha o Plano Ideal para o Seu Studio</h2>
               <p className="lp-section-subtitle">Sem contrato de fidelidade · Cancele quando quiser</p>
             </div>
 
@@ -297,7 +297,7 @@ export function SalesLandingPage() {
             <span className="lp-footer-logo">
               Studio<em>Menu</em>
             </span>
-            <span className="lp-footer-tagline">Catálogo Digital Interativo para Estúdios de Beleza</span>
+            <span className="lp-footer-tagline">Catálogo Digital Interativo para Studios de Beleza</span>
             <span className="lp-footer-copy">© 2026 · Todos os direitos reservados</span>
           </div>
         </div>
