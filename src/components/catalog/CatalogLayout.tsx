@@ -10,6 +10,7 @@ import { VisualEditorBottomBar } from './VisualEditorBottomBar';
 import { VisualEditorModals } from './VisualEditorModals';
 import { NewCatalogWelcomeOverlay } from './NewCatalogWelcomeOverlay';
 import { BookingModal } from './modals/BookingModal';
+import { FakeBookingModal } from './modals/FakeBookingModal';
 
 import '@/styles/visual-editor.css';
 
@@ -19,6 +20,14 @@ interface CatalogLayoutProps {
   editToken?: string;
   isNewCatalog?: boolean;
   onThemeChange?: (theme: ThemeVariant) => void;
+  /** Só o showroom (`/c/showcase/[niche]`, sem catálogo real por trás)
+   *  usa isso — troca o wizard de agendamento real (que bate em
+   *  /api/scheduling/*, exige uma linha de verdade em `orders`) por uma
+   *  simulação 100% local (`FakeBookingModal`), pra dar pra mostrar a
+   *  experiência de agendamento automático sem precisar de uma
+   *  profissional fake no banco (2026-09-24). Não muda nada em catálogos
+   *  reais — default `false`. */
+  demoBookingOnly?: boolean;
 }
 
 export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
@@ -27,6 +36,7 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
   editToken = '',
   isNewCatalog = false,
   onThemeChange,
+  demoBookingOnly = false,
 }) => {
   const [showWelcomeOverlay, setShowWelcomeOverlay] = useState(isNewCatalog);
   const [catalogState, setCatalogState] = useState<CatalogOrderData>(data);
@@ -509,11 +519,15 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
 
       {/* Wizard de Agendamento (cliente final, só quando booking_enabled) */}
       {bookingItem && !isEditMode && (
-        <BookingModal
-          service={bookingItem}
-          slug={catalogState.slug}
-          onClose={() => setBookingItem(null)}
-        />
+        demoBookingOnly ? (
+          <FakeBookingModal service={bookingItem} onClose={() => setBookingItem(null)} />
+        ) : (
+          <BookingModal
+            service={bookingItem}
+            slug={catalogState.slug}
+            onClose={() => setBookingItem(null)}
+          />
+        )
       )}
     </div>
   );
