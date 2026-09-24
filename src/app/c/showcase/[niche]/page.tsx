@@ -48,6 +48,13 @@ export default function ShowcasePage({ params }: { params: Promise<{ niche: stri
     theme_variant: themeVariant,
     cover_media_url: layoutModel === 'classico' ? '/modelos/classico/assets/img/Hero.webp' : '/modelos/mosaico/assets/img/Hero.webp',
     avatar_url: layoutModel === 'classico' ? '/modelos/classico/assets/img/Hero.webp' : '/modelos/mosaico/assets/img/Hero.webp',
+    // Liga o botão "Agendar agora" pra mostrar a simulação de agendamento
+    // automático (`demoBookingOnly` no CatalogLayout abaixo) — o preset
+    // não tem `booking_enabled`/`duration_minutes` de verdade porque não
+    // existe profissional real por trás; só nesse objeto em memória, não
+    // mexe no preset fonte (2026-09-24).
+    booking_enabled: true,
+    procedures: basePreset.procedures.map((p) => ({ ...p, duration_minutes: p.duration_minutes ?? 60 })),
   };
 
   return (
@@ -68,7 +75,7 @@ export default function ShowcasePage({ params }: { params: Promise<{ niche: stri
 
       {/* Renderização do Catálogo Real — mesmo componente usado nos catálogos de clientes.
           CatalogLayout re-sincroniza sozinho ao trocar modelo/tema, preservando o scroll. */}
-      <CatalogLayout data={catalog} />
+      <CatalogLayout data={catalog} demoBookingOnly />
     </div>
   );
 }
