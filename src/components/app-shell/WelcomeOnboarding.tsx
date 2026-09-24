@@ -1,11 +1,14 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { Home, BookOpen, CalendarClock, CalendarCheck, type LucideIcon } from 'lucide-react';
+import { Home, BookOpen, CalendarClock, Settings, type LucideIcon } from 'lucide-react';
 
 interface WelcomeOnboardingProps {
   slug: string;
-  planTier: 'catalog' | 'basico' | 'plus';
+  /** Nunca 'catalog' aqui — quem ainda não assinou nada não tem BottomNav
+   *  (Agenda/Config) pra esse onboarding referenciar, e nem chega a montar
+   *  esse componente (guard em `layout.tsx`, mesma condição do `showNav`). */
+  planTier: 'basico' | 'plus';
 }
 
 interface Slide {
@@ -69,9 +72,9 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({ slug, plan
             subtitle: 'Com o agendamento automático ativo, é só acompanhar tudo na sua Agenda.',
           }
         : {
-            icon: CalendarCheck,
-            title: 'Acompanhe tudo por aqui',
-            subtitle: 'Início, Agenda e Configurações — sempre à mão, no menu abaixo.',
+            icon: Settings,
+            title: 'Tudo mais, sempre à mão',
+            subtitle: 'Sua conta, assinatura e configurações ficam aqui embaixo, no menu do app.',
           },
     ],
     [planTier]
