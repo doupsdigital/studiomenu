@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { BASICO_PRICE, PLUS_PRICE } from '@/lib/pricing';
 
 const WHATSAPP_NUMBER = '5562991083435';
@@ -84,12 +83,17 @@ export function SalesLandingPage() {
                 </p>
 
                 <div className="lp-hero-actions">
-                  <Link href="/form" className="lp-btn lp-btn--primary">
+                  <a
+                    href={whatsappLink('Olá! Vi a página do StudioMenu e quero criar meu catálogo digital 😊 (vim pelo botão "Criar Meu Catálogo Agora" da home)')}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="lp-btn lp-btn--primary"
+                  >
                     Criar Meu Catálogo Agora
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
                       <path d="M5 12h14m-7-7 7 7-7 7" />
                     </svg>
-                  </Link>
+                  </a>
                 </div>
 
                 <p className="lp-hero-swipe-hint">👇 Teste a experiência real do catálogo rolando a tela do celular ao lado:</p>
@@ -255,9 +259,14 @@ export function SalesLandingPage() {
                   <li>{CHECK_ICON}<span>Cliente agenda direto pelo seu WhatsApp</span></li>
                 </ul>
 
-                <Link href="/form" className="lp-btn lp-btn--whatsapp">
+                <a
+                  href={whatsappLink('Olá! Quero assinar o StudioMenu Básico (R$ 39,90/mês) — vim pelo botão da home (catálogo).')}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="lp-btn lp-btn--whatsapp"
+                >
                   COMEÇAR NO BÁSICO
-                </Link>
+                </a>
               </div>
 
               {/* Plus */}
@@ -282,9 +291,14 @@ export function SalesLandingPage() {
                   <li>{CHECK_ICON}<span>Menos ida e volta pelo WhatsApp</span></li>
                 </ul>
 
-                <Link href="/form" className="lp-btn lp-btn--whatsapp">
+                <a
+                  href={whatsappLink('Olá! Quero assinar o StudioMenu+ (R$ 69,90/mês) — vim pelo botão da home (catálogo).')}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="lp-btn lp-btn--whatsapp"
+                >
                   COMEÇAR NO PLUS
-                </Link>
+                </a>
               </div>
             </div>
           </div>
@@ -303,9 +317,12 @@ export function SalesLandingPage() {
         </div>
       </footer>
 
-      {/* Botão Flutuante de WhatsApp — contato de pré-venda genérico, não
-       *  fechamento de um plano específico (o CTA de venda de verdade é o
-       *  /form). */}
+      {/* Botão Flutuante de WhatsApp — contato genérico ("tenho dúvidas"),
+       *  diferente dos CTAs específicos de cada plano acima (cada um com
+       *  sua própria mensagem, pra ela saber de onde a cliente veio e qual
+       *  plano/página gerou o contato — pedido explícito: no começo das
+       *  vendas ela mesma monta os catálogos, então todo CTA vai pro
+       *  WhatsApp dela em vez do formulário self-service, 2026-09-24). */}
       <div className="lp-sticky-wa-bar">
         <a href={whatsappLink('Olá! Vi o StudioMenu no site e gostaria de saber mais informações! 😊')} target="_blank" rel="noopener noreferrer" className="lp-sticky-wa-btn">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
