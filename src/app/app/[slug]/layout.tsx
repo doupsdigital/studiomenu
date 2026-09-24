@@ -4,6 +4,7 @@ import { isProfessionalRequestAuthorized } from '@/lib/professional-session';
 import { getOrderForProfessionalApp } from '@/lib/professional-app-service';
 import { ServiceWorkerRegister } from '@/components/app-shell/ServiceWorkerRegister';
 import { BottomNav } from '@/components/app-shell/BottomNav';
+import { WelcomeOnboarding } from '@/components/app-shell/WelcomeOnboarding';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -53,6 +54,11 @@ export default async function ProfessionalAppLayout({ children, params }: AppLay
   return (
     <div className={`pro-app-shell min-h-screen bg-cream text-ink font-body-pro ${showNav ? 'pb-20' : ''}`}>
       <ServiceWorkerRegister />
+      {/* Mesma condição do `showNav`: sem BottomNav (`plan_tier === 'catalog'`),
+       *  não tem Agenda/Config pra esse boas-vindas citar — quem tá no
+       *  `FirstContactScreen` só vê a tela de assinar mesmo. Checado direto
+       *  em `order.plan_tier` (não via `showNav`) pro TS estreitar o tipo. */}
+      {order && order.plan_tier !== 'catalog' && <WelcomeOnboarding slug={slug} planTier={order.plan_tier} />}
       {children}
       {showNav && <BottomNav slug={slug} />}
     </div>

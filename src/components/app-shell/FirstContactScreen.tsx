@@ -4,6 +4,7 @@ import React, { useMemo, useState } from 'react';
 import type { Step } from 'react-joyride';
 import { ViewCatalogCard } from './ViewCatalogCard';
 import { EditCatalogCard } from './EditCatalogCard';
+import { CatalogReadyPreview } from './CatalogReadyPreview';
 import { PlanSubscribeCard } from '@/components/billing/PlanSubscribeCard';
 import { ProductTour } from '@/components/tour/ProductTour';
 import { PLAN_PRICING, type PayablePlanTier } from '@/lib/pricing';
@@ -36,6 +37,17 @@ export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order })
   const firstName = order.client_name.split(' ')[0];
   const [plan, setPlan] = useState<PayablePlanTier>(order.first_offer_tier);
   const isPlusOffer = order.first_offer_tier === 'plus';
+  const [highlightView, setHighlightView] = useState(false);
+
+  // Ao CONCLUIR o tour (não ao pular — intenção diferente): o último passo
+  // fica lá embaixo, perto do card de assinar. Ela pediu, 2026-09-24, pra
+  // voltar o foco pro topo e destacar o card de "Ver catálogo" nesse
+  // momento, já que é o próximo passo natural (ver como ficou de verdade).
+  const handleTourFinish = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setHighlightView(true);
+    setTimeout(() => setHighlightView(false), 6000);
+  };
 
   const steps = useMemo<Step[]>(
     () => [
@@ -63,7 +75,17 @@ export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order })
         <p className="text-[15px] text-ink-soft mt-1.5">Seu catálogo digital já está pronto.</p>
       </div>
 
-      <ViewCatalogCard slug={order.slug} dataTour="fc-view" />
+      <CatalogReadyPreview slug={order.slug} />
+
+      <div className="relative">
+        {highlightView && (
+          <span
+            className="absolute -inset-1.5 rounded-[20px] ring-4 ring-rose-400 animate-pulse pointer-events-none"
+            aria-hidden="true"
+          />
+        )}
+        <ViewCatalogCard slug={order.slug} dataTour="fc-view" />
+      </div>
       <EditCatalogCard slug={order.slug} dataTour="fc-edit" />
 
       <div className="mt-2" data-tour="fc-subscribe">
@@ -97,7 +119,7 @@ export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order })
         )}
       </div>
 
-      <ProductTour tourId="primeiro-contato" slug={order.slug} steps={steps} enabled />
+      <ProductTour tourId="primeiro-contato" slug={order.slug} steps={steps} enabled onFinish={handleTourFinish} />
     </main>
   );
 };
