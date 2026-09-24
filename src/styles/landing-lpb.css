@@ -39,6 +39,8 @@
 .lp-lashmenu *::before,
 .lp-lashmenu *::after {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 .lp-lashmenu h1,
@@ -246,7 +248,7 @@
   font-weight: 900;
   line-height: 1.16;
   letter-spacing: -0.03em;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 }
 
 .lp-hero-subtitle {
