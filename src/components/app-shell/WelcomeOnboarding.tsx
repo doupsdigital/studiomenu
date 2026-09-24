@@ -52,7 +52,10 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({ slug, plan
       {
         icon: Home,
         title: 'Bem-vinda ao seu StudioMenu!',
-        subtitle: 'Esse é o app onde você cuida do seu catálogo e da sua agenda, tudo num só lugar.',
+        subtitle:
+          planTier === 'plus'
+            ? 'Esse é o app onde você cuida do seu catálogo e da sua agenda, tudo num só lugar.'
+            : 'Esse é o app onde você cuida do seu catálogo, sempre prontinho pra compartilhar com suas clientes.',
       },
       {
         icon: BookOpen,
