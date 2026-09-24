@@ -46,7 +46,7 @@ export const PlusOnboardingModal: React.FC<PlusOnboardingModalProps> = ({ slug, 
   return (
     <div
       data-theme="rose"
-      className="fixed inset-0 z-50 flex flex-col bg-cream"
+      className="fixed inset-0 z-50 flex flex-col bg-rose-200"
       role="dialog"
       aria-modal="true"
       aria-label="Conheça o StudioMenu+"
@@ -56,7 +56,7 @@ export const PlusOnboardingModal: React.FC<PlusOnboardingModalProps> = ({ slug, 
           {STEPS.map((s, i) => (
             <span
               key={s}
-              className={`h-1.5 rounded-full transition-all ${i === stepIndex ? 'w-6 bg-rose-600' : 'w-1.5 bg-rose-200'}`}
+              className={`h-1.5 rounded-full transition-all ${i === stepIndex ? 'w-6 bg-rose-600' : 'w-1.5 bg-white/70'}`}
             />
           ))}
         </div>
