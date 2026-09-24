@@ -30,6 +30,21 @@ body.has-lm-editor #contato {
   padding-bottom: 85px !important;
 }
 
+/* `.mosaico-app` é o próprio contêiner de rolagem (não a `window`), com
+ * `scroll-snap-type: y mandatory` pra experiência de "deslizar entre
+ * seções" da leitura pública. Em modo edição isso atrapalha: o tour guiado
+ * (`ProductTour`/react-joyride, 2026-09-24) rola até o alvo calculando uma
+ * posição exata, mas o snap nativo do navegador "puxava" a rolagem pro
+ * próximo ponto de encaixe em vez de parar onde o Joyride pediu — o balão
+ * acabava desenhado numa posição que não batia mais com o elemento de
+ * verdade (achado testando o passo "Adicionar novo serviço"). Desligar o
+ * snap só durante a edição resolve, sem afetar a leitura pública do
+ * catálogo (só ativo quando `body.has-lm-editor`).
+ */
+body.has-lm-editor .mosaico-app {
+  scroll-snap-type: none;
+}
+
 /* Indicador Discreto de Status no Topo Direito */
 #lm-editor-top-status {
   position: fixed !important;

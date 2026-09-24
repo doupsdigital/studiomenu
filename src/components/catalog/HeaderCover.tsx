@@ -94,6 +94,7 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
           <button
             type="button"
             className="lm-cover-edit-btn"
+            data-tour="cat-cover"
             title="Clique para alterar a foto de capa"
             onClick={handleCoverClick}
           >
@@ -118,9 +119,11 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
 
           <h1
             className="anim-fade-up delay-2"
+            data-tour="cat-text"
             data-lm-editable={isEditMode ? 'true' : undefined}
             contentEditable={isEditMode}
             suppressContentEditableWarning={true}
+            suppressHydrationWarning={isEditMode}
             onBlur={(e) => {
               if (isEditMode && onUpdateClientName) {
                 onUpdateClientName(e.currentTarget.innerText.trim());
@@ -137,6 +140,7 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
             data-lm-editable={isEditMode ? 'true' : undefined}
             contentEditable={isEditMode}
             suppressContentEditableWarning={true}
+            suppressHydrationWarning={isEditMode}
             onBlur={(e) => {
               if (isEditMode && onUpdateHeroPhrase) {
                 onUpdateHeroPhrase(e.currentTarget.innerText.trim());

@@ -52,8 +52,11 @@ const SortableProcCard: React.FC<{
   isEditMode: boolean;
   onEdit?: () => void;
   onDelete?: () => void;
+  /** Âncora pro tour guiado do editor (`cat-edit-proc`) — só passada pelo
+   *  primeiro card da lista, já que a barra de ações só existe por card. */
+  dataTour?: string;
   children: React.ReactNode;
-}> = ({ id, isEditMode, onEdit, onDelete, children }) => {
+}> = ({ id, isEditMode, onEdit, onDelete, dataTour, children }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id, disabled: !isEditMode });
 
   const style: React.CSSProperties = {
@@ -67,7 +70,7 @@ const SortableProcCard: React.FC<{
     <div ref={setNodeRef} style={style} className="lm-sortable-proc">
       {isEditMode && (
         <>
-          <div className="lm-svc-actions-bar">
+          <div className="lm-svc-actions-bar" data-tour={dataTour}>
             <button type="button" className="lm-svc-btn-action" onClick={onEdit}>
               ✏️ Editar
             </button>
@@ -277,13 +280,14 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
           >
             {isClassico ? (
               <div className="studio__lista">
-                {filteredProcedures.map((item) => (
+                {filteredProcedures.map((item, idx) => (
                   <SortableProcCard
                     key={item.id}
                     id={item.id}
                     isEditMode={isEditMode}
                     onEdit={() => onEditProc?.(item)}
                     onDelete={() => onDeleteProc?.(item)}
+                    dataTour={idx === 0 ? 'cat-edit-proc' : undefined}
                   >
                     <div
                       className={`servico-card ${isEditMode ? 'lm-service-card-wrapper' : ''}`}
@@ -315,13 +319,14 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
               </div>
             ) : (
               <div className="mosaico__grid">
-                {filteredProcedures.map((item) => (
+                {filteredProcedures.map((item, idx) => (
                   <SortableProcCard
                     key={item.id}
                     id={item.id}
                     isEditMode={isEditMode}
                     onEdit={() => onEditProc?.(item)}
                     onDelete={() => onDeleteProc?.(item)}
+                    dataTour={idx === 0 ? 'cat-edit-proc' : undefined}
                   >
                     <ProcedureCard
                       item={item}

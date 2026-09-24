@@ -23,6 +23,11 @@ interface ProductTourProps {
    *  não é a mesma intenção). Usado pelo `primeiro-contato` pra voltar o
    *  scroll pro topo e destacar o próximo passo esperado. */
   onFinish?: () => void;
+  /** Distância extra ao rolar até o alvo — padrão 90px por causa da barra
+   *  fixa do topo (`PageTitleBar`) que as outras telas têm. Telas sem essa
+   *  barra (ex: editor do catálogo, sem `PageTitleBar`) podem passar um
+   *  valor menor. */
+  scrollOffset?: number;
 }
 
 /** Inclui os alvos dos steps na chave — de propósito. Sem isso, um tour já
@@ -66,7 +71,7 @@ const isTourSeen = (tourId: string, slug: string, steps: Step[]): boolean => {
  *  (`tailwind.config.js`: rose-600 `#b04e6c`, `ink` `#2C1810`, fontes
  *  Fraunces/Jost de `globals.css`, não as `font-serif`/`font-sans` padrão
  *  do Tailwind que não estão carregadas aqui). */
-export const ProductTour: React.FC<ProductTourProps> = ({ tourId, slug, steps, enabled, initialStepId, onFinish }) => {
+export const ProductTour: React.FC<ProductTourProps> = ({ tourId, slug, steps, enabled, initialStepId, onFinish, scrollOffset = 90 }) => {
   const [run, setRun] = useState(false);
 
   const key = storageKey(tourId, slug, steps);
@@ -131,8 +136,9 @@ export const ProductTour: React.FC<ProductTourProps> = ({ tourId, slug, steps, e
         // Distância extra ao rolar até o alvo — sem isso, a barra fixa do
         // topo (`PageTitleBar`, 60px, `sticky top-0`) cobria a borda de
         // cima do card em destaque, deixando o balão desalinhado (achado
-        // testando de verdade no Início e na Agenda).
-        scrollOffset: 90,
+        // testando de verdade no Início e na Agenda). Configurável pra
+        // telas sem essa barra (prop `scrollOffset`, default 90).
+        scrollOffset,
       }}
       styles={{
         tooltip: {

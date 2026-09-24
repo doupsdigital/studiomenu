@@ -68,6 +68,7 @@ export const VisualEditorBottomBar: React.FC<VisualEditorBottomBarProps> = ({
             type="button"
             className="lm-mb-btn"
             id="lm-btn-theme"
+            data-tour="cat-theme"
             title="Alternar Tema (Rosé / Luxury)"
             onClick={onToggleTheme}
           >
@@ -107,6 +108,7 @@ export const VisualEditorBottomBar: React.FC<VisualEditorBottomBarProps> = ({
           type="button"
           className="lm-mb-btn-save"
           id="lm-btn-save"
+          data-tour="cat-save"
           onClick={onSave}
           disabled={isSaving}
         >
