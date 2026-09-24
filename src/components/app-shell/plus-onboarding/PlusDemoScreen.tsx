@@ -90,7 +90,7 @@ export const PlusDemoScreen: React.FC<PlusDemoScreenProps> = ({ catalog, onNext 
       <button
         type="button"
         onClick={onNext}
-        className="w-full py-3.5 rounded-xl border-2 border-rose-200 bg-surface text-rose-700 text-[15px] font-bold transition-colors hover:bg-rose-50"
+        className="w-full py-3.5 rounded-xl border-2 border-rose-300 bg-rose-100 text-rose-700 text-[15px] font-bold shadow-sm transition-colors hover:bg-rose-200"
       >
         Já testei, continuar →
       </button>

@@ -30,17 +30,19 @@ export const AgendaPreviewScreen: React.FC<AgendaPreviewScreenProps> = ({ servic
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-cream" role="dialog" aria-modal="true" aria-label="Prévia da sua agenda">
-      <div className="flex-1 overflow-y-auto flex flex-col items-center px-6 pt-10 pb-8 max-w-sm mx-auto w-full text-center">
-        <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mb-4">
-          <CheckCircle2 className="w-7 h-7" />
+      <div className="flex-1 overflow-y-auto flex flex-col items-center justify-center px-6 py-8 max-w-sm mx-auto w-full text-center">
+        <div className="w-full rounded-2xl bg-surface border border-rose-100 shadow-sm px-6 py-6 mb-4">
+          <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-4">
+            <CheckCircle2 className="w-7 h-7" />
+          </div>
+          <p className="font-serif-pro font-bold text-xl text-ink mb-1.5">Agendamento reservado!</p>
+          <p className="text-[15px] text-ink-soft leading-snug">
+            É assim que ele aparece na sua Agenda — organizado, com o nome da cliente, o serviço e
+            o horário, sem você precisar anotar nada.
+          </p>
         </div>
-        <p className="font-serif-pro font-bold text-xl text-ink mb-1.5">Agendamento reservado!</p>
-        <p className="text-[15px] text-ink-soft leading-snug mb-7">
-          É assim que ele aparece na sua Agenda — organizado, com o nome da cliente, o serviço e o
-          horário, sem você precisar anotar nada.
-        </p>
 
-        <div className="w-full rounded-2xl bg-surface border border-linen p-4 mb-8 text-left">
+        <div className="w-full rounded-2xl bg-surface border border-linen shadow-sm p-4 mb-8 text-left">
           <p className="text-[12px] font-bold uppercase tracking-wide text-ink-faint mb-3">{dateLabel}</p>
           <div className="flex gap-2.5">
             <div className="w-[52px] shrink-0 pt-0.5 text-sm tabular-nums font-semibold text-ink">{time}</div>
