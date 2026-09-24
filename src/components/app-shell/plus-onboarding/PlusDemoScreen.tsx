@@ -30,7 +30,9 @@ export const PlusDemoScreen: React.FC<PlusDemoScreenProps> = ({ catalog, onNext 
   // `duration_minutes`, o que travaria o botão "Agendar agora" na demo.
   const demoProcedures = useMemo<ProcedureItem[]>(
     () =>
-      catalog.procedures.slice(0, 4).map((p) => ({
+      // Só 2 (não a lista toda) — pra não poluir a tela, pedido explícito
+      // (2026-09-24). São sempre os serviços reais dela, nunca exemplo.
+      catalog.procedures.slice(0, 2).map((p) => ({
         ...p,
         duration_minutes: p.duration_minutes ?? 60,
         bookable: p.bookable !== false,
