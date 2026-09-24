@@ -47,13 +47,12 @@ export default async function InicioPage({ params }: InicioPageProps) {
   // Nunca assinou nada ainda — tela de primeiro contato, deliberadamente
   // simples (Fase 19). Permanece assim até ela pagar Básico ou Plus; não
   // regride de volta aqui mesmo se cancelar depois (ver `SubscriptionSection`).
+  // Sem `PageTitleBar` aqui de propósito (2026-09-24): ela ainda nem está
+  // "no app" de verdade, só conhecendo o catálogo — uma barra com título
+  // "Início" e botão de instalar não fazia sentido ainda. Volta normalmente
+  // assim que ela assina (branch abaixo, que já tem a sua própria).
   if (order.plan_tier === 'catalog') {
-    return (
-      <>
-        <PageTitleBar title="Início" icon={<Home className="w-5 h-5 text-ink-soft" />} slug={slug} />
-        <FirstContactScreen order={order} />
-      </>
-    );
+    return <FirstContactScreen order={order} />;
   }
 
   const isPlusAtivo = order.plan_tier === 'plus' && order.subscription_status === 'ativo';
@@ -86,14 +85,14 @@ export default async function InicioPage({ params }: InicioPageProps) {
        *  usado no cabeçalho da Agenda — não dava pra reduzir ali sem afetar
        *  essa outra tela) + badge PLUS mais compacto (mt-2/py-1 em vez de
        *  mt-3/py-1.5): pedido pra diminuir a altura desse cartão, 2026-09-23. */}
-      <GradientHeader className="pt-5 pb-5">
+      <GradientHeader tone="light" className="pt-5 pb-5">
         <h1 className="font-serif-pro font-bold text-3xl">
           {greeting}, {firstName}!
         </h1>
-        <p className="text-[15px] text-white/70 mt-1.5 italic">Bem-vinda ao seu Studio! ✨</p>
+        <p className="text-[15px] text-rose-800/70 mt-1.5 italic">Bem-vinda ao seu Studio! ✨</p>
         {isPlusAtivo && (
           <div className="flex justify-end">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 mt-2 rounded-full bg-white/15 backdrop-blur-sm text-[13px] font-bold tracking-wide">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 mt-2 rounded-full bg-rose-600 text-white text-[13px] font-bold tracking-wide">
               <Crown className="w-3.5 h-3.5" />
               PLUS
             </span>
