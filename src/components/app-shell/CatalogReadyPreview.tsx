@@ -33,8 +33,8 @@ const SCALE_Y = SCREEN_H / BASE_H;
 export const CatalogReadyPreview: React.FC<CatalogReadyPreviewProps> = ({ slug }) => {
   return (
     <div className="flex flex-col items-center gap-3 py-1">
-      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-100 text-rose-700 text-[13px] font-bold">
-        ✨ Seu catálogo já está no ar
+      <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-rose-100 text-rose-700 text-base font-bold">
+        ✨ Seu catálogo digital já está pronto
       </span>
       <div
         style={{
