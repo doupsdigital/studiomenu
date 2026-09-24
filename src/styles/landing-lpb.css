@@ -310,7 +310,7 @@
 .lp-testdrive-phone {
   --lp-phone-w: 245px;
   --lp-phone-h: 530px;
-  --lp-bezel: 11px;
+  --lp-bezel: 6px;
   --lp-screen-w: calc(var(--lp-phone-w) - var(--lp-bezel) * 2);
   --lp-screen-h: calc(var(--lp-phone-h) - var(--lp-bezel) * 2);
   --lp-base-w: 390px;
@@ -320,32 +320,32 @@
   width: var(--lp-phone-w);
   max-width: 65vw;
   height: var(--lp-phone-h);
-  background: linear-gradient(155deg, #2a2426 0%, #110e10 45%);
-  border-radius: 38px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35), 0 0 0 1.5px rgba(255, 255, 255, 0.08) inset;
+  background: linear-gradient(155deg, #2e2729 0%, #110e10 55%);
+  border-radius: 34px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
   margin: 0 auto;
 }
 
 .lp-testdrive-notch {
   position: absolute;
-  top: var(--lp-bezel, 11px);
+  top: var(--lp-bezel, 6px);
   left: 50%;
   transform: translateX(-50%);
-  width: 74px;
-  height: 14px;
+  width: 62px;
+  height: 10px;
   background: #000000;
-  border-radius: 8px;
+  border-radius: 6px;
   z-index: 100;
   pointer-events: none;
 }
 
 .lp-testdrive-screen {
   position: absolute;
-  top: var(--lp-bezel, 11px);
-  left: var(--lp-bezel, 11px);
+  top: var(--lp-bezel, 6px);
+  left: var(--lp-bezel, 6px);
   width: var(--lp-screen-w);
   height: var(--lp-screen-h);
-  border-radius: 26px;
+  border-radius: 29px;
   overflow: hidden;
   background: #f2cad5;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4) inset;
@@ -373,7 +373,7 @@
 }
 
 @media (min-width: 600px) {
-  .lp-testdrive-phone { --lp-phone-w: 310px; --lp-phone-h: 671px; --lp-bezel: 13px; }
+  .lp-testdrive-phone { --lp-phone-w: 310px; --lp-phone-h: 671px; --lp-bezel: 7px; }
 }
 
 .lp-phone-scroll-indicator {
