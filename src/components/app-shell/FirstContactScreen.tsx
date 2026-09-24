@@ -70,7 +70,7 @@ export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order })
 
   return (
     <main className="max-w-md mx-auto px-5 pt-8 pb-6 flex flex-col gap-4">
-      <div className="text-center mb-2">
+      <div className="text-center">
         <h1 className="font-serif-pro font-bold text-2xl text-ink">Olá, {firstName}! ✨</h1>
       </div>
 
