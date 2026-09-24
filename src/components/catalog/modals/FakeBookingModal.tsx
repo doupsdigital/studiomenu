@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { CheckCircle } from 'lucide-react';
 import { ProcedureItem } from '@/types/catalog';
 import '@/styles/scheduling-wizard.css';
@@ -8,17 +8,28 @@ import '@/styles/scheduling-wizard.css';
 interface FakeBookingModalProps {
   service: ProcedureItem;
   onClose: () => void;
+  /** Onboarding do StudioMenu+ dentro do app (Fase 2026-09-24): quando
+   *  definido, escolhe o primeiro horário sozinha depois desse tempo (ms),
+   *  pra "se explicar sozinha" antes da profissional tocar em algo. Sem
+   *  esse prop (showroom público, mockups das landing pages), comportamento
+   *  idêntico a hoje — nenhum dos 3 usos atuais passa isso. */
+  autopilotDelayMs?: number;
+  onAutoBooked?: () => void;
+  /** Avisa quem chamou que a profissional tocou em algo de verdade (dia ou
+   *  horário), pra cancelar o autoplay do onboarding imediatamente. */
+  onUserInteract?: () => void;
 }
 
-/** Simulação 100% local do agendamento automático — usada só no showroom
- *  (`/c/showcase/[niche]`, sem catálogo real por trás) e no mockup de
- *  celular da home. Visual idêntico ao `BookingModal.tsx` de verdade
- *  (mesmas classes de scheduling-wizard.css), mas sem nenhuma chamada de
- *  rede: os horários são fixos/fictícios e, ao escolher um, pula direto
- *  pra tela de confirmação (sem pedir nome/WhatsApp — pedido explícito,
- *  2026-09-24, é só pra mostrar a experiência pro lead, não coletar dado
- *  nenhum). Nunca usada em catálogo real — ver `CatalogLayout.tsx`,
- *  prop `demoBookingOnly`. */
+/** Simulação 100% local do agendamento automático — usada no showroom
+ *  (`/c/showcase/[niche]`, sem catálogo real por trás), no mockup de
+ *  celular da home e no onboarding do StudioMenu+ dentro do app (aqui com
+ *  catálogo real, mas ainda sem gravar nada — só demonstração). Visual
+ *  idêntico ao `BookingModal.tsx` de verdade (mesmas classes de
+ *  scheduling-wizard.css), mas sem nenhuma chamada de rede: os horários são
+ *  fixos/fictícios e, ao escolher um, pula direto pra tela de confirmação
+ *  (sem pedir nome/WhatsApp — pedido explícito, 2026-09-24, é só pra
+ *  mostrar a experiência, não coletar dado nenhum). Nunca grava em pedido
+ *  real — ver `CatalogLayout.tsx`, prop `demoBookingOnly`. */
 const FAKE_TIMES = ['09:00', '10:30', '12:00', '14:00', '15:30', '17:00'];
 const DAYS_AHEAD = 6;
 
@@ -61,10 +72,28 @@ function formatPrice(val: string): string {
   return `R$ ${val}`;
 }
 
-export const FakeBookingModal: React.FC<FakeBookingModalProps> = ({ service, onClose }) => {
+export const FakeBookingModal: React.FC<FakeBookingModalProps> = ({
+  service,
+  onClose,
+  autopilotDelayMs,
+  onAutoBooked,
+  onUserInteract,
+}) => {
   const days = useState(() => buildNextDays(DAYS_AHEAD))[0];
   const [selectedDate, setSelectedDate] = useState<string>(days[0].key);
   const [booked, setBooked] = useState<BookedFake | null>(null);
+  const onAutoBookedRef = useRef(onAutoBooked);
+  onAutoBookedRef.current = onAutoBooked;
+
+  useEffect(() => {
+    if (!autopilotDelayMs) return;
+    const timer = setTimeout(() => {
+      setBooked({ time: FAKE_TIMES[0], dateLabel: formatDateLabel(selectedDate) });
+      onAutoBookedRef.current?.();
+    }, autopilotDelayMs);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autopilotDelayMs]);
 
   const fallbackImage = 'https://images.unsplash.com/photo-1583001809873-a1284d563391?auto=format&fit=crop&w=400&q=80';
 
@@ -133,7 +162,10 @@ export const FakeBookingModal: React.FC<FakeBookingModalProps> = ({ service, onC
                 key={d.key}
                 type="button"
                 className={`wizard__dia-chip ${selectedDate === d.key ? 'is-ativo' : ''}`}
-                onClick={() => setSelectedDate(d.key)}
+                onClick={() => {
+                  onUserInteract?.();
+                  setSelectedDate(d.key);
+                }}
               >
                 <span>{d.weekday}</span>
                 <strong>{d.day}</strong>
@@ -148,7 +180,10 @@ export const FakeBookingModal: React.FC<FakeBookingModalProps> = ({ service, onC
                 key={time}
                 type="button"
                 className="wizard__slot"
-                onClick={() => setBooked({ time, dateLabel: formatDateLabel(selectedDate) })}
+                onClick={() => {
+                  onUserInteract?.();
+                  setBooked({ time, dateLabel: formatDateLabel(selectedDate) });
+                }}
               >
                 {time}
               </button>
