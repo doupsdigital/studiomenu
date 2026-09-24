@@ -138,6 +138,7 @@ export const CTASection: React.FC<CTASectionProps> = ({
                 data-lm-editable={isEditMode ? 'true' : undefined}
                 contentEditable={isEditMode}
                 suppressContentEditableWarning={true}
+                suppressHydrationWarning={isEditMode}
                 onBlur={(e) => {
                   if (isEditMode && onUpdateAddress) {
                     onUpdateAddress(e.currentTarget.innerText.trim());
