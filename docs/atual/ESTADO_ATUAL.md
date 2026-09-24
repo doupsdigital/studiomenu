@@ -22,7 +22,7 @@ Dois planos pagos (cobrança recorrente via Asaas), mais um catálogo estático 
 | Plano | Preço | O que dá |
 |---|---|---|
 | **Catálogo** (gratuito) | — | Catálogo público, sem agendamento automático — cliente final fala com a profissional pelo WhatsApp. |
-| **StudioMenu Básico** | R$ 39/mês | Igual ao gratuito hoje em termos de agendamento (WhatsApp), mas assinado — é o "degrau" pro Plus. |
+| **StudioMenu Básico** | R$ 39,90/mês | Igual ao gratuito hoje em termos de agendamento (WhatsApp), mas assinado — é o "degrau" pro Plus. |
 | **StudioMenu+** | R$ 69,90/mês | Agendamento automático de verdade: wizard de horário no catálogo público + Agenda/Horários/Bloqueios liberados no app da profissional. |
 
 Preços/labels centralizados em [`src/lib/pricing.ts`](../../src/lib/pricing.ts) — nunca
