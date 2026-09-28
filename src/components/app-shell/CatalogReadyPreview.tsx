@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
 
 interface CatalogReadyPreviewProps {
   slug: string;
@@ -31,6 +33,16 @@ const SCALE_Y = SCREEN_H / BASE_H;
  *  `pointer-events: none` — é só vitrine; navegar de verdade continua
  *  sendo o `ViewCatalogCard` logo abaixo. */
 export const CatalogReadyPreview: React.FC<CatalogReadyPreviewProps> = ({ slug }) => {
+  // O catálogo real (`/c/[slug]`) é 100% dinâmico (usa `searchParams`, sem
+  // cache possível) e o iframe carrega a página inteira (fontes, imagem de
+  // capa, animações) — em produção isso varia de rápido a alguns segundos
+  // (cold start da função serverless, latência do Supabase). Sem esse
+  // estado, o fundo sólido do "vidro" do celular (linha abaixo) ficava
+  // parado durante essa espera, parecendo travado (achado reportado em
+  // produção, 2026-09-28) — o spinner por cima resolve isso mostrando que
+  // algo está de fato carregando, não quebrado.
+  const [isLoaded, setIsLoaded] = useState(false);
+
   return (
     <div className="flex flex-col items-center gap-3 -mt-2 pb-1">
       <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-rose-100 text-rose-700 text-base font-bold">
@@ -75,6 +87,31 @@ export const CatalogReadyPreview: React.FC<CatalogReadyPreviewProps> = ({ slug }
           <div
             style={{
               position: 'absolute',
+              inset: 0,
+              zIndex: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'linear-gradient(155deg, #f7d9e2 0%, #f2cad5 100%)',
+              opacity: isLoaded ? 0 : 1,
+              pointerEvents: 'none',
+              transition: 'opacity 0.4s ease',
+            }}
+          >
+            <span
+              className="animate-spin"
+              style={{
+                width: 26,
+                height: 26,
+                borderRadius: '9999px',
+                border: '3px solid rgba(176, 78, 108, 0.25)',
+                borderTopColor: '#b04e6c',
+              }}
+            />
+          </div>
+          <div
+            style={{
+              position: 'absolute',
               top: 0,
               left: 0,
               width: BASE_W,
@@ -87,6 +124,7 @@ export const CatalogReadyPreview: React.FC<CatalogReadyPreviewProps> = ({ slug }
               src={`/c/${slug}`}
               title="Prévia do seu catálogo"
               tabIndex={-1}
+              onLoad={() => setIsLoaded(true)}
               style={{ width: BASE_W, height: BASE_H, border: 0, display: 'block', pointerEvents: 'none' }}
             />
           </div>
