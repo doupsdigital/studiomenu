@@ -89,6 +89,24 @@ export default async function CatalogPage({ params, searchParams }: CatalogPageP
     );
   }
 
+  // Bloqueia tanto o link público quanto o link mágico de edição — a
+  // profissional e a cliente dela veem a mesma mensagem amigável, sem
+  // distinção (Fase 24). O acesso ao app (/app/slug) não passa por aqui,
+  // continua normal de propósito.
+  if (catalog.catalog_disabled) {
+    return (
+      <main className="min-h-screen flex items-center justify-center p-6 bg-rose-50 text-center">
+        <div className="max-w-sm w-full p-8 rounded-3xl bg-white border border-rose-100 shadow-2xl">
+          <div className="w-16 h-16 rounded-2xl bg-rose-100 text-rose-500 flex items-center justify-center mx-auto mb-4">
+            <Sparkles className="w-8 h-8" />
+          </div>
+          <h1 className="font-serif text-2xl font-bold mb-2 text-rose-900">Catálogo Temporariamente Indisponível</h1>
+          <p className="text-sm text-rose-900/70 leading-relaxed">Volte em breve! 🌸</p>
+        </div>
+      </main>
+    );
+  }
+
   const isEditAuthorized = Boolean(edit && catalog.edit_token && edit === catalog.edit_token);
 
   // Nunca repassar o edit_token real pro client component — ele nunca é lido no
