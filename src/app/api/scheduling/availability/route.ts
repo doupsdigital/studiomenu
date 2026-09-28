@@ -29,7 +29,7 @@ export async function GET(request: Request) {
 
     const { data: order, error: orderErr } = await supabaseAdmin
       .from('orders')
-      .select('id, booking_enabled, agenda_paused')
+      .select('id, booking_enabled, agenda_paused, plan_tier, subscription_status')
       .eq('slug', slug)
       .single();
 
@@ -59,6 +59,33 @@ export async function GET(request: Request) {
         { success: false, message: 'Esse serviço ainda não tem duração configurada pra agendamento automático.' },
         { status: 400 }
       );
+    }
+
+    // Preview antes de assinar (2026-09-28): o admin liga `booking_enabled`
+    // manualmente pra ela ver o wizard funcionando antes de virar assinante
+    // Plus de verdade — mas configurar horário de atendimento só é possível
+    // depois de assinar, então a busca abaixo sempre voltaria vazia pra
+    // qualquer dia, parecendo bug em vez de "ainda não configurado". Só
+    // ativa quando NENHUM horário foi cadastrado ainda (garante que é essa
+    // situação, não só "esse dia específico lotou") E ela ainda não é
+    // assinante Plus ativa — uma assinante Plus de verdade que simplesmente
+    // ainda não configurou o horário dela continua vendo a mensagem padrão,
+    // sem nenhuma mudança de comportamento.
+    const isActivePlus = order.plan_tier === 'plus' && order.subscription_status === 'ativo';
+    if (!isActivePlus) {
+      const { count: hoursCount } = await supabaseAdmin
+        .from('business_hours')
+        .select('id', { count: 'exact', head: true })
+        .eq('order_id', order.id);
+
+      if (!hoursCount) {
+        return NextResponse.json({
+          success: true,
+          slots: [],
+          noSchedulingYet: true,
+          service: { id: service.id, title: service.title, price: service.price },
+        });
+      }
     }
 
     const slots = await getAvailableSlotsForDate(order.id, dateStr, service.duration_minutes);
