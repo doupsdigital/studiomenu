@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { isProfessionalRequestAuthorized } from '@/lib/professional-session';
 import { getOrderForProfessionalApp } from '@/lib/professional-app-service';
 import { getCatalogBySlug } from '@/lib/catalog-service';
+import { PRODUCTION_DOMAIN } from '@/lib/public-url';
 import { ServiceWorkerRegister } from '@/components/app-shell/ServiceWorkerRegister';
 import { BottomNav } from '@/components/app-shell/BottomNav';
 import { WelcomeOnboarding } from '@/components/app-shell/WelcomeOnboarding';
@@ -46,7 +47,9 @@ export async function generateMetadata({ params }: AppLayoutProps): Promise<Meta
           description: 'Acesse seu catálogo digital e faça as edições que quiser, direto pelo celular.',
           images: [
             {
-              url: catalog.cover_media_url || catalog.avatar_url || 'https://studiomenu.art/modelos/mosaico/assets/img/Hero.webp',
+              url: `https://${PRODUCTION_DOMAIN}/api/og/catalog/${slug}`,
+              width: 1200,
+              height: 630,
             },
           ],
           type: 'website',
