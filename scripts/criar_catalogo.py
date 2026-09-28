@@ -2,28 +2,40 @@
 # -*- coding: utf-8 -*-
 """
 =============================================================================
-LashMenu — Motor de Criação Automatizada de Catálogos VIP
+StudioMenu — Criação de Catálogo via Admin API (produção)
 =============================================================================
-Este script recebe os dados estruturados de uma cliente e:
-1. Faz upload da foto de capa para o Supabase Storage (se fornecido arquivo local).
-2. Garante a unicidade do slug (subdomínio da cliente).
-3. Cria o pedido na tabela 'orders' com status 'pendente_revisao'.
-4. Cadastra os procedimentos na tabela 'order_services' mapeando fotos e descrições.
-5. Retorna links oficiais de pré-visualização, link do admin e mensagem para o WhatsApp.
+Recebe os dados de uma cliente (JSON) e cria o catálogo dela em produção,
+chamando as MESMAS rotas de admin que o painel web (/admin/criar-com-ia)
+usa — não escreve direto no banco. Isso é proposital: toda a regra de
+negócio (geração de slug, preset de nicho, cálculo de duração agendável,
+código curto do link do app, etc.) continua vivendo só no código TypeScript
+do app, então este script nunca fica desatualizado por conta própria.
+
+Fluxo:
+1. Login no admin (POST /api/admin/login) usando ADMIN_PASSWORD do .env.
+2. Cria o catálogo (POST /api/admin/finalize-catalog) — nome, WhatsApp,
+   Instagram, nicho, modelo visual, procedimentos e foto de capa.
+3. Aprova o catálogo (PATCH /api/admin/catalog-actions, status=aprovado) —
+   equivalente a clicar em "Aprovar & Entregar" no painel.
+4. Busca o catálogo recém-criado (GET /api/admin/catalogs-list) pra pegar o
+   link curto do app (gerado sob demanda nessa mesma chamada).
+5. Monta e imprime os links oficiais e as 2 mensagens prontas de WhatsApp
+   (entrega do catálogo + apresentação do app), no mesmo formato que o
+   painel admin já usa.
 =============================================================================
 """
 
 import sys
 import os
-import json
 import re
+import json
 import mimetypes
 import urllib.request
 import urllib.parse
 import urllib.error
+import http.cookiejar
 from datetime import datetime
 
-# Garante compatibilidade de encoding UTF-8 no terminal Windows (PowerShell/CMD)
 if hasattr(sys.stdout, "reconfigure"):
     try:
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -31,450 +43,350 @@ if hasattr(sys.stdout, "reconfigure"):
     except Exception:
         pass
 
-SUPABASE_URL = "https://wffhptpsafllsmcsoiih.supabase.co"
-SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndmZmhwdHBzYWZsbHNtY3NvaWloIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcyODkyMTYsImV4cCI6MjEwMjg2NTIxNn0.nwpvIwl8V6_KGIp5e5oeraAcGyt3oo8Kdam2hp6ajSQ"
-STORAGE_BUCKET = "catalog-assets"
+# Domínio público (usado pra montar os links que vão pra cliente — igual ao
+# que o próprio app gera, ver src/lib/public-url.ts).
+PUBLIC_BASE_URL = os.environ.get("STUDIOMENU_BASE_URL", "https://studiomenu.art").rstrip("/")
 
-# Catálogo Canônico de Procedimentos Oficiais do LashMenu
-CANONICAL_SERVICES = {
-    "volume_brasileiro": {
-        "keywords": ["brasileiro", "volume brasileiro", "fio y", "fios em y", "técnica em y", "extensao em y", "y"],
-        "name": "Volume Brasileiro",
-        "category": "Extensão em Y",
-        "duration": "1h30",
-        "maintenance": "90,00 (até 20 dias)",
-        "description": "Fios tecnológicos em formato Y que proporcionam volume delicado com acabamento uniforme, alta retenção e extrema leveza para o dia a dia.",
-        "effect": "Preenchimento, Textura & Leveza",
-        "photo_url": "/modelos/mosaico/assets/img/volume-brasileiro.png"
-    },
-    "classico_fio_a_fio": {
-        "keywords": ["classico", "fio a fio", "clássico", "fio-a-fio", "natural", "efeito rímel", "efeito rimel"],
-        "name": "Clássico Fio a Fio",
-        "category": "Fio a Fio Clássico",
-        "duration": "1h30",
-        "maintenance": "70,00 (até 18 dias)",
-        "description": "Um fio sintético ultrafino acoplado a cada cílio natural saudável. O resultado mais elegante e discreto: olhar iluminado com efeito de rímel perfeito.",
-        "effect": "Natural, Discreto & Elegante",
-        "photo_url": "/modelos/mosaico/assets/img/classico-fio-a-fio.png"
-    },
-    "volume_egipcio": {
-        "keywords": ["egipcio", "egípcio", "volume egipcio", "volume egípcio", "fio w", "fios em w", "3d w"],
-        "name": "Volume Egípcio",
-        "category": "Extensão em W",
-        "duration": "1h30",
-        "maintenance": "95,00 (até 20 dias)",
-        "description": "Fios especiais em formato W (3D tecnológico) que proporcionam densidade homogênea, efeito aveludado e volume equilibrado sem pesar nos olhos.",
-        "effect": "Densidade Aveludada & Uniforme",
-        "photo_url": "/modelos/mosaico/assets/img/volume-egipcio.png"
-    },
-    "volume_hibrido": {
-        "keywords": ["hibrido", "híbrido", "volume hibrido", "volume híbrido", "mix", "fio a fio com volume"],
-        "name": "Volume Híbrido",
-        "category": "Clássico + Volume",
-        "duration": "1h45",
-        "maintenance": "95,00 (até 20 dias)",
-        "description": "A combinação artesanal entre a delicadeza do fio a fio clássico e leques de volume, criando textura multidimensional, profundidade e brilho no olhar.",
-        "effect": "Textura Desconstruída & Volume Sob Medida",
-        "photo_url": "/modelos/mosaico/assets/img/volume-hibrido.png"
-    },
-    "volume_russo": {
-        "keywords": ["russo", "volume russo", "fans", "fan", "leques artesanais", "3d a 6d", "3d-6d"],
-        "name": "Volume Russo",
-        "category": "Fans Artesanais 3D–6D",
-        "duration": "2h00",
-        "maintenance": "110,00 (até 20 dias)",
-        "description": "Técnica de alta precisão com fans ultrafinos (3 a 6 fios de seda) montados à mão na hora. Cria um volume expressivo, extremamente macio, denso e sofisticado.",
-        "effect": "Glamour, Densidade & Toque de Pluma",
-        "photo_url": "/modelos/mosaico/assets/img/volume-russo.png"
-    },
-    "mega_volume": {
-        "keywords": ["mega", "mega volume", "megavolume", "8d", "10d", "12d", "0.03"],
-        "name": "Mega Volume",
-        "category": "Densidade Máxima 8D–12D",
-        "duration": "2h30",
-        "maintenance": "140,00 (até 18 dias)",
-        "description": "O ápice da densidade e do impacto visual: leques artesanais com fios ultrafinos de 0.03mm. Proporciona um olhar super pretinho, aveludado e hipnotizante.",
-        "effect": "Impacto Máximo, Densidade Total & Preto Profundo",
-        "photo_url": "/modelos/mosaico/assets/img/mega-volume.png"
-    },
-    "fox_eyes": {
-        "keywords": ["fox", "fox eyes", "foxy", "foxy eyes", "efeito raposa", "delineado", "canto externo"],
-        "name": "Fox Eyes",
-        "category": "Mapping Estilizado",
-        "duration": "1h45",
-        "maintenance": "100,00 (até 20 dias)",
-        "description": "Alongamento estratégico com curvaturas graduais no canto externo. Cria um efeito delineado sofisticado que eleva o olhar sem necessidade de maquiagem.",
-        "effect": "Olhar Delineado, Marcante & Elevação",
-        "photo_url": "/modelos/mosaico/assets/img/fox-eyes.png"
-    },
-    "lash_lifting": {
-        "keywords": ["lifting", "lash lifting", "lash lift", "curvatura natural", "botox de cilios", "botox"],
-        "name": "Lash Lifting",
-        "category": "Tratamento Natural",
-        "duration": "1h00",
-        "maintenance": "Incluso",
-        "description": "Curvatura e hidratação profunda dos próprios cílios naturais com tintura e queratina botox. Sem fios artificiais, durabilidade de até 6 a 8 semanas.",
-        "effect": "Cílios Curvados, Pretos e Nutridos",
-        "photo_url": "/modelos/mosaico/assets/img/lash-lifting.png"
-    },
-    "mapping_boneca": {
-        "keywords": ["mapping", "boneca", "gatinho", "esquilo", "visagismo"],
-        "name": "Mapping Boneca / Gatinho",
-        "category": "Personalização de Olhar",
-        "duration": "Design",
-        "maintenance": "-",
-        "description": "Consultoria de visagismo personalizada para definir o desenho ideal dos fios de acordo com o formato e proporção única dos olhos da cliente.",
-        "effect": "Harmonização do Olhar",
-        "photo_url": "/modelos/mosaico/assets/img/mapping-boneca.png"
-    },
-    "remocao": {
-        "keywords": ["remocao", "remoção", "retirada", "remover cilios", "remover fios"],
-        "name": "Remoção dos Fios",
-        "category": "Remoção Segura",
-        "duration": "40min",
-        "maintenance": "-",
-        "description": "Remoção com produto profissional dermatologicamente testado em creme/gel, preservando 100% da integridade e saúde dos cílios naturais.",
-        "effect": "Desacoplamento Suave Sem Danos",
-        "photo_url": "/modelos/mosaico/assets/img/remocao.png"
-    },
-    "design_sobrancelha": {
-        "keywords": ["design de sobrancelha", "design sobrancelha", "sobrancelha", "design simples", "sobrancelhas"],
-        "name": "Design de Sobrancelha",
-        "category": "Design & Visagismo",
-        "duration": "40min",
-        "maintenance": "15 a 20 dias",
-        "description": "Mapeamento facial e visagismo personalizado para valorizar os traços únicos do seu rosto. Remoção precisa dos pelos para um desenho limpo, harmônico e natural.",
-        "effect": "Alinhamento, Simetria & Expressividade Natural",
-        "photo_url": "/modelos/mosaico/assets/img/volume-brasileiro.png"
-    },
-    "design_sobrancelha_henna": {
-        "keywords": ["henna", "sobrancelha com henna", "design com henna", "sobrancelhas com henna", "design de sobrancelha com henna"],
-        "name": "Design de Sobrancelha com Henna",
-        "category": "Design Facial + Henna",
-        "duration": "50min",
-        "maintenance": "7 a 15 dias",
-        "description": "Design visagista completo combinado com aplicação de henna de alta fixação para preencher falhas, realçar o contorno e destacar o olhar com acabamento impecável.",
-        "effect": "Preenchimento de Falhas & Olhar Marcante",
-        "photo_url": "/modelos/mosaico/assets/img/volume-brasileiro.png"
-    }
-}
+# Host real das rotas de API. O domínio nu (`studiomenu.art`) faz redirect
+# 308 pra `www.studiomenu.art` no nível da Vercel — urllib não repete POST
+# em 308 automaticamente, então as chamadas de admin precisam ir direto no
+# host final pra não perder o corpo da requisição no meio do redirect.
+API_BASE_URL = os.environ.get("STUDIOMENU_API_BASE_URL", "https://www.studiomenu.art").rstrip("/")
 
-DEFAULT_PLACEHOLDER_PHOTO = "/modelos/mosaico/assets/img/volume-brasileiro.png"
+VALID_NICHES = {"lash", "nail", "estetica", "studio"}
+VALID_LAYOUTS = {"mosaico", "classico"}
+VALID_THEMES = {"rose", "luxury"}
+VALID_OFFER_TIERS = {"basico", "plus"}
 
 
-def api_request(url, method="GET", data=None, headers=None):
-    """Executa requisição HTTP usando urllib nativo do Python."""
-    req_headers = {
-        "apikey": SUPABASE_ANON_KEY,
-        "Authorization": f"Bearer {SUPABASE_ANON_KEY}",
-        "Content-Type": "application/json"
-    }
-    if headers:
-        req_headers.update(headers)
+# --------------------------------------------------------------------------
+# Infraestrutura HTTP (stdlib puro, sem dependências externas — mesma
+# convenção do script anterior). Usa um CookieJar pra manter a sessão do
+# admin entre as chamadas (login → finalize-catalog → catalog-actions →
+# catalogs-list), do mesmo jeito que o navegador faria.
+# --------------------------------------------------------------------------
+_cookie_jar = http.cookiejar.CookieJar()
+_opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(_cookie_jar))
 
+
+def _read_admin_password() -> str:
+    """Lê ADMIN_PASSWORD da variável de ambiente ou do .env local (o mesmo
+    .env do projeto já aponta pra produção — ver docs/atual/ESTADO_ATUAL.md).
+    Nunca imprime o valor."""
+    env_val = os.environ.get("ADMIN_PASSWORD")
+    if env_val:
+        return env_val
+
+    env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".env")
+    if os.path.exists(env_path):
+        with open(env_path, "r", encoding="utf-8", errors="replace") as f:
+            for line in f:
+                m = re.match(r"^\s*ADMIN_PASSWORD\s*=\s*(.+?)\s*$", line)
+                if m:
+                    return m.group(1).strip().strip('"').strip("'")
+
+    raise RuntimeError(
+        "ADMIN_PASSWORD não encontrada (defina a variável de ambiente ou tenha um .env na raiz do projeto)."
+    )
+
+
+def _request_json(path: str, method: str = "GET", payload=None):
+    url = f"{API_BASE_URL}{path}"
     body_bytes = None
-    if data is not None:
-        if isinstance(data, (dict, list)):
-            body_bytes = json.dumps(data, ensure_ascii=False).encode("utf-8")
-        elif isinstance(data, bytes):
-            body_bytes = data
-        else:
-            body_bytes = str(data).encode("utf-8")
+    headers = {"Accept": "application/json"}
+    if payload is not None:
+        body_bytes = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+        headers["Content-Type"] = "application/json"
 
-    req = urllib.request.Request(url, data=body_bytes, headers=req_headers, method=method)
+    req = urllib.request.Request(url, data=body_bytes, headers=headers, method=method)
     try:
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            resp_data = resp.read().decode("utf-8")
-            if resp_data:
-                try:
-                    return json.loads(resp_data)
-                except Exception:
-                    return resp_data
-            return None
+        with _opener.open(req, timeout=30) as resp:
+            raw = resp.read().decode("utf-8")
+            return json.loads(raw) if raw else {}
     except urllib.error.HTTPError as e:
-        err_msg = e.read().decode("utf-8", errors="ignore")
-        raise RuntimeError(f"HTTP {e.code} em {url}: {err_msg}")
-    except Exception as e:
-        raise RuntimeError(f"Falha de conexão com {url}: {str(e)}")
+        raw = e.read().decode("utf-8", errors="ignore")
+        try:
+            return json.loads(raw)
+        except Exception:
+            raise RuntimeError(f"HTTP {e.code} em {url}: {raw}")
 
 
-def upload_cover_image(local_filepath, slug):
-    """Faz upload da foto de capa local para o bucket catalog-assets do Supabase."""
-    if not os.path.exists(local_filepath):
-        print(f"⚠️ Aviso: Arquivo de capa não encontrado em {local_filepath}. Usando capa padrão do modelo.")
-        return None
+def _encode_multipart(fields: dict, files: dict):
+    """Monta um corpo multipart/form-data manualmente (sem dependências
+    externas). `fields`: {nome: valor_str}. `files`: {nome: (filename, bytes, content_type)}."""
+    boundary = "----StudioMenuBoundary" + datetime.now().strftime("%Y%m%d%H%M%S%f")
+    parts = []
 
-    filename = os.path.basename(local_filepath)
-    ext = os.path.splitext(filename)[1].lower() or ".jpg"
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    target_path = f"covers/{slug}_{timestamp}{ext}"
+    for name, value in fields.items():
+        if value is None:
+            continue
+        parts.append(f"--{boundary}\r\n".encode("utf-8"))
+        parts.append(f'Content-Disposition: form-data; name="{name}"\r\n\r\n'.encode("utf-8"))
+        parts.append(f"{value}\r\n".encode("utf-8"))
 
-    mime_type, _ = mimetypes.guess_type(local_filepath)
-    if not mime_type:
-        mime_type = "image/jpeg" if ext in [".jpg", ".jpeg"] else "image/png"
+    for name, (filename, file_bytes, content_type) in files.items():
+        parts.append(f"--{boundary}\r\n".encode("utf-8"))
+        parts.append(
+            f'Content-Disposition: form-data; name="{name}"; filename="{filename}"\r\n'.encode("utf-8")
+        )
+        parts.append(f"Content-Type: {content_type}\r\n\r\n".encode("utf-8"))
+        parts.append(file_bytes)
+        parts.append(b"\r\n")
 
-    with open(local_filepath, "rb") as f:
-        file_bytes = f.read()
-
-    upload_url = f"{SUPABASE_URL}/storage/v1/object/{STORAGE_BUCKET}/{target_path}"
-    headers = {
-        "Content-Type": mime_type,
-        "x-upsert": "true",
-        "cache-control": "max-age=31536000"
-    }
-
-    try:
-        api_request(upload_url, method="POST", data=file_bytes, headers=headers)
-        public_url = f"{SUPABASE_URL}/storage/v1/object/public/{STORAGE_BUCKET}/{target_path}"
-        print(f"✅ Foto de capa enviada com sucesso para o Supabase Storage: {public_url}")
-        return public_url
-    except Exception as e:
-        print(f"⚠️ Erro ao fazer upload da capa para o Supabase: {e}")
-        return None
+    parts.append(f"--{boundary}--\r\n".encode("utf-8"))
+    body = b"".join(parts)
+    return body, f"multipart/form-data; boundary={boundary}"
 
 
-def upload_service_image(local_filepath, slug, svc_index):
-    """Faz upload da foto de serviço local para o bucket catalog-assets do Supabase."""
-    if not local_filepath or not os.path.exists(local_filepath):
-        print(f"⚠️ Aviso: Arquivo de serviço não encontrado em {local_filepath}.")
-        return None
-
-    filename = os.path.basename(local_filepath)
-    ext = os.path.splitext(filename)[1].lower() or ".jpg"
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    target_path = f"services/{slug}_svc{svc_index}_{timestamp}{ext}"
-
-    mime_type, _ = mimetypes.guess_type(local_filepath)
-    if not mime_type:
-        mime_type = "image/jpeg" if ext in [".jpg", ".jpeg"] else "image/png"
-
-    with open(local_filepath, "rb") as f:
-        file_bytes = f.read()
-
-    upload_url = f"{SUPABASE_URL}/storage/v1/object/{STORAGE_BUCKET}/{target_path}"
-    headers = {
-        "Content-Type": mime_type,
-        "x-upsert": "true",
-        "cache-control": "max-age=31536000"
-    }
-
-    try:
-        api_request(upload_url, method="POST", data=file_bytes, headers=headers)
-        public_url = f"{SUPABASE_URL}/storage/v1/object/public/{STORAGE_BUCKET}/{target_path}"
-        print(f"✅ Foto de serviço [{svc_index}] enviada com sucesso para o Supabase Storage: {public_url}")
-        return public_url
-    except Exception as e:
-        print(f"⚠️ Erro ao fazer upload da foto de serviço para o Supabase: {e}")
-        return None
+def admin_login(password: str):
+    res = _request_json("/api/admin/login", method="POST", payload={"password": password})
+    if not res.get("success"):
+        raise RuntimeError(f"Falha no login do admin: {res.get('message', 'motivo desconhecido')}")
 
 
-def ensure_unique_slug(base_name):
-    """Gera um slug limpo e único consultando a tabela orders."""
-    clean = re.sub(r"[^a-z0-9]", "", base_name.lower().strip()) or "catalogo"
-    candidate = clean
-    counter = 1
+def resolve_cover_bytes(client_data: dict):
+    """Retorna (filename, bytes, content_type) pra foto de capa, a partir de
+    um arquivo local (`cover_image_path`) ou de uma URL já pronta
+    (`cover_image_url`, ex: extraída de outro site durante a conversa).
+    Se nenhum dos dois vier, o catálogo nasce com a capa padrão do modelo
+    (comportamento normal do finalize-catalog sem `coverFile`)."""
+    local_path = client_data.get("cover_image_path")
+    cover_url = client_data.get("cover_image_url")
 
-    while counter <= 30:
-        url = f"{SUPABASE_URL}/rest/v1/orders?slug=eq.{urllib.parse.quote(candidate)}&select=id"
-        res = api_request(url)
-        if not res or len(res) == 0:
-            return candidate
-        counter += 1
-        candidate = f"{clean}{counter}"
+    if local_path:
+        if not os.path.exists(local_path):
+            print(f"⚠️  Aviso: cover_image_path não encontrado ({local_path}). Seguindo com a capa padrão do modelo.")
+            return None
+        filename = os.path.basename(local_path)
+        content_type = mimetypes.guess_type(local_path)[0] or "image/jpeg"
+        with open(local_path, "rb") as f:
+            return filename, f.read(), content_type
 
-    return f"{clean}_{int(datetime.now().timestamp()) % 10000}"
-
-
-def match_canonical_service(raw_service_name):
-    """Localiza o serviço canônico oficial a partir do nome ou palavra-chave."""
-    raw_lower = raw_service_name.lower().strip()
-
-    # 1. Match exato de nome
-    for key, item in CANONICAL_SERVICES.items():
-        if item["name"].lower() == raw_lower:
-            return item
-
-    # 2. Match de palavra-chave ordenado por especificidade (maior comprimento primeiro)
-    candidates = []
-    for key, item in CANONICAL_SERVICES.items():
-        for kw in item["keywords"]:
-            if kw in raw_lower or raw_lower in kw:
-                candidates.append((len(kw), item))
-
-    if candidates:
-        candidates.sort(key=lambda x: x[0], reverse=True)
-        return candidates[0][1]
+    if cover_url:
+        try:
+            req = urllib.request.Request(cover_url, headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                data = resp.read()
+                content_type = resp.headers.get_content_type() or "image/jpeg"
+            filename = os.path.basename(urllib.parse.urlparse(cover_url).path) or "capa.jpg"
+            return filename, data, content_type
+        except Exception as e:
+            print(f"⚠️  Aviso: não consegui baixar cover_image_url ({e}). Seguindo com a capa padrão do modelo.")
+            return None
 
     return None
 
 
-def sanitize_price(val):
-    """Limpa e padroniza o preço no formato '150,00' ou 'R$ 150,00'."""
-    if not val:
-        return "Sob Consulta"
-    val_str = str(val).replace("R$", "").replace("$", "").strip()
-    return val_str
-
-
-def build_catalog(client_data):
-    """
-    Função mestre que cria o catálogo no Supabase.
-    """
-    client_name = client_data.get("client_name", "").strip()
-    if not client_name:
-        raise ValueError("client_name é obrigatório!")
-
-    # 1. Definir e garantir Slug Único
-    base_slug = client_data.get("slug") or client_name
-    slug = ensure_unique_slug(base_slug)
-
-    # 2. Upload da Foto de Capa (se houver)
-    cover_media_url = client_data.get("cover_media_url")
-    local_cover = client_data.get("cover_image_path")
-    if local_cover and not cover_media_url:
-        cover_media_url = upload_cover_image(local_cover, slug)
-
-    if raw_model in ["harmonia", "mosaico-rose", "mosaico-luxury", "harmonia-rose", "harmonia-midnight"]:
-        model_id = "mosaico"
-    elif raw_model in ["classico-rose", "classico-midnight"]:
-        model_id = "classico"
-    else:
-        model_id = raw_model
-    color_id = client_data.get("color_id", "rose")
-
-    hero_phrase = client_data.get(
-        "hero_phrase",
-        "Especialista em extensão de cílios. Cada aplicação começa por ouvir você."
-    )
-
-    # 3. Payload da Tabela 'orders'
-    order_payload = {
-        "client_name": client_name,
-        "whatsapp": client_data.get("whatsapp", "").strip(),
-        "instagram": client_data.get("instagram", "").replace("@", "").strip(),
-        "location": client_data.get("location", "").strip(),
-        "slug": slug,
-        "model_id": model_id,
-        "color_id": color_id,
-        "hero_phrase": hero_phrase,
-        "cover_media_url": cover_media_url,
-        "cover_media_type": "image",
-        "status": "pendente_revisao",
-        "published_url": f"https://{slug}.lashmenu.com",
-        "admin_notes": f"Criado via Agente Automatizado LashMenu em {datetime.now().strftime('%d/%m/%Y %H:%M')}"
-    }
-
-    insert_order_url = f"{SUPABASE_URL}/rest/v1/orders"
-    order_res = api_request(
-        insert_order_url,
-        method="POST",
-        data=order_payload,
-        headers={"Prefer": "return=representation"}
-    )
-
-    if not order_res or len(order_res) == 0:
-        raise RuntimeError("Falha ao criar o pedido na tabela orders.")
-
-    created_order = order_res[0]
-    order_id = created_order["id"]
-    print(f"✨ Catálogo criado em 'orders' com ID: {order_id} (slug: {slug})")
-
-    # 4. Processar e Inserir os Procedimentos ('order_services')
-    raw_services = client_data.get("services", [])
-    services_to_insert = []
-
+def build_procedures_payload(raw_services: list) -> list:
+    """Converte os serviços recebidos (formato livre vindo da conversa) pro
+    formato ProcedureItem esperado pelo finalize-catalog. Duração em minutos
+    e fallback de preço/imagem ficam por conta do servidor (buildServicesPayload
+    em src/lib/order-payload.ts) — aqui só normaliza o que a IA da conversa
+    já coletou."""
+    procedures = []
     for idx, svc in enumerate(raw_services):
-        svc_name = svc.get("name", "").strip()
-        if not svc_name:
+        title = (svc.get("title") or svc.get("name") or "").strip()
+        if not title:
             continue
-
-        # Mapeamento com catálogo oficial
-        canonical = match_canonical_service(svc_name)
-
-        final_price = sanitize_price(svc.get("price"))
-        final_duration = svc.get("duration") or (canonical["duration"] if canonical else "1h30")
-        final_maintenance = svc.get("maintenance") or (canonical["maintenance"] if canonical else "")
-        final_category = svc.get("category") or (canonical["category"] if canonical else "Procedimento Especial")
-        final_description = svc.get("description") or (canonical["description"] if canonical else f"Aplicação profissional e cuidadosa de {svc_name} com acabamento impecável.")
-        final_effect = svc.get("effect") or (canonical["effect"] if canonical else "Realce do Olhar e Definição")
-
-        # Foto oficial, personalizada enviada ou fallback
-        final_photo = svc.get("photo_url")
-        local_svc_photo = svc.get("photo_path") or svc.get("local_image_path")
-        is_custom = False
-
-        if not final_photo and local_svc_photo:
-            uploaded_url = upload_service_image(local_svc_photo, slug, idx + 1)
-            if uploaded_url:
-                final_photo = uploaded_url
-                is_custom = True
-
-        if not final_photo:
-            if canonical:
-                final_photo = canonical["photo_url"]
-            else:
-                final_photo = DEFAULT_PLACEHOLDER_PHOTO
-                is_custom = True
-
-        services_to_insert.append({
-            "order_id": order_id,
-            "name": canonical["name"] if canonical else svc_name,
-            "price": final_price,
-            "duration": final_duration,
-            "maintenance": final_maintenance,
-            "category": final_category,
-            "description": final_description,
-            "effect": final_effect,
-            "photo_url": final_photo,
-            "is_custom_photo": is_custom,
-            "order_index": idx
-        })
-
-    if services_to_insert:
-        insert_services_url = f"{SUPABASE_URL}/rest/v1/order_services"
-        api_request(
-            insert_services_url,
-            method="POST",
-            data=services_to_insert,
-            headers={"Prefer": "return=representation"}
+        procedures.append(
+            {
+                "id": f"chat-{int(datetime.now().timestamp())}-{idx}",
+                "title": title,
+                "description": svc.get("description") or "",
+                "price": (svc.get("price") or "Sob Consulta"),
+                "duration": svc.get("duration") or "",
+                "duration_minutes": svc.get("duration_minutes"),
+                "category": svc.get("category") or "Geral",
+                "image_url": svc.get("image_url") or "",
+                "badge": svc.get("badge") or "",
+                "is_highlight": bool(svc.get("is_highlight", False)),
+            }
         )
-        print(f"💎 {len(services_to_insert)} procedimentos vinculados com sucesso na tabela order_services.")
+    return procedures
 
-    # 5. Formatar Resumo e Links Finais
-    first_name = client_name.split()[0]
-    preview_url = f"https://lashmenu.com/catalogo/?slug={slug}"
-    subdomain_url = f"https://{slug}.lashmenu.com"
-    admin_editor_url = f"https://lashmenu.com/admin/editor.html?id={order_id}"
-    admin_panel_url = "https://lashmenu.com/admin/"
 
-    delivery_message = (
-        f"Olá, {first_name}! ✨👑\n\n"
-        f"Seu catálogo digital oficial LashMenu está pronto, calibrado e no ar! 🚀\n\n"
-        f"🔗 *Seu Link Exclusivo:*\n"
-        f"👉 {subdomain_url}\n\n"
-        f"📌 *O que fazer agora:*\n"
-        f"1. Abra o link no seu celular e confira seu catálogo completo.\n"
-        f"2. Coloque este link na bio do seu Instagram e no seu perfil do WhatsApp Business.\n"
-        f"3. Comece a enviar para suas clientes no momento do agendamento!\n\n"
-        f"Qualquer dúvida ou ajuste que precisar, nossa equipe está à sua inteira disposição. "
-        f"Parabéns pelo seu novo posicionamento de luxo! 💖✨"
-    )
+def finalize_catalog(client_data: dict) -> dict:
+    client_name = (client_data.get("client_name") or "").strip()
+    whatsapp = (client_data.get("whatsapp") or "").strip()
+    if not client_name:
+        raise ValueError("client_name é obrigatório.")
+    if not whatsapp:
+        raise ValueError("whatsapp é obrigatório.")
 
-    result = {
-        "success": True,
-        "order_id": order_id,
-        "slug": slug,
-        "client_name": client_name,
-        "model": f"{model_id}-{color_id}",
-        "services_count": len(services_to_insert),
-        "subdomain_url": subdomain_url,
-        "preview_url": preview_url,
-        "admin_editor_url": admin_editor_url,
-        "admin_panel_url": admin_panel_url,
-        "delivery_message": delivery_message
+    niche = client_data.get("niche", "lash")
+    if niche not in VALID_NICHES:
+        raise ValueError(f"niche inválido: {niche!r}. Use um de: {sorted(VALID_NICHES)}")
+
+    layout_model = client_data.get("layout_model", "mosaico")
+    if layout_model not in VALID_LAYOUTS:
+        raise ValueError(f"layout_model inválido: {layout_model!r}. Use um de: {sorted(VALID_LAYOUTS)}")
+
+    theme_variant = client_data.get("theme_variant", "rose")
+    if theme_variant not in VALID_THEMES:
+        raise ValueError(f"theme_variant inválido: {theme_variant!r}. Use um de: {sorted(VALID_THEMES)}")
+
+    first_offer_tier = client_data.get("first_offer_tier", "basico")
+    if first_offer_tier not in VALID_OFFER_TIERS:
+        raise ValueError(f"first_offer_tier inválido: {first_offer_tier!r}. Use 'basico' ou 'plus'.")
+
+    procedures = build_procedures_payload(client_data.get("services", []))
+
+    fields = {
+        "clientName": client_name,
+        "whatsappNumber": whatsapp,
+        "instagramHandle": (client_data.get("instagram") or "").replace("@", "").strip(),
+        "niche": niche,
+        "layoutModel": layout_model,
+        "themeVariant": theme_variant,
+        "procedures": json.dumps(procedures, ensure_ascii=False),
+        "firstOfferTier": first_offer_tier,
+        "aiAdaptCover": "1" if client_data.get("ai_adapt_cover") else "0",
     }
+
+    files = {}
+    cover = resolve_cover_bytes(client_data)
+    if cover:
+        filename, file_bytes, content_type = cover
+        files["coverFile"] = (filename, file_bytes, content_type)
+
+    body, content_type_header = _encode_multipart(fields, files)
+    req = urllib.request.Request(
+        f"{API_BASE_URL}/api/admin/finalize-catalog",
+        data=body,
+        headers={"Content-Type": content_type_header, "Accept": "application/json"},
+        method="POST",
+    )
+    with _opener.open(req, timeout=60) as resp:
+        result = json.loads(resp.read().decode("utf-8"))
+
+    if not result.get("success"):
+        raise RuntimeError(f"Erro ao criar o catálogo: {result.get('message', 'motivo desconhecido')}")
 
     return result
+
+
+def approve_and_fetch(slug: str) -> dict:
+    """Aprova o catálogo (equivalente a 'Aprovar & Entregar' no painel) e
+    devolve a linha completa da listagem (já com app_short_code preenchido
+    pela própria chamada, que faz o backfill sob demanda)."""
+    catalogs = _request_json("/api/admin/catalogs-list", method="GET")
+    if not catalogs.get("success"):
+        raise RuntimeError(f"Erro ao buscar catálogos: {catalogs.get('message')}")
+
+    item = next((c for c in catalogs.get("catalogs", []) if c.get("slug") == slug), None)
+    if not item:
+        raise RuntimeError(f"Catálogo criado (slug={slug}) mas não encontrado na listagem do admin.")
+
+    patch_res = _request_json(
+        "/api/admin/catalog-actions",
+        method="PATCH",
+        payload={"id": item["id"], "status": "aprovado"},
+    )
+    if not patch_res.get("success"):
+        print(f"⚠️  Aviso: catálogo criado, mas falhou ao aprovar automaticamente ({patch_res.get('message')}).")
+
+    return item
+
+
+def normalize_whatsapp_br(value: str) -> str:
+    digits = re.sub(r"\D", "", value or "")
+    if not digits:
+        return ""
+    return digits if len(digits) > 11 else f"55{digits}"
+
+
+def build_links(slug: str, edit_token: str, app_short_code: str) -> dict:
+    domain = PUBLIC_BASE_URL.split("//", 1)[-1]
+    official = f"https://{slug}.{domain}"
+    edit = f"{official}?edit={edit_token}"
+    app = (
+        f"https://{domain}/a/{app_short_code}"
+        if app_short_code
+        else f"{official}/api/professional/login?slug={slug}&token={edit_token}"
+    )
+    return {"official": official, "edit": edit, "app": app}
+
+
+def build_whatsapp_messages(client_name: str, first_offer_tier: str, links: dict) -> dict:
+    first_name = client_name.split()[0] if client_name.split() else client_name
+
+    if first_offer_tier == "plus":
+        delivery_message = (
+            f"Olá, {first_name}! ✨\n\n"
+            f"Seu catálogo digital StudioMenu está pronto — e com ele você já pode liberar o *agendamento automático*: "
+            f"suas clientes escolhem o dia e o horário sozinhas, sem trocar mensagem com você. 📅\n\n"
+            f"🔗 *Seu Link Exclusivo:*\n👉 {links['official']}\n\n"
+            f"📌 *O que fazer agora:*\n"
+            f"1. Abra o link no seu celular e confira seu catálogo completo.\n"
+            f"2. Coloque este link na bio do seu Instagram e no seu perfil do WhatsApp Business.\n"
+            f"3. Pra ativar o agendamento automático, é só assinar — te mando o acesso em seguida.\n\n"
+            f"Qualquer dúvida ou ajuste que precisar, nossa equipe está à sua inteira disposição. "
+            f"Parabéns pelo seu novo posicionamento! 💖✨"
+        )
+    else:
+        delivery_message = (
+            f"Olá, {first_name}! ✨\n\n"
+            f"Seu catálogo digital oficial StudioMenu está pronto, calibrado e no ar! 🚀\n\n"
+            f"🔗 *Seu Link Exclusivo:*\n👉 {links['official']}\n\n"
+            f"📌 *O que fazer agora:*\n"
+            f"1. Abra o link no seu celular e confira seu catálogo completo.\n"
+            f"2. Coloque este link na bio do seu Instagram e no seu perfil do WhatsApp Business.\n"
+            f"3. Comece a enviar para suas clientes no momento do agendamento!\n\n"
+            f"Qualquer dúvida ou ajuste que precisar, nossa equipe está à sua inteira disposição. "
+            f"Parabéns pelo seu novo posicionamento! 💖✨"
+        )
+
+    app_message = (
+        f"Oi, {first_name}! ✨\n\n"
+        f"Agora quero te apresentar o *app do seu StudioMenu* 📱\n\n"
+        f"É por ele que você:\n"
+        f"• vê e compartilha o link do seu catálogo\n"
+        f"• edita fotos, serviços e preços quando quiser, sem depender de ninguém\n"
+        f"• assina o plano pra manter tudo no ar\n\n"
+        f"👉 *Seu acesso ao app:*\n{links['app']}\n\n"
+        f"📌 *Dicas:*\n"
+        f"1. Abra pelo celular. Ao abrir, aparecem umas dicas rápidas te mostrando cada parte.\n"
+        f"2. Esse link é só seu e já te deixa logada, então não compartilhe com ninguém.\n"
+        f"3. Dá pra instalar na tela inicial do celular, como um app de verdade.\n\n"
+        f"Qualquer dúvida é só me chamar por aqui! 💖"
+    )
+
+    return {"delivery_message": delivery_message, "app_message": app_message}
+
+
+def build_catalog(client_data: dict) -> dict:
+    password = _read_admin_password()
+    admin_login(password)
+
+    created = finalize_catalog(client_data)
+    slug = created["slug"]
+    edit_token = created["editToken"]
+
+    item = approve_and_fetch(slug)
+    app_short_code = item.get("app_short_code")
+
+    links = build_links(slug, edit_token, app_short_code)
+    messages = build_whatsapp_messages(client_data.get("client_name", ""), client_data.get("first_offer_tier", "basico"), links)
+
+    clean_phone = normalize_whatsapp_br(client_data.get("whatsapp", ""))
+    delivery_wa_url = f"https://api.whatsapp.com/send?phone={clean_phone}&text={urllib.parse.quote(messages['delivery_message'])}"
+    app_wa_url = f"https://api.whatsapp.com/send?phone={clean_phone}&text={urllib.parse.quote(messages['app_message'])}"
+
+    return {
+        "success": True,
+        "order_id": item["id"],
+        "slug": slug,
+        "client_name": client_data.get("client_name", ""),
+        "niche": client_data.get("niche", "lash"),
+        "model": f"{client_data.get('layout_model', 'mosaico')}-{client_data.get('theme_variant', 'rose')}",
+        "services_count": len(client_data.get("services", [])),
+        "links": links,
+        "admin_panel_url": f"{PUBLIC_BASE_URL}/admin/catalogos",
+        "delivery_whatsapp_url": delivery_wa_url,
+        "app_whatsapp_url": app_wa_url,
+        "delivery_message": messages["delivery_message"],
+        "app_message": messages["app_message"],
+    }
 
 
 def main():
@@ -493,10 +405,26 @@ def main():
             print(f"Erro ao parsear JSON: {e}")
             sys.exit(1)
 
-    res = build_catalog(data)
-    print("\n" + "="*50)
-    print("🎉 CATÁLOGO CRIADO COM SUCESSO!")
-    print("="*50)
+    try:
+        res = build_catalog(data)
+    except Exception as e:
+        print(f"\n❌ Erro ao criar o catálogo: {e}")
+        sys.exit(1)
+
+    print("\n" + "=" * 60)
+    print("🎉 CATÁLOGO CRIADO E APROVADO COM SUCESSO!")
+    print("=" * 60)
+    print(f"Cliente: {res['client_name']}  |  Nicho: {res['niche']}  |  Modelo: {res['model']}")
+    print(f"Serviços cadastrados: {res['services_count']}")
+    print(f"\n🌐 Link Oficial do Catálogo: {res['links']['official']}")
+    print(f"🔗 Link Mágico de Edição:    {res['links']['edit']}")
+    print(f"📱 Link do App:              {res['links']['app']}")
+    print(f"🛠️  Painel Admin:             {res['admin_panel_url']}")
+    print("\n--- Mensagem 1: Entrega do Catálogo (clique pra abrir no WhatsApp) ---")
+    print(res["delivery_whatsapp_url"])
+    print("\n--- Mensagem 2: Apresentação do App (clique pra abrir no WhatsApp) ---")
+    print(res["app_whatsapp_url"])
+    print("\n" + "=" * 60)
     print(json.dumps(res, indent=2, ensure_ascii=False))
 
 
