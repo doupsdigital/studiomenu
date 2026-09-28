@@ -102,6 +102,7 @@ export async function getCatalogBySlug(slug: string): Promise<CatalogOrderData |
       edit_token: orderData.edit_token,
       booking_enabled: Boolean(orderData.booking_enabled),
       agenda_paused: Boolean(orderData.agenda_paused),
+      catalog_disabled: Boolean(orderData.catalog_disabled),
       client_name: orderData.client_name || orderData.name || normalizedSlug,
       studio_name: orderData.studio_name || `Studio ${orderData.client_name || normalizedSlug}`,
       hero_phrase: orderData.hero_phrase || 'A arte de transformar a sua beleza com leveza e precisão.',
