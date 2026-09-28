@@ -124,6 +124,16 @@ export const CatalogReadyPreview: React.FC<CatalogReadyPreviewProps> = ({ slug }
               src={`/c/${slug}`}
               title="Prévia do seu catálogo"
               tabIndex={-1}
+              // `fetchPriority` ainda não existe na tipagem do React pra
+              // <iframe> (só pra <img>), embora o atributo HTML seja válido
+              // — setado via ref. Sem isso, essa requisição concorre de
+              // igual pra igual com o JS/fontes da própria tela de primeiro
+              // contato pela banda da conexão; como é o destaque visual da
+              // tela (não um recurso secundário), pede prioridade alta ao
+              // navegador.
+              ref={(el) => {
+                el?.setAttribute('fetchpriority', 'high');
+              }}
               onLoad={() => setIsLoaded(true)}
               style={{ width: BASE_W, height: BASE_H, border: 0, display: 'block', pointerEvents: 'none' }}
             />
