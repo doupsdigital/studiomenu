@@ -13,6 +13,7 @@ type AdminCatalog = CatalogOrderData & {
   plan_tier?: 'catalog' | 'basico' | 'plus';
   subscription_status?: 'none' | 'ativo' | 'suspenso' | 'cancelado';
   first_offer_tier?: 'basico' | 'plus';
+  app_short_code?: string | null;
 };
 
 export default function AdminCatalogosPage() {
@@ -155,14 +156,24 @@ export default function AdminCatalogosPage() {
    *  pro host, então tanto o link de edição (`?edit=`) quanto o do app
    *  (`/api/professional/login`) funcionam normalmente nesse formato. Em
    *  localhost/*.vercel.app (onde esse roteamento é propositalmente
-   *  ignorado) cai pro caminho `/c/slug` de sempre. */
+   *  ignorado) cai pro caminho `/c/slug` de sempre.
+   *
+   *  Link do app usa o alias curto `/a/[code]` (Fase 25) em vez do login
+   *  direto com o token de 32 caracteres cru — pedido real, 2026-09-28: o
+   *  link completo tinha "muita informação" pra mandar no primeiro
+   *  contato. Sempre no domínio raiz (nunca no subdomínio), fica mais
+   *  curto ainda. Sem `app_short_code` ainda (`catalogs-list` deveria
+   *  sempre preencher, mas por segurança) cai pro link longo de sempre. */
   const buildProfessionalLinks = (item: AdminCatalog) => {
     if (typeof window === 'undefined' || !item.slug) return { official: '', edit: '', app: '' };
     const { hostname, origin } = window.location;
     const subdomain = usesSubdomainRouting(hostname);
     const root = subdomain ? `https://${item.slug}.${PRODUCTION_DOMAIN}` : origin;
     const official = subdomain ? root : `${root}/c/${item.slug}`;
-    const app = `${root}/api/professional/login?slug=${item.slug}&token=${item.edit_token}`;
+    const rootDomainOrigin = subdomain ? `https://${PRODUCTION_DOMAIN}` : origin;
+    const app = item.app_short_code
+      ? `${rootDomainOrigin}/a/${item.app_short_code}`
+      : `${root}/api/professional/login?slug=${item.slug}&token=${item.edit_token}`;
     return { official, edit: `${official}?edit=${item.edit_token}`, app };
   };
 
@@ -517,9 +528,7 @@ export default function AdminCatalogosPage() {
                                 Copiar Link
                               </button>
                             </div>
-                            <p className="text-xs font-mono text-slate-300 truncate">
-                              {item.slug}.{PRODUCTION_DOMAIN}/api/professional/login?slug={item.slug}&token={item.edit_token.substring(0, 8)}...
-                            </p>
+                            <p className="text-xs font-mono text-slate-300 truncate">{buildProfessionalLinks(item).app}</p>
                           </div>
                         )}
 
