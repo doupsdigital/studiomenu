@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
-import { isProfessionalRequestAuthorized } from '@/lib/professional-session';
+import { isProfessionalRequestAuthorized, PROFESSIONAL_SESSION_COOKIE } from '@/lib/professional-session';
 
 /** PUT /api/professional/agenda-pause
- *  Body: { slug, paused: boolean }
+ *  Body: { slug?, paused: boolean }
  *  Liga/desliga `orders.agenda_paused` (Fase 23) — a profissional pausa o
  *  agendamento automático temporariamente sem mexer na assinatura. Não toca
  *  em `booking_enabled` (ver comentário na migração): ela continua com
@@ -19,7 +20,15 @@ export async function PUT(request: Request) {
     }
 
     const body = await request.json();
-    const { slug, paused } = body as { slug?: string; paused?: boolean };
+    let { slug, paused } = body as { slug?: string; paused?: boolean };
+
+    if (!slug) {
+      const cookieStore = await cookies();
+      const cookieVal = cookieStore.get(PROFESSIONAL_SESSION_COOKIE)?.value;
+      if (cookieVal) {
+        slug = cookieVal.split('.')[0];
+      }
+    }
 
     if (!slug || typeof paused !== 'boolean') {
       return NextResponse.json({ success: false, message: 'Dados inválidos.' }, { status: 400 });

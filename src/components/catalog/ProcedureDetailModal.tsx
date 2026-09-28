@@ -59,9 +59,10 @@ export const ProcedureDetailModal: React.FC<ProcedureDetailModalProps> = ({
     return list;
   };
 
-  const firstName = clientName.split(' ')[0];
+  const firstName = clientName?.trim() ? clientName.trim().split(' ')[0] : '';
+  const greeting = firstName ? `Olá, ${firstName}!` : 'Olá!';
   const messageText = encodeURIComponent(
-    `Olá, ${firstName}! Estava vendo seu catálogo digital e gostaria de agendar o procedimento: *${item.title}*.`
+    `${greeting} Estava vendo seu catálogo digital e gostaria de agendar o procedimento: *${item.title}*.`
   );
   const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${messageText}`;
 

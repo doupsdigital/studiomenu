@@ -23,7 +23,7 @@ interface BookedAppointment {
 const DAYS_AHEAD = 14;
 
 function toDateKey(d: Date): string {
-  return d.toLocaleDateString('en-CA'); // YYYY-MM-DD
+  return d.toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' }); // YYYY-MM-DD
 }
 
 function buildNextDays(count: number): { key: string; weekday: string; day: string }[] {
@@ -34,16 +34,16 @@ function buildNextDays(count: number): { key: string; weekday: string; day: stri
     d.setDate(today.getDate() + i);
     days.push({
       key: toDateKey(d),
-      weekday: d.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', ''),
-      day: d.toLocaleDateString('pt-BR', { day: '2-digit' }),
+      weekday: d.toLocaleDateString('pt-BR', { weekday: 'short', timeZone: 'America/Sao_Paulo' }).replace('.', ''),
+      day: d.toLocaleDateString('pt-BR', { day: '2-digit', timeZone: 'America/Sao_Paulo' }),
     });
   }
   return days;
 }
 
 function formatDateLabel(dateKey: string): string {
-  const d = new Date(`${dateKey}T00:00:00`);
-  const label = d.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
+  const d = new Date(`${dateKey}T12:00:00-03:00`);
+  const label = d.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', timeZone: 'America/Sao_Paulo' });
   return label.charAt(0).toUpperCase() + label.slice(1);
 }
 
@@ -318,7 +318,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                 <button
                   type="button"
                   className="modal__cta wizard__cta"
-                  disabled={submitting || !clientName.trim() || !clientWhatsapp.trim()}
+                  disabled={submitting || !clientName.trim() || clientWhatsapp.replace(/\D/g, '').length < 10}
                   onClick={handleSubmitContact}
                 >
                   {submitting ? 'Confirmando...' : 'Confirmar agendamento'}
