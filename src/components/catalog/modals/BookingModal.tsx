@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { CheckCircle, CalendarX } from 'lucide-react';
+import { CheckCircle, CalendarX, Sparkles } from 'lucide-react';
 import { ProcedureItem } from '@/types/catalog';
 import type { AvailabilitySlot } from '@/lib/scheduling/availability';
 import { formatPhoneBR } from '@/lib/format';
@@ -68,6 +68,10 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   const [slots, setSlots] = useState<AvailabilitySlot[]>([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [slotsError, setSlotsError] = useState<string | null>(null);
+  // Preview antes de assinar (2026-09-28): a API sinaliza quando o motivo
+  // de não ter horário nenhum é ela ainda não ter cadastrado horário de
+  // atendimento (só possível depois de assinar), não "esse dia lotou".
+  const [noSchedulingYet, setNoSchedulingYet] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<AvailabilitySlot | null>(null);
 
   const [clientName, setClientName] = useState('');
@@ -93,6 +97,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   const fetchSlots = async (dateKey: string) => {
     setLoadingSlots(true);
     setSlotsError(null);
+    setNoSchedulingYet(false);
     setSelectedSlot(null);
     try {
       const params = new URLSearchParams({ slug, service_id: service.id, date: dateKey });
@@ -104,6 +109,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
         return;
       }
       setSlots(json.slots || []);
+      setNoSchedulingYet(Boolean(json.noSchedulingYet));
     } catch {
       setSlots([]);
       setSlotsError('Falha na conexão ao buscar horários.');
@@ -246,6 +252,11 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                 <div className="wizard__vazio">Carregando horários...</div>
               ) : slotsError ? (
                 <div className="wizard__vazio">{slotsError}</div>
+              ) : noSchedulingYet ? (
+                <div className="wizard__vazio">
+                  <Sparkles className="w-6 h-6" />
+                  Assine o StudioMenu+ pra cadastrar seus horários e liberar a agenda.
+                </div>
               ) : slots.length === 0 ? (
                 <div className="wizard__vazio">
                   <CalendarX className="w-6 h-6" />
