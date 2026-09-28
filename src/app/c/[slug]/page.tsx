@@ -3,6 +3,7 @@ import { getCatalogBySlug } from '@/lib/catalog-service';
 import { CatalogLayout } from '@/components/catalog/CatalogLayout';
 import Link from 'next/link';
 import { Sparkles, ArrowLeft } from 'lucide-react';
+import { PRODUCTION_DOMAIN } from '@/lib/public-url';
 
 interface CatalogPageProps {
   params: Promise<{
@@ -33,7 +34,14 @@ export async function generateMetadata({ params }: CatalogPageProps): Promise<Me
   // path relativo não funciona aqui). Domínio antigo trocado pelo real
   // (achado investigando o bug de carregamento lento de imagens, 2026-09-23
   // — apontava pro `lashmenu.com`, que não existe mais).
-  const image = catalog.cover_media_url || catalog.avatar_url || 'https://studiomenu.art/modelos/mosaico/assets/img/Hero.webp';
+  //
+  // Passa pela rota `/api/og/catalog/[slug]` (recorte 1200×630) em vez da
+  // capa crua — o WhatsApp usa as dimensões REAIS da imagem, não o
+  // `width`/`height` declarado abaixo, e a capa quase sempre é retrato
+  // (selfie); isso fazia o card do link sair alto e estreito, espremendo
+  // até o texto da mensagem que vinha junto (achado real reportado em
+  // produção, 2026-09-28).
+  const image = `https://${PRODUCTION_DOMAIN}/api/og/catalog/${slug}`;
 
   return {
     title: title,
@@ -44,8 +52,8 @@ export async function generateMetadata({ params }: CatalogPageProps): Promise<Me
       images: [
         {
           url: image,
-          width: 800,
-          height: 600,
+          width: 1200,
+          height: 630,
           alt: title,
         },
       ],
