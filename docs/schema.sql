@@ -67,6 +67,11 @@ CREATE TABLE IF NOT EXISTS public.orders (
     -- bloqueia o link público E o link mágico de edição (mensagem amigável
     -- pra ela e pra cliente dela); acesso ao app continua normal.
     catalog_disabled BOOLEAN NOT NULL DEFAULT false,
+    -- Código curto do link do app (Fase 25,
+    -- docs/historico/migrations/2026-09-28_fase25_link_curto_app.sql) —
+    -- alias público em /a/[code], gerado sob demanda pela listagem do
+    -- admin pra catálogos que ainda não têm um.
+    app_short_code TEXT UNIQUE,
     -- Login real da profissional (docs/PLANO_PRODUCAO_V1.md, Fase 17): vínculo
     -- 1:1 opcional com uma conta do Supabase Auth. NULL até ela "reivindicar"
     -- o login (continua entrando só pelo link mágico até lá).
