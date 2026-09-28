@@ -89,7 +89,9 @@ export async function findOrderIdByAsaasIds(input: { subscriptionId?: string | n
       .from('orders')
       .select('id')
       .eq('asaas_subscription_id', input.subscriptionId)
-      .single();
+      .order('updated_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
     if (data) return data.id;
   }
   if (input.customerId) {
@@ -97,7 +99,9 @@ export async function findOrderIdByAsaasIds(input: { subscriptionId?: string | n
       .from('orders')
       .select('id')
       .eq('asaas_customer_id', input.customerId)
-      .single();
+      .order('updated_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
     if (data) return data.id;
   }
   return null;
