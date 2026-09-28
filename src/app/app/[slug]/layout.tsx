@@ -2,6 +2,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 import { isProfessionalRequestAuthorized } from '@/lib/professional-session';
 import { getOrderForProfessionalApp } from '@/lib/professional-app-service';
+import { getCatalogBySlug } from '@/lib/catalog-service';
 import { ServiceWorkerRegister } from '@/components/app-shell/ServiceWorkerRegister';
 import { BottomNav } from '@/components/app-shell/BottomNav';
 import { WelcomeOnboarding } from '@/components/app-shell/WelcomeOnboarding';
@@ -19,12 +20,42 @@ interface AppLayoutProps {
  *  Só devolve esse manifest quando a sessão é válida: sem isso, o Chrome
  *  considerava a tela de "link inválido" instalável e oferecia o app antes
  *  do login (achado testando no celular) — sem sessão, cai de volta no
- *  manifest raiz (inofensivo, é o mesmo já usado pela home de vendas). */
+ *  manifest raiz (inofensivo, é o mesmo já usado pela home de vendas).
+ *
+ *  Título/descrição/OG também precisam de override próprio aqui — sem isso,
+ *  herdava o texto genérico da home de vendas ("StudioMenu — Catálogos
+ *  Digitais de Alta Conversão..."), que é o que aparecia no preview do
+ *  WhatsApp quando ela mandava o link do app pra cliente (bug real
+ *  reportado, 2026-09-28). Não depende de sessão — o crawler do WhatsApp
+ *  não necessariamente carrega o cookie ao seguir o redirect do link de
+ *  login, e o nome do studio/foto de capa já são públicos mesmo (mesmos
+ *  dados que aparecem no catálogo público dela). */
 export async function generateMetadata({ params }: AppLayoutProps): Promise<Metadata> {
   const { slug } = await params;
-  const isAuthenticated = await isProfessionalRequestAuthorized(slug);
-  if (!isAuthenticated) return {};
-  return { manifest: `/app/${slug}/manifest.webmanifest` };
+  const [isAuthenticated, catalog] = await Promise.all([
+    isProfessionalRequestAuthorized(slug),
+    getCatalogBySlug(slug),
+  ]);
+
+  const base: Metadata = catalog
+    ? {
+        title: `${catalog.studio_name || catalog.client_name} — App StudioMenu`,
+        description: 'Acesse seu catálogo digital e faça as edições que quiser, direto pelo celular.',
+        openGraph: {
+          title: `${catalog.studio_name || catalog.client_name} — App StudioMenu`,
+          description: 'Acesse seu catálogo digital e faça as edições que quiser, direto pelo celular.',
+          images: [
+            {
+              url: catalog.cover_media_url || catalog.avatar_url || 'https://studiomenu.art/modelos/mosaico/assets/img/Hero.webp',
+            },
+          ],
+          type: 'website',
+        },
+      }
+    : {};
+
+  if (!isAuthenticated) return base;
+  return { ...base, manifest: `/app/${slug}/manifest.webmanifest` };
 }
 
 export default async function ProfessionalAppLayout({ children, params }: AppLayoutProps) {
