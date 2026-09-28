@@ -72,3 +72,29 @@ export function parseDurationToMinutes(text: string | undefined | null): number 
 
   return null;
 }
+
+/** Rótulo curto ("1h30min", "2h", "45min") a partir do total em minutos —
+ *  inverso informal de `parseDurationToMinutes`, usado pro campo de horas
+ *  e minutos do editor manter o texto de exibição (`duration`) sempre
+ *  coerente com o valor estruturado que ela escolheu, sem ela precisar
+ *  digitar nada. */
+export function formatMinutesToLabel(totalMinutes: number): string {
+  if (!totalMinutes) return '';
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  if (hours && minutes) return `${hours}h${minutes}min`;
+  if (hours) return `${hours}h`;
+  return `${minutes}min`;
+}
+
+/** Máscara de preço em Real (R$ 1.234,56), no padrão "digita os centavos
+ *  primeiro" (cada dígito novo entra pela direita) — mesmo comportamento
+ *  de app de banco, sem depender de posição de cursor. Recebe o valor cru
+ *  do input (com ou sem formatação prévia), descarta tudo que não é
+ *  dígito e reconstrói a máscara do zero a cada tecla. */
+export function formatCurrencyBRL(value: string): string {
+  const digits = value.replace(/\D/g, '');
+  if (!digits) return '';
+  const cents = parseInt(digits, 10);
+  return (cents / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}

@@ -1,9 +1,20 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { ProcedureItem } from '@/types/catalog';
+import { formatCurrencyBRL, formatMinutesToLabel, parseDurationToMinutes } from '@/lib/format';
 
 type ProcForm = ProcedureItem & { maintenance?: string; visualEffect?: string };
+
+const DURATION_HOUR_OPTIONS = [0, 1, 2, 3, 4, 5, 6];
+const DURATION_MINUTE_OPTIONS = [0, 15, 30, 45];
+
+/** Arredonda pro múltiplo de 15 mais próximo — cobre o raro caso de um
+ *  catálogo antigo ter uma duração "torta" (ex: extraída por IA de um
+ *  texto incomum) que não bate certinho com as opções do seletor. */
+function roundToNearestQuarter(minutes: number): number {
+  return Math.round(minutes / 15) * 15;
+}
 
 interface ProcedureModalProps {
   procForm: ProcForm;
@@ -30,6 +41,15 @@ export const ProcedureModal: React.FC<ProcedureModalProps> = ({
   onSaveProcedure,
   onClose,
 }) => {
+  const initialTotalMinutes = roundToNearestQuarter(procForm.duration_minutes ?? parseDurationToMinutes(procForm.duration) ?? 0);
+  const [durationHours, setDurationHours] = useState(() => Math.min(6, Math.floor(initialTotalMinutes / 60)));
+  const [durationMinutesPart, setDurationMinutesPart] = useState(() => initialTotalMinutes % 60);
+
+  const applyDuration = (hours: number, minutesPart: number) => {
+    const total = hours * 60 + minutesPart;
+    setProcForm({ ...procForm, duration_minutes: total || null, duration: formatMinutesToLabel(total) });
+  };
+
   return (
     <div className="lm-modal-card">
       <h3 className="lm-modal-title">
@@ -46,45 +66,57 @@ export const ProcedureModal: React.FC<ProcedureModalProps> = ({
         />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-        <div className="lm-form-group">
-          <label>PREÇO (R$) *</label>
-          <input
-            type="text"
-            value={procForm.price}
-            onChange={(e) => setProcForm({ ...procForm, price: e.target.value })}
-            placeholder="100,00"
-          />
-        </div>
-        <div className="lm-form-group">
-          <label>DURAÇÃO *</label>
-          <input
-            type="text"
-            value={procForm.duration || ''}
-            onChange={(e) => setProcForm({ ...procForm, duration: e.target.value })}
-            placeholder="1h30"
-          />
-        </div>
+      <div className="lm-form-group">
+        <label>PREÇO (R$) *</label>
+        <input
+          type="text"
+          inputMode="decimal"
+          value={procForm.price}
+          onChange={(e) => setProcForm({ ...procForm, price: formatCurrencyBRL(e.target.value) })}
+          placeholder="R$ 0,00"
+        />
       </div>
 
       <div className="lm-form-group">
-        <label>DURAÇÃO EM MINUTOS (PARA AGENDAMENTO AUTOMÁTICO)</label>
-        <input
-          type="number"
-          min={5}
-          step={5}
-          value={procForm.duration_minutes ?? ''}
-          onChange={(e) =>
-            setProcForm({
-              ...procForm,
-              duration_minutes: e.target.value === '' ? null : Number(e.target.value),
-            })
-          }
-          placeholder="Ex: 90"
-        />
-        <span style={{ fontSize: '0.75rem', opacity: 0.65, marginTop: '4px', display: 'block' }}>
-          Opcional por enquanto. Vai ser usado pra calcular os horários disponíveis quando o agendamento automático estiver ativo.
-        </span>
+        <label>DURAÇÃO *</label>
+        {/* Seletores em vez de texto livre — evita qualquer duração "torta"
+         *  chegar na agenda (achado real, 2026-09-28: campo de texto
+         *  atrapalhava a leitura de tempo). `duration` (o texto de exibição
+         *  no catálogo) e `duration_minutes` (o que o agendamento automático
+         *  usa) são sempre derivados juntos daqui — nunca mais digitados
+         *  separadamente. */}
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <select
+            className="lm-form-select"
+            value={durationHours}
+            onChange={(e) => {
+              const hours = Number(e.target.value);
+              setDurationHours(hours);
+              applyDuration(hours, durationMinutesPart);
+            }}
+          >
+            {DURATION_HOUR_OPTIONS.map((h) => (
+              <option key={h} value={h}>
+                {h}h
+              </option>
+            ))}
+          </select>
+          <select
+            className="lm-form-select"
+            value={durationMinutesPart}
+            onChange={(e) => {
+              const minutesPart = Number(e.target.value);
+              setDurationMinutesPart(minutesPart);
+              applyDuration(durationHours, minutesPart);
+            }}
+          >
+            {DURATION_MINUTE_OPTIONS.map((m) => (
+              <option key={m} value={m}>
+                {m}min
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div className="lm-form-group">
