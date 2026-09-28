@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { CatalogOrderData } from '@/types/catalog';
 import { normalizeWhatsappBR } from '@/lib/format';
 import Link from 'next/link';
-import { ArrowLeft, Sparkles, ExternalLink, Search, RefreshCw, Scissors, Plus, Trash2, MessageCircle, Phone, Clock, Smartphone, CalendarClock, Globe, Crown, ChevronDown } from 'lucide-react';
+import { ArrowLeft, Sparkles, ExternalLink, Search, RefreshCw, Scissors, Plus, Trash2, MessageCircle, Phone, Clock, Smartphone, CalendarClock, Globe, Crown, ChevronDown, PauseCircle, PlayCircle } from 'lucide-react';
 import { usesSubdomainRouting, PRODUCTION_DOMAIN } from '@/lib/public-url';
 
 /** Campos de billing/agendamento não fazem parte do shape público do
@@ -214,6 +214,28 @@ export default function AdminCatalogosPage() {
     }
   };
 
+  const toggleCatalogDisabled = async (item: AdminCatalog) => {
+    if (!item.id) return;
+    try {
+      const res = await fetch('/api/admin/catalog-actions', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ id: item.id, catalog_disabled: !item.catalog_disabled }),
+      });
+      const result = await res.json();
+      if (!result.success) {
+        showToast('❌ Erro ao atualizar o catálogo.');
+        return;
+      }
+      showToast(item.catalog_disabled ? '▶️ Catálogo reativado!' : '⏸️ Catálogo desativado.');
+      fetchCatalogs();
+    } catch (e) {
+      console.error('Erro ao atualizar catalog_disabled:', e);
+      showToast('❌ Erro ao atualizar o catálogo.');
+    }
+  };
+
   const PLAN_BADGE: Record<string, { label: string; className: string }> = {
     catalog: { label: 'Catálogo', className: 'bg-slate-800 text-slate-400 border-slate-700' },
     'basico-ativo': { label: 'Básico Ativo', className: 'bg-sky-500/10 text-sky-400 border-sky-500/30' },
@@ -335,6 +357,11 @@ export default function AdminCatalogosPage() {
                         >
                           {isPending ? 'Pendente' : 'Aprovado'}
                         </span>
+                        {item.catalog_disabled && (
+                          <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border bg-amber-500/10 text-amber-400 border-amber-500/30">
+                            Desativado
+                          </span>
+                        )}
                       </div>
                     </div>
 
@@ -525,7 +552,20 @@ export default function AdminCatalogosPage() {
                           </a>
                         )}
 
-                        <div className="pt-2 border-t border-slate-800/80 flex items-center justify-end">
+                        <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between">
+                          <button
+                            onClick={() => toggleCatalogDisabled(item)}
+                            className={`p-2 rounded-lg transition-all flex items-center gap-1.5 text-xs font-semibold ${
+                              item.catalog_disabled
+                                ? 'text-emerald-400 hover:bg-emerald-500/10'
+                                : 'text-amber-400 hover:bg-amber-500/10'
+                            }`}
+                            title={item.catalog_disabled ? 'Reativar Catálogo' : 'Desativar Catálogo'}
+                          >
+                            {item.catalog_disabled ? <PlayCircle className="w-4 h-4" /> : <PauseCircle className="w-4 h-4" />}
+                            <span>{item.catalog_disabled ? 'Reativar' : 'Desativar'} Catálogo</span>
+                          </button>
+
                           <button
                             onClick={() => setCatalogToDelete(item)}
                             className="p-2 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-all flex items-center gap-1.5 text-xs font-semibold"

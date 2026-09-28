@@ -62,6 +62,11 @@ CREATE TABLE IF NOT EXISTS public.orders (
     -- docs/migrations/2026-09-22_fase23_pausar_agenda.sql) — só afeta o que a
     -- cliente final vê no catálogo público, nunca o acesso dela à Agenda.
     agenda_paused BOOLEAN NOT NULL DEFAULT false,
+    -- Desativação do catálogo pelo admin (Fase 24,
+    -- docs/historico/migrations/2026-09-28_fase24_desativar_catalogo.sql) —
+    -- bloqueia o link público E o link mágico de edição (mensagem amigável
+    -- pra ela e pra cliente dela); acesso ao app continua normal.
+    catalog_disabled BOOLEAN NOT NULL DEFAULT false,
     -- Login real da profissional (docs/PLANO_PRODUCAO_V1.md, Fase 17): vínculo
     -- 1:1 opcional com uma conta do Supabase Auth. NULL até ela "reivindicar"
     -- o login (continua entrando só pelo link mágico até lá).
