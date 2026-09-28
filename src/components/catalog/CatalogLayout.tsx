@@ -12,6 +12,7 @@ import { VisualEditorModals } from './VisualEditorModals';
 import { NewCatalogWelcomeOverlay } from './NewCatalogWelcomeOverlay';
 import { BookingModal } from './modals/BookingModal';
 import { FakeBookingModal } from './modals/FakeBookingModal';
+import { AgendaDemoScreen } from './modals/AgendaDemoScreen';
 import { ProductTour } from '@/components/tour/ProductTour';
 
 import '@/styles/visual-editor.css';
@@ -85,6 +86,12 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
   // independente do `activeModal` acima, que é exclusivo dos modais do
   // editor visual e nunca renderiza fora de isEditMode.
   const [bookingItem, setBookingItem] = useState<ProcedureItem | null>(null);
+
+  // Só preenchido no showroom (`demoBookingOnly`): depois que ela simula um
+  // horário no FakeBookingModal, mostramos a Agenda de exemplo em vez do
+  // "Ok, entendido" simples (pedido 2026-09-28, pra gravar o vídeo da
+  // experiência completa da profissional).
+  const [agendaDemo, setAgendaDemo] = useState<{ service: ProcedureItem; time: string; dateLabel: string } | null>(null);
 
   // Toast discreto pra cada edição local (feedback imediato antes de "Salvar")
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -569,7 +576,14 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
       {/* Wizard de Agendamento (cliente final, só quando booking_enabled) */}
       {bookingItem && !isEditMode && (
         demoBookingOnly ? (
-          <FakeBookingModal service={bookingItem} onClose={() => setBookingItem(null)} />
+          <FakeBookingModal
+            service={bookingItem}
+            onClose={() => setBookingItem(null)}
+            onBooked={(info) => {
+              setAgendaDemo({ service: bookingItem, ...info });
+              setBookingItem(null);
+            }}
+          />
         ) : (
           <BookingModal
             service={bookingItem}
@@ -577,6 +591,10 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
             onClose={() => setBookingItem(null)}
           />
         )
+      )}
+
+      {agendaDemo && (
+        <AgendaDemoScreen booked={agendaDemo} onClose={() => setAgendaDemo(null)} />
       )}
     </div>
   );
