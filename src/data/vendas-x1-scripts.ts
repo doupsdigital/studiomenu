@@ -32,6 +32,8 @@ export type ScriptCategory =
   | 'abordagem-06'
   | 'abordagem-07'
   | 'abordagem-08'
+  | 'abordagem-09'
+  | 'abordagem-10'
   | 'entrega'
   | 'objecao'
   | 'followup'
@@ -58,6 +60,8 @@ export const SCRIPT_CATEGORIES: { key: 'all' | ScriptCategory; label: string }[]
   { key: 'abordagem-06', label: `🗂️ Funil Abordagem 06: Catálogo — "Link exclusivo de serviços"` },
   { key: 'abordagem-07', label: `💬 Funil Abordagem 07: Catálogo — "Como manda seus valores?"` },
   { key: 'abordagem-08', label: `🔗 Funil Abordagem 08: Catálogo — "Site aponta pro Instagram"` },
+  { key: 'abordagem-09', label: `🔁 Funil Abordagem 09: Já Tem Link — Elogio + Vídeo (Prévia sob Pedido)` },
+  { key: 'abordagem-10', label: `📋 Funil Abordagem 10: Já Tem Link — Prévia Pronta` },
   { key: 'entrega', label: '🎁 Entrega, Prévia & Pagamento' },
   { key: 'objecao', label: '🛡️ Quebra de Objeções' },
   { key: 'followup', label: '🔄 Follow-up / Resgate' },
@@ -350,11 +354,11 @@ Vamos preparar com muito carinho, já pensando no seu agendamento automático. A
     categoryName: `Funil Abordagem 03: Agenda — "Já dá pra agendar por link?"`,
     title: `1️⃣ Primeira Mensagem`,
     tip: `Por que está aqui: Curiosidade + a dor mais forte (responder agendamento um por um). O vídeo já desperta vontade de ver. · Dia 0 · ótimo pra studios com agenda cheia · Não precisa configurar nada no Google: ela mesma cola o link na bio e no campo 'Site'.`,
-    content: `Oi, [Nome]! Tudo bem? Aqui é do StudioMenu, de Goiânia. Te achei no Google pesquisando [nail designer].
+    content: `Oi, [Nome]! Tudo bem? Aqui é do StudioMenu, de Goiânia. Te achei no Google pesquisando [nail designer]. 😊
 
-Uma curiosidade: você sabia que dá pra ter um link exclusivo seu onde a cliente vê seus serviços e já marca o horário sozinha? Você coloca na bio do Instagram e no Google, e para de responder agendamento um por um.
+Uma curiosidade: você sabia que dá pra ter um link exclusivo seu onde a cliente vê seus serviços e já marca o horário sozinha? Você coloca na bio do Instagram e no Google, e para de responder agendamento um por um. 📅
 
-Gravei um vídeo de 20 segundos mostrando como fica na prática. Quer ver?`,
+Gravei um vídeo de 20 segundos mostrando como fica na prática. Quer dar uma olhadinha? 🎥`,
   },
   {
     id: 'abordagem-03-2',
@@ -394,11 +398,19 @@ Se quiser mexer você mesma: https://studiomenu.art/c/showcase/lash`,
     category: 'abordagem-03',
     categoryName: `Funil Abordagem 03: Agenda — "Já dá pra agendar por link?"`,
     title: `5️⃣ Entrega da Prévia + Preço`,
-    tip: `Quando a prévia estiver pronta · Se ela achar caro, ofereça só o Catálogo (R$39,90) como alternativa em vez de perder a venda.`,
+    tip: `Quando a prévia estiver pronta · Resume o valor, ancora o preço no dia a dia e tira o medo do compromisso. Termina com pergunta de sim. Objeção? Veja o bloco no fim da aba.`,
     content: `Pronto, [Nome]! Olha como ficou o seu, já com a agenda funcionando:
 👉 [link da prévia]
 
-Com a agenda online é R$69,90/mês — é seu link exclusivo pra bio do Instagram e pro Google: a cliente vê seus serviços e marca sozinha, e você edita tudo pelo celular. Quer que eu deixe ativo?`,
+Funciona assim:
+
+✨ É um link exclusivo seu, com suas fotos, serviços e valores
+📅 A cliente vê seus horários livres e marca sozinha, sem você responder uma por uma
+✏️ Você mesma edita tudo pelo celular, quando quiser
+
+Tudo isso por R$69,90/mês — menos de R$2,50 por dia. Se trouxer uma cliente a mais no mês, já se pagou. E sem fidelidade: você só paga enquanto estiver usando.
+
+Posso deixar o seu ativo hoje?`,
   },
   {
     id: 'abordagem-03-6',
@@ -435,9 +447,9 @@ Com a agenda online é R$69,90/mês — é seu link exclusivo pra bio do Instagr
     categoryName: `Funil Abordagem 04: Agenda — "Responde na hora?"`,
     title: `1️⃣ Primeira Mensagem`,
     tip: `Por que está aqui: Faz ela mesma perceber a dor, sem você afirmar nada. · Dia 0 · ótimo pra lash e nail (atendimentos longos) · Não fale do produto aqui. Só a pergunta.`,
-    content: `Oi, [Nome]! Tudo bem? Aqui é do StudioMenu, de Goiânia. Te achei no Google pesquisando [lash designer].
+    content: `Oi, [Nome]! Tudo bem? Aqui é do StudioMenu, de Goiânia. Te achei no Google pesquisando [lash designer]. 😊
 
-Pergunta rápida: quando cliente te chama pra agendar à noite ou enquanto você tá atendendo, você consegue responder na hora ou fica pra depois?`,
+Pergunta rápida: quando cliente te chama pra agendar à noite ou enquanto você tá atendendo, você consegue responder na hora ou fica pra depois? ⏰`,
   },
   {
     id: 'abordagem-04-2',
@@ -477,11 +489,19 @@ Se quiser mexer você mesma: https://studiomenu.art/c/showcase/lash`,
     category: 'abordagem-04',
     categoryName: `Funil Abordagem 04: Agenda — "Responde na hora?"`,
     title: `5️⃣ Entrega da Prévia + Preço`,
-    tip: `Quando a prévia estiver pronta · Se ela achar caro, ofereça só o Catálogo (R$39,90) como alternativa em vez de perder a venda.`,
+    tip: `Quando a prévia estiver pronta · Resume o valor, ancora o preço no dia a dia e tira o medo do compromisso. Termina com pergunta de sim. Objeção? Veja o bloco no fim da aba.`,
     content: `Pronto, [Nome]! Olha como ficou o seu, já com a agenda funcionando:
 👉 [link da prévia]
 
-Com a agenda online é R$69,90/mês — é seu link exclusivo pra bio do Instagram e pro Google: a cliente vê seus serviços e marca sozinha, e você edita tudo pelo celular. Quer que eu deixe ativo?`,
+Funciona assim:
+
+✨ É um link exclusivo seu, com suas fotos, serviços e valores
+📅 A cliente vê seus horários livres e marca sozinha, sem você responder uma por uma
+✏️ Você mesma edita tudo pelo celular, quando quiser
+
+Tudo isso por R$69,90/mês — menos de R$2,50 por dia. Se trouxer uma cliente a mais no mês, já se pagou. E sem fidelidade: você só paga enquanto estiver usando.
+
+Posso deixar o seu ativo hoje?`,
   },
   {
     id: 'abordagem-04-6',
@@ -520,9 +540,9 @@ Com a agenda online é R$69,90/mês — é seu link exclusivo pra bio do Instagr
     categoryName: `Funil Abordagem 05: Agenda — "Já perdeu cliente?"`,
     title: `1️⃣ Primeira Mensagem`,
     tip: `Por que está aqui: Ângulo de perda: medo de perder cliente move mais que promessa de ganho. Pergunta fácil de responder. · Dia 0 · qualquer lead do Google · Não fale do produto aqui. Só a pergunta.`,
-    content: `Oi, [Nome]! Tudo bem? Aqui é do StudioMenu, de Goiânia. Te achei no Google pesquisando [lash designer].
+    content: `Oi, [Nome]! Tudo bem? Aqui é do StudioMenu, de Goiânia. Te achei no Google pesquisando [lash designer]. 😊
 
-Uma curiosidade: já aconteceu de cliente te chamar pra agendar, você demorar um pouquinho pra responder e ela acabar marcando com outra?`,
+Uma curiosidade: já aconteceu de cliente te chamar pra agendar, você demorar um pouquinho pra responder e ela acabar marcando com outra? 😅`,
   },
   {
     id: 'abordagem-05-2',
@@ -562,11 +582,19 @@ Se quiser mexer você mesma: https://studiomenu.art/c/showcase/lash`,
     category: 'abordagem-05',
     categoryName: `Funil Abordagem 05: Agenda — "Já perdeu cliente?"`,
     title: `5️⃣ Entrega da Prévia + Preço`,
-    tip: `Quando a prévia estiver pronta · Se ela achar caro, ofereça só o Catálogo (R$39,90) como alternativa em vez de perder a venda.`,
+    tip: `Quando a prévia estiver pronta · Resume o valor, ancora o preço no dia a dia e tira o medo do compromisso. Termina com pergunta de sim. Objeção? Veja o bloco no fim da aba.`,
     content: `Pronto, [Nome]! Olha como ficou o seu, já com a agenda funcionando:
 👉 [link da prévia]
 
-Com a agenda online é R$69,90/mês — é seu link exclusivo pra bio do Instagram e pro Google: a cliente vê seus serviços e marca sozinha, e você edita tudo pelo celular. Quer que eu deixe ativo?`,
+Funciona assim:
+
+✨ É um link exclusivo seu, com suas fotos, serviços e valores
+📅 A cliente vê seus horários livres e marca sozinha, sem você responder uma por uma
+✏️ Você mesma edita tudo pelo celular, quando quiser
+
+Tudo isso por R$69,90/mês — menos de R$2,50 por dia. Se trouxer uma cliente a mais no mês, já se pagou. E sem fidelidade: você só paga enquanto estiver usando.
+
+Posso deixar o seu ativo hoje?`,
   },
   {
     id: 'abordagem-05-6',
@@ -605,11 +633,11 @@ Com a agenda online é R$69,90/mês — é seu link exclusivo pra bio do Instagr
     categoryName: `Funil Abordagem 06: Catálogo — "Link exclusivo de serviços"`,
     title: `1️⃣ Primeira Mensagem`,
     tip: `Por que está aqui: Mesma curiosidade do F1, com o plano de entrada (R$39,90/mês) — o mais fácil de fechar. · Dia 0 · qualquer lead do Google · Se o campo 'Site' do Google dela estiver vazio, melhor ainda: é exatamente onde o link entra.`,
-    content: `Oi, [Nome]! Tudo bem? Aqui é do StudioMenu, de Goiânia. Te achei no Google pesquisando [lash designer].
+    content: `Oi, [Nome]! Tudo bem? Aqui é do StudioMenu, de Goiânia. Te achei no Google pesquisando [lash designer]. 😊
 
-Uma curiosidade: você sabia que dá pra ter um link exclusivo seu, com seus serviços, fotos e valores, pra colocar na bio do Instagram e no seu Google? Quem te encontra já vê tudo antes de te chamar.
+Uma curiosidade: você sabia que dá pra ter um link exclusivo seu, com seus serviços, fotos e valores, pra colocar na bio do Instagram e no seu Google? Quem te encontra já vê tudo antes de te chamar. ✨
 
-Gravei um vídeo de 20 segundos mostrando como fica na prática. Quer ver?`,
+Gravei um vídeo de 20 segundos mostrando como fica na prática. Quer dar uma olhadinha? 🎥`,
   },
   {
     id: 'abordagem-06-2',
@@ -648,11 +676,19 @@ Se quiser mexer você mesma: https://studiomenu.art/c/showcase/lash`,
     category: 'abordagem-06',
     categoryName: `Funil Abordagem 06: Catálogo — "Link exclusivo de serviços"`,
     title: `5️⃣ Entrega da Prévia + Preço`,
-    tip: `Quando a prévia estiver pronta · Preço junto do valor já visível + pergunta de sim/não. Objeção? Veja o bloco de objeções no fim da aba.`,
+    tip: `Quando a prévia estiver pronta · Resume o valor, ancora o preço no dia a dia e tira o medo do compromisso. Termina com pergunta de sim. Objeção? Veja o bloco no fim da aba.`,
     content: `Pronto, [Nome]! Olha como ficou o seu:
 👉 [link da prévia]
 
-Pra deixar no ar com seu link exclusivo é R$39,90/mês — você coloca na bio do Instagram e no seu Google, e troca valores e fotos pelo celular quando quiser. Quer que eu deixe ativo?`,
+Funciona assim:
+
+✨ É um link exclusivo seu, com suas fotos, serviços e valores
+📲 Você coloca na bio e no Google, e manda pras clientes quando perguntam valor
+✏️ Você mesma edita tudo pelo celular, quando quiser
+
+Tudo isso por R$39,90/mês — menos de R$1,50 por dia. Se trouxer uma cliente a mais no mês, já se pagou. E sem fidelidade: você só paga enquanto estiver usando.
+
+Posso deixar o seu ativo hoje?`,
   },
   {
     id: 'abordagem-06-6',
@@ -689,9 +725,9 @@ Pra deixar no ar com seu link exclusivo é R$39,90/mês — você coloca na bio 
     categoryName: `Funil Abordagem 07: Catálogo — "Como manda seus valores?"`,
     title: `1️⃣ Primeira Mensagem`,
     tip: `Por que está aqui: Pergunta fácil de responder e sem cara de venda. A resposta dela te dá o gancho. · Dia 0 · qualquer lead do Google · Não fale do produto aqui. Só a pergunta.`,
-    content: `Oi, [Nome]! Tudo bem? Aqui é do StudioMenu, de Goiânia. Te achei no Google pesquisando [lash designer].
+    content: `Oi, [Nome]! Tudo bem? Aqui é do StudioMenu, de Goiânia. Te achei no Google pesquisando [lash designer]. 😊
 
-Pergunta rápida: quando cliente nova te pede os valores, você manda print da tabela, áudio ou algum link?`,
+Pergunta rápida: quando cliente nova te pede os valores, você manda print da tabela, áudio ou algum link? 💬`,
   },
   {
     id: 'abordagem-07-2',
@@ -730,11 +766,19 @@ Se quiser mexer você mesma: https://studiomenu.art/c/showcase/lash`,
     category: 'abordagem-07',
     categoryName: `Funil Abordagem 07: Catálogo — "Como manda seus valores?"`,
     title: `5️⃣ Entrega da Prévia + Preço`,
-    tip: `Quando a prévia estiver pronta · Preço junto do valor já visível + pergunta de sim/não. Objeção? Veja o bloco de objeções no fim da aba.`,
+    tip: `Quando a prévia estiver pronta · Resume o valor, ancora o preço no dia a dia e tira o medo do compromisso. Termina com pergunta de sim. Objeção? Veja o bloco no fim da aba.`,
     content: `Pronto, [Nome]! Olha como ficou o seu:
 👉 [link da prévia]
 
-Pra deixar no ar com seu link exclusivo é R$39,90/mês — você coloca na bio do Instagram e no seu Google, e troca valores e fotos pelo celular quando quiser. Quer que eu deixe ativo?`,
+Funciona assim:
+
+✨ É um link exclusivo seu, com suas fotos, serviços e valores
+📲 Você coloca na bio e no Google, e manda pras clientes quando perguntam valor
+✏️ Você mesma edita tudo pelo celular, quando quiser
+
+Tudo isso por R$39,90/mês — menos de R$1,50 por dia. Se trouxer uma cliente a mais no mês, já se pagou. E sem fidelidade: você só paga enquanto estiver usando.
+
+Posso deixar o seu ativo hoje?`,
   },
   {
     id: 'abordagem-07-6',
@@ -773,9 +817,9 @@ Pra deixar no ar com seu link exclusivo é R$39,90/mês — você coloca na bio 
     categoryName: `Funil Abordagem 08: Catálogo — "Site aponta pro Instagram"`,
     title: `1️⃣ Primeira Mensagem`,
     tip: `Por que está aqui: Fato verificável do perfil dela + pergunta. Muito comum em studios pequenos. · Dia 0 · 'Site' do Google aponta pro Instagram · Confira o botão 'Site' antes de mandar.`,
-    content: `Oi, [Nome]! Tudo bem? Aqui é do StudioMenu, de Goiânia. Te achei no Google pesquisando [nail designer] e vi que o botão "Site" do seu perfil leva pro Instagram.
+    content: `Oi, [Nome]! Tudo bem? Aqui é do StudioMenu, de Goiânia. Te achei no Google pesquisando [nail designer] e vi que o botão "Site" do seu perfil leva pro Instagram. 😊
 
-Uma curiosidade: suas clientes costumam achar os valores por lá, ou acabam te chamando pra perguntar?`,
+Uma curiosidade: suas clientes costumam achar os valores por lá, ou acabam te chamando pra perguntar? 🤔`,
   },
   {
     id: 'abordagem-08-2',
@@ -814,11 +858,19 @@ Se quiser mexer você mesma: https://studiomenu.art/c/showcase/lash`,
     category: 'abordagem-08',
     categoryName: `Funil Abordagem 08: Catálogo — "Site aponta pro Instagram"`,
     title: `5️⃣ Entrega da Prévia + Preço`,
-    tip: `Quando a prévia estiver pronta · Preço junto do valor já visível + pergunta de sim/não. Objeção? Veja o bloco de objeções no fim da aba.`,
+    tip: `Quando a prévia estiver pronta · Resume o valor, ancora o preço no dia a dia e tira o medo do compromisso. Termina com pergunta de sim. Objeção? Veja o bloco no fim da aba.`,
     content: `Pronto, [Nome]! Olha como ficou o seu:
 👉 [link da prévia]
 
-Pra deixar no ar com seu link exclusivo é R$39,90/mês — você coloca na bio do Instagram e no seu Google, e troca valores e fotos pelo celular quando quiser. Quer que eu deixe ativo?`,
+Funciona assim:
+
+✨ É um link exclusivo seu, com suas fotos, serviços e valores
+📲 Você coloca na bio e no Google, e manda pras clientes quando perguntam valor
+✏️ Você mesma edita tudo pelo celular, quando quiser
+
+Tudo isso por R$39,90/mês — menos de R$1,50 por dia. Se trouxer uma cliente a mais no mês, já se pagou. E sem fidelidade: você só paga enquanto estiver usando.
+
+Posso deixar o seu ativo hoje?`,
   },
   {
     id: 'abordagem-08-6',
@@ -846,6 +898,202 @@ Pra deixar no ar com seu link exclusivo é R$39,90/mês — você coloca na bio 
     title: `🔄 Follow-up 3 (Sem Resposta)`,
     tip: `+7 dias depois do FU2 · Despedida costuma trazer resposta de quem estava adiando. Depois: status 'Sem resposta'.`,
     content: `Oi, [Nome]! Não quero ficar te incomodando, então essa é minha última mensagem. Se um dia quiser o catálogo do seu studio, é só me chamar aqui. Sucesso nos atendimentos!`,
+  },
+
+  // ==========================================================================
+  // FUNIL ABORDAGEM 09 — JÁ TEM LINK — ELOGIO + VÍDEO (PRÉVIA SOB PEDIDO) (Google/Maps, spreadsheet Funis_StudioMenu.xlsx)
+  // ==========================================================================
+  {
+    id: 'abordagem-09-1',
+    category: 'abordagem-09',
+    categoryName: `Funil Abordagem 09: Já Tem Link — Elogio + Vídeo (Prévia sob Pedido)`,
+    title: `1️⃣ Primeira Mensagem`,
+    tip: `Por que está aqui: ABORDAGEM PRINCIPAL pra quem já tem link. Ela já entendeu o valor de ter um link. Você só monta prévia pra quem demonstrou interesse, então consegue abordar muito mais leads. · Dia 0 · 'Possui link? = Sim' · Elogie o que ela já tem e nunca critique a ferramenta atual — ela escolheu e vai defender. Confira o link da bio antes de mandar.`,
+    content: `Oi, [Nome]! Tudo bem? Aqui é do StudioMenu, de Goiânia. Te achei no Google e vi que você já tem agendamento online no link da bio, que legal! Poucas profissionais já se organizam assim. 👏
+
+A gente faz um link parecido, mas com fotos dos seus serviços e uma capa com a sua cara. Gravei um vídeo de 20 segundos mostrando como fica. Quer dar uma olhadinha? 🎥`,
+  },
+  {
+    id: 'abordagem-09-2',
+    category: 'abordagem-09',
+    categoryName: `Funil Abordagem 09: Já Tem Link — Elogio + Vídeo (Prévia sob Pedido)`,
+    title: `2️⃣ Ela Quer Ver`,
+    tip: `'Quero' / 'Manda' · Mande o vídeo do nicho dela, como vídeo normal (não documento).`,
+    content: `Olha aí 👇
+[📹 envie o vídeo de 20s — lash ou nail]
+
+A ideia é a cliente ver o resultado de cada procedimento antes de marcar, não só o nome e o valor. O que achou?`,
+  },
+  {
+    id: 'abordagem-09-3',
+    category: 'abordagem-09',
+    categoryName: `Funil Abordagem 09: Já Tem Link — Elogio + Vídeo (Prévia sob Pedido)`,
+    title: `3️⃣ Ela Curtiu / Ficou Curiosa`,
+    tip: `'Achei lindo' / 'Como funciona?' · Só agora você monta prévia — pra quem já demonstrou interesse.`,
+    content: `Que bom que curtiu! Se quiser, monto uma prévia rapidinha com alguns dos seus serviços, pra você ver como ficaria o seu. Posso?`,
+  },
+  {
+    id: 'abordagem-09-4',
+    category: 'abordagem-09',
+    categoryName: `Funil Abordagem 09: Já Tem Link — Elogio + Vídeo (Prévia sob Pedido)`,
+    title: `4️⃣ Envia a Prévia (4 Serviços)`,
+    tip: `Depois que ela topar · Monte com ~4 serviços: pegue nomes e valores do link atual dela e fotos do Instagram. Não precisa pedir nada pra ela.`,
+    content: `Pronto! Olha como ficou o seu 👇
+[link da prévia]
+
+Coloquei alguns dos seus serviços pra você ter uma ideia. O que achou?`,
+  },
+  {
+    id: 'abordagem-09-5',
+    category: 'abordagem-09',
+    categoryName: `Funil Abordagem 09: Já Tem Link — Elogio + Vídeo (Prévia sob Pedido)`,
+    title: `5️⃣ Ela Gostou → Link Oficial + Valor`,
+    tip: `'Amei' / 'Ficou lindo' · Se a agenda precisar dos dias/horários dela, peça junto aqui. Se ela achar caro, ofereça o Básico (R$39,90). Objeção? Veja o bloco no fim da aba.`,
+    content: `Que bom que gostou! 😍 Posso deixar esse no ar como seu link oficial. Funciona assim:
+
+✨ É um link exclusivo seu, com suas fotos, serviços e valores
+📅 A cliente vê seus horários livres e marca sozinha, sem você responder uma por uma
+✏️ Você mesma edita tudo pelo celular, quando quiser
+
+Tudo isso por R$69,90/mês — menos de R$2,50 por dia. Se trouxer uma cliente a mais no mês, já se pagou. E sem fidelidade: você só paga enquanto estiver usando.
+
+Posso deixar o seu ativo hoje?`,
+  },
+  {
+    id: 'abordagem-09-6',
+    category: 'abordagem-09',
+    categoryName: `Funil Abordagem 09: Já Tem Link — Elogio + Vídeo (Prévia sob Pedido)`,
+    title: `❓ Objeção: "E os Outros Serviços?"`,
+    tip: `Quando ela perguntar dos serviços que faltam · Transforma a 'falta' em vantagem: ela tem autonomia total, sem depender de ninguém.`,
+    content: `Você mesma adiciona do jeito que quiser! No seu link tem o botão "Editar": é só tocar, colocar o serviço, a foto e o valor, e salvar. Já aparece na hora pras suas clientes.`,
+  },
+  {
+    id: 'abordagem-09-7',
+    category: 'abordagem-09',
+    categoryName: `Funil Abordagem 09: Já Tem Link — Elogio + Vídeo (Prévia sob Pedido)`,
+    title: `6️⃣ Ela Topou → Envia o Link Oficial`,
+    tip: `Assim que ela confirmar · Se você cobra antes de ativar, mande o link de pagamento junto. Depois, mude o status para 'Fechou'.`,
+    content: `Perfeito! Aqui está seu link oficial 🎉
+👉 [link oficial]
+
+É só colocar no botão "Agendar" do seu Linktree. Pra adicionar mais serviços, trocar fotos ou valores, toca em "Editar" dentro do link e muda do jeito que quiser.`,
+  },
+  {
+    id: 'abordagem-09-8',
+    category: 'abordagem-09',
+    categoryName: `Funil Abordagem 09: Já Tem Link — Elogio + Vídeo (Prévia sob Pedido)`,
+    title: `🔄 Sumiu Depois da Prévia`,
+    tip: `+2 dias sem resposta após a etapa 4 · Pergunta leve, sem cobrar decisão.`,
+    content: `Oi, [Nome]! Conseguiu dar uma olhada na prévia do seu studio? 👇
+[link da prévia]
+
+Se quiser mudar alguma coisa nela, é só me falar.`,
+  },
+  {
+    id: 'abordagem-09-9',
+    category: 'abordagem-09',
+    categoryName: `Funil Abordagem 09: Já Tem Link — Elogio + Vídeo (Prévia sob Pedido)`,
+    title: `🔄 Follow-up 1 (Sem Resposta)`,
+    tip: `+2 dias sem resposta à 1ª mensagem · O vídeo chama mais atenção que texto — ela vê o produto sem precisar dizer sim.`,
+    content: `Oi, [Nome]! Deixo aqui o vídeo de 20s pra você ver quando tiver um tempinho 👇
+[📹 envie o vídeo de 20s — lash ou nail]
+
+É um link com fotos dos seus serviços pra usar na sua bio.`,
+  },
+  {
+    id: 'abordagem-09-10',
+    category: 'abordagem-09',
+    categoryName: `Funil Abordagem 09: Já Tem Link — Elogio + Vídeo (Prévia sob Pedido)`,
+    title: `🔄 Follow-up 2 (Sem Resposta)`,
+    tip: `+4 dias depois do FU1 · Duas opções, dá pra responder com 1 palavra.`,
+    content: `[Nome], pergunta sincera: trocar seu link não é prioridade agora, ou só não deu tempo de olhar ainda? Qualquer resposta tá ótima.`,
+  },
+  {
+    id: 'abordagem-09-11',
+    category: 'abordagem-09',
+    categoryName: `Funil Abordagem 09: Já Tem Link — Elogio + Vídeo (Prévia sob Pedido)`,
+    title: `🔄 Follow-up 3 (Sem Resposta)`,
+    tip: `+4 dias depois do FU2 · Depois: status 'Sem resposta'.`,
+    content: `Oi, [Nome]! Não quero ficar te incomodando, então essa é minha última mensagem. Se um dia quiser seu link com fotos e capa, é só me chamar aqui. Sucesso nos atendimentos!`,
+  },
+
+  // ==========================================================================
+  // FUNIL ABORDAGEM 10 — JÁ TEM LINK — PRÉVIA PRONTA (Google/Maps, spreadsheet Funis_StudioMenu.xlsx)
+  // ==========================================================================
+  {
+    id: 'abordagem-10-1',
+    category: 'abordagem-10',
+    categoryName: `Funil Abordagem 10: Já Tem Link — Prévia Pronta`,
+    title: `1️⃣ Primeira Mensagem`,
+    tip: `Por que está aqui: Maior impacto por lead (ela compara na hora a prévia com a lista simples que usa hoje), mas exige montar a prévia antes. Use nas leads mais promissoras. · Dia 0 · com a prévia já montada · Monte antes com ~4 serviços do link atual dela + fotos do Instagram.`,
+    content: `Oi, [Nome]! Tudo bem? Aqui é do StudioMenu, de Goiânia. Te achei no Google e vi que você já tem agendamento online no seu link, que legal! 👏
+
+Fiquei curioso pra ver como seus serviços ficariam com fotos e capa, em vez de só a lista, e montei uma prévia com os seus. Quer ver como ficou? ✨`,
+  },
+  {
+    id: 'abordagem-10-2',
+    category: 'abordagem-10',
+    categoryName: `Funil Abordagem 10: Já Tem Link — Prévia Pronta`,
+    title: `2️⃣ Ela Respondeu`,
+    tip: `'Quero ver' · Deixe a comparação acontecer sozinha — não fale mal do link atual.`,
+    content: `Olha como ficou o seu 👇
+[link da prévia]
+
+Usei seus serviços e valores e algumas fotos do seu Instagram. Assim a cliente vê o resultado de cada procedimento antes de marcar. O que achou?`,
+  },
+  {
+    id: 'abordagem-10-3',
+    category: 'abordagem-10',
+    categoryName: `Funil Abordagem 10: Já Tem Link — Prévia Pronta`,
+    title: `3️⃣ Ela Gostou → Completo + Valor`,
+    tip: `'Gostei' / 'Ficou lindo' · Se ela achar caro, ofereça o Básico (R$39,90).`,
+    content: `Que bom que curtiu! Consigo deixar o seu completo no ar, com a agenda funcionando: é só trocar o link do botão "Agendar" do seu Linktree por esse. Fica R$69,90/mês, e você mesma edita fotos, serviços e valores pelo celular.
+
+Se topar, me manda um print da sua tabela completa e seus dias e horários de atendimento.`,
+  },
+  {
+    id: 'abordagem-10-4',
+    category: 'abordagem-10',
+    categoryName: `Funil Abordagem 10: Já Tem Link — Prévia Pronta`,
+    title: `4️⃣ Ela Quer / Mandou o Material`,
+    tip: `Assim que ela confirmar · Se cobra antes de ativar, mande o link de pagamento aqui.`,
+    content: `Perfeito, recebi tudo! Te mando seu link oficial aqui até [hoje à tarde / amanhã de manhã].`,
+  },
+  {
+    id: 'abordagem-10-5',
+    category: 'abordagem-10',
+    categoryName: `Funil Abordagem 10: Já Tem Link — Prévia Pronta`,
+    title: `5️⃣ Entrega do Link Oficial`,
+    tip: `Quando estiver pronto · Mude o status para 'Fechou'.`,
+    content: `Pronto, [Nome]! Seu StudioMenu está no ar 🎉
+👉 [link oficial]
+
+É só trocar o link do botão "Agendar" no seu Linktree por esse. Qualquer mudança, você edita pelo celular ou me chama aqui.`,
+  },
+  {
+    id: 'abordagem-10-6',
+    category: 'abordagem-10',
+    categoryName: `Funil Abordagem 10: Já Tem Link — Prévia Pronta`,
+    title: `🔄 Follow-up 1 (Sem Resposta)`,
+    tip: `+2 dias sem resposta · Ver o próprio studio pronto é o que gera resposta.`,
+    content: `Oi, [Nome]! Vou deixar a prévia do seu studio aqui pra você olhar com calma 👇
+[link da prévia]`,
+  },
+  {
+    id: 'abordagem-10-7',
+    category: 'abordagem-10',
+    categoryName: `Funil Abordagem 10: Já Tem Link — Prévia Pronta`,
+    title: `🔄 Follow-up 2 (Sem Resposta)`,
+    tip: `+4 dias depois do FU1 · Duas opções, dá pra responder com 1 palavra.`,
+    content: `[Nome], pergunta sincera: trocar seu link não é prioridade agora, ou só não deu tempo de olhar ainda? Qualquer resposta tá ótima.`,
+  },
+  {
+    id: 'abordagem-10-8',
+    category: 'abordagem-10',
+    categoryName: `Funil Abordagem 10: Já Tem Link — Prévia Pronta`,
+    title: `🔄 Follow-up 3 (Sem Resposta)`,
+    tip: `+4 dias depois do FU2 · Depois: status 'Sem resposta'.`,
+    content: `Oi, [Nome]! Não quero ficar te incomodando, então essa é minha última mensagem. Sua prévia fica guardada, se um dia quiser é só me chamar aqui. Sucesso nos atendimentos!`,
   },
 
   // ==========================================================================
