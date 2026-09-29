@@ -77,7 +77,7 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
   >('none');
   const [editingProc, setEditingProc] = useState<ProcedureItem | null>(null);
   const [editingProcIndex, setEditingProcIndex] = useState<number | null>(null);
-  const [editingSocialType, setEditingSocialType] = useState<'whatsapp' | 'instagram' | 'address' | null>(null);
+  const [editingSocialType, setEditingSocialType] = useState<'whatsapp' | 'instagram' | 'address' | 'maps' | null>(null);
   const [categoryToDelete, setCategoryToDelete] = useState<{ name: string; count: number } | null>(null);
   const [procToDelete, setProcToDelete] = useState<ProcedureItem | null>(null);
   const [saveErrorMessage, setSaveErrorMessage] = useState<string>('');
@@ -248,25 +248,20 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
     }
   };
 
-  const handleUpdateAddress = (newAddress: string) => {
-    if (newAddress !== catalogState.address) {
-      pushState({ ...catalogState, address: newAddress });
-      showToast('✅ Endereço atualizado!');
-    }
-  };
-
   const handleSaveCoverUrl = (url: string) => {
     pushState({ ...catalogState, cover_media_url: url });
     showToast('📷 Foto de capa atualizada!');
   };
 
-  const handleSaveSocial = (type: 'whatsapp' | 'instagram' | 'address', val: string) => {
+  const handleSaveSocial = (type: 'whatsapp' | 'instagram' | 'address' | 'maps', val: string) => {
     if (type === 'whatsapp') {
       pushState({ ...catalogState, whatsapp_number: val });
     } else if (type === 'instagram') {
       pushState({ ...catalogState, instagram_handle: val });
     } else if (type === 'address') {
       pushState({ ...catalogState, address: val });
+    } else if (type === 'maps') {
+      pushState({ ...catalogState, maps_url: val });
     }
     showToast('✅ Contato atualizado!');
   };
@@ -569,7 +564,6 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
             setEditingSocialType(type);
             setActiveModal('social');
           }}
-          onUpdateAddress={handleUpdateAddress}
         />
       </div>
 

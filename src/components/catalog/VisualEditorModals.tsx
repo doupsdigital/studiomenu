@@ -30,13 +30,13 @@ interface VisualEditorModalsProps {
   errorMessage?: string;
   editingProc: ProcedureItem | null;
   editingProcIndex: number | null;
-  editingSocialType: 'whatsapp' | 'instagram' | 'address' | null;
+  editingSocialType: 'whatsapp' | 'instagram' | 'address' | 'maps' | null;
   categoryToDelete?: { name: string; count: number } | null;
   procToDelete?: ProcedureItem | null;
   onClose: () => void;
   onSaveProcedure: (proc: ProcedureItem, index: number | null) => void;
   onSaveCoverUrl: (url: string) => void;
-  onSaveSocial: (type: 'whatsapp' | 'instagram' | 'address', value: string) => void;
+  onSaveSocial: (type: 'whatsapp' | 'instagram' | 'address' | 'maps', value: string) => void;
   onAddCategory: (categoryName: string) => void;
   onConfirmDeleteCategory?: () => void;
   onConfirmDeleteProc?: () => void;
@@ -170,6 +170,7 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
     whatsapp: catalogData.whatsapp_number || '',
     instagram: catalogData.instagram_handle || '',
     address: catalogData.address || '',
+    maps: catalogData.maps_url || '',
   });
 
   // Category State
@@ -209,6 +210,7 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
       whatsapp: catalogData.whatsapp_number || '',
       instagram: catalogData.instagram_handle || '',
       address: catalogData.address || '',
+      maps: catalogData.maps_url || '',
     });
   }, [catalogData]);
 

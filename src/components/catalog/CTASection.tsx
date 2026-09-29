@@ -1,18 +1,17 @@
 import React from 'react';
+import { MapPin } from 'lucide-react';
 import { CatalogOrderData } from '@/types/catalog';
 
 interface CTASectionProps {
   data: CatalogOrderData;
   isEditMode?: boolean;
-  onOpenSocialModal?: (type: 'whatsapp' | 'instagram' | 'address') => void;
-  onUpdateAddress?: (newAddress: string) => void;
+  onOpenSocialModal?: (type: 'whatsapp' | 'instagram' | 'address' | 'maps') => void;
 }
 
 export const CTASection: React.FC<CTASectionProps> = ({
   data,
   isEditMode = false,
   onOpenSocialModal,
-  onUpdateAddress,
 }) => {
   const wspText = encodeURIComponent(`Olá ${data.client_name}! Vim através do seu catálogo digital e gostaria de agendar um horário.`);
   const wspUrl = `https://wa.me/${data.whatsapp_number}?text=${wspText}`;
@@ -128,26 +127,43 @@ export const CTASection: React.FC<CTASectionProps> = ({
               </span>
               <span className="btn__arrow">↗</span>
             </a>
-          </div>
 
-          <div className="secao-contato__info anim-fade-up delay-6">
-            <span>
-              {data.client_name} —{' '}
-              <span
-                className="secao-contato__endereco"
-                data-lm-editable={isEditMode ? 'true' : undefined}
-                contentEditable={isEditMode}
-                suppressContentEditableWarning={true}
-                suppressHydrationWarning={isEditMode}
-                onBlur={(e) => {
-                  if (isEditMode && onUpdateAddress) {
-                    onUpdateAddress(e.currentTarget.innerText.trim());
-                  }
+            {/* Botão Google Maps — só aparece na visualização pública quando o
+                link já foi preenchido; no modo de edição sempre aparece, como
+                convite pra profissional preencher (mesmo padrão do lápis dos
+                outros dois botões). */}
+            {(isEditMode || data.maps_url) && (
+              <a
+                href={isEditMode ? '#' : data.maps_url || '#'}
+                target={isEditMode ? '_self' : '_blank'}
+                rel="noopener noreferrer"
+                className={`btn-maps anim-fade-up delay-6 ${isEditMode ? 'lm-social-wrapper' : ''}`}
+                onClick={(e) => {
+                  if (isEditMode) e.preventDefault();
                 }}
               >
-                {data.address || 'Atendimento Privativo'}
-              </span>
-            </span>
+                {isEditMode && (
+                  <button
+                    type="button"
+                    className="lm-social-edit-pencil"
+                    title="Editar Google Maps"
+                    onClick={(ev) => {
+                      ev.preventDefault();
+                      ev.stopPropagation();
+                      if (onOpenSocialModal) onOpenSocialModal('maps');
+                    }}
+                  >
+                    ✏️
+                  </button>
+                )}
+
+                <span className="btn__left">
+                  <MapPin className="btn__icon" strokeWidth={2.2} />
+                  <span>Localização</span>
+                </span>
+                <span className="btn__arrow">↗</span>
+              </a>
+            )}
           </div>
         </div>
       </div>
