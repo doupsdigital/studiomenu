@@ -26,6 +26,12 @@ export type ScriptCategory =
   | 'anuncio-agendamento'
   | 'abordagem-catalogo'
   | 'abordagem-agendamento'
+  | 'abordagem-03'
+  | 'abordagem-04'
+  | 'abordagem-05'
+  | 'abordagem-06'
+  | 'abordagem-07'
+  | 'abordagem-08'
   | 'entrega'
   | 'objecao'
   | 'followup'
@@ -46,6 +52,12 @@ export const SCRIPT_CATEGORIES: { key: 'all' | ScriptCategory; label: string }[]
   { key: 'anuncio-agendamento', label: '📅 Funil Anúncio 02: Agendamento Automático' },
   { key: 'abordagem-catalogo', label: '🎯 Funil Abordagem 01: Catálogo' },
   { key: 'abordagem-agendamento', label: '📆 Funil Abordagem 02: Agendamento Automático' },
+  { key: 'abordagem-03', label: `🔍 Funil Abordagem 03: Agenda — "Já dá pra agendar por link?"` },
+  { key: 'abordagem-04', label: `📲 Funil Abordagem 04: Agenda — "Responde na hora?"` },
+  { key: 'abordagem-05', label: `⏰ Funil Abordagem 05: Agenda — "Já perdeu cliente?"` },
+  { key: 'abordagem-06', label: `🗂️ Funil Abordagem 06: Catálogo — "Link exclusivo de serviços"` },
+  { key: 'abordagem-07', label: `💬 Funil Abordagem 07: Catálogo — "Como manda seus valores?"` },
+  { key: 'abordagem-08', label: `🔗 Funil Abordagem 08: Catálogo — "Site aponta pro Instagram"` },
   { key: 'entrega', label: '🎁 Entrega, Prévia & Pagamento' },
   { key: 'objecao', label: '🛡️ Quebra de Objeções' },
   { key: 'followup', label: '🔄 Follow-up / Resgate' },
@@ -327,6 +339,513 @@ Com isso já consigo montar sua prévia! ✨`,
     content: `Recebi tudo por aqui! 🎉
 
 Vamos preparar com muito carinho, já pensando no seu agendamento automático. Assim que sua prévia estiver pronta eu te mando aqui! 💕`,
+  },
+
+  // ==========================================================================
+  // FUNIL ABORDAGEM 03 — AGENDA — "JÁ DÁ PRA AGENDAR POR LINK?" (Google/Maps, spreadsheet Funis_StudioMenu.xlsx)
+  // ==========================================================================
+  {
+    id: 'abordagem-03-1',
+    category: 'abordagem-03',
+    categoryName: `Funil Abordagem 03: Agenda — "Já dá pra agendar por link?"`,
+    title: `1️⃣ Primeira Mensagem`,
+    tip: `Por que está aqui: Curiosidade + a dor mais forte (responder agendamento um por um). O vídeo já desperta vontade de ver. · Dia 0 · ótimo pra studios com agenda cheia · Não precisa configurar nada no Google: ela mesma cola o link na bio e no campo 'Site'.`,
+    content: `Oi, [Nome]! Tudo bem? Aqui é do StudioMenu, de Goiânia. Te achei no Google pesquisando [nail designer].
+
+Uma curiosidade: você sabia que dá pra ter um link exclusivo seu onde a cliente vê seus serviços e já marca o horário sozinha? Você coloca na bio do Instagram e no Google, e para de responder agendamento um por um.
+
+Gravei um vídeo de 20 segundos mostrando como fica na prática. Quer ver?`,
+  },
+  {
+    id: 'abordagem-03-2',
+    category: 'abordagem-03',
+    categoryName: `Funil Abordagem 03: Agenda — "Já dá pra agendar por link?"`,
+    title: `2️⃣ Ela Respondeu`,
+    tip: `'Quero ver' / 'Manda' / 'Como assim?' · Se ela disser que já tem agenda online: 'Que ótimo! Você usa qual?' — ouça e ofereça o Catálogo (F4) como complemento. · Mande o vídeo do nicho dela, como vídeo normal (não como documento).`,
+    content: `Olha aí 👇
+[📹 envie o vídeo de 20s — lash ou nail]
+
+É uma página com seu nome no link: a cliente vê seus serviços, valores e horários livres, e já marca ali. Você coloca na bio e no Google.
+
+Se quiser mexer você mesma: https://studiomenu.art/c/showcase/lash`,
+  },
+  {
+    id: 'abordagem-03-3',
+    category: 'abordagem-03',
+    categoryName: `Funil Abordagem 03: Agenda — "Já dá pra agendar por link?"`,
+    title: `3️⃣ Ela Gostou do Exemplo`,
+    tip: `Logo após ela reagir bem · Pouco esforço pra ela + 'ver antes de decidir' tira o risco.`,
+    content: `Que bom que curtiu! Consigo montar um desse com seu nome, seus serviços e sua agenda, pra você ver pronto antes de decidir qualquer coisa. Me manda só:
+
+• Seu @ do Instagram
+• Um print com 3 a 5 serviços e valores
+• Seus dias e horários de atendimento`,
+  },
+  {
+    id: 'abordagem-03-4',
+    category: 'abordagem-03',
+    categoryName: `Funil Abordagem 03: Agenda — "Já dá pra agendar por link?"`,
+    title: `4️⃣ Ela Mandou o Material`,
+    tip: `Assim que chegar · Prazo concreto passa profissionalismo. Cumpra o prazo.`,
+    content: `Recebi tudo! Te mando sua prévia com a agenda aqui até [hoje à tarde / amanhã de manhã].`,
+  },
+  {
+    id: 'abordagem-03-5',
+    category: 'abordagem-03',
+    categoryName: `Funil Abordagem 03: Agenda — "Já dá pra agendar por link?"`,
+    title: `5️⃣ Entrega da Prévia + Preço`,
+    tip: `Quando a prévia estiver pronta · Se ela achar caro, ofereça só o Catálogo (R$39,90) como alternativa em vez de perder a venda.`,
+    content: `Pronto, [Nome]! Olha como ficou o seu, já com a agenda funcionando:
+👉 [link da prévia]
+
+Com a agenda online é R$69,90/mês — é seu link exclusivo pra bio do Instagram e pro Google: a cliente vê seus serviços e marca sozinha, e você edita tudo pelo celular. Quer que eu deixe ativo?`,
+  },
+  {
+    id: 'abordagem-03-6',
+    category: 'abordagem-03',
+    categoryName: `Funil Abordagem 03: Agenda — "Já dá pra agendar por link?"`,
+    title: `🔄 Follow-up 1 (Sem Resposta)`,
+    tip: `+2 dias sem resposta · O vídeo chama mais atenção que link — ela vê o produto sem precisar dizer sim.`,
+    content: `Oi, [Nome]! Vou deixar aqui um vídeo de 20s mostrando a agenda na prática, pra você olhar quando tiver um tempinho:
+[📹 envie o vídeo de 20s — lash ou nail]`,
+  },
+  {
+    id: 'abordagem-03-7',
+    category: 'abordagem-03',
+    categoryName: `Funil Abordagem 03: Agenda — "Já dá pra agendar por link?"`,
+    title: `🔄 Follow-up 2 (Sem Resposta)`,
+    tip: `+4 dias depois do FU1 · Duas opções, dá pra responder com 1 palavra.`,
+    content: `[Nome], pergunta sincera: agendamento online não é prioridade pra você agora, ou só não deu tempo de olhar ainda? Qualquer resposta tá ótima.`,
+  },
+  {
+    id: 'abordagem-03-8',
+    category: 'abordagem-03',
+    categoryName: `Funil Abordagem 03: Agenda — "Já dá pra agendar por link?"`,
+    title: `🔄 Follow-up 3 (Sem Resposta)`,
+    tip: `+7 dias depois do FU2 · Despedida costuma trazer resposta de quem estava adiando. Depois: status 'Sem resposta'.`,
+    content: `Oi, [Nome]! Não quero ficar te incomodando, então essa é minha última mensagem. Se um dia quiser a agenda online no seu studio, é só me chamar aqui. Sucesso nos atendimentos!`,
+  },
+
+  // ==========================================================================
+  // FUNIL ABORDAGEM 04 — AGENDA — "RESPONDE NA HORA?" (Google/Maps, spreadsheet Funis_StudioMenu.xlsx)
+  // ==========================================================================
+  {
+    id: 'abordagem-04-1',
+    category: 'abordagem-04',
+    categoryName: `Funil Abordagem 04: Agenda — "Responde na hora?"`,
+    title: `1️⃣ Primeira Mensagem`,
+    tip: `Por que está aqui: Faz ela mesma perceber a dor, sem você afirmar nada. · Dia 0 · ótimo pra lash e nail (atendimentos longos) · Não fale do produto aqui. Só a pergunta.`,
+    content: `Oi, [Nome]! Tudo bem? Aqui é do StudioMenu, de Goiânia. Te achei no Google pesquisando [lash designer].
+
+Pergunta rápida: quando cliente te chama pra agendar à noite ou enquanto você tá atendendo, você consegue responder na hora ou fica pra depois?`,
+  },
+  {
+    id: 'abordagem-04-2',
+    category: 'abordagem-04',
+    categoryName: `Funil Abordagem 04: Agenda — "Responde na hora?"`,
+    title: `2️⃣ Ela Respondeu`,
+    tip: `Qualquer resposta · Se ela disser que responde sempre na hora: elogie e ofereça o Catálogo (F4/F5) — a dor dela é outra. · Mande o vídeo do nicho dela, como vídeo normal (não como documento).`,
+    content: `Super normal na correria! Pergunto porque a gente faz um link exclusivo pra studios, pra colocar na bio e no Google: a cliente vê seus horários livres e marca sozinha, até de madrugada.
+
+Gravei um vídeo rapidinho mostrando na prática 👇
+[📹 envie o vídeo de 20s — lash ou nail]
+
+Se quiser mexer você mesma: https://studiomenu.art/c/showcase/lash`,
+  },
+  {
+    id: 'abordagem-04-3',
+    category: 'abordagem-04',
+    categoryName: `Funil Abordagem 04: Agenda — "Responde na hora?"`,
+    title: `3️⃣ Ela Gostou do Exemplo`,
+    tip: `Logo após ela reagir bem · Pouco esforço pra ela + 'ver antes de decidir' tira o risco.`,
+    content: `Que bom que curtiu! Consigo montar um desse com seu nome, seus serviços e sua agenda, pra você ver pronto antes de decidir qualquer coisa. Me manda só:
+
+• Seu @ do Instagram
+• Um print com 3 a 5 serviços e valores
+• Seus dias e horários de atendimento`,
+  },
+  {
+    id: 'abordagem-04-4',
+    category: 'abordagem-04',
+    categoryName: `Funil Abordagem 04: Agenda — "Responde na hora?"`,
+    title: `4️⃣ Ela Mandou o Material`,
+    tip: `Assim que chegar · Prazo concreto passa profissionalismo. Cumpra o prazo.`,
+    content: `Recebi tudo! Te mando sua prévia com a agenda aqui até [hoje à tarde / amanhã de manhã].`,
+  },
+  {
+    id: 'abordagem-04-5',
+    category: 'abordagem-04',
+    categoryName: `Funil Abordagem 04: Agenda — "Responde na hora?"`,
+    title: `5️⃣ Entrega da Prévia + Preço`,
+    tip: `Quando a prévia estiver pronta · Se ela achar caro, ofereça só o Catálogo (R$39,90) como alternativa em vez de perder a venda.`,
+    content: `Pronto, [Nome]! Olha como ficou o seu, já com a agenda funcionando:
+👉 [link da prévia]
+
+Com a agenda online é R$69,90/mês — é seu link exclusivo pra bio do Instagram e pro Google: a cliente vê seus serviços e marca sozinha, e você edita tudo pelo celular. Quer que eu deixe ativo?`,
+  },
+  {
+    id: 'abordagem-04-6',
+    category: 'abordagem-04',
+    categoryName: `Funil Abordagem 04: Agenda — "Responde na hora?"`,
+    title: `🔄 Follow-up 1 (Sem Resposta)`,
+    tip: `+2 dias sem resposta · O vídeo chama mais atenção que link — ela vê o produto sem precisar dizer sim.`,
+    content: `Oi, [Nome]! Sei que a agenda é corrida 😅 Deixo aqui um vídeo de 20s do que eu ia te mostrar:
+[📹 envie o vídeo de 20s — lash ou nail]
+
+É uma agenda online onde a cliente vê seus horários e marca sozinha.`,
+  },
+  {
+    id: 'abordagem-04-7',
+    category: 'abordagem-04',
+    categoryName: `Funil Abordagem 04: Agenda — "Responde na hora?"`,
+    title: `🔄 Follow-up 2 (Sem Resposta)`,
+    tip: `+4 dias depois do FU1 · Duas opções, dá pra responder com 1 palavra.`,
+    content: `[Nome], pergunta sincera: agendamento online não é prioridade pra você agora, ou só não deu tempo de olhar ainda? Qualquer resposta tá ótima.`,
+  },
+  {
+    id: 'abordagem-04-8',
+    category: 'abordagem-04',
+    categoryName: `Funil Abordagem 04: Agenda — "Responde na hora?"`,
+    title: `🔄 Follow-up 3 (Sem Resposta)`,
+    tip: `+7 dias depois do FU2 · Despedida costuma trazer resposta de quem estava adiando. Depois: status 'Sem resposta'.`,
+    content: `Oi, [Nome]! Não quero ficar te incomodando, então essa é minha última mensagem. Se um dia quiser a agenda online no seu studio, é só me chamar aqui. Sucesso nos atendimentos!`,
+  },
+
+  // ==========================================================================
+  // FUNIL ABORDAGEM 05 — AGENDA — "JÁ PERDEU CLIENTE?" (Google/Maps, spreadsheet Funis_StudioMenu.xlsx)
+  // ==========================================================================
+  {
+    id: 'abordagem-05-1',
+    category: 'abordagem-05',
+    categoryName: `Funil Abordagem 05: Agenda — "Já perdeu cliente?"`,
+    title: `1️⃣ Primeira Mensagem`,
+    tip: `Por que está aqui: Ângulo de perda: medo de perder cliente move mais que promessa de ganho. Pergunta fácil de responder. · Dia 0 · qualquer lead do Google · Não fale do produto aqui. Só a pergunta.`,
+    content: `Oi, [Nome]! Tudo bem? Aqui é do StudioMenu, de Goiânia. Te achei no Google pesquisando [lash designer].
+
+Uma curiosidade: já aconteceu de cliente te chamar pra agendar, você demorar um pouquinho pra responder e ela acabar marcando com outra?`,
+  },
+  {
+    id: 'abordagem-05-2',
+    category: 'abordagem-05',
+    categoryName: `Funil Abordagem 05: Agenda — "Já perdeu cliente?"`,
+    title: `2️⃣ Ela Respondeu`,
+    tip: `Qualquer resposta · Se ela disser que nunca aconteceu: elogie a organização e ofereça o Catálogo (F4) como complemento. · Mande o vídeo do nicho dela, como vídeo normal (não como documento).`,
+    content: `Acontece com quase todo studio, né? É que a gente faz um link exclusivo pra colocar na bio e no Google: a cliente vê seus horários livres e já marca na hora, sem depender de você responder.
+
+Gravei um vídeo rapidinho mostrando na prática 👇
+[📹 envie o vídeo de 20s — lash ou nail]
+
+Se quiser mexer você mesma: https://studiomenu.art/c/showcase/lash`,
+  },
+  {
+    id: 'abordagem-05-3',
+    category: 'abordagem-05',
+    categoryName: `Funil Abordagem 05: Agenda — "Já perdeu cliente?"`,
+    title: `3️⃣ Ela Gostou do Exemplo`,
+    tip: `Logo após ela reagir bem · Pouco esforço pra ela + 'ver antes de decidir' tira o risco.`,
+    content: `Que bom que curtiu! Consigo montar um desse com seu nome, seus serviços e sua agenda, pra você ver pronto antes de decidir qualquer coisa. Me manda só:
+
+• Seu @ do Instagram
+• Um print com 3 a 5 serviços e valores
+• Seus dias e horários de atendimento`,
+  },
+  {
+    id: 'abordagem-05-4',
+    category: 'abordagem-05',
+    categoryName: `Funil Abordagem 05: Agenda — "Já perdeu cliente?"`,
+    title: `4️⃣ Ela Mandou o Material`,
+    tip: `Assim que chegar · Prazo concreto passa profissionalismo. Cumpra o prazo.`,
+    content: `Recebi tudo! Te mando sua prévia com a agenda aqui até [hoje à tarde / amanhã de manhã].`,
+  },
+  {
+    id: 'abordagem-05-5',
+    category: 'abordagem-05',
+    categoryName: `Funil Abordagem 05: Agenda — "Já perdeu cliente?"`,
+    title: `5️⃣ Entrega da Prévia + Preço`,
+    tip: `Quando a prévia estiver pronta · Se ela achar caro, ofereça só o Catálogo (R$39,90) como alternativa em vez de perder a venda.`,
+    content: `Pronto, [Nome]! Olha como ficou o seu, já com a agenda funcionando:
+👉 [link da prévia]
+
+Com a agenda online é R$69,90/mês — é seu link exclusivo pra bio do Instagram e pro Google: a cliente vê seus serviços e marca sozinha, e você edita tudo pelo celular. Quer que eu deixe ativo?`,
+  },
+  {
+    id: 'abordagem-05-6',
+    category: 'abordagem-05',
+    categoryName: `Funil Abordagem 05: Agenda — "Já perdeu cliente?"`,
+    title: `🔄 Follow-up 1 (Sem Resposta)`,
+    tip: `+2 dias sem resposta · O vídeo chama mais atenção que link — ela vê o produto sem precisar dizer sim.`,
+    content: `Oi, [Nome]! Sei que a agenda é corrida 😅 Deixo aqui um vídeo de 20s do que eu ia te mostrar:
+[📹 envie o vídeo de 20s — lash ou nail]
+
+É um link onde a cliente vê seus horários livres e marca na hora, sem esperar resposta.`,
+  },
+  {
+    id: 'abordagem-05-7',
+    category: 'abordagem-05',
+    categoryName: `Funil Abordagem 05: Agenda — "Já perdeu cliente?"`,
+    title: `🔄 Follow-up 2 (Sem Resposta)`,
+    tip: `+4 dias depois do FU1 · Duas opções, dá pra responder com 1 palavra.`,
+    content: `[Nome], pergunta sincera: agendamento online não é prioridade pra você agora, ou só não deu tempo de olhar ainda? Qualquer resposta tá ótima.`,
+  },
+  {
+    id: 'abordagem-05-8',
+    category: 'abordagem-05',
+    categoryName: `Funil Abordagem 05: Agenda — "Já perdeu cliente?"`,
+    title: `🔄 Follow-up 3 (Sem Resposta)`,
+    tip: `+7 dias depois do FU2 · Despedida costuma trazer resposta de quem estava adiando. Depois: status 'Sem resposta'.`,
+    content: `Oi, [Nome]! Não quero ficar te incomodando, então essa é minha última mensagem. Se um dia quiser a agenda online no seu studio, é só me chamar aqui. Sucesso nos atendimentos!`,
+  },
+
+  // ==========================================================================
+  // FUNIL ABORDAGEM 06 — CATÁLOGO — "LINK EXCLUSIVO DE SERVIÇOS" (Google/Maps, spreadsheet Funis_StudioMenu.xlsx)
+  // ==========================================================================
+  {
+    id: 'abordagem-06-1',
+    category: 'abordagem-06',
+    categoryName: `Funil Abordagem 06: Catálogo — "Link exclusivo de serviços"`,
+    title: `1️⃣ Primeira Mensagem`,
+    tip: `Por que está aqui: Mesma curiosidade do F1, com o plano de entrada (R$39,90/mês) — o mais fácil de fechar. · Dia 0 · qualquer lead do Google · Se o campo 'Site' do Google dela estiver vazio, melhor ainda: é exatamente onde o link entra.`,
+    content: `Oi, [Nome]! Tudo bem? Aqui é do StudioMenu, de Goiânia. Te achei no Google pesquisando [lash designer].
+
+Uma curiosidade: você sabia que dá pra ter um link exclusivo seu, com seus serviços, fotos e valores, pra colocar na bio do Instagram e no seu Google? Quem te encontra já vê tudo antes de te chamar.
+
+Gravei um vídeo de 20 segundos mostrando como fica na prática. Quer ver?`,
+  },
+  {
+    id: 'abordagem-06-2',
+    category: 'abordagem-06',
+    categoryName: `Funil Abordagem 06: Catálogo — "Link exclusivo de serviços"`,
+    title: `2️⃣ Ela Respondeu`,
+    tip: `'Quero ver' / 'Manda' / 'Como assim?' · Troque /lash por /nail, /estetica ou /studio. Se ela perguntar como coloca: na bio é em Editar perfil → Links; no Google, Editar perfil → Contato → Site. · Mande o vídeo do nicho dela, como vídeo normal (não como documento).`,
+    content: `Olha aí 👇
+[📹 envie o vídeo de 20s — lash ou nail]
+
+É um catálogo digital com o seu nome no link. Você coloca na bio e no campo "Site" do Google, e manda pras clientes quando perguntam valor.
+
+Se quiser mexer você mesma: https://studiomenu.art/c/showcase/lash`,
+  },
+  {
+    id: 'abordagem-06-3',
+    category: 'abordagem-06',
+    categoryName: `Funil Abordagem 06: Catálogo — "Link exclusivo de serviços"`,
+    title: `3️⃣ Ela Gostou do Exemplo`,
+    tip: `Logo após ela reagir bem · Pouco esforço pra ela + 'ver antes de decidir' tira o risco.`,
+    content: `Que bom que curtiu! Consigo montar um igual com seu nome, suas fotos e seus valores, pra você ver pronto antes de decidir qualquer coisa. Me manda só:
+
+• Seu @ do Instagram
+• Um print com 3 a 5 serviços e valores`,
+  },
+  {
+    id: 'abordagem-06-4',
+    category: 'abordagem-06',
+    categoryName: `Funil Abordagem 06: Catálogo — "Link exclusivo de serviços"`,
+    title: `4️⃣ Ela Mandou o Material`,
+    tip: `Assim que chegar · Prazo concreto passa profissionalismo. Cumpra o prazo.`,
+    content: `Recebi tudo! Te mando sua prévia aqui até [hoje à tarde / amanhã de manhã].`,
+  },
+  {
+    id: 'abordagem-06-5',
+    category: 'abordagem-06',
+    categoryName: `Funil Abordagem 06: Catálogo — "Link exclusivo de serviços"`,
+    title: `5️⃣ Entrega da Prévia + Preço`,
+    tip: `Quando a prévia estiver pronta · Preço junto do valor já visível + pergunta de sim/não. Objeção? Veja o bloco de objeções no fim da aba.`,
+    content: `Pronto, [Nome]! Olha como ficou o seu:
+👉 [link da prévia]
+
+Pra deixar no ar com seu link exclusivo é R$39,90/mês — você coloca na bio do Instagram e no seu Google, e troca valores e fotos pelo celular quando quiser. Quer que eu deixe ativo?`,
+  },
+  {
+    id: 'abordagem-06-6',
+    category: 'abordagem-06',
+    categoryName: `Funil Abordagem 06: Catálogo — "Link exclusivo de serviços"`,
+    title: `🔄 Follow-up 1 (Sem Resposta)`,
+    tip: `+2 dias sem resposta · O vídeo chama mais atenção que link — ela vê o produto sem precisar dizer sim.`,
+    content: `Oi, [Nome]! Deixo aqui um vídeo de 20s mostrando o catálogo na prática pra você olhar com calma:
+[📹 envie o vídeo de 20s — lash ou nail]`,
+  },
+  {
+    id: 'abordagem-06-7',
+    category: 'abordagem-06',
+    categoryName: `Funil Abordagem 06: Catálogo — "Link exclusivo de serviços"`,
+    title: `🔄 Follow-up 2 (Sem Resposta)`,
+    tip: `+4 dias depois do FU1 · Duas opções, dá pra responder com 1 palavra.`,
+    content: `[Nome], pergunta sincera: catálogo digital não é prioridade pra você agora, ou só não deu tempo de olhar ainda? Qualquer resposta tá ótima.`,
+  },
+  {
+    id: 'abordagem-06-8',
+    category: 'abordagem-06',
+    categoryName: `Funil Abordagem 06: Catálogo — "Link exclusivo de serviços"`,
+    title: `🔄 Follow-up 3 (Sem Resposta)`,
+    tip: `+7 dias depois do FU2 · Despedida costuma trazer resposta de quem estava adiando. Depois: status 'Sem resposta'.`,
+    content: `Oi, [Nome]! Não quero ficar te incomodando, então essa é minha última mensagem. Se um dia quiser o catálogo do seu studio, é só me chamar aqui. Sucesso nos atendimentos!`,
+  },
+
+  // ==========================================================================
+  // FUNIL ABORDAGEM 07 — CATÁLOGO — "COMO MANDA SEUS VALORES?" (Google/Maps, spreadsheet Funis_StudioMenu.xlsx)
+  // ==========================================================================
+  {
+    id: 'abordagem-07-1',
+    category: 'abordagem-07',
+    categoryName: `Funil Abordagem 07: Catálogo — "Como manda seus valores?"`,
+    title: `1️⃣ Primeira Mensagem`,
+    tip: `Por que está aqui: Pergunta fácil de responder e sem cara de venda. A resposta dela te dá o gancho. · Dia 0 · qualquer lead do Google · Não fale do produto aqui. Só a pergunta.`,
+    content: `Oi, [Nome]! Tudo bem? Aqui é do StudioMenu, de Goiânia. Te achei no Google pesquisando [lash designer].
+
+Pergunta rápida: quando cliente nova te pede os valores, você manda print da tabela, áudio ou algum link?`,
+  },
+  {
+    id: 'abordagem-07-2',
+    category: 'abordagem-07',
+    categoryName: `Funil Abordagem 07: Catálogo — "Como manda seus valores?"`,
+    title: `2️⃣ Ela Respondeu`,
+    tip: `Qualquer resposta · Comece reagindo à resposta dela ('Print é o que a maioria faz!'). Se ela já usa link, mostre o diferencial: ela mesma edita pelo celular. · Mande o vídeo do nicho dela, como vídeo normal (não como documento).`,
+    content: `Entendi! Pergunto porque a gente faz catálogo digital pra studios: em vez de print ou áudio, você tem um link exclusivo com seus serviços, fotos e valores, que abre bonito no celular — e ainda coloca na bio e no Google.
+
+Gravei um vídeo rapidinho mostrando na prática 👇
+[📹 envie o vídeo de 20s — lash ou nail]
+
+Se quiser mexer você mesma: https://studiomenu.art/c/showcase/lash`,
+  },
+  {
+    id: 'abordagem-07-3',
+    category: 'abordagem-07',
+    categoryName: `Funil Abordagem 07: Catálogo — "Como manda seus valores?"`,
+    title: `3️⃣ Ela Gostou do Exemplo`,
+    tip: `Logo após ela reagir bem · Pouco esforço pra ela + 'ver antes de decidir' tira o risco.`,
+    content: `Que bom que curtiu! Consigo montar um igual com seu nome, suas fotos e seus valores, pra você ver pronto antes de decidir qualquer coisa. Me manda só:
+
+• Seu @ do Instagram
+• Um print com 3 a 5 serviços e valores`,
+  },
+  {
+    id: 'abordagem-07-4',
+    category: 'abordagem-07',
+    categoryName: `Funil Abordagem 07: Catálogo — "Como manda seus valores?"`,
+    title: `4️⃣ Ela Mandou o Material`,
+    tip: `Assim que chegar · Prazo concreto passa profissionalismo. Cumpra o prazo.`,
+    content: `Recebi tudo! Te mando sua prévia aqui até [hoje à tarde / amanhã de manhã].`,
+  },
+  {
+    id: 'abordagem-07-5',
+    category: 'abordagem-07',
+    categoryName: `Funil Abordagem 07: Catálogo — "Como manda seus valores?"`,
+    title: `5️⃣ Entrega da Prévia + Preço`,
+    tip: `Quando a prévia estiver pronta · Preço junto do valor já visível + pergunta de sim/não. Objeção? Veja o bloco de objeções no fim da aba.`,
+    content: `Pronto, [Nome]! Olha como ficou o seu:
+👉 [link da prévia]
+
+Pra deixar no ar com seu link exclusivo é R$39,90/mês — você coloca na bio do Instagram e no seu Google, e troca valores e fotos pelo celular quando quiser. Quer que eu deixe ativo?`,
+  },
+  {
+    id: 'abordagem-07-6',
+    category: 'abordagem-07',
+    categoryName: `Funil Abordagem 07: Catálogo — "Como manda seus valores?"`,
+    title: `🔄 Follow-up 1 (Sem Resposta)`,
+    tip: `+2 dias sem resposta · O vídeo chama mais atenção que link — ela vê o produto sem precisar dizer sim.`,
+    content: `Oi, [Nome]! Sei que a rotina é corrida 😅 Deixo aqui um vídeo de 20s do que eu ia te mostrar:
+[📹 envie o vídeo de 20s — lash ou nail]
+
+É um catálogo digital pra mandar quando cliente pede valores.`,
+  },
+  {
+    id: 'abordagem-07-7',
+    category: 'abordagem-07',
+    categoryName: `Funil Abordagem 07: Catálogo — "Como manda seus valores?"`,
+    title: `🔄 Follow-up 2 (Sem Resposta)`,
+    tip: `+4 dias depois do FU1 · Duas opções, dá pra responder com 1 palavra.`,
+    content: `[Nome], pergunta sincera: catálogo digital não é prioridade pra você agora, ou só não deu tempo de olhar ainda? Qualquer resposta tá ótima.`,
+  },
+  {
+    id: 'abordagem-07-8',
+    category: 'abordagem-07',
+    categoryName: `Funil Abordagem 07: Catálogo — "Como manda seus valores?"`,
+    title: `🔄 Follow-up 3 (Sem Resposta)`,
+    tip: `+7 dias depois do FU2 · Despedida costuma trazer resposta de quem estava adiando. Depois: status 'Sem resposta'.`,
+    content: `Oi, [Nome]! Não quero ficar te incomodando, então essa é minha última mensagem. Se um dia quiser o catálogo do seu studio, é só me chamar aqui. Sucesso nos atendimentos!`,
+  },
+
+  // ==========================================================================
+  // FUNIL ABORDAGEM 08 — CATÁLOGO — "SITE APONTA PRO INSTAGRAM" (Google/Maps, spreadsheet Funis_StudioMenu.xlsx)
+  // ==========================================================================
+  {
+    id: 'abordagem-08-1',
+    category: 'abordagem-08',
+    categoryName: `Funil Abordagem 08: Catálogo — "Site aponta pro Instagram"`,
+    title: `1️⃣ Primeira Mensagem`,
+    tip: `Por que está aqui: Fato verificável do perfil dela + pergunta. Muito comum em studios pequenos. · Dia 0 · 'Site' do Google aponta pro Instagram · Confira o botão 'Site' antes de mandar.`,
+    content: `Oi, [Nome]! Tudo bem? Aqui é do StudioMenu, de Goiânia. Te achei no Google pesquisando [nail designer] e vi que o botão "Site" do seu perfil leva pro Instagram.
+
+Uma curiosidade: suas clientes costumam achar os valores por lá, ou acabam te chamando pra perguntar?`,
+  },
+  {
+    id: 'abordagem-08-2',
+    category: 'abordagem-08',
+    categoryName: `Funil Abordagem 08: Catálogo — "Site aponta pro Instagram"`,
+    title: `2️⃣ Ela Respondeu`,
+    tip: `Qualquer resposta · Adapte o começo à resposta dela. · Mande o vídeo do nicho dela, como vídeo normal (não como documento).`,
+    content: `Faz sentido! No feed a cliente precisa rolar bastante até achar. A gente faz um catálogo digital que resolve isso: um link exclusivo seu, com serviços, fotos e valores, que você coloca no botão "Site" do Google e na bio.
+
+Gravei um vídeo rapidinho mostrando na prática 👇
+[📹 envie o vídeo de 20s — lash ou nail]
+
+Se quiser mexer você mesma: https://studiomenu.art/c/showcase/lash`,
+  },
+  {
+    id: 'abordagem-08-3',
+    category: 'abordagem-08',
+    categoryName: `Funil Abordagem 08: Catálogo — "Site aponta pro Instagram"`,
+    title: `3️⃣ Ela Gostou do Exemplo`,
+    tip: `Logo após ela reagir bem · Pouco esforço pra ela + 'ver antes de decidir' tira o risco.`,
+    content: `Que bom que curtiu! Consigo montar um igual com seu nome, suas fotos e seus valores, pra você ver pronto antes de decidir qualquer coisa. Me manda só:
+
+• Seu @ do Instagram
+• Um print com 3 a 5 serviços e valores`,
+  },
+  {
+    id: 'abordagem-08-4',
+    category: 'abordagem-08',
+    categoryName: `Funil Abordagem 08: Catálogo — "Site aponta pro Instagram"`,
+    title: `4️⃣ Ela Mandou o Material`,
+    tip: `Assim que chegar · Prazo concreto passa profissionalismo. Cumpra o prazo.`,
+    content: `Recebi tudo! Te mando sua prévia aqui até [hoje à tarde / amanhã de manhã].`,
+  },
+  {
+    id: 'abordagem-08-5',
+    category: 'abordagem-08',
+    categoryName: `Funil Abordagem 08: Catálogo — "Site aponta pro Instagram"`,
+    title: `5️⃣ Entrega da Prévia + Preço`,
+    tip: `Quando a prévia estiver pronta · Preço junto do valor já visível + pergunta de sim/não. Objeção? Veja o bloco de objeções no fim da aba.`,
+    content: `Pronto, [Nome]! Olha como ficou o seu:
+👉 [link da prévia]
+
+Pra deixar no ar com seu link exclusivo é R$39,90/mês — você coloca na bio do Instagram e no seu Google, e troca valores e fotos pelo celular quando quiser. Quer que eu deixe ativo?`,
+  },
+  {
+    id: 'abordagem-08-6',
+    category: 'abordagem-08',
+    categoryName: `Funil Abordagem 08: Catálogo — "Site aponta pro Instagram"`,
+    title: `🔄 Follow-up 1 (Sem Resposta)`,
+    tip: `+2 dias sem resposta · O vídeo chama mais atenção que link — ela vê o produto sem precisar dizer sim.`,
+    content: `Oi, [Nome]! Sei que a rotina é corrida 😅 Deixo aqui um vídeo de 20s do que eu ia te mostrar:
+[📹 envie o vídeo de 20s — lash ou nail]
+
+É um catálogo pra colocar no botão "Site" do seu Google.`,
+  },
+  {
+    id: 'abordagem-08-7',
+    category: 'abordagem-08',
+    categoryName: `Funil Abordagem 08: Catálogo — "Site aponta pro Instagram"`,
+    title: `🔄 Follow-up 2 (Sem Resposta)`,
+    tip: `+4 dias depois do FU1 · Duas opções, dá pra responder com 1 palavra.`,
+    content: `[Nome], pergunta sincera: catálogo digital não é prioridade pra você agora, ou só não deu tempo de olhar ainda? Qualquer resposta tá ótima.`,
+  },
+  {
+    id: 'abordagem-08-8',
+    category: 'abordagem-08',
+    categoryName: `Funil Abordagem 08: Catálogo — "Site aponta pro Instagram"`,
+    title: `🔄 Follow-up 3 (Sem Resposta)`,
+    tip: `+7 dias depois do FU2 · Despedida costuma trazer resposta de quem estava adiando. Depois: status 'Sem resposta'.`,
+    content: `Oi, [Nome]! Não quero ficar te incomodando, então essa é minha última mensagem. Se um dia quiser o catálogo do seu studio, é só me chamar aqui. Sucesso nos atendimentos!`,
   },
 
   // ==========================================================================
