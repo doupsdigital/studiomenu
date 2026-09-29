@@ -13,6 +13,12 @@ interface SubscriptionSectionProps {
   billingEmail?: string;
   billingCpfCnpj?: string;
   paymentMethod: 'pix' | 'card' | null;
+  /** Plano concedido manualmente pelo admin, fora do Asaas (Fase 26) — não
+   *  existe assinatura de verdade por trás, então troca o texto de
+   *  "cobrança recorrente" e esconde o botão de cancelar (a API de
+   *  cancelamento exige um asaas_subscription_id que nunca vai existir
+   *  aqui). */
+  manualPlan?: boolean;
 }
 
 const TIER_LABEL: Record<PayablePlanTier, string> = { basico: 'StudioMenu Básico', plus: 'StudioMenu+' };
@@ -23,12 +29,14 @@ const TIER_LABEL: Record<PayablePlanTier, string> = { basico: 'StudioMenu Básic
 const ActivePlanCard: React.FC<{
   tier: PayablePlanTier;
   paymentMethod: 'pix' | 'card' | null;
+  manualPlan?: boolean;
   onCancel: () => void;
   loading: boolean;
   error: string | null;
 }> = ({
   tier,
   paymentMethod,
+  manualPlan,
   onCancel,
   loading,
   error,
@@ -44,51 +52,61 @@ const ActivePlanCard: React.FC<{
         </div>
         <div className="min-w-0">
           <p className="font-serif-pro font-bold text-lg text-rose-800 leading-tight">{TIER_LABEL[tier]} ativo</p>
-          <p className="text-sm text-rose-800/70 mt-0.5">Cobrança recorrente {paymentMethod === 'card' ? 'no cartão de crédito' : 'via Pix'}</p>
+          <p className="text-sm text-rose-800/70 mt-0.5">
+            {manualPlan
+              ? 'Ativado manualmente pela equipe StudioMenu'
+              : `Cobrança recorrente ${paymentMethod === 'card' ? 'no cartão de crédito' : 'via Pix'}`}
+          </p>
         </div>
       </div>
 
       <div className="bg-surface rounded-xl px-4 py-3 mb-4 border border-rose-200/60">
         <p className="text-[13px] font-bold uppercase tracking-wider text-rose-700/70 mb-0.5">Mensalidade</p>
-        <p className="font-serif-pro font-bold text-lg text-rose-800 whitespace-nowrap">{pricing.label}</p>
+        <p className="font-serif-pro font-bold text-lg text-rose-800 whitespace-nowrap">{manualPlan ? 'Sem cobrança' : pricing.label}</p>
       </div>
 
-      {error && <p className="text-sm text-rose-600 mb-3">{error}</p>}
-
-      {confirming ? (
-        <div className="rounded-xl bg-surface border border-rose-200/60 p-4">
-          <p className="text-sm text-ink-soft mb-3">
-            Cancelar sua assinatura do {TIER_LABEL[tier]}?{' '}
-            {tier === 'plus' ? 'Você perde acesso à agenda automática.' : 'Seu catálogo deixa de fazer parte do plano pago.'}
-          </p>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => setConfirming(false)}
-              disabled={loading}
-              className="flex-1 h-11 rounded-xl bg-linen text-ink-soft text-[15px] font-bold disabled:opacity-50"
-            >
-              Voltar
-            </button>
-            <button
-              type="button"
-              onClick={onCancel}
-              disabled={loading}
-              className="flex-1 h-11 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-[15px] font-bold disabled:opacity-50 transition-colors"
-            >
-              {loading ? 'Cancelando...' : 'Sim, cancelar'}
-            </button>
-          </div>
-        </div>
+      {manualPlan ? (
+        <p className="text-sm text-ink-soft">Qualquer alteração nesse plano, é só falar com a gente.</p>
       ) : (
-        <button
-          type="button"
-          onClick={() => setConfirming(true)}
-          disabled={loading}
-          className="w-full h-11 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-[15px] font-bold disabled:opacity-50 transition-colors"
-        >
-          Cancelar assinatura
-        </button>
+        <>
+          {error && <p className="text-sm text-rose-600 mb-3">{error}</p>}
+
+          {confirming ? (
+            <div className="rounded-xl bg-surface border border-rose-200/60 p-4">
+              <p className="text-sm text-ink-soft mb-3">
+                Cancelar sua assinatura do {TIER_LABEL[tier]}?{' '}
+                {tier === 'plus' ? 'Você perde acesso à agenda automática.' : 'Seu catálogo deixa de fazer parte do plano pago.'}
+              </p>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setConfirming(false)}
+                  disabled={loading}
+                  className="flex-1 h-11 rounded-xl bg-linen text-ink-soft text-[15px] font-bold disabled:opacity-50"
+                >
+                  Voltar
+                </button>
+                <button
+                  type="button"
+                  onClick={onCancel}
+                  disabled={loading}
+                  className="flex-1 h-11 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-[15px] font-bold disabled:opacity-50 transition-colors"
+                >
+                  {loading ? 'Cancelando...' : 'Sim, cancelar'}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setConfirming(true)}
+              disabled={loading}
+              className="w-full h-11 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-[15px] font-bold disabled:opacity-50 transition-colors"
+            >
+              Cancelar assinatura
+            </button>
+          )}
+        </>
       )}
     </div>
   );
@@ -106,6 +124,7 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
   billingEmail,
   billingCpfCnpj,
   paymentMethod,
+  manualPlan,
 }) => {
   const router = useRouter();
   const isPlusActive = planTier === 'plus' && subscriptionStatus === 'ativo';
@@ -137,13 +156,13 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
   };
 
   if (isPlusActive) {
-    return <ActivePlanCard tier="plus" paymentMethod={paymentMethod} onCancel={handleCancel} loading={loading} error={error} />;
+    return <ActivePlanCard tier="plus" paymentMethod={paymentMethod} manualPlan={manualPlan} onCancel={handleCancel} loading={loading} error={error} />;
   }
 
   if (isBasicoActive) {
     return (
       <div className="flex flex-col gap-4">
-        <ActivePlanCard tier="basico" paymentMethod={paymentMethod} onCancel={handleCancel} loading={loading} error={error} />
+        <ActivePlanCard tier="basico" paymentMethod={paymentMethod} manualPlan={manualPlan} onCancel={handleCancel} loading={loading} error={error} />
         <div id="upgrade-plus">
           <p className="flex items-center gap-1.5 text-[15px] font-bold text-ink mb-2">
             <Sparkles className="w-4 h-4 text-rose-600" /> Evolua pro StudioMenu+

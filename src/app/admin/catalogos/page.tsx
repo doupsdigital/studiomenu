@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { CatalogOrderData } from '@/types/catalog';
 import { normalizeWhatsappBR } from '@/lib/format';
 import Link from 'next/link';
-import { ArrowLeft, Sparkles, ExternalLink, Search, RefreshCw, Scissors, Plus, Trash2, MessageCircle, Phone, Clock, Smartphone, CalendarClock, Globe, Crown, ChevronDown, PauseCircle, PlayCircle } from 'lucide-react';
+import { ArrowLeft, Sparkles, ExternalLink, Search, RefreshCw, Scissors, Plus, Trash2, MessageCircle, Phone, Clock, Smartphone, CalendarClock, Globe, Crown, ChevronDown, PauseCircle, PlayCircle, Gift } from 'lucide-react';
 import { usesSubdomainRouting, PRODUCTION_DOMAIN } from '@/lib/public-url';
 
 /** Campos de billing/agendamento não fazem parte do shape público do
@@ -14,6 +14,9 @@ type AdminCatalog = CatalogOrderData & {
   subscription_status?: 'none' | 'ativo' | 'suspenso' | 'cancelado';
   first_offer_tier?: 'basico' | 'plus';
   app_short_code?: string | null;
+  /** Plano concedido manualmente pelo admin, fora do Asaas (Fase 26) —
+   *  caso de borda tipo cliente pagando uma vez só, fora do sistema. */
+  manual_plan?: boolean;
 };
 
 export default function AdminCatalogosPage() {
@@ -244,6 +247,56 @@ export default function AdminCatalogosPage() {
     } catch (e) {
       console.error('Erro ao atualizar catalog_disabled:', e);
       showToast('❌ Erro ao atualizar o catálogo.');
+    }
+  };
+
+  /** Fase 26: caso de borda — cliente pagando fora do sistema (ex: uma
+   *  vez só, via Pix direto), sem assinatura Asaas de verdade por trás.
+   *  Libera o acesso ao app dela igual a uma assinatura real (mesmo
+   *  plan_tier/subscription_status), só marcando `manual_plan` pra tela
+   *  "Minha assinatura" não mostrar cobrança recorrente nem um botão de
+   *  cancelar que nunca vai funcionar. */
+  const grantManualPlan = async (item: AdminCatalog, tier: 'basico' | 'plus') => {
+    if (!item.id) return;
+    try {
+      const res = await fetch('/api/admin/catalog-actions', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ id: item.id, plan_tier: tier, subscription_status: 'ativo', manual_plan: true }),
+      });
+      const result = await res.json();
+      if (!result.success) {
+        showToast('❌ Erro ao conceder o plano manual.');
+        return;
+      }
+      showToast(`🎁 Plano ${tier === 'plus' ? 'Plus' : 'Básico'} concedido manualmente!`);
+      fetchCatalogs();
+    } catch (e) {
+      console.error('Erro ao conceder plano manual:', e);
+      showToast('❌ Erro ao conceder o plano manual.');
+    }
+  };
+
+  const revokeManualPlan = async (item: AdminCatalog) => {
+    if (!item.id) return;
+    try {
+      const res = await fetch('/api/admin/catalog-actions', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ id: item.id, plan_tier: 'catalog', subscription_status: 'none', manual_plan: false }),
+      });
+      const result = await res.json();
+      if (!result.success) {
+        showToast('❌ Erro ao revogar o plano manual.');
+        return;
+      }
+      showToast('🔄 Plano manual revogado.');
+      fetchCatalogs();
+    } catch (e) {
+      console.error('Erro ao revogar plano manual:', e);
+      showToast('❌ Erro ao revogar o plano manual.');
     }
   };
 
@@ -547,6 +600,43 @@ export default function AdminCatalogosPage() {
                             <Crown className="w-3.5 h-3.5" />
                             Oferta inicial: {item.first_offer_tier === 'plus' ? 'Plus direto' : 'Básico (padrão)'}
                           </button>
+                        )}
+
+                        {/* Fase 26: caso de borda — cliente pagando fora do sistema (ex:
+                         *  uma vez só, via Pix direto), sem assinatura Asaas de verdade. */}
+                        {item.manual_plan ? (
+                          <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 space-y-1.5">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-bold uppercase tracking-wider text-emerald-300 flex items-center gap-1.5">
+                                <Gift className="w-3.5 h-3.5" />
+                                Manual: {item.plan_tier === 'plus' ? 'Plus' : 'Básico'} ativo
+                              </span>
+                              <button
+                                onClick={() => revokeManualPlan(item)}
+                                className="text-xs text-rose-400 hover:text-rose-300 font-bold underline"
+                              >
+                                Revogar
+                              </button>
+                            </div>
+                            <p className="text-[11px] text-emerald-300/60">Sem cobrança via Asaas — concedido manualmente.</p>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              onClick={() => grantManualPlan(item, 'basico')}
+                              className="flex-1 px-2 py-2 rounded-xl text-xs font-bold bg-white/5 border border-slate-700 text-slate-400 hover:border-emerald-500/60 hover:text-emerald-300 transition-all flex items-center justify-center gap-1"
+                            >
+                              <Gift className="w-3.5 h-3.5" />
+                              Conceder Básico (manual)
+                            </button>
+                            <button
+                              onClick={() => grantManualPlan(item, 'plus')}
+                              className="flex-1 px-2 py-2 rounded-xl text-xs font-bold bg-white/5 border border-slate-700 text-slate-400 hover:border-amber-500/60 hover:text-amber-300 transition-all flex items-center justify-center gap-1"
+                            >
+                              <Gift className="w-3.5 h-3.5" />
+                              Conceder Plus (manual)
+                            </button>
+                          </div>
                         )}
 
                         {item.edit_token && (

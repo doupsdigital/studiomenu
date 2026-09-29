@@ -36,6 +36,7 @@ export default async function ConfigPage({ params }: ConfigPageProps) {
           bookingEnabled={order.booking_enabled}
           agendaPaused={order.agenda_paused}
           authUserId={order.auth_user_id}
+          manualPlan={order.manual_plan}
         />
       </main>
     </>
