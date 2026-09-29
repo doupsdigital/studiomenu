@@ -1,0 +1,11 @@
+-- Fase 26 — Plano concedido manualmente (fora do Asaas)
+-- Caso de borda real (2026-09-29): cliente pagando uma vez só (fora do
+-- sistema, ex: Pix direto) por acesso equivalente ao StudioMenu Básico,
+-- sem cobrança recorrente nenhuma. `manual_plan = true` sinaliza que
+-- `plan_tier`/`subscription_status` foram setados pelo admin, não por uma
+-- assinatura Asaas de verdade — usado só pra ajustar o que a tela "Minha
+-- assinatura" mostra (sem texto de cobrança recorrente, sem botão de
+-- cancelar que chamaria a API do Asaas à toa). Não afeta gating nenhum:
+-- plan_tier/subscription_status continuam sendo a fonte de verdade pra
+-- liberar o app/agenda, exatamente como numa assinatura real.
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS manual_plan BOOLEAN NOT NULL DEFAULT false;
