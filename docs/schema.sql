@@ -72,6 +72,12 @@ CREATE TABLE IF NOT EXISTS public.orders (
     -- alias público em /a/[code], gerado sob demanda pela listagem do
     -- admin pra catálogos que ainda não têm um.
     app_short_code TEXT UNIQUE,
+    -- Plano concedido manualmente pelo admin, fora do Asaas (Fase 26,
+    -- docs/historico/migrations/2026-09-29_fase26_plano_manual.sql) — caso
+    -- de borda (ex: cliente pagando uma vez só, fora do sistema). Só muda
+    -- o que a tela "Minha assinatura" mostra; plan_tier/subscription_status
+    -- continuam sendo a fonte de verdade pra liberar o app/agenda.
+    manual_plan BOOLEAN NOT NULL DEFAULT false,
     -- Login real da profissional (docs/PLANO_PRODUCAO_V1.md, Fase 17): vínculo
     -- 1:1 opcional com uma conta do Supabase Auth. NULL até ela "reivindicar"
     -- o login (continua entrando só pelo link mágico até lá).

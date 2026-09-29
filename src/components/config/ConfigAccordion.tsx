@@ -33,6 +33,8 @@ interface ConfigAccordionProps {
   /** Conta do Supabase Auth já vinculada pro login real (Fase 17) — null
    *  enquanto a profissional só entra pelo link mágico. */
   authUserId: string | null;
+  /** Plano concedido manualmente pelo admin, fora do Asaas (Fase 26). */
+  manualPlan: boolean;
 }
 
 type SectionKey = 'horarios' | 'bloqueios' | 'pausar' | 'assinatura' | 'conta' | 'notificacoes' | 'suporte';
@@ -56,6 +58,7 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
   bookingEnabled,
   agendaPaused,
   authUserId,
+  manualPlan,
 }) => {
   const [open, setOpen] = useState<Record<SectionKey, boolean>>({
     horarios: false,
@@ -253,6 +256,7 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
             billingEmail={billingEmail}
             billingCpfCnpj={billingCpfCnpj}
             paymentMethod={paymentMethod}
+            manualPlan={manualPlan}
           />
         </SectionCard>
       </div>
