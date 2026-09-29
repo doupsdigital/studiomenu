@@ -55,6 +55,11 @@ export default function ShowcasePage({ params }: { params: Promise<{ niche: stri
     // mexe no preset fonte (2026-09-24).
     booking_enabled: true,
     procedures: basePreset.procedures.map((p) => ({ ...p, duration_minutes: p.duration_minutes ?? 60 })),
+    // Endereço fictício só pra dar pra mostrar o botão de Localização
+    // funcionando na vitrine (não existe profissional real por trás, então
+    // não mexe no preset fonte — mesmo espírito do booking_enabled acima).
+    address: 'Av. Paulista, 1578 - Bela Vista, São Paulo - SP',
+    maps_url: 'https://www.google.com/maps/search/?api=1&query=Avenida+Paulista+1578+S%C3%A3o+Paulo',
   };
 
   return (
