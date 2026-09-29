@@ -6,12 +6,13 @@ interface SocialForm {
   whatsapp: string;
   instagram: string;
   address: string;
+  maps: string;
 }
 
 interface SocialModalProps {
   socialForm: SocialForm;
   setSocialForm: React.Dispatch<React.SetStateAction<SocialForm>>;
-  onSaveSocial: (type: 'whatsapp' | 'instagram' | 'address', value: string) => void;
+  onSaveSocial: (type: 'whatsapp' | 'instagram' | 'address' | 'maps', value: string) => void;
   onClose: () => void;
 }
 
@@ -51,6 +52,16 @@ export const SocialModal: React.FC<SocialModalProps> = ({ socialForm, setSocialF
         />
       </div>
 
+      <div className="lm-form-group">
+        <label>LINK DO GOOGLE MAPS</label>
+        <input
+          type="text"
+          value={socialForm.maps}
+          onChange={(e) => setSocialForm({ ...socialForm, maps: e.target.value })}
+          placeholder="Cole aqui o link que o Google Maps gera ao compartilhar sua localização"
+        />
+      </div>
+
       <div className="lm-modal-actions">
         <button type="button" className="lm-modal-btn lm-modal-btn-cancel" onClick={onClose}>
           Cancelar
@@ -62,6 +73,7 @@ export const SocialModal: React.FC<SocialModalProps> = ({ socialForm, setSocialF
             onSaveSocial('whatsapp', socialForm.whatsapp);
             onSaveSocial('instagram', socialForm.instagram);
             onSaveSocial('address', socialForm.address);
+            onSaveSocial('maps', socialForm.maps);
             onClose();
           }}
         >
