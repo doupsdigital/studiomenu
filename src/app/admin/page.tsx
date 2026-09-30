@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { LayoutGrid, ArrowRight, Palette, MessageCircle, ClipboardList, Gem, Target, Clapperboard, Sparkles, LogOut } from 'lucide-react';
+import { LayoutGrid, ArrowRight, Palette, MessageCircle, ClipboardList, Gem, Target, Clapperboard, Sparkles, LogOut, Megaphone } from 'lucide-react';
 
 export default function AdminHubPage() {
   const router = useRouter();
@@ -25,8 +25,9 @@ export default function AdminHubPage() {
             <p className="text-sm text-slate-400 mt-1.5">Painel central de operação.</p>
           </div>
           <button
+            type="button"
             onClick={handleLogout}
-            className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-rose-400 transition-all px-3 py-2 rounded-lg hover:bg-slate-900"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white hover:border-slate-700 transition-all flex-shrink-0"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>Sair</span>
@@ -104,6 +105,28 @@ export default function AdminHubPage() {
             <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all flex-shrink-0" />
           </Link>
 
+          {/* Destaque para Funil - ADS */}
+          <Link
+            href="/admin/funil-ads"
+            className="group p-6 rounded-2xl border transition-all flex items-center justify-between gap-3 sm:col-span-2"
+            style={{
+              background: 'rgba(245, 158, 11, 0.08)',
+              borderColor: 'rgba(245, 158, 11, 0.35)',
+            }}
+          >
+            <div>
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider mb-2 text-amber-400">
+                <Megaphone className="w-4 h-4" />
+                <span>Tráfego Pago · Meta Ads</span>
+              </div>
+              <h2 className="font-bold text-white text-xl">🚀 Funil - ADS</h2>
+              <p className="text-sm text-slate-400 mt-1 leading-relaxed">
+                Funis de conversão WhatsApp X1 completos de 1 clique para os leads que chegam dos Anúncios de Vídeo e Imagem.
+              </p>
+            </div>
+            <ArrowRight className="w-5 h-5 text-amber-400 group-hover:translate-x-1 transition-all flex-shrink-0" />
+          </Link>
+
           <Link
             href="/admin/formularios"
             className="group p-6 rounded-2xl bg-slate-900 border border-slate-800 hover:border-rose-500/50 transition-all flex items-center justify-between gap-3"
@@ -138,7 +161,7 @@ export default function AdminHubPage() {
             <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-rose-400 group-hover:translate-x-1 transition-all flex-shrink-0" />
           </Link>
 
-          {/* Prospecção & CRM — destaque, era o item featured no painel original */}
+          {/* Prospecção & CRM */}
           <Link
             href="/admin/prospeccao"
             className="group p-6 rounded-2xl border transition-all flex items-center justify-between gap-3 sm:col-span-2"
