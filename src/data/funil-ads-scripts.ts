@@ -166,7 +166,9 @@ Para que você consiga ver como ficaria incrível o seu Catálogo, nossa equipe 
 
 👉 [LINK DO APP]
 
-Esperamos que você goste. Se for do seu interesse adquirir o catálogo é só nos chamar aqui. 💕`,
+Esperamos que você goste. Ah, e você consegue editar tudo depois tá bom? 😊
+
+Se for do seu interesse adquirir o catálogo é só nos chamar aqui. 💕`,
     },
   ];
 }
