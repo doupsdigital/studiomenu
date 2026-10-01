@@ -155,6 +155,21 @@ No StudioMenu, ela clica no seu link e abre na hora. E você mesma troca preços
       tip: 'Resposta curta pra quando ela topa mas vai mandar o material em outro momento — não insista, só confirma que você vai esperar.',
       content: `Ficamos no aguardo 🙏`,
     },
+    {
+      stepNumber: 11,
+      title: '🆘 Resgate — Catálogo Montado Sem Ela Responder',
+      badge: 'Resgate',
+      tip: 'Use quando a lead sumir de vez durante a coleta de dados e você decidir montar o catálogo dela mesmo assim (buscando fotos/serviços por conta própria, ex: Instagram/Google) em vez de esperar ela responder.',
+      content: `Oii, [NOME]! Sei que a rotina é corrida e às vezes a gente nem consegue responder tudo 😅
+
+Para que você consiga ver como ficaria incrível o seu Catálogo, nossa equipe criou uma prévia com o que encontramos do seu trabalho:
+
+👉 [LINK DO APP]
+
+Esperamos que você goste. Ah, e você consegue editar tudo depois tá bom? 😊
+
+Se for do seu interesse adquirir o catálogo é só nos chamar aqui. 💕`,
+    },
   ];
 }
 
