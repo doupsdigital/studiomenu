@@ -1,86 +1,42 @@
-'use client';
+import type { Metadata } from 'next';
+import { NicheType } from '@/types/catalog';
+import { ShowcaseClient } from './ShowcaseClient';
 
-import { use, useEffect, useState } from 'react';
-import { LayoutModel, ThemeVariant, NicheType } from '@/types/catalog';
-import { CatalogLayout } from '@/components/catalog/CatalogLayout';
-import { StylePickerPanel } from '@/components/catalog/StylePickerPanel';
-import { nichePresetsMap } from '@/data/niche-presets';
+interface ShowcasePageProps {
+  params: Promise<{ niche: string }>;
+}
 
-export default function ShowcasePage({ params }: { params: Promise<{ niche: string }> }) {
-  const { niche: nicheParam } = use(params);
+// Nomes por nicho pro título do link (plural, "venda pro nicho" — não o
+// singular usado em NICHE_OPTIONS, que é pra UI de seleção).
+const NICHE_METADATA_LABEL: Record<NicheType, string> = {
+  lash: 'Lash Designers',
+  nail: 'Nail Designers',
+  estetica: 'Clínicas de Estética',
+  studio: 'Studios de Beleza',
+};
+
+/** Preview do link no WhatsApp pra esse showroom — pedido real, 2026-10-01:
+ *  sem isso, herdava o título/descrição genérico de venda da home (feito
+ *  pra visitante institucional, não pro primeiro contato de um lead de
+ *  anúncio clicando num link "olha esse exemplo"). Sem "exemplo"/"demo" no
+ *  título de propósito — a palavra já está na mensagem de texto que ela
+ *  manda; o card do link não precisa repetir e soar menos como algo real. */
+export async function generateMetadata({ params }: ShowcasePageProps): Promise<Metadata> {
+  const { niche: nicheParam } = await params;
   const niche = nicheParam as NicheType;
-  const basePreset = nichePresetsMap[niche];
+  const nicheLabel = NICHE_METADATA_LABEL[niche];
 
-  const [layoutModel, setLayoutModel] = useState<LayoutModel>(basePreset?.layout_model || 'mosaico');
-  const [themeVariant, setThemeVariant] = useState<ThemeVariant>(basePreset?.theme_variant || 'rose');
-  // Na capa (#hero) faz mais sentido mostrar o seletor de Tema; a partir da tela
-  // de procedimentos (#catalogo) em diante, o que se destaca é o Modelo (grid vs lista).
-  const [onCoverScreen, setOnCoverScreen] = useState(true);
+  const title = nicheLabel ? `Catálogo Digital para ${nicheLabel}` : 'Catálogo Digital — StudioMenu';
+  const description = 'Veja como fica, ao vivo, no seu celular — em menos de 1 minuto você já visualiza tudo funcionando.';
 
-  useEffect(() => {
-    const heroEl = document.getElementById('hero');
-    if (!heroEl) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => setOnCoverScreen(entry.isIntersecting),
-      { threshold: 0.5 }
-    );
-    observer.observe(heroEl);
-    return () => observer.disconnect();
-  }, [niche, layoutModel, themeVariant]);
-
-  if (!basePreset) {
-    return (
-      <main className="min-h-screen flex items-center justify-center p-6 bg-slate-950 text-white text-center">
-        <div className="max-w-sm w-full p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl">
-          <h1 className="font-serif text-2xl font-bold mb-2">Modelo Não Encontrado</h1>
-          <p className="text-xs text-slate-400 leading-relaxed">
-            Não existe um modelo de vitrine para o nicho <code className="text-rose-400 font-mono">{nicheParam}</code>.
-          </p>
-        </div>
-      </main>
-    );
-  }
-
-  const catalog = {
-    ...basePreset,
-    layout_model: layoutModel,
-    theme_variant: themeVariant,
-    cover_media_url: layoutModel === 'classico' ? '/modelos/classico/assets/img/Hero.webp' : '/modelos/mosaico/assets/img/Hero.webp',
-    avatar_url: layoutModel === 'classico' ? '/modelos/classico/assets/img/Hero.webp' : '/modelos/mosaico/assets/img/Hero.webp',
-    // Liga o botão "Agendar agora" pra mostrar a simulação de agendamento
-    // automático (`demoBookingOnly` no CatalogLayout abaixo) — o preset
-    // não tem `booking_enabled`/`duration_minutes` de verdade porque não
-    // existe profissional real por trás; só nesse objeto em memória, não
-    // mexe no preset fonte (2026-09-24).
-    booking_enabled: true,
-    procedures: basePreset.procedures.map((p) => ({ ...p, duration_minutes: p.duration_minutes ?? 60 })),
-    // Endereço fictício só pra dar pra mostrar o botão de Localização
-    // funcionando na vitrine (não existe profissional real por trás, então
-    // não mexe no preset fonte — mesmo espírito do booking_enabled acima).
-    address: 'Av. Paulista, 1578 - Bela Vista, São Paulo - SP',
-    maps_url: 'https://www.google.com/maps/search/?api=1&query=Avenida+Paulista+1578+S%C3%A3o+Paulo',
+  return {
+    title,
+    description,
+    openGraph: { title, description },
   };
+}
 
-  return (
-    <div className="relative min-h-screen">
-      <StylePickerPanel
-        layoutModel={layoutModel}
-        themeVariant={themeVariant}
-        onChangeLayout={setLayoutModel}
-        onChangeTheme={setThemeVariant}
-        onCoverScreen={onCoverScreen}
-        // Começa aberto de propósito (pedido, 2026-09-23) — é o link que
-        // ela manda pra cliente testar os modelos, então o controle de
-        // tema/layout precisa já estar visível de cara, não escondido
-        // atrás de um toque. Mesmo comportamento também usado no mockup
-        // de celular da home (`SalesLandingPage.tsx`).
-        defaultOpen
-      />
-
-      {/* Renderização do Catálogo Real — mesmo componente usado nos catálogos de clientes.
-          CatalogLayout re-sincroniza sozinho ao trocar modelo/tema, preservando o scroll. */}
-      <CatalogLayout data={catalog} demoBookingOnly />
-    </div>
-  );
+export default async function ShowcasePage({ params }: ShowcasePageProps) {
+  const { niche: nicheParam } = await params;
+  return <ShowcaseClient niche={nicheParam as NicheType} />;
 }
