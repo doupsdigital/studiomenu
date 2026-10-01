@@ -199,7 +199,7 @@ Dá uma olhadinha nesse exemplo do Catálogo Digital, pra você ver funcionando 
 
 *Já imaginou seu studio com esse catálogo?* Suas clientes iriam amar a experiência. 💗
 
-Depois me conta o que achou. 🥰`,
+Depois me conta o que achou, que eu te explico como funciona pra ter o seu. 🥰`,
       },
       ...buildCommonSteps(),
     ],
