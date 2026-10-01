@@ -50,7 +50,14 @@ export async function POST(request: Request) {
     }
     const finalSlug = slugResult.slug;
 
-    let coverUrl = layoutModel === 'classico' ? '/modelos/classico/assets/img/Hero.webp' : '/modelos/mosaico/assets/img/Hero.webp';
+    // Vazio por padrão (não mais o Hero.webp genérico do modelo) — sem foto
+    // própria, `HeaderCover.tsx` já cai pra trás sozinho na foto da tela
+    // final (`cta_bg_url`/`final_screen_bg_url` do preset de nicho, pedido
+    // da usuária 2026-09-22) e só usa o Hero.webp como último recurso. Preencher
+    // aqui de antemão disparava sempre o Hero.webp primeiro (bug real,
+    // 2026-09-30: catálogo criado sem capa própria via /admin/criar-com-ia
+    // saiu com a foto de modelo genérica em vez da foto da tela final).
+    let coverUrl = '';
 
     if (coverFile) {
       if (!isAllowedImageType(coverFile.type)) {
