@@ -97,7 +97,11 @@ export default function AdminCatalogosPage() {
         return;
       }
 
-      setExtractedProcedures(json.procedures);
+      // Soma com o que já estava na revisão em vez de substituir — permite
+      // extrair em mais de uma leva (ex: catálogo da lead com mais de 5
+      // produtos, acima do limite por chamada em /api/admin/extract-catalog).
+      setExtractedProcedures((prev) => [...prev, ...json.procedures]);
+      setServicesFiles([]);
       setServicesModalStep('review');
     } catch {
       setServicesErrorMsg('Falha de conexão ao extrair os procedimentos.');
@@ -878,7 +882,8 @@ export default function AdminCatalogosPage() {
               <>
                 <p className="text-sm text-slate-400">
                   Envie o print, foto ou PDF com os serviços e valores que a cliente mandou. A IA extrai tudo pra você revisar antes
-                  de salvar.
+                  de salvar. Limite de 5 arquivos por vez — catálogo maior que isso, é só repetir o processo (usando "+ Adicionar
+                  mais" na revisão) quantas vezes precisar, que os resultados se somam.
                 </p>
                 <p className="text-xs text-amber-400 bg-amber-500/10 border border-amber-500/30 rounded-xl p-3">
                   ⚠️ Isso vai <strong>substituir todos os serviços atuais</strong> do catálogo (inclusive os de exemplo, se ainda
@@ -971,8 +976,9 @@ export default function AdminCatalogosPage() {
                   <button
                     onClick={() => setServicesModalStep('upload')}
                     className="flex-1 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm font-semibold text-slate-300"
+                    title="Envia mais arquivos e soma com o que já está na lista de revisão"
                   >
-                    Voltar
+                    + Adicionar mais
                   </button>
                   <button
                     onClick={handleSaveServices}

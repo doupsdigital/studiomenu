@@ -106,7 +106,11 @@ export default function CriarComIAPage() {
         return;
       }
 
-      setProcedures(json.procedures);
+      // Soma com o que já estava na revisão em vez de substituir — permite
+      // extrair em mais de uma leva (ex: catálogo da lead com mais de 5
+      // produtos, acima do limite por chamada em /api/admin/extract-catalog).
+      setProcedures((prev) => [...prev, ...json.procedures]);
+      setMenuFiles([]);
       setStep('reviewing');
     } catch (err: any) {
       setErrorMsg('Falha de conexão ao extrair os procedimentos.');
@@ -469,7 +473,7 @@ export default function CriarComIAPage() {
             </label>
             <p className="text-xs text-slate-500 mt-1.5">
               {menuFiles.length
-                ? 'Pode enviar mais de uma foto se a tabela ocupar várias páginas/prints.'
+                ? 'Pode enviar mais de uma foto se a tabela ocupar várias páginas/prints. Limite de 5 por vez — catálogo maior, é só voltar aqui (seta no canto da tela de revisão) e extrair de novo, que os resultados se somam.'
                 : 'Sem arquivo, o catálogo entra com 4 serviços de exemplo do nicho — troque pelos dela quando mandar os preços.'}
             </p>
           </div>
