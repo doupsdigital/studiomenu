@@ -894,27 +894,12 @@ button {
   aspect-ratio: 3 / 5.2;
 }
 
-.tile__foto-bg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  /* Escala maior que o box pra blur não deixar borda transparente visível. */
-  transform: scale(1.25);
-  filter: var(--tile-photo-filter) blur(18px) brightness(0.55) saturate(1.15);
-}
-
 .tile__foto {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  /* 'contain' em vez de 'cover': fotos que não são 9:16 (menores ou outra
-   *  proporção) aparecem inteiras, sem cortar — o espaço sobrando revela o
-   *  fundo desfocado (.tile__foto-bg) em vez de ficar preto/vazio. Pra foto
-   *  já em 9:16 o resultado é idêntico ao 'cover' de antes. */
-  object-fit: contain;
+  object-fit: cover;
   filter: var(--tile-photo-filter);
   transition: transform 0.4s ease;
 }
