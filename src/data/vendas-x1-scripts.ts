@@ -103,9 +103,12 @@ Posso te mostrar como ficaria personalizado pra você? 💕`,
     tip: 'Peça só o mínimo pra montar a prévia — nada de formulário longo. Aceite qualquer formato: foto, print, lista solta.',
     content: `Perfeito! Me manda por aqui:
 
-📸 Uma foto sua ou do seu espaço
 📝 O nome que você quer no catálogo
-💰 De 3 a 5 procedimentos com os valores
+📲 Seu @ do Instagram
+
+Se quiser, pode mandar também uma foto sua ou do seu espaço pra capa — mas não é obrigatório, se não mandar eu já uso uma capa padrão bonitinha.
+
+Os serviços eu já deixo com alguns exemplos prontos, só pra você já ver funcionando — depois você troca pelos seus com calma, ou, se preferir, a gente cadastra pra você.
 
 Com isso já consigo montar sua prévia! ✨`,
   },
@@ -154,10 +157,12 @@ Posso te mostrar como ficaria personalizado pra você? 💕`,
     tip: 'Mesmo pedido do Funil de Catálogo, só acrescenta os dias/horários — essencial pro agendamento automático. Continua aceitando qualquer formato.',
     content: `Perfeito! Me manda por aqui:
 
-📸 Uma foto sua ou do seu espaço
 📝 O nome que você quer no catálogo
-💰 De 3 a 5 procedimentos com os valores
-🗓️ Seus dias e horários de atendimento
+📲 Seu @ do Instagram
+
+Se quiser, pode mandar também uma foto sua ou do seu espaço pra capa — mas não é obrigatório, se não mandar eu já uso uma capa padrão bonitinha.
+
+Os serviços eu já deixo com alguns exemplos prontos, só pra você já ver funcionando — depois você troca pelos seus com calma, ou, se preferir, a gente cadastra pra você. Os dias e horários de atendimento você configura direto no app, no seu ritmo.
 
 Com isso já consigo montar sua prévia! ✨`,
   },
@@ -241,9 +246,12 @@ Posso te mostrar como ficaria personalizado pra você? 💕`,
     tip: 'Peça só o mínimo pra montar a prévia — nada de formulário longo. Aceite qualquer formato: foto, print, lista solta.',
     content: `Perfeito! Me manda por aqui:
 
-📸 Uma foto sua ou do seu espaço
 📝 O nome que você quer no catálogo
-💰 De 3 a 5 procedimentos com os valores
+📲 Seu @ do Instagram
+
+Se quiser, pode mandar também uma foto sua ou do seu espaço pra capa — mas não é obrigatório, se não mandar eu já uso uma capa padrão bonitinha.
+
+Os serviços eu já deixo com alguns exemplos prontos, só pra você já ver funcionando — depois você troca pelos seus com calma, ou, se preferir, a gente cadastra pra você.
 
 Com isso já consigo montar sua prévia! ✨`,
   },
@@ -327,10 +335,12 @@ Posso te mostrar como ficaria personalizado pra você? 💕`,
     tip: 'Mesmo pedido do Funil de Catálogo, só acrescenta os dias/horários — essencial pro agendamento automático. Continua aceitando qualquer formato.',
     content: `Perfeito! Me manda por aqui:
 
-📸 Uma foto sua ou do seu espaço
 📝 O nome que você quer no catálogo
-💰 De 3 a 5 procedimentos com os valores
-🗓️ Seus dias e horários de atendimento
+📲 Seu @ do Instagram
+
+Se quiser, pode mandar também uma foto sua ou do seu espaço pra capa — mas não é obrigatório, se não mandar eu já uso uma capa padrão bonitinha.
+
+Os serviços eu já deixo com alguns exemplos prontos, só pra você já ver funcionando — depois você troca pelos seus com calma, ou, se preferir, a gente cadastra pra você. Os dias e horários de atendimento você configura direto no app, no seu ritmo.
 
 Com isso já consigo montar sua prévia! ✨`,
   },
@@ -381,9 +391,10 @@ Se quiser mexer você mesma: https://studiomenu.art/c/showcase/lash`,
     tip: `Logo após ela reagir bem · Pouco esforço pra ela + 'ver antes de decidir' tira o risco.`,
     content: `Que bom que curtiu! Consigo montar um desse com seu nome, seus serviços e sua agenda, pra você ver pronto antes de decidir qualquer coisa. Me manda só:
 
+• O nome que você quer no catálogo
 • Seu @ do Instagram
-• Um print com 3 a 5 serviços e valores
-• Seus dias e horários de atendimento`,
+
+Se quiser, manda também uma foto sua ou do seu espaço pra capa — não é obrigatório, se não mandar eu já uso uma capa padrão. Os serviços eu já deixo com alguns exemplos prontos pra você ver funcionando (troca pelos seus depois, com calma, ou, se preferir, a gente cadastra pra você), e os dias e horários de atendimento você configura direto no app.`,
   },
   {
     id: 'abordagem-03-4',
@@ -471,9 +482,10 @@ Se quiser mexer você mesma: https://studiomenu.art/c/showcase/lash`,
     tip: `Logo após ela reagir bem · Pouco esforço pra ela + 'ver antes de decidir' tira o risco.`,
     content: `Que bom que curtiu! Consigo montar um desse com seu nome, seus serviços e sua agenda, pra você ver pronto antes de decidir qualquer coisa. Me manda só:
 
+• O nome que você quer no catálogo
 • Seu @ do Instagram
-• Um print com 3 a 5 serviços e valores
-• Seus dias e horários de atendimento`,
+
+Se quiser, manda também uma foto sua ou do seu espaço pra capa — não é obrigatório, se não mandar eu já uso uma capa padrão. Os serviços eu já deixo com alguns exemplos prontos pra você ver funcionando (troca pelos seus depois, com calma, ou, se preferir, a gente cadastra pra você), e os dias e horários de atendimento você configura direto no app.`,
   },
   {
     id: 'abordagem-04-4',
@@ -563,9 +575,10 @@ Se quiser mexer você mesma: https://studiomenu.art/c/showcase/lash`,
     tip: `Logo após ela reagir bem · Pouco esforço pra ela + 'ver antes de decidir' tira o risco.`,
     content: `Que bom que curtiu! Consigo montar um desse com seu nome, seus serviços e sua agenda, pra você ver pronto antes de decidir qualquer coisa. Me manda só:
 
+• O nome que você quer no catálogo
 • Seu @ do Instagram
-• Um print com 3 a 5 serviços e valores
-• Seus dias e horários de atendimento`,
+
+Se quiser, manda também uma foto sua ou do seu espaço pra capa — não é obrigatório, se não mandar eu já uso uma capa padrão. Os serviços eu já deixo com alguns exemplos prontos pra você ver funcionando (troca pelos seus depois, com calma, ou, se preferir, a gente cadastra pra você), e os dias e horários de atendimento você configura direto no app.`,
   },
   {
     id: 'abordagem-05-4',
@@ -657,8 +670,10 @@ Se quiser mexer você mesma: https://studiomenu.art/c/showcase/lash`,
     tip: `Logo após ela reagir bem · Pouco esforço pra ela + 'ver antes de decidir' tira o risco.`,
     content: `Que bom que curtiu! Consigo montar um igual com seu nome, suas fotos e seus valores, pra você ver pronto antes de decidir qualquer coisa. Me manda só:
 
+• O nome que você quer no catálogo
 • Seu @ do Instagram
-• Um print com 3 a 5 serviços e valores`,
+
+Se quiser, manda também uma foto sua ou do seu espaço pra capa — não é obrigatório, se não mandar eu já uso uma capa padrão. Os serviços eu já deixo com alguns exemplos prontos pra você ver funcionando — troca pelos seus depois, com calma, ou, se preferir, a gente cadastra pra você.`,
   },
   {
     id: 'abordagem-06-4',
@@ -746,8 +761,10 @@ Se quiser mexer você mesma: https://studiomenu.art/c/showcase/lash`,
     tip: `Logo após ela reagir bem · Pouco esforço pra ela + 'ver antes de decidir' tira o risco.`,
     content: `Que bom que curtiu! Consigo montar um igual com seu nome, suas fotos e seus valores, pra você ver pronto antes de decidir qualquer coisa. Me manda só:
 
+• O nome que você quer no catálogo
 • Seu @ do Instagram
-• Um print com 3 a 5 serviços e valores`,
+
+Se quiser, manda também uma foto sua ou do seu espaço pra capa — não é obrigatório, se não mandar eu já uso uma capa padrão. Os serviços eu já deixo com alguns exemplos prontos pra você ver funcionando — troca pelos seus depois, com calma, ou, se preferir, a gente cadastra pra você.`,
   },
   {
     id: 'abordagem-07-4',
@@ -837,8 +854,10 @@ Se quiser mexer você mesma: https://studiomenu.art/c/showcase/lash`,
     tip: `Logo após ela reagir bem · Pouco esforço pra ela + 'ver antes de decidir' tira o risco.`,
     content: `Que bom que curtiu! Consigo montar um igual com seu nome, suas fotos e seus valores, pra você ver pronto antes de decidir qualquer coisa. Me manda só:
 
+• O nome que você quer no catálogo
 • Seu @ do Instagram
-• Um print com 3 a 5 serviços e valores`,
+
+Se quiser, manda também uma foto sua ou do seu espaço pra capa — não é obrigatório, se não mandar eu já uso uma capa padrão. Os serviços eu já deixo com alguns exemplos prontos pra você ver funcionando — troca pelos seus depois, com calma, ou, se preferir, a gente cadastra pra você.`,
   },
   {
     id: 'abordagem-08-4',
@@ -1118,6 +1137,8 @@ Estamos finalizando o seu catálogo — já já te mando! ✨`,
 👉 [LINK DO APP]
 
 Lá dentro, toque em *"Visualizar catálogo"* pra ver como ficou. Se quiser mudar algo, é só tocar em *"Editar meu catálogo"* 💕
+
+Os serviços que estão aí agora são só exemplos, pra você já ver tudo funcionando de verdade — você troca pelos seus quando quiser, no seu ritmo, ou, se preferir, a gente cadastra pra você: é só mandar sua tabela, PDF ou print por aqui (ou falar se já tem em algum lugar online) que a gente deixa certinho. 😊
 
 Dá uma olhadinha e me conta o que achou!`,
   },

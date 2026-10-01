@@ -1,11 +1,27 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { CatalogOrderData } from '@/types/catalog';
+import { CatalogOrderData, ProcedureItem } from '@/types/catalog';
 import { normalizeWhatsappBR } from '@/lib/format';
+import { compressImageFiles } from '@/lib/image-compress-client';
 import Link from 'next/link';
-import { ArrowLeft, Sparkles, ExternalLink, Search, RefreshCw, Scissors, Plus, Trash2, MessageCircle, Phone, Clock, Smartphone, CalendarClock, Globe, Crown, ChevronDown, PauseCircle, PlayCircle, Gift } from 'lucide-react';
+import { ArrowLeft, Sparkles, ExternalLink, Search, RefreshCw, Scissors, Plus, Trash2, MessageCircle, Phone, Clock, Smartphone, CalendarClock, Globe, Crown, ChevronDown, PauseCircle, PlayCircle, Gift, Bot, Upload, FileText, X } from 'lucide-react';
 import { usesSubdomainRouting, PRODUCTION_DOMAIN } from '@/lib/public-url';
+
+/** `res.json()` direto quebra quando o corpo não é JSON de verdade (ex: erro
+ *  413 da Vercel antes mesmo da rota rodar) — mesmo utilitário já usado em
+ *  /admin/criar-com-ia. */
+async function readJsonSafely(res: Response): Promise<{ success: boolean; message?: string; [key: string]: any }> {
+  const text = await res.text();
+  try {
+    return JSON.parse(text);
+  } catch {
+    if (res.status === 413) {
+      return { success: false, message: 'Arquivos grandes demais mesmo após compressão. Tente enviar menos fotos por vez.' };
+    }
+    return { success: false, message: `Erro inesperado do servidor (status ${res.status}).` };
+  }
+}
 
 /** Campos de billing/agendamento não fazem parte do shape público do
  *  catálogo (`CatalogOrderData`) — extensão só local, pro admin. */
@@ -29,6 +45,110 @@ export default function AdminCatalogosPage() {
   // raras (copiar link mágico/app, oferta inicial, excluir) ficam atrás
   // desse toggle. Pedido pra reduzir a poluição visual, 2026-09-23.
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+
+  // "Cadastrar Serviços com IA" (2026-10-01) — exclusivo do admin: extrai
+  // serviços de um print/PDF enviado pelo lead e SUBSTITUI os serviços atuais
+  // de um catálogo já publicado (ex: os 4 de exemplo criados na prévia
+  // rápida). Pedido explícito da usuária: sempre substituir, nunca somar, e
+  // sempre mostrar uma tela de revisão antes de salvar de verdade.
+  const [servicesModalItem, setServicesModalItem] = useState<AdminCatalog | null>(null);
+  const [servicesModalStep, setServicesModalStep] = useState<'upload' | 'review'>('upload');
+  const [servicesFiles, setServicesFiles] = useState<File[]>([]);
+  const [extractedProcedures, setExtractedProcedures] = useState<ProcedureItem[]>([]);
+  const [isExtractingServices, setIsExtractingServices] = useState(false);
+  const [isSavingServices, setIsSavingServices] = useState(false);
+  const [servicesErrorMsg, setServicesErrorMsg] = useState('');
+
+  const openServicesModal = (item: AdminCatalog) => {
+    setServicesModalItem(item);
+    setServicesModalStep('upload');
+    setServicesFiles([]);
+    setExtractedProcedures([]);
+    setServicesErrorMsg('');
+  };
+
+  const closeServicesModal = () => {
+    setServicesModalItem(null);
+    setServicesFiles([]);
+    setExtractedProcedures([]);
+    setServicesErrorMsg('');
+  };
+
+  const handleExtractServices = async () => {
+    if (!servicesModalItem || !servicesFiles.length) return;
+    setIsExtractingServices(true);
+    setServicesErrorMsg('');
+
+    try {
+      const compressedFiles = await compressImageFiles(servicesFiles);
+      const fd = new FormData();
+      compressedFiles.forEach((f) => fd.append('files', f));
+      fd.append('niche', servicesModalItem.niche || 'lash');
+
+      const res = await fetch('/api/admin/extract-catalog', {
+        method: 'POST',
+        credentials: 'same-origin',
+        body: fd,
+      });
+      const json = await readJsonSafely(res);
+
+      if (!json.success) {
+        setServicesErrorMsg(json.message || 'Não foi possível extrair os procedimentos.');
+        return;
+      }
+
+      setExtractedProcedures(json.procedures);
+      setServicesModalStep('review');
+    } catch {
+      setServicesErrorMsg('Falha de conexão ao extrair os procedimentos.');
+    } finally {
+      setIsExtractingServices(false);
+    }
+  };
+
+  const updateExtractedProcedure = (id: string, field: keyof ProcedureItem, value: any) => {
+    setExtractedProcedures((prev) => prev.map((p) => (p.id === id ? { ...p, [field]: value } : p)));
+  };
+
+  const removeExtractedProcedure = (id: string) => {
+    setExtractedProcedures((prev) => prev.filter((p) => p.id !== id));
+  };
+
+  const addExtractedProcedure = () => {
+    setExtractedProcedures((prev) => [
+      ...prev,
+      { id: `manual-${Date.now()}`, title: '', price: '', duration: '', category: 'Geral', description: '' },
+    ]);
+  };
+
+  const handleSaveServices = async () => {
+    if (!servicesModalItem?.id || !extractedProcedures.length) return;
+    setIsSavingServices(true);
+    setServicesErrorMsg('');
+
+    try {
+      const res = await fetch('/api/admin/replace-services', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ orderId: servicesModalItem.id, procedures: extractedProcedures }),
+      });
+      const json = await readJsonSafely(res);
+
+      if (!json.success) {
+        setServicesErrorMsg(json.message || 'Erro ao salvar os serviços.');
+        return;
+      }
+
+      showToast('🤖 Serviços substituídos com sucesso!');
+      closeServicesModal();
+      fetchCatalogs();
+    } catch {
+      setServicesErrorMsg('Falha de conexão ao salvar os serviços.');
+    } finally {
+      setIsSavingServices(false);
+    }
+  };
 
   const toggleExpanded = (id: string) => {
     setExpandedIds((prev) => {
@@ -651,6 +771,17 @@ export default function AdminCatalogosPage() {
                           </a>
                         )}
 
+                        {/* Admin-only (2026-10-01): extrai serviços de um print/PDF que
+                         *  a cliente mandou e SUBSTITUI os serviços atuais do catálogo
+                         *  dela — nunca exposto no self-edit da profissional. */}
+                        <button
+                          onClick={() => openServicesModal(item)}
+                          className="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-rose-500/40 text-rose-300 text-sm font-bold flex items-center justify-center gap-2 transition-all"
+                        >
+                          <Bot className="w-4 h-4" />
+                          <span>Cadastrar Serviços com IA</span>
+                        </button>
+
                         <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between">
                           <button
                             onClick={() => toggleCatalogDisabled(item)}
@@ -715,6 +846,144 @@ export default function AdminCatalogosPage() {
                 Sim, Excluir
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {servicesModalItem && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-[60]">
+          <div className="max-w-lg w-full max-h-[85vh] overflow-y-auto bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-5">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h3 className="font-bold text-white text-lg flex items-center gap-2">
+                  <Bot className="w-5 h-5 text-rose-400" />
+                  Cadastrar Serviços com IA
+                </h3>
+                <p className="text-xs text-slate-400 mt-1">
+                  {servicesModalItem.studio_name || servicesModalItem.client_name}
+                </p>
+              </div>
+              <button onClick={closeServicesModal} className="p-1.5 text-slate-500 hover:text-white flex-shrink-0">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {servicesErrorMsg && (
+              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-sm text-center font-medium">
+                {servicesErrorMsg}
+              </div>
+            )}
+
+            {servicesModalStep === 'upload' ? (
+              <>
+                <p className="text-sm text-slate-400">
+                  Envie o print, foto ou PDF com os serviços e valores que a cliente mandou. A IA extrai tudo pra você revisar antes
+                  de salvar.
+                </p>
+                <p className="text-xs text-amber-400 bg-amber-500/10 border border-amber-500/30 rounded-xl p-3">
+                  ⚠️ Isso vai <strong>substituir todos os serviços atuais</strong> do catálogo (inclusive os de exemplo, se ainda
+                  estiverem lá) pelos novos. Não é possível desfazer.
+                </p>
+
+                <label className="flex items-center justify-center gap-2.5 w-full bg-slate-950 border-2 border-dashed border-slate-800 hover:border-rose-500 rounded-xl p-5 text-sm text-slate-400 cursor-pointer transition-all">
+                  <FileText className="w-5 h-5" />
+                  <span>{servicesFiles.length ? `${servicesFiles.length} arquivo(s) selecionado(s)` : 'Escolher imagem(ns) ou PDF'}</span>
+                  <input
+                    type="file"
+                    accept="image/*,application/pdf"
+                    multiple
+                    className="hidden"
+                    onChange={(e) => setServicesFiles(Array.from(e.target.files || []))}
+                  />
+                </label>
+
+                <button
+                  type="button"
+                  onClick={handleExtractServices}
+                  disabled={isExtractingServices || !servicesFiles.length}
+                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-rose-500 to-rose-600 hover:opacity-95 disabled:opacity-50 font-bold text-sm tracking-wider uppercase text-white flex items-center justify-center gap-2.5 shadow-lg"
+                >
+                  <Upload className="w-5 h-5" />
+                  <span>{isExtractingServices ? 'Lendo com IA...' : 'Extrair com IA'}</span>
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center justify-between gap-3">
+                  <h4 className="font-serif text-base font-bold text-white flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-rose-400 flex-shrink-0" /> Confira o que a IA entendeu
+                  </h4>
+                  <button
+                    type="button"
+                    onClick={addExtractedProcedure}
+                    className="px-3 py-2 rounded-lg bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs font-bold flex items-center gap-1.5 flex-shrink-0"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Item
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  {extractedProcedures.map((proc) => (
+                    <div key={proc.id} className="p-3.5 bg-slate-950 rounded-xl border border-slate-800 space-y-2.5">
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          placeholder="Nome do serviço"
+                          value={proc.title}
+                          onChange={(e) => updateExtractedProcedure(proc.id, 'title', e.target.value)}
+                          className="flex-1 bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-sm text-white focus:border-rose-500 focus:outline-none"
+                        />
+                        <button type="button" onClick={() => removeExtractedProcedure(proc.id)} className="text-slate-500 hover:text-rose-400 p-1.5 flex-shrink-0">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2">
+                        <input
+                          type="text"
+                          placeholder="Preço"
+                          value={proc.price}
+                          onChange={(e) => updateExtractedProcedure(proc.id, 'price', e.target.value)}
+                          className="bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-white focus:border-rose-500 focus:outline-none"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Duração"
+                          value={proc.duration}
+                          onChange={(e) => updateExtractedProcedure(proc.id, 'duration', e.target.value)}
+                          className="bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-white focus:border-rose-500 focus:outline-none"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Categoria"
+                          value={proc.category}
+                          onChange={(e) => updateExtractedProcedure(proc.id, 'category', e.target.value)}
+                          className="bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-white focus:border-rose-500 focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                  {extractedProcedures.length === 0 && (
+                    <p className="text-center text-sm text-slate-500 py-4">Nenhum procedimento — adicione manualmente ou volte e tente outro arquivo.</p>
+                  )}
+                </div>
+
+                <div className="flex gap-2.5">
+                  <button
+                    onClick={() => setServicesModalStep('upload')}
+                    className="flex-1 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm font-semibold text-slate-300"
+                  >
+                    Voltar
+                  </button>
+                  <button
+                    onClick={handleSaveServices}
+                    disabled={isSavingServices || extractedProcedures.length === 0}
+                    className="flex-1 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 disabled:opacity-60 text-sm font-bold text-white"
+                  >
+                    {isSavingServices ? 'Salvando...' : 'Confirmar e Substituir'}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
