@@ -72,10 +72,15 @@ export default function CriarComIAPage() {
   }, [step, layoutModel, themeVariant]);
 
   const handleExtract = async () => {
+    // Sem print/PDF ainda (cliente que não mandou os preços na hora): começa
+    // com os 4 primeiros serviços do preset do nicho, pra adiantar a criação
+    // e trocar pelos dela depois no editor — pedido real, 2026-10-01.
     if (!menuFiles.length) {
-      setErrorMsg('Envie ao menos um print ou PDF da tabela de preços.');
+      setProcedures(preset.procedures.slice(0, 4).map((p, i) => ({ ...p, id: `preset-${Date.now()}-${i}` })));
+      setStep('reviewing');
       return;
     }
+
     setIsExtracting(true);
     setErrorMsg('');
 
@@ -314,7 +319,8 @@ export default function CriarComIAPage() {
             🤖 Criar Catálogo com IA
           </h1>
           <p className="text-sm text-slate-400 mt-1.5">
-            Envie a foto de capa e um print (ou PDF) da tabela de preços — a IA lê e monta os procedimentos pra você revisar antes de criar.
+            Envie a foto de capa e, se já tiver, um print (ou PDF) da tabela de preços — a IA lê e monta os procedimentos pra você
+            revisar antes de criar. Sem a tabela, o catálogo nasce com os 4 primeiros serviços do modelo do nicho, prontos pra editar depois.
           </p>
         </header>
 
@@ -449,7 +455,7 @@ export default function CriarComIAPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-slate-300 mb-1.5">Print ou PDF de Serviços e Valores *</label>
+            <label className="block text-sm font-semibold text-slate-300 mb-1.5">Print ou PDF de Serviços e Valores (opcional)</label>
             <label className="flex items-center justify-center gap-2.5 w-full bg-slate-950 border-2 border-dashed border-slate-800 hover:border-rose-500 rounded-xl p-5 text-sm text-slate-400 cursor-pointer transition-all">
               <FileText className="w-5 h-5" />
               <span>{menuFiles.length ? `${menuFiles.length} arquivo(s) selecionado(s)` : 'Escolher imagem(ns) ou PDF'}</span>
@@ -461,17 +467,23 @@ export default function CriarComIAPage() {
                 onChange={(e) => setMenuFiles(Array.from(e.target.files || []))}
               />
             </label>
-            <p className="text-xs text-slate-500 mt-1.5">Pode enviar mais de uma foto se a tabela ocupar várias páginas/prints.</p>
+            <p className="text-xs text-slate-500 mt-1.5">
+              {menuFiles.length
+                ? 'Pode enviar mais de uma foto se a tabela ocupar várias páginas/prints.'
+                : 'Sem arquivo, o catálogo entra com 4 serviços de exemplo do nicho — troque pelos dela quando mandar os preços.'}
+            </p>
           </div>
 
           <button
             type="button"
             onClick={handleExtract}
-            disabled={isExtracting || !clientName || whatsappDigits.length < 10 || !menuFiles.length}
+            disabled={isExtracting || !clientName || whatsappDigits.length < 10}
             className="w-full mt-2 py-4 rounded-xl bg-gradient-to-r from-rose-500 to-rose-600 hover:opacity-95 disabled:opacity-50 font-bold text-sm tracking-wider uppercase text-white flex items-center justify-center gap-2.5 shadow-lg"
           >
             <Upload className="w-5 h-5" />
-            <span>{isExtracting ? 'Lendo com IA...' : '🤖 Extrair com IA'}</span>
+            <span>
+              {isExtracting ? 'Lendo com IA...' : menuFiles.length ? '🤖 Extrair com IA' : '➕ Criar com serviços padrão'}
+            </span>
           </button>
         </div>
       </div>
