@@ -404,8 +404,8 @@ Se quiser mexer você mesma: https://studiomenu.art/c/showcase/lash`,
 
 Você escolhe como continuar:
 
-📋 *Básico — R$39,90/mês*: link exclusivo com suas fotos, serviços e valores — a cliente chama você no WhatsApp pra agendar.
-📅 *Plus — R$69,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma.
+📋 *Básico — R$29,90/mês*: link exclusivo com suas fotos, serviços e valores — a cliente chama você no WhatsApp pra agendar.
+📅 *Plus — R$59,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma.
 
 Nos dois você edita tudo pelo celular, sem fidelidade — paga só enquanto estiver usando.
 
@@ -494,8 +494,8 @@ Se quiser mexer você mesma: https://studiomenu.art/c/showcase/lash`,
 
 Você escolhe como continuar:
 
-📋 *Básico — R$39,90/mês*: link exclusivo com suas fotos, serviços e valores — a cliente chama você no WhatsApp pra agendar.
-📅 *Plus — R$69,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma.
+📋 *Básico — R$29,90/mês*: link exclusivo com suas fotos, serviços e valores — a cliente chama você no WhatsApp pra agendar.
+📅 *Plus — R$59,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma.
 
 Nos dois você edita tudo pelo celular, sem fidelidade — paga só enquanto estiver usando.
 
@@ -586,8 +586,8 @@ Se quiser mexer você mesma: https://studiomenu.art/c/showcase/lash`,
 
 Você escolhe como continuar:
 
-📋 *Básico — R$39,90/mês*: link exclusivo com suas fotos, serviços e valores — a cliente chama você no WhatsApp pra agendar.
-📅 *Plus — R$69,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma.
+📋 *Básico — R$29,90/mês*: link exclusivo com suas fotos, serviços e valores — a cliente chama você no WhatsApp pra agendar.
+📅 *Plus — R$59,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma.
 
 Nos dois você edita tudo pelo celular, sem fidelidade — paga só enquanto estiver usando.
 
@@ -629,7 +629,7 @@ Qual desses faz mais sentido pra você?`,
     category: 'abordagem-06',
     categoryName: `Funil Abordagem 06: Catálogo — "Link exclusivo de serviços"`,
     title: `1️⃣ Primeira Mensagem`,
-    tip: `Por que está aqui: Mesma curiosidade do F1, com o plano de entrada (R$39,90/mês) — o mais fácil de fechar. · Dia 0 · qualquer lead do Google · Se o campo 'Site' do Google dela estiver vazio, melhor ainda: é exatamente onde o link entra.`,
+    tip: `Por que está aqui: Mesma curiosidade do F1, com o plano de entrada (R$29,90/mês) — o mais fácil de fechar. · Dia 0 · qualquer lead do Google · Se o campo 'Site' do Google dela estiver vazio, melhor ainda: é exatamente onde o link entra.`,
     content: `Oi, [Nome]! Tudo bem? Aqui é do StudioMenu, de Goiânia. Te achei no Google pesquisando [lash designer]. 😊
 
 Uma curiosidade: você sabia que dá pra ter um link exclusivo seu, com seus serviços, fotos e valores, pra colocar na bio do Instagram e no seu Google? Quem te encontra já vê tudo antes de te chamar. ✨
@@ -679,8 +679,8 @@ Se quiser mexer você mesma: https://studiomenu.art/c/showcase/lash`,
 
 Você escolhe como continuar:
 
-📋 *Básico — R$39,90/mês*: link exclusivo com suas fotos, serviços e valores — a cliente chama você no WhatsApp pra agendar.
-📅 *Plus — R$69,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma.
+📋 *Básico — R$29,90/mês*: link exclusivo com suas fotos, serviços e valores — a cliente chama você no WhatsApp pra agendar.
+📅 *Plus — R$59,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma.
 
 Nos dois você edita tudo pelo celular, sem fidelidade — paga só enquanto estiver usando.
 
@@ -768,8 +768,8 @@ Se quiser mexer você mesma: https://studiomenu.art/c/showcase/lash`,
 
 Você escolhe como continuar:
 
-📋 *Básico — R$39,90/mês*: link exclusivo com suas fotos, serviços e valores — a cliente chama você no WhatsApp pra agendar.
-📅 *Plus — R$69,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma.
+📋 *Básico — R$29,90/mês*: link exclusivo com suas fotos, serviços e valores — a cliente chama você no WhatsApp pra agendar.
+📅 *Plus — R$59,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma.
 
 Nos dois você edita tudo pelo celular, sem fidelidade — paga só enquanto estiver usando.
 
@@ -859,8 +859,8 @@ Se quiser mexer você mesma: https://studiomenu.art/c/showcase/lash`,
 
 Você escolhe como continuar:
 
-📋 *Básico — R$39,90/mês*: link exclusivo com suas fotos, serviços e valores — a cliente chama você no WhatsApp pra agendar.
-📅 *Plus — R$69,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma.
+📋 *Básico — R$29,90/mês*: link exclusivo com suas fotos, serviços e valores — a cliente chama você no WhatsApp pra agendar.
+📅 *Plus — R$59,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma.
 
 Nos dois você edita tudo pelo celular, sem fidelidade — paga só enquanto estiver usando.
 
@@ -945,8 +945,8 @@ Coloquei alguns dos seus serviços pra você ter uma ideia. O que achou?`,
     tip: `'Amei' / 'Ficou lindo' · Se ela escolher o Plus, peça os dias/horários de atendimento junto aqui. Objeção? Veja o bloco no fim da aba.`,
     content: `Que bom que gostou! 😍 Posso deixar esse no ar como seu link oficial. Você escolhe como continuar:
 
-📋 *Básico — R$39,90/mês*: link exclusivo com suas fotos, serviços e valores — a cliente chama você no WhatsApp pra agendar.
-📅 *Plus — R$69,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma.
+📋 *Básico — R$29,90/mês*: link exclusivo com suas fotos, serviços e valores — a cliente chama você no WhatsApp pra agendar.
+📅 *Plus — R$59,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma.
 
 Nos dois você edita tudo pelo celular, sem fidelidade — paga só enquanto estiver usando.
 
@@ -1042,8 +1042,8 @@ Usei seus serviços e valores e algumas fotos do seu Instagram. Assim a cliente 
     tip: `'Gostei' / 'Ficou lindo' · Deixa claro que ela escolhe entre os dois modelos.`,
     content: `Que bom que curtiu! Consigo deixar o seu completo no ar. Você escolhe como continuar:
 
-📋 *Básico — R$39,90/mês*: link exclusivo com suas fotos, serviços e valores — a cliente chama você no WhatsApp pra agendar.
-📅 *Plus — R$69,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma. É só trocar o link do botão "Agendar" do seu Linktree por esse.
+📋 *Básico — R$29,90/mês*: link exclusivo com suas fotos, serviços e valores — a cliente chama você no WhatsApp pra agendar.
+📅 *Plus — R$59,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma. É só trocar o link do botão "Agendar" do seu Linktree por esse.
 
 Nos dois você edita tudo pelo celular, sem fidelidade — paga só enquanto estiver usando.
 
@@ -1129,7 +1129,7 @@ Dá uma olhadinha e me conta o que achou!`,
     tip: 'Use pra quem veio pelo Funil Anúncio 01 ou Abordagem 01 (catálogo), quando ela reagir bem ou perguntar como funciona o pagamento. Só entra em cena depois da entrega, nunca antes.',
     content: `Que bom que gostou! 😍
 
-Por esse link você já vê e compartilha seu catálogo com suas clientes. Se quiser manter tudo sempre ativo e poder editar quando quiser, é só assinar ali dentro — R$ 39,90/mês, Pix ou cartão, ativa na hora.
+Por esse link você já vê e compartilha seu catálogo com suas clientes. Se quiser manter tudo sempre ativo e poder editar quando quiser, é só assinar ali dentro — R$ 29,90/mês, Pix ou cartão, ativa na hora.
 
 Qualquer dúvida me chama! 💖`,
   },
@@ -1141,7 +1141,7 @@ Qualquer dúvida me chama! 💖`,
     tip: 'Use pra quem veio pelo Funil Anúncio 02 ou Abordagem 02 (agendamento) — mesma lógica da versão de catálogo, mas com o agendamento automático em destaque.',
     content: `Que bom que gostou! 😍
 
-Por esse link você já vê e compartilha seu catálogo, e sua cliente já pode agendar direto por ele. Pra manter o agendamento automático sempre ativo, é só assinar ali dentro — R$ 69,90/mês, Pix ou cartão, ativa na hora.
+Por esse link você já vê e compartilha seu catálogo, e sua cliente já pode agendar direto por ele. Pra manter o agendamento automático sempre ativo, é só assinar ali dentro — R$ 59,90/mês, Pix ou cartão, ativa na hora.
 
 Qualquer dúvida me chama! 💖`,
   },
@@ -1253,7 +1253,7 @@ Se quiser deixar tudo sempre ativo (ou ligar o agendamento automático), é só 
 
 Aqui mudou bastante desde a nossa conversa: o LashMenu passou por um rebranding e virou StudioMenu ✨ Melhoramos o catálogo e agora você mesma edita tudo quando quiser (fotos, preços, etc), sem depender da gente.
 
-E o valor ficou bem mais em conta: R$ 39,90/mês, sem compromisso — usa um mês, se curtir continua, se não quiser é só cancelar.
+E o valor ficou bem mais em conta: R$ 29,90/mês, sem compromisso — usa um mês, se curtir continua, se não quiser é só cancelar.
 
 Agora você também tem um app exclusivo seu, com os links pra ver e editar o catálogo, tudo num só lugar:
 👉 [LINK DO APP]

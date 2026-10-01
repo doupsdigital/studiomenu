@@ -1,5 +1,13 @@
 // Funil de Vendas X1 WhatsApp — Exclusivo para Anúncios de Tráfego Pago (Meta Ads)
 // Estrutura em 2 Funis completos (Vídeo e Imagem) otimizados para converter os leads dos anúncios do StudioMenu.
+//
+// Reescrito em 2026-10-01: a versão anterior descrevia o modelo antigo do LashMenu
+// (catálogo pago, pagamento único de R$89/R$149 via PIX pessoal, "liberar o painel"
+// só depois do pagamento) — não bate com o produto atual. Hoje o catálogo é sempre
+// grátis pra criar; o que é vendido é uma assinatura recorrente opcional (Básico ou
+// Plus), explicada só na entrega da prévia, paga dentro do app via Asaas (Pix ou
+// cartão), nunca por chave PIX pessoal. Mesmo modelo de preço de
+// `src/data/vendas-x1-scripts.ts` — preços centralizados em `src/lib/pricing.ts`.
 
 export interface FunnelStep {
   stepNumber: number;
@@ -38,7 +46,7 @@ export const FUNIL_ADS_DATA: FunnelData[] = [
 Dá uma olhadinha de perto em como o Catálogo Digital funciona, ao vivo no celular:
 👉 https://studiomenu.art/c/showcase/lash
 
-Fica parecido com um aplicativo próprio do seu estúdio! O que achou do visual? 💕`
+Fica parecido com um aplicativo próprio do seu estúdio! O que achou do visual? 💕`,
       },
       {
         stepNumber: 2,
@@ -47,86 +55,79 @@ Fica parecido com um aplicativo próprio do seu estúdio! O que achou do visual?
         tip: 'Envie quando ela elogiar a prévia.',
         content: `Lindo demais, né? 😍 Como você viu no vídeo, ele foi pensado pra valorizar cada detalhe do seu trabalho e acabar de vez com a bagunça de enviar tabela em PDF pesado ou foto do papel.
 
-Hoje você envia seus valores por foto/mensagem ou já usa algum link?`
+Hoje você envia seus valores por foto/mensagem ou já usa algum link?`,
       },
       {
         stepNumber: 3,
         title: '3️⃣ Explicar a Solução StudioMenu sem Fricção',
         badge: 'Apresentação do Produto',
-        tip: 'Mostre a simplicidade e a elegância.',
-        content: `Entendi! O StudioMenu resolve exatamente isso: nós criamos um link exclusivo com a sua marca, foto de capa em alta definição, seus procedimentos categorizados por fotos e botão direto pro seu WhatsApp.
+        tip: 'Deixa claro que criar o catálogo não custa nada — isso tira a resistência antes mesmo de pedir os dados.',
+        content: `Entendi! O StudioMenu resolve exatamente isso: você ganha um link exclusivo com a sua marca, foto de capa em alta definição, seus procedimentos organizados com fotos e botão direto pro seu WhatsApp.
 
-E o melhor: sua cliente navega sem precisar baixar nada no celular dela! ✨`
+Criar o catálogo não tem nenhum custo. Se mais pra frente você quiser ativar o agendamento automático (a cliente marcando sozinha, sem trocar mensagem com você), aí sim existe uma assinatura — mas isso eu só te mostro depois, sem pressa. ✨`,
       },
       {
         stepNumber: 4,
         title: '4️⃣ Coleta de Dados (Onboarding Express)',
         badge: 'Coleta de Informações',
-        tip: 'Peça os dados pra montar o catálogo personalizado.',
-        content: `Para eu montar uma prévia do seu catálogo exclusivo agora mesmo, só preciso de 3 coisas:
+        tip: 'Peça os dados pra montar a prévia personalizada — sem pedir nada de pagamento aqui.',
+        content: `Pra eu montar uma prévia do seu catálogo exclusivo agora mesmo, só preciso de 3 coisas:
 
 1️⃣ Nome do seu Estúdio/Marca
 2️⃣ Sua foto de perfil ou logo
 3️⃣ Um print ou foto da sua tabela de serviços e valores atual
 
-Pode me mandar por aqui mesmo! 📲`
+Pode me mandar por aqui mesmo, sem compromisso nenhum! 📲`,
       },
       {
         stepNumber: 5,
-        title: '5️⃣ Apresentação da Oferta & Planos (Essencial vs. VIP)',
-        badge: 'Preço & Valor',
-        tip: 'Apresente as duas opções com clareza.',
-        content: `Que incrível! Seu catálogo vai ficar maravilhoso! 😍
+        title: '5️⃣ Confirmação de Recebimento',
+        badge: 'Confirmação',
+        tip: 'Envie assim que ela mandar o material.',
+        content: `Recebi tudo por aqui! 🎉
 
-Nós temos 2 opções de planos (pagamento único, sem mensalidade):
-
-🌸 **Plano Essencial — R$ 89,00**
-• Catálogo Digital Completo + Link Exclusivo + Acesso ao Editor de Preços no App.
-
-👑 **Plano VIP — R$ 149,00**
-• Tudo do Essencial + Sistema de Agendamento Automático 24h + Suporte Prioritário.
-
-Qual das duas opções se encaixa melhor no momento do seu estúdio? 💕`
+Vamos preparar com muito carinho. Assim que sua prévia estiver pronta eu te mando aqui!`,
       },
       {
         stepNumber: 6,
-        title: '6️⃣ Contorno de Objeções (Canva / PDF / Preço)',
-        badge: 'Objeção',
-        tip: 'Use caso ela relute sobre o preço ou diga que faz no Canva.',
-        content: `Te entendo super! A diferença do Canva é que o PDF do Canva fica pesado, a cliente precisa baixar no celular e a tabela fica desconfigurada.
+        title: '6️⃣ Entrega da Prévia + Os 2 Planos',
+        badge: 'Preço & Valor',
+        tip: 'Só aqui o preço entra na conversa — depois que ela já viu o catálogo pronto com a marca dela. Objeção? Veja o próximo passo.',
+        content: `Pronto, [Nome]! Olha como ficou o seu:
+👉 [link da prévia]
 
-No StudioMenu, a cliente clica no seu link e abre em 0 segundos. Além disso, você altera seus preços a qualquer momento direto pelo celular! É um investimento único que se paga no primeiro atendimento do mês. ✨`
+Você escolhe como continuar:
+
+📋 *Básico — R$29,90/mês*: link exclusivo com suas fotos, serviços e valores — a cliente chama você no WhatsApp pra agendar.
+📅 *Plus — R$59,90/mês*: tudo isso + agendamento automático — a cliente marca sozinha, sem você responder uma por uma.
+
+Nos dois você edita tudo pelo celular, sem fidelidade — paga só enquanto estiver usando.
+
+Qual desses faz mais sentido pra você?`,
       },
       {
         stepNumber: 7,
-        title: '7️⃣ Fechamento & Envio do PIX',
-        badge: 'Fechamento',
-        tip: 'Mande para fechar a venda.',
-        content: `Excelente escolha! Vamos deixar o seu estúdio em outro patamar profissional! 🚀
+        title: '7️⃣ Contorno de Objeções (Canva / PDF / Preço)',
+        badge: 'Objeção',
+        tip: 'Use caso ela relute sobre o preço ou diga que faz no Canva.',
+        content: `Te entendo super! A diferença do Canva é que o PDF fica pesado, a cliente precisa baixar no celular e a tabela desconfigura.
 
-Vou te enviar nossa chave PIX oficial pra confirmarmos a liberação do seu painel:
-
-🔑 **Chave PIX**: [INSERIR_SUA_CHAVE_PIX_AQUI]
-Valor: R$ 89,00 (ou R$ 149,00)
-
-Assim que fizer o PIX, me manda o comprovante aqui pra eu te entregar o link de acesso imediato!`
+No StudioMenu, ela clica no seu link e abre na hora. E você mesma troca preços e fotos quando quiser, direto pelo celular — o catálogo em si não tem custo nenhum pra manter no ar. ✨`,
       },
       {
         stepNumber: 8,
-        title: '8️⃣ Entrega do Link do Catálogo + Painel do App',
+        title: '8️⃣ Entrega do Link do App (Catálogo + Edição + Assinatura)',
         badge: 'Entrega Final',
-        tip: 'Mande após a confirmação do pagamento.',
-        content: `Parabéns! Seu StudioMenu está 100% no ar! 🎉✨
+        tip: 'O link é o do APP — já vem com o catálogo, edição e a opção de assinar, tudo dentro da mesma experiência. Nunca mande chave PIX nem link de pagamento separado.',
+        content: `Prontinho! Seu StudioMenu já está no ar 🎉
 
-👉 **Seu Link do Catálogo para por na Bio do Instagram**:
-https://studiomenu.art/c/seu-estudio
+👉 [LINK DO APP]
 
-📲 **Seu Acesso para Editar Preços e Procedimentos no App**:
-https://studiomenu.art/app
+Lá dentro, toque em *"Visualizar catálogo"* pra ver como ficou. Se quiser mudar algo, é só tocar em *"Editar meu catálogo"* — e se quiser ativar a assinatura, a opção já está lá dentro também.
 
-Qualquer dúvida que tiver, estou aqui no WhatsApp pra te ajudar! Boas vendas! 💕`
-      }
-    ]
+Qualquer dúvida, estou aqui! 💕`,
+      },
+    ],
   },
   {
     id: 'funil-imagem',
@@ -148,7 +149,7 @@ O anúncio que você viu mostra exatamente a elegância do nosso Catálogo Mosai
 Veja como ele fica completo e interativo na tela do celular:
 👉 https://studiomenu.art/c/showcase/lash
 
-O que achou dessa apresentação profissional pro seu estúdio? 💕`
+O que achou dessa apresentação profissional pro seu estúdio? 💕`,
       },
       {
         stepNumber: 2,
@@ -157,63 +158,61 @@ O que achou dessa apresentação profissional pro seu estúdio? 💕`
         tip: 'Mostre como o catálogo economiza tempo no atendimento.',
         content: `Com esse catálogo na sua Bio do Instagram ou no WhatsApp, suas clientes navegam pelos seus procedimentos com fotos reais, descrição e valores sem precisar ficar perguntando "quanto é a manutenção?" toda hora.
 
-Dá uma autoridade gigante pro seu estúdio e passa muita segurança! ✨`
+Dá uma autoridade gigante pro seu estúdio e passa muita segurança! ✨`,
       },
       {
         stepNumber: 3,
         title: '3️⃣ Coleta Prática de Dados',
         badge: 'Onboarding Express',
-        tip: 'Peça os dados pra montar o catálogo.',
-        content: `Quer que eu monte uma prévia com a marca do seu estúdio? 
+        tip: 'Peça os dados pra montar o catálogo — sem pedir nada de pagamento aqui.',
+        content: `Quer que eu monte uma prévia com a marca do seu estúdio?
 
 Me envia aqui por favor:
 1. O nome da sua marca/estúdio
 2. Uma foto sua ou da sua logo
 3. Um print ou foto dos seus preços atuais
 
-Já coloco no sistema pra você ver como fica! 📲`
+Já coloco no sistema pra você ver como fica, sem nenhum custo! 📲`,
       },
       {
         stepNumber: 4,
-        title: '4️⃣ Apresentação de Planos (Essencial R$ 89 vs VIP R$ 149)',
-        badge: 'Preço & Planos',
-        tip: 'Apresente os valores sem mensalidade.',
-        content: `Perfeito! O investimento para ter o seu StudioMenu é único (sem mensalidade mensal):
+        title: '4️⃣ Confirmação de Recebimento',
+        badge: 'Confirmação',
+        tip: 'Envie assim que ela mandar o material.',
+        content: `Recebi tudo por aqui! 🎉
 
-🌸 **Plano Essencial**: R$ 89,00 (Catálogo Digital Completo + Editor no celular)
-👑 **Plano VIP**: R$ 149,00 (Catálogo Digital + Sistema de Agendamento Automático 24h)
-
-Qual dessas opções combina mais com o seu estúdio hoje? 💕`
+Vamos preparar com muito carinho. Assim que sua prévia estiver pronta eu te mando aqui!`,
       },
       {
         stepNumber: 5,
-        title: '5️⃣ Fechamento & Chave PIX',
-        badge: 'Fechamento',
-        tip: 'Envie para receber o pagamento.',
-        content: `Excelente! Seu estúdio vai ficar um luxo! 💖
+        title: '5️⃣ Entrega da Prévia + Os 2 Planos',
+        badge: 'Preço & Valor',
+        tip: 'Só aqui o preço entra na conversa — depois que ela já viu o catálogo pronto com a marca dela.',
+        content: `Pronto, [Nome]! Olha como ficou o seu:
+👉 [link da prévia]
 
-Segue a nossa chave PIX oficial para liberar o seu catálogo e painel de edição:
+Você escolhe como continuar:
 
-🔑 **Chave PIX**: [INSERIR_SUA_CHAVE_PIX_AQUI]
-Valor: R$ 89,00 (ou R$ 149,00)
+📋 *Básico — R$29,90/mês*: link exclusivo com suas fotos, serviços e valores — a cliente chama você no WhatsApp pra agendar.
+📅 *Plus — R$59,90/mês*: tudo isso + agendamento automático — a cliente marca sozinha, sem você responder uma por uma.
 
-Assim que realizar a transferência, me envia o comprovante aqui pra eu te liberar o acesso na hora!`
+Nos dois você edita tudo pelo celular, sem fidelidade — paga só enquanto estiver usando.
+
+Qual desses faz mais sentido pra você?`,
       },
       {
         stepNumber: 6,
-        title: '6️⃣ Entrega do Link do Catálogo + Painel',
+        title: '6️⃣ Entrega do Link do App (Catálogo + Edição + Assinatura)',
         badge: 'Entrega Final',
-        tip: 'Mande após a confirmação do PIX.',
-        content: `Prontinho! Seu catálogo digital está oficialmente no ar e pronto para brilhar! ✨🎉
+        tip: 'O link é o do APP — já vem com o catálogo, edição e a opção de assinar, tudo dentro da mesma experiência. Nunca mande chave PIX nem link de pagamento separado.',
+        content: `Prontinho! Seu catálogo digital está oficialmente no ar e pronto pra brilhar! ✨🎉
 
-👉 **Seu Link do Catálogo para o Instagram/WhatsApp**:
-https://studiomenu.art/c/seu-estudio
+👉 [LINK DO APP]
 
-📲 **Seu Acesso para Editar Preços e Serviços**:
-https://studiomenu.art/app
+Lá dentro, toque em *"Visualizar catálogo"* pra ver como ficou. Se quiser mudar algo, é só tocar em *"Editar meu catálogo"* — e se quiser ativar a assinatura, a opção já está lá dentro também.
 
-Estou à disposição pra qualquer dúvida! Desejo muito sucesso e agenda lotada! 💕`
-      }
-    ]
-  }
+Estou à disposição pra qualquer dúvida! Desejo muito sucesso e agenda lotada! 💕`,
+      },
+    ],
+  },
 ];
