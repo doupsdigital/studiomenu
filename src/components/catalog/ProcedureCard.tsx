@@ -35,18 +35,6 @@ export const ProcedureCard: React.FC<ProcedureCardProps> = ({ item, whatsappNumb
       className={`tile ${item.is_highlight ? 'tile--destaque' : ''} is-revealed ${isEditMode ? 'lm-service-card-wrapper' : ''}`}
       onClick={handleBooking}
     >
-      {/* Fundo desfocado com a própria foto, ampliada — preenche o card
-       *  quando a imagem não é 9:16 (menor/outra proporção), em vez de
-       *  deixar borda preta em cima/embaixo (mesmo efeito do Status do
-       *  WhatsApp/Stories). Pra foto já em 9:16 fica invisível, escondida
-       *  atrás da foto nítida da frente. */}
-      <img
-        src={item.image_url || fallbackImage}
-        alt=""
-        aria-hidden="true"
-        className="tile__foto-bg"
-        loading="lazy"
-      />
       <img
         src={item.image_url || fallbackImage}
         alt={item.title}
