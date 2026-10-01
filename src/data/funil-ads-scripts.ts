@@ -90,14 +90,12 @@ Quer que eu monte a sua? ✨`,
       tip: 'Envie assim que ela topar fazer a prévia (em qualquer uma das variantes acima).',
       content: `Pra montarmos uma prévia do seu catálogo exclusivo agora mesmo, só preciso de 2 coisas:
 
-1️⃣ Nome do seu Estúdio/Marca
+1️⃣ Nome do seu Studio
 2️⃣ Seu @ do Instagram
 
 Se quiser, pode mandar também uma foto sua ou do seu espaço pra capa — mas não é obrigatório, se não mandar a gente já usa uma capa padrão.
 
 Os serviços a gente já deixa com alguns exemplos prontos, só pra você ver funcionando — depois você troca pelos seus com calma, ou, se preferir, a gente cadastra pra você: é só mandar sua tabela ou PDF depois.
-
-Pode me mandar por aqui mesmo, da forma que ficar mais fácil pra você! 📲
 
 *Entregamos sua prévia em até 24 horas* (geralmente entregamos bem antes 🥰)`,
     },
