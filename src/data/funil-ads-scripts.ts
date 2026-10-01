@@ -88,13 +88,14 @@ Quer que eu monte a sua? ✨`,
       title: '3️⃣ Coleta de Dados (Onboarding Express)',
       badge: 'Coleta de Informações',
       tip: 'Envie assim que ela topar fazer a prévia (em qualquer uma das variantes acima).',
-      content: `Pra montarmos uma prévia do seu catálogo exclusivo agora mesmo, só preciso de 3 coisas:
+      content: `Pra montarmos uma prévia do seu catálogo exclusivo agora mesmo, só preciso de 2 coisas:
 
-1️⃣ Nome do seu Estúdio/Marca
-2️⃣ Sua foto de perfil ou logo, pra capa do catálogo
-3️⃣ Um print ou foto da sua tabela de serviços e valores atual (depois você edita tudo como preferir)
+1️⃣ Nome do seu Studio
+2️⃣ Seu @ do Instagram
 
-Pode me mandar por aqui mesmo, da forma que ficar mais fácil pra você! 📲
+Se quiser, pode mandar também uma foto sua ou do seu espaço pra capa — mas não é obrigatório, se não mandar a gente já usa uma capa padrão.
+
+Os serviços a gente já deixa com alguns exemplos prontos, só pra você ver funcionando — depois você troca pelos seus com calma, ou, se preferir, a gente cadastra pra você: é só mandar sua tabela ou PDF depois.
 
 *Entregamos sua prévia em até 24 horas* (geralmente entregamos bem antes 🥰)`,
     },
@@ -117,6 +118,8 @@ Vamos preparar com muito carinho. Assim que sua prévia estiver pronta eu te man
 👉 *[LINK DO APP]*
 
 Lá dentro, toque em *"Visualizar catálogo"* pra ver como ficou. Se quiser mudar algo, é só tocar em *"Editar meu catálogo"* — e se quiser ativar a assinatura, a opção já está lá dentro também.
+
+Os serviços que estão aí agora são só exemplos, pra você já ver tudo funcionando de verdade — você troca pelos seus quando quiser, ou, se preferir, a gente cadastra pra você: é só mandar sua tabela, PDF ou print por aqui (ou falar se já tem em algum lugar online) que a gente deixa certinho. 😊
 
 Qualquer dúvida, estou aqui! 💕`,
     },
