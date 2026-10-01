@@ -14,8 +14,24 @@ export async function optimizeImage(buffer: Buffer, contentType: string): Promis
     return { buffer, contentType, ext: 'gif' };
   }
   try {
-    const optimized = await sharp(buffer)
-      .rotate() // aplica a orientação EXIF (fotos de celular) antes de medir/redimensionar
+    const rotated = await sharp(buffer).rotate().toBuffer(); // aplica a orientação EXIF (fotos de celular) antes de medir/redimensionar
+
+    // Corta bordas de cor sólida já gravadas na foto (ex: faixas pretas de
+    // letterboxing de quem exportou de um vídeo/outro formato antes de subir
+    // — pedido real, 2026-10-01: card do mosaico é 9:16 e fica feio com faixa
+    // preta em cima/embaixo). `trim()` mede a partir do pixel do canto quanto
+    // dessa cor se estende a partir de cada borda e corta só isso — sem IA,
+    // detecção pura de cor sólida. Se a foto não tiver borda sólida (ou for
+    // uma cor só, o que faria o corte zerar a imagem), sharp lança erro:
+    // seguimos com a imagem só rotacionada, sem cortar nada.
+    let trimmed = rotated;
+    try {
+      trimmed = await sharp(rotated).trim({ threshold: 20 }).toBuffer();
+    } catch {
+      // Sem borda sólida detectável — mantém a imagem como está.
+    }
+
+    const optimized = await sharp(trimmed)
       .resize({ width: 1600, height: 1600, fit: 'inside', withoutEnlargement: true })
       .webp({ quality: 82 })
       .toBuffer();
