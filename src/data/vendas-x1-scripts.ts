@@ -398,19 +398,18 @@ Se quiser mexer você mesma: https://studiomenu.art/c/showcase/lash`,
     category: 'abordagem-03',
     categoryName: `Funil Abordagem 03: Agenda — "Já dá pra agendar por link?"`,
     title: `5️⃣ Entrega da Prévia + Preço`,
-    tip: `Quando a prévia estiver pronta · Resume o valor, ancora o preço no dia a dia e tira o medo do compromisso. Termina com pergunta de sim. Objeção? Veja o bloco no fim da aba.`,
-    content: `Pronto, [Nome]! Olha como ficou o seu, já com a agenda funcionando:
+    tip: `Quando a prévia estiver pronta · Deixa claro que ela escolhe entre os dois modelos — evita perder venda por achar que só tem a opção mais cara. Objeção? Veja o bloco no fim da aba.`,
+    content: `Pronto, [Nome]! Olha como ficou o seu:
 👉 [link da prévia]
 
-Funciona assim:
+Você escolhe como continuar:
 
-✨ É um link exclusivo seu, com suas fotos, serviços e valores
-📅 A cliente vê seus horários livres e marca sozinha, sem você responder uma por uma
-✏️ Você mesma edita tudo pelo celular, quando quiser
+📋 *Básico — R$29,90/mês*: link exclusivo com suas fotos, serviços e valores — a cliente chama você no WhatsApp pra agendar.
+📅 *Plus — R$59,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma.
 
-Tudo isso por R$69,90/mês — menos de R$2,50 por dia. Se trouxer uma cliente a mais no mês, já se pagou. E sem fidelidade: você só paga enquanto estiver usando.
+Nos dois você edita tudo pelo celular, sem fidelidade — paga só enquanto estiver usando.
 
-Posso deixar o seu ativo hoje?`,
+Qual desses faz mais sentido pra você?`,
   },
   {
     id: 'abordagem-03-6',
@@ -489,19 +488,18 @@ Se quiser mexer você mesma: https://studiomenu.art/c/showcase/lash`,
     category: 'abordagem-04',
     categoryName: `Funil Abordagem 04: Agenda — "Responde na hora?"`,
     title: `5️⃣ Entrega da Prévia + Preço`,
-    tip: `Quando a prévia estiver pronta · Resume o valor, ancora o preço no dia a dia e tira o medo do compromisso. Termina com pergunta de sim. Objeção? Veja o bloco no fim da aba.`,
-    content: `Pronto, [Nome]! Olha como ficou o seu, já com a agenda funcionando:
+    tip: `Quando a prévia estiver pronta · Deixa claro que ela escolhe entre os dois modelos — evita perder venda por achar que só tem a opção mais cara. Objeção? Veja o bloco no fim da aba.`,
+    content: `Pronto, [Nome]! Olha como ficou o seu:
 👉 [link da prévia]
 
-Funciona assim:
+Você escolhe como continuar:
 
-✨ É um link exclusivo seu, com suas fotos, serviços e valores
-📅 A cliente vê seus horários livres e marca sozinha, sem você responder uma por uma
-✏️ Você mesma edita tudo pelo celular, quando quiser
+📋 *Básico — R$29,90/mês*: link exclusivo com suas fotos, serviços e valores — a cliente chama você no WhatsApp pra agendar.
+📅 *Plus — R$59,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma.
 
-Tudo isso por R$69,90/mês — menos de R$2,50 por dia. Se trouxer uma cliente a mais no mês, já se pagou. E sem fidelidade: você só paga enquanto estiver usando.
+Nos dois você edita tudo pelo celular, sem fidelidade — paga só enquanto estiver usando.
 
-Posso deixar o seu ativo hoje?`,
+Qual desses faz mais sentido pra você?`,
   },
   {
     id: 'abordagem-04-6',
@@ -582,19 +580,18 @@ Se quiser mexer você mesma: https://studiomenu.art/c/showcase/lash`,
     category: 'abordagem-05',
     categoryName: `Funil Abordagem 05: Agenda — "Já perdeu cliente?"`,
     title: `5️⃣ Entrega da Prévia + Preço`,
-    tip: `Quando a prévia estiver pronta · Resume o valor, ancora o preço no dia a dia e tira o medo do compromisso. Termina com pergunta de sim. Objeção? Veja o bloco no fim da aba.`,
-    content: `Pronto, [Nome]! Olha como ficou o seu, já com a agenda funcionando:
+    tip: `Quando a prévia estiver pronta · Deixa claro que ela escolhe entre os dois modelos — evita perder venda por achar que só tem a opção mais cara. Objeção? Veja o bloco no fim da aba.`,
+    content: `Pronto, [Nome]! Olha como ficou o seu:
 👉 [link da prévia]
 
-Funciona assim:
+Você escolhe como continuar:
 
-✨ É um link exclusivo seu, com suas fotos, serviços e valores
-📅 A cliente vê seus horários livres e marca sozinha, sem você responder uma por uma
-✏️ Você mesma edita tudo pelo celular, quando quiser
+📋 *Básico — R$29,90/mês*: link exclusivo com suas fotos, serviços e valores — a cliente chama você no WhatsApp pra agendar.
+📅 *Plus — R$59,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma.
 
-Tudo isso por R$69,90/mês — menos de R$2,50 por dia. Se trouxer uma cliente a mais no mês, já se pagou. E sem fidelidade: você só paga enquanto estiver usando.
+Nos dois você edita tudo pelo celular, sem fidelidade — paga só enquanto estiver usando.
 
-Posso deixar o seu ativo hoje?`,
+Qual desses faz mais sentido pra você?`,
   },
   {
     id: 'abordagem-05-6',
@@ -632,7 +629,7 @@ Posso deixar o seu ativo hoje?`,
     category: 'abordagem-06',
     categoryName: `Funil Abordagem 06: Catálogo — "Link exclusivo de serviços"`,
     title: `1️⃣ Primeira Mensagem`,
-    tip: `Por que está aqui: Mesma curiosidade do F1, com o plano de entrada (R$39,90/mês) — o mais fácil de fechar. · Dia 0 · qualquer lead do Google · Se o campo 'Site' do Google dela estiver vazio, melhor ainda: é exatamente onde o link entra.`,
+    tip: `Por que está aqui: Mesma curiosidade do F1, com o plano de entrada (R$29,90/mês) — o mais fácil de fechar. · Dia 0 · qualquer lead do Google · Se o campo 'Site' do Google dela estiver vazio, melhor ainda: é exatamente onde o link entra.`,
     content: `Oi, [Nome]! Tudo bem? Aqui é do StudioMenu, de Goiânia. Te achei no Google pesquisando [lash designer]. 😊
 
 Uma curiosidade: você sabia que dá pra ter um link exclusivo seu, com seus serviços, fotos e valores, pra colocar na bio do Instagram e no seu Google? Quem te encontra já vê tudo antes de te chamar. ✨
@@ -676,19 +673,18 @@ Se quiser mexer você mesma: https://studiomenu.art/c/showcase/lash`,
     category: 'abordagem-06',
     categoryName: `Funil Abordagem 06: Catálogo — "Link exclusivo de serviços"`,
     title: `5️⃣ Entrega da Prévia + Preço`,
-    tip: `Quando a prévia estiver pronta · Resume o valor, ancora o preço no dia a dia e tira o medo do compromisso. Termina com pergunta de sim. Objeção? Veja o bloco no fim da aba.`,
+    tip: `Quando a prévia estiver pronta · Deixa claro que ela escolhe entre os dois modelos — evita perder venda por achar que só tem a opção mais cara. Objeção? Veja o bloco no fim da aba.`,
     content: `Pronto, [Nome]! Olha como ficou o seu:
 👉 [link da prévia]
 
-Funciona assim:
+Você escolhe como continuar:
 
-✨ É um link exclusivo seu, com suas fotos, serviços e valores
-📲 Você coloca na bio e no Google, e manda pras clientes quando perguntam valor
-✏️ Você mesma edita tudo pelo celular, quando quiser
+📋 *Básico — R$29,90/mês*: link exclusivo com suas fotos, serviços e valores — a cliente chama você no WhatsApp pra agendar.
+📅 *Plus — R$59,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma.
 
-Tudo isso por R$39,90/mês — menos de R$1,50 por dia. Se trouxer uma cliente a mais no mês, já se pagou. E sem fidelidade: você só paga enquanto estiver usando.
+Nos dois você edita tudo pelo celular, sem fidelidade — paga só enquanto estiver usando.
 
-Posso deixar o seu ativo hoje?`,
+Qual desses faz mais sentido pra você?`,
   },
   {
     id: 'abordagem-06-6',
@@ -766,19 +762,18 @@ Se quiser mexer você mesma: https://studiomenu.art/c/showcase/lash`,
     category: 'abordagem-07',
     categoryName: `Funil Abordagem 07: Catálogo — "Como manda seus valores?"`,
     title: `5️⃣ Entrega da Prévia + Preço`,
-    tip: `Quando a prévia estiver pronta · Resume o valor, ancora o preço no dia a dia e tira o medo do compromisso. Termina com pergunta de sim. Objeção? Veja o bloco no fim da aba.`,
+    tip: `Quando a prévia estiver pronta · Deixa claro que ela escolhe entre os dois modelos — evita perder venda por achar que só tem a opção mais cara. Objeção? Veja o bloco no fim da aba.`,
     content: `Pronto, [Nome]! Olha como ficou o seu:
 👉 [link da prévia]
 
-Funciona assim:
+Você escolhe como continuar:
 
-✨ É um link exclusivo seu, com suas fotos, serviços e valores
-📲 Você coloca na bio e no Google, e manda pras clientes quando perguntam valor
-✏️ Você mesma edita tudo pelo celular, quando quiser
+📋 *Básico — R$29,90/mês*: link exclusivo com suas fotos, serviços e valores — a cliente chama você no WhatsApp pra agendar.
+📅 *Plus — R$59,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma.
 
-Tudo isso por R$39,90/mês — menos de R$1,50 por dia. Se trouxer uma cliente a mais no mês, já se pagou. E sem fidelidade: você só paga enquanto estiver usando.
+Nos dois você edita tudo pelo celular, sem fidelidade — paga só enquanto estiver usando.
 
-Posso deixar o seu ativo hoje?`,
+Qual desses faz mais sentido pra você?`,
   },
   {
     id: 'abordagem-07-6',
@@ -858,19 +853,18 @@ Se quiser mexer você mesma: https://studiomenu.art/c/showcase/lash`,
     category: 'abordagem-08',
     categoryName: `Funil Abordagem 08: Catálogo — "Site aponta pro Instagram"`,
     title: `5️⃣ Entrega da Prévia + Preço`,
-    tip: `Quando a prévia estiver pronta · Resume o valor, ancora o preço no dia a dia e tira o medo do compromisso. Termina com pergunta de sim. Objeção? Veja o bloco no fim da aba.`,
+    tip: `Quando a prévia estiver pronta · Deixa claro que ela escolhe entre os dois modelos — evita perder venda por achar que só tem a opção mais cara. Objeção? Veja o bloco no fim da aba.`,
     content: `Pronto, [Nome]! Olha como ficou o seu:
 👉 [link da prévia]
 
-Funciona assim:
+Você escolhe como continuar:
 
-✨ É um link exclusivo seu, com suas fotos, serviços e valores
-📲 Você coloca na bio e no Google, e manda pras clientes quando perguntam valor
-✏️ Você mesma edita tudo pelo celular, quando quiser
+📋 *Básico — R$29,90/mês*: link exclusivo com suas fotos, serviços e valores — a cliente chama você no WhatsApp pra agendar.
+📅 *Plus — R$59,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma.
 
-Tudo isso por R$39,90/mês — menos de R$1,50 por dia. Se trouxer uma cliente a mais no mês, já se pagou. E sem fidelidade: você só paga enquanto estiver usando.
+Nos dois você edita tudo pelo celular, sem fidelidade — paga só enquanto estiver usando.
 
-Posso deixar o seu ativo hoje?`,
+Qual desses faz mais sentido pra você?`,
   },
   {
     id: 'abordagem-08-6',
@@ -948,16 +942,15 @@ Coloquei alguns dos seus serviços pra você ter uma ideia. O que achou?`,
     category: 'abordagem-09',
     categoryName: `Funil Abordagem 09: Já Tem Link — Elogio + Vídeo (Prévia sob Pedido)`,
     title: `5️⃣ Ela Gostou → Link Oficial + Valor`,
-    tip: `'Amei' / 'Ficou lindo' · Se a agenda precisar dos dias/horários dela, peça junto aqui. Se ela achar caro, ofereça o Básico (R$39,90). Objeção? Veja o bloco no fim da aba.`,
-    content: `Que bom que gostou! 😍 Posso deixar esse no ar como seu link oficial. Funciona assim:
+    tip: `'Amei' / 'Ficou lindo' · Se ela escolher o Plus, peça os dias/horários de atendimento junto aqui. Objeção? Veja o bloco no fim da aba.`,
+    content: `Que bom que gostou! 😍 Posso deixar esse no ar como seu link oficial. Você escolhe como continuar:
 
-✨ É um link exclusivo seu, com suas fotos, serviços e valores
-📅 A cliente vê seus horários livres e marca sozinha, sem você responder uma por uma
-✏️ Você mesma edita tudo pelo celular, quando quiser
+📋 *Básico — R$29,90/mês*: link exclusivo com suas fotos, serviços e valores — a cliente chama você no WhatsApp pra agendar.
+📅 *Plus — R$59,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma.
 
-Tudo isso por R$69,90/mês — menos de R$2,50 por dia. Se trouxer uma cliente a mais no mês, já se pagou. E sem fidelidade: você só paga enquanto estiver usando.
+Nos dois você edita tudo pelo celular, sem fidelidade — paga só enquanto estiver usando.
 
-Posso deixar o seu ativo hoje?`,
+Qual desses faz mais sentido pra você?`,
   },
   {
     id: 'abordagem-09-6',
@@ -1046,10 +1039,15 @@ Usei seus serviços e valores e algumas fotos do seu Instagram. Assim a cliente 
     category: 'abordagem-10',
     categoryName: `Funil Abordagem 10: Já Tem Link — Prévia Pronta`,
     title: `3️⃣ Ela Gostou → Completo + Valor`,
-    tip: `'Gostei' / 'Ficou lindo' · Se ela achar caro, ofereça o Básico (R$39,90).`,
-    content: `Que bom que curtiu! Consigo deixar o seu completo no ar, com a agenda funcionando: é só trocar o link do botão "Agendar" do seu Linktree por esse. Fica R$69,90/mês, e você mesma edita fotos, serviços e valores pelo celular.
+    tip: `'Gostei' / 'Ficou lindo' · Deixa claro que ela escolhe entre os dois modelos.`,
+    content: `Que bom que curtiu! Consigo deixar o seu completo no ar. Você escolhe como continuar:
 
-Se topar, me manda um print da sua tabela completa e seus dias e horários de atendimento.`,
+📋 *Básico — R$29,90/mês*: link exclusivo com suas fotos, serviços e valores — a cliente chama você no WhatsApp pra agendar.
+📅 *Plus — R$59,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma. É só trocar o link do botão "Agendar" do seu Linktree por esse.
+
+Nos dois você edita tudo pelo celular, sem fidelidade — paga só enquanto estiver usando.
+
+Se topar, me manda um print da sua tabela completa. Se escolher o Plus, manda também seus dias e horários de atendimento.`,
   },
   {
     id: 'abordagem-10-4',
@@ -1131,7 +1129,7 @@ Dá uma olhadinha e me conta o que achou!`,
     tip: 'Use pra quem veio pelo Funil Anúncio 01 ou Abordagem 01 (catálogo), quando ela reagir bem ou perguntar como funciona o pagamento. Só entra em cena depois da entrega, nunca antes.',
     content: `Que bom que gostou! 😍
 
-Por esse link você já vê e compartilha seu catálogo com suas clientes. Se quiser manter tudo sempre ativo e poder editar quando quiser, é só assinar ali dentro — R$ 39,90/mês, Pix ou cartão, ativa na hora.
+Por esse link você já vê e compartilha seu catálogo com suas clientes. Se quiser manter tudo sempre ativo e poder editar quando quiser, é só assinar ali dentro — R$ 29,90/mês, Pix ou cartão, ativa na hora.
 
 Qualquer dúvida me chama! 💖`,
   },
@@ -1143,7 +1141,7 @@ Qualquer dúvida me chama! 💖`,
     tip: 'Use pra quem veio pelo Funil Anúncio 02 ou Abordagem 02 (agendamento) — mesma lógica da versão de catálogo, mas com o agendamento automático em destaque.',
     content: `Que bom que gostou! 😍
 
-Por esse link você já vê e compartilha seu catálogo, e sua cliente já pode agendar direto por ele. Pra manter o agendamento automático sempre ativo, é só assinar ali dentro — R$ 69,90/mês, Pix ou cartão, ativa na hora.
+Por esse link você já vê e compartilha seu catálogo, e sua cliente já pode agendar direto por ele. Pra manter o agendamento automático sempre ativo, é só assinar ali dentro — R$ 59,90/mês, Pix ou cartão, ativa na hora.
 
 Qualquer dúvida me chama! 💖`,
   },
@@ -1255,7 +1253,7 @@ Se quiser deixar tudo sempre ativo (ou ligar o agendamento automático), é só 
 
 Aqui mudou bastante desde a nossa conversa: o LashMenu passou por um rebranding e virou StudioMenu ✨ Melhoramos o catálogo e agora você mesma edita tudo quando quiser (fotos, preços, etc), sem depender da gente.
 
-E o valor ficou bem mais em conta: R$ 39,90/mês, sem compromisso — usa um mês, se curtir continua, se não quiser é só cancelar.
+E o valor ficou bem mais em conta: R$ 29,90/mês, sem compromisso — usa um mês, se curtir continua, se não quiser é só cancelar.
 
 Agora você também tem um app exclusivo seu, com os links pra ver e editar o catálogo, tudo num só lugar:
 👉 [LINK DO APP]
