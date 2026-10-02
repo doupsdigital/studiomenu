@@ -36,7 +36,10 @@ const PHONE_H = 844;
 export default function EstudioVideosPage() {
   const [activeNiche, setActiveNiche] = useState<NicheType>('lash');
   const [bookingMode, setBookingMode] = useState<BookingMode>('plus');
-  const [bgMode, setBgMode] = useState<BgMode>('light');
+  // Fixo em "light" (pedido real, 2026-10-02: seletor de fundo removido da
+  // tela pra ficar mais compacta) — BG_STYLES/BgMode continuam existindo
+  // caso essa escolha volte a ser necessária no futuro.
+  const bgMode: BgMode = 'light';
   const [recordingMode, setRecordingMode] = useState(false);
   const [scale, setScale] = useState(1);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -133,10 +136,7 @@ export default function EstudioVideosPage() {
               <span>Básico</span>
             </button>
           </div>
-        </div>
 
-        {/* Modo Gravação + Fundo, também compactos */}
-        <div className="flex items-center justify-center gap-1.5 flex-wrap">
           <button
             onClick={() => setRecordingMode(true)}
             className="px-3.5 py-1.5 rounded-full text-[11px] font-bold flex items-center gap-1 shadow-lg"
@@ -145,23 +145,6 @@ export default function EstudioVideosPage() {
             <Video className="w-3 h-3" />
             Modo Gravação
           </button>
-
-          <select
-            value={bgMode}
-            onChange={(e) => setBgMode(e.target.value as BgMode)}
-            className="px-2.5 py-1.5 rounded-full text-[11px] font-semibold outline-none border"
-            style={{
-              background: bgMode === 'dark' || bgMode === 'black' ? '#14100e' : '#ffffff',
-              color: bgMode === 'dark' || bgMode === 'black' ? '#fff' : '#1a1412',
-              borderColor: 'rgba(0,0,0,0.15)',
-            }}
-          >
-            {(Object.keys(BG_STYLES) as BgMode[]).map((mode) => (
-              <option key={mode} value={mode}>
-                Fundo: {BG_STYLES[mode].label}
-              </option>
-            ))}
-          </select>
         </div>
       </div>
 
