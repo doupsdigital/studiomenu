@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import { ProcedureItem } from '@/types/catalog';
 import { formatCurrencyBRL, formatMinutesToLabel, parseDurationToMinutes } from '@/lib/format';
+import { useFilePickerFallback } from '@/lib/use-file-picker-fallback';
+import { isKnownInAppBrowser } from '@/lib/in-app-browser';
 
 type ProcForm = ProcedureItem & { maintenance?: string; visualEffect?: string };
 
@@ -44,6 +46,7 @@ export const ProcedureModal: React.FC<ProcedureModalProps> = ({
   const initialTotalMinutes = roundToNearestQuarter(procForm.duration_minutes ?? parseDurationToMinutes(procForm.duration) ?? 0);
   const [durationHours, setDurationHours] = useState(() => Math.min(6, Math.floor(initialTotalMinutes / 60)));
   const [durationMinutesPart, setDurationMinutesPart] = useState(() => initialTotalMinutes % 60);
+  const { showStuckHint, copied, handleLabelClick, handleChange: handleFileChange, copyPageLink } = useFilePickerFallback(onFileUpload);
 
   const applyDuration = (hours: number, minutesPart: number) => {
     const total = hours * 60 + minutesPart;
@@ -170,6 +173,12 @@ export const ProcedureModal: React.FC<ProcedureModalProps> = ({
 
       <div className="lm-form-group">
         <label>FOTO DO SERVIÇO</label>
+        {isKnownInAppBrowser() && (
+          <p className="lm-filepicker-inapp-hint">
+            Parece que você abriu esse link por dentro de outro app (Instagram, Facebook ou TikTok). Se o seletor de
+            fotos não abrir, toque em "⋮" e escolha "Abrir no navegador".
+          </p>
+        )}
         <div className="lm-svc-photo-row">
           <div className="lm-svc-photo-preview-wrap">
             <img
@@ -177,11 +186,19 @@ export const ProcedureModal: React.FC<ProcedureModalProps> = ({
               alt="Preview"
             />
           </div>
-          <label className="lm-svc-photo-upload-btn">
+          <label className="lm-svc-photo-upload-btn" onClick={handleLabelClick}>
             <span>📤 ESCOLHER FOTO</span>
-            <input type="file" accept="image/*" onChange={onFileUpload} style={{ display: 'none' }} />
+            <input type="file" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
           </label>
         </div>
+        {showStuckHint && (
+          <p className="lm-filepicker-stuck-hint">
+            Não abriu? Copie este link e cole direto no Chrome ou Safari.{' '}
+            <button type="button" onClick={copyPageLink}>
+              {copied ? '✓ Copiado!' : 'Copiar link'}
+            </button>
+          </p>
+        )}
       </div>
 
       <div className="lm-form-group">
