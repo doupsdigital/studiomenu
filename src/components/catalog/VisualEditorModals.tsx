@@ -36,7 +36,7 @@ interface VisualEditorModalsProps {
   onClose: () => void;
   onSaveProcedure: (proc: ProcedureItem, index: number | null) => void;
   onSaveCoverUrl: (url: string) => void;
-  onSaveSocial: (type: 'whatsapp' | 'instagram' | 'address' | 'maps', value: string) => void;
+  onSaveSocial: (values: { whatsapp: string; instagram: string; address: string; maps: string }) => void;
   onAddCategory: (categoryName: string) => void;
   onConfirmDeleteCategory?: () => void;
   onConfirmDeleteProc?: () => void;

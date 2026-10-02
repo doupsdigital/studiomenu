@@ -12,7 +12,7 @@ interface SocialForm {
 interface SocialModalProps {
   socialForm: SocialForm;
   setSocialForm: React.Dispatch<React.SetStateAction<SocialForm>>;
-  onSaveSocial: (type: 'whatsapp' | 'instagram' | 'address' | 'maps', value: string) => void;
+  onSaveSocial: (values: { whatsapp: string; instagram: string; address: string; maps: string }) => void;
   onClose: () => void;
 }
 
@@ -70,10 +70,7 @@ export const SocialModal: React.FC<SocialModalProps> = ({ socialForm, setSocialF
           type="button"
           className="lm-modal-btn lm-modal-btn-confirm"
           onClick={() => {
-            onSaveSocial('whatsapp', socialForm.whatsapp);
-            onSaveSocial('instagram', socialForm.instagram);
-            onSaveSocial('address', socialForm.address);
-            onSaveSocial('maps', socialForm.maps);
+            onSaveSocial(socialForm);
             onClose();
           }}
         >
