@@ -2,8 +2,11 @@
 
 # Leitura obrigatória antes de qualquer tarefa
 
-Leia **`docs/atual/ESTADO_ATUAL.md`** primeiro — é o único documento com garantia de refletir o
-estado atual do projeto (produto, stack, estrutura de pastas, pendências reais).
+Leia **`docs/atual/PLAYBOOK_IA.md`** primeiro — regras de comportamento (fluxo de Git, escopo,
+verificação, como investigar bug, como se comunicar) válidas pra qualquer IA/agente neste
+repositório, em qualquer ferramenta. Depois, **`docs/atual/ESTADO_ATUAL.md`** — é o único
+documento com garantia de refletir o estado atual do projeto (produto, stack, estrutura de
+pastas, pendências reais).
 
 **`docs/historico/`** é só rastreabilidade (registro Fase por Fase de como cada funcionalidade
 foi construída) — **nunca** trate algo de lá como descrição do estado atual sem confirmar contra

@@ -154,7 +154,19 @@ partir do próximo ciclo).
   agendamento, 2026-09-24). Login direto em qualquer um deles via
   `/api/professional/login?slug=<slug>&token=<edit_token>` (o mesmo link mágico de sempre; os
   `edit_token` de cada um ficam só no banco de dev, não neste doc). As chaves ficam em
-  `.env.dev.local` (fora do Git) na máquina de trabalho.
+  **`.env.development.local`** (fora do Git, nome reconhecido pelo Next.js — só carrega em
+  `next dev`, nunca em build/produção) na máquina de trabalho, sobrescrevendo só essas 3 chaves do
+  `.env` normal.
+
+  **Bug real corrigido em 2026-10-02:** esse arquivo existia desde a criação do banco de dev
+  (22/09) só que com nome errado (`.env.dev.local`, que o Next.js não reconhece) e variáveis
+  prefixadas `DEV_*` (`DEV_SUPABASE_URL` etc., que nenhum código lê) — por isso nunca foi
+  carregado de verdade. **Todo `next dev` local, durante dias, rodou contra o banco de PRODUÇÃO
+  sem ninguém perceber**, mesmo esta seção dizendo o contrário. Corrigido renomeando pro nome
+  certo e pras variáveis reais (`NEXT_PUBLIC_SUPABASE_URL`/`NEXT_PUBLIC_SUPABASE_ANON_KEY`/
+  `SUPABASE_SERVICE_ROLE_KEY`), confirmado batendo com os 3 catálogos de teste acima. **Qualquer
+  IA/agente que configurar esse arquivo do zero numa máquina nova precisa usar exatamente esse
+  nome e essas 3 variáveis — nunca inventar prefixo nem nome de arquivo.**
 
 **Ciclo de uma mudança, do começo ao fim:**
 1. Trabalha e testa (`tsc`/`check-integrity.js`) na `desenv`, push.
