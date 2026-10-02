@@ -198,7 +198,7 @@ export default function EstudioVideosPage() {
           >
             <iframe
               key={`${activeNiche}-${bookingMode}`}
-              src={`/c/showcase/${activeNiche}${bookingMode === 'basico' ? '?modo=basico' : ''}`}
+              src={`/c/showcase/${activeNiche}${bookingMode === 'basico' ? 'designer' : ''}`}
               title="Prévia StudioMenu"
               className="border-0 block bg-slate-950"
               style={{ width: PHONE_W, height: PHONE_H }}
