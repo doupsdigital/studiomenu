@@ -11,6 +11,10 @@ interface ProcedureDetailModalProps {
   onNext?: () => void;
   bookingEnabled?: boolean;
   onBook?: (item: ProcedureItem) => void;
+  /** Só o showroom em modo "Básico" usa isso — em vez do link real de
+   *  WhatsApp (que abriria o WhatsApp de verdade na gravação), mostra a
+   *  simulação visual (`FakeWhatsappScreen`). */
+  onFakeWhatsapp?: (item: ProcedureItem) => void;
 }
 
 export const ProcedureDetailModal: React.FC<ProcedureDetailModalProps> = ({
@@ -21,6 +25,7 @@ export const ProcedureDetailModal: React.FC<ProcedureDetailModalProps> = ({
   onNext,
   bookingEnabled = false,
   onBook,
+  onFakeWhatsapp,
 }) => {
   // Lock body scroll when modal is active
   useEffect(() => {
@@ -119,6 +124,14 @@ export const ProcedureDetailModal: React.FC<ProcedureDetailModalProps> = ({
                 type="button"
                 className="modal__cta"
                 onClick={() => onBook?.(item)}
+              >
+                Agendar agora →
+              </button>
+            ) : onFakeWhatsapp ? (
+              <button
+                type="button"
+                className="modal__cta"
+                onClick={() => onFakeWhatsapp(item)}
               >
                 Agendar agora →
               </button>

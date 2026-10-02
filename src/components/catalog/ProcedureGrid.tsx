@@ -39,6 +39,7 @@ interface ProcedureGridProps {
   onMoveCategory?: (categoryName: string, direction: 'left' | 'right') => void;
   bookingEnabled?: boolean;
   onRequestBooking?: (item: ProcedureItem) => void;
+  onFakeWhatsapp?: (item: ProcedureItem) => void;
 }
 
 /** Envolve um card de procedimento (mosaico OU clássico) pra deixar arrastar
@@ -104,6 +105,7 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
   onMoveCategory,
   bookingEnabled = false,
   onRequestBooking,
+  onFakeWhatsapp,
 }) => {
   const [selectedProcedure, setSelectedProcedure] = useState<ProcedureItem | null>(null);
 
@@ -369,6 +371,14 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
               ? (proc) => {
                   setSelectedProcedure(null);
                   onRequestBooking(proc);
+                }
+              : undefined
+          }
+          onFakeWhatsapp={
+            onFakeWhatsapp
+              ? (proc) => {
+                  setSelectedProcedure(null);
+                  onFakeWhatsapp(proc);
                 }
               : undefined
           }
