@@ -4,6 +4,7 @@ import { ShowcaseClient } from './ShowcaseClient';
 
 interface ShowcasePageProps {
   params: Promise<{ niche: string }>;
+  searchParams: Promise<{ modo?: string }>;
 }
 
 // Nomes por nicho pro título do link (plural, "venda pro nicho" — não o
@@ -36,7 +37,8 @@ export async function generateMetadata({ params }: ShowcasePageProps): Promise<M
   };
 }
 
-export default async function ShowcasePage({ params }: ShowcasePageProps) {
+export default async function ShowcasePage({ params, searchParams }: ShowcasePageProps) {
   const { niche: nicheParam } = await params;
-  return <ShowcaseClient niche={nicheParam as NicheType} />;
+  const { modo } = await searchParams;
+  return <ShowcaseClient niche={nicheParam as NicheType} forceBasico={modo === 'basico'} />;
 }

@@ -13,6 +13,7 @@ import { NewCatalogWelcomeOverlay } from './NewCatalogWelcomeOverlay';
 import { BookingModal } from './modals/BookingModal';
 import { FakeBookingModal } from './modals/FakeBookingModal';
 import { AgendaDemoScreen } from './modals/AgendaDemoScreen';
+import { FakeWhatsappScreen } from './modals/FakeWhatsappScreen';
 import { ProductTour } from '@/components/tour/ProductTour';
 
 import '@/styles/visual-editor.css';
@@ -92,6 +93,8 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
   // "Ok, entendido" simples (pedido 2026-09-28, pra gravar o vídeo da
   // experiência completa da profissional).
   const [agendaDemo, setAgendaDemo] = useState<{ service: ProcedureItem; time: string; dateLabel: string } | null>(null);
+  // Par do agendaDemo pro modo "Básico" do showroom — ver FakeWhatsappScreen.
+  const [fakeWhatsappItem, setFakeWhatsappItem] = useState<ProcedureItem | null>(null);
 
   // Toast discreto pra cada edição local (feedback imediato antes de "Salvar")
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -552,6 +555,15 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
           // Básico, sem nenhum outro efeito (a Agenda dela continua normal).
           bookingEnabled={!isEditMode && Boolean(catalogState.booking_enabled) && !catalogState.agenda_paused}
           onRequestBooking={!isEditMode && catalogState.booking_enabled && !catalogState.agenda_paused ? setBookingItem : undefined}
+          // Só no showroom (demoBookingOnly), quando o agendamento automático
+          // está "desligado" nessa demo (sem booking_enabled, ou com
+          // agenda_paused ligado pra simular o plano Básico) — mostra a
+          // simulação de WhatsApp em vez do link real. Catálogo de verdade
+          // nunca passa isso, então o link de WhatsApp de verdade continua
+          // intacto em produção.
+          onFakeWhatsapp={
+            demoBookingOnly && (!catalogState.booking_enabled || catalogState.agenda_paused) ? setFakeWhatsappItem : undefined
+          }
         />
 
         {/* Seção Orientações */}
@@ -594,6 +606,10 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
 
       {agendaDemo && (
         <AgendaDemoScreen booked={agendaDemo} onClose={() => setAgendaDemo(null)} />
+      )}
+
+      {fakeWhatsappItem && (
+        <FakeWhatsappScreen item={fakeWhatsappItem} onClose={() => setFakeWhatsappItem(null)} />
       )}
     </div>
   );

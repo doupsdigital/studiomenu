@@ -8,9 +8,15 @@ import { nichePresetsMap } from '@/data/niche-presets';
 
 interface ShowcaseClientProps {
   niche: NicheType;
+  /** Só o Estúdio de Vídeos (admin) usa isso, via ?modo=basico na URL —
+   *  simula o plano Básico (botão "Agendar" cai na simulação de WhatsApp
+   *  em vez do assistente de agendamento automático). Link normal que vai
+   *  pra lead nunca tem esse parâmetro, então o comportamento de sempre
+   *  (demo do Plus) continua intacto. */
+  forceBasico?: boolean;
 }
 
-export function ShowcaseClient({ niche }: ShowcaseClientProps) {
+export function ShowcaseClient({ niche, forceBasico = false }: ShowcaseClientProps) {
   const basePreset = nichePresetsMap[niche];
 
   const [layoutModel, setLayoutModel] = useState<LayoutModel>(basePreset?.layout_model || 'mosaico');
@@ -62,6 +68,11 @@ export function ShowcaseClient({ niche }: ShowcaseClientProps) {
     // existe profissional real por trás; só nesse objeto em memória, não
     // mexe no preset fonte (2026-09-24).
     booking_enabled: true,
+    // Modo Básico do Estúdio de Vídeos (2026-10-02): agenda_paused liga a
+    // mesma simulação que um catálogo Plus real usa quando pausa a agenda
+    // temporariamente — cai na simulação de WhatsApp em vez do agendamento
+    // automático. Default false preserva o link normal da vitrine intacto.
+    agenda_paused: forceBasico,
     procedures: basePreset.procedures.map((p) => ({ ...p, duration_minutes: p.duration_minutes ?? 60 })),
     // Endereço fictício só pra dar pra mostrar o botão de Localização
     // funcionando na vitrine (não existe profissional real por trás, então
