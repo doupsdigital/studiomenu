@@ -102,19 +102,30 @@ export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order })
 
         {/* Troca entre planos só aparece pra catálogos marcados como oferta
          *  Plus (Fase 22) — pra quem já vinha vendo só o Básico, a tela
-         *  continua idêntica a antes. */}
+         *  continua idêntica a antes. Antes era um texto sublinhado solto
+         *  (sem parecer clicável) — agora é um botão de contorno (mesmo
+         *  padrão usado em outros CTAs secundários do app, ex: trocar forma
+         *  de pagamento em PlanSubscribeCard), com alvo de toque maior.
+         *  Pedido real, 2026-10-02. */}
         {isPlusOffer && (
-          <p className="text-[13px] text-center text-ink-faint mt-3">
+          <button
+            type="button"
+            onClick={() => setPlan(plan === 'plus' ? 'basico' : 'plus')}
+            className="w-full mt-3 py-3 px-4 rounded-xl border border-rose-200 bg-surface text-center transition-colors hover:bg-rose-50 active:scale-[0.98]"
+          >
             {plan === 'plus' ? (
-              <button type="button" onClick={() => setPlan('basico')} className="underline underline-offset-2 font-semibold text-ink-soft">
-                Prefiro começar só com o catálogo ({PLAN_PRICING.basico.label}) — o agendamento continua pelo WhatsApp
-              </button>
+              <>
+                <span className="block text-sm font-bold text-ink-soft">
+                  Prefiro começar só com o catálogo ({PLAN_PRICING.basico.label})
+                </span>
+                <span className="block text-xs text-ink-faint mt-0.5">O agendamento continua pelo WhatsApp</span>
+              </>
             ) : (
-              <button type="button" onClick={() => setPlan('plus')} className="underline underline-offset-2 font-semibold text-rose-700">
+              <span className="block text-sm font-bold text-rose-700">
                 ← Prefiro o agendamento automático ({PLAN_PRICING.plus.label})
-              </button>
+              </span>
             )}
-          </p>
+          </button>
         )}
       </div>
 
