@@ -253,17 +253,22 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
     showToast('📷 Foto de capa atualizada!');
   };
 
-  const handleSaveSocial = (type: 'whatsapp' | 'instagram' | 'address' | 'maps', val: string) => {
-    if (type === 'whatsapp') {
-      pushState({ ...catalogState, whatsapp_number: val });
-    } else if (type === 'instagram') {
-      pushState({ ...catalogState, instagram_handle: val });
-    } else if (type === 'address') {
-      pushState({ ...catalogState, address: val });
-    } else if (type === 'maps') {
-      pushState({ ...catalogState, maps_url: val });
-    }
-    showToast('✅ Contato atualizado!');
+  // Recebe os 4 campos de uma vez e faz um único pushState — chamar pushState
+  // 4 vezes seguidas (1 por campo) é o bug real encontrado em produção
+  // (2026-10-02): cada chamada montava o novo estado a partir do MESMO
+  // `catalogState` da closure (ainda não atualizado pelas chamadas
+  // anteriores, já que setState é assíncrono), então só o último campo
+  // (maps) realmente "vencia" — os outros 3, incluindo o Instagram, eram
+  // silenciosamente descartados mesmo mostrando o toast de sucesso.
+  const handleSaveSocial = (values: { whatsapp: string; instagram: string; address: string; maps: string }) => {
+    pushState({
+      ...catalogState,
+      whatsapp_number: values.whatsapp,
+      instagram_handle: values.instagram,
+      address: values.address,
+      maps_url: values.maps,
+    });
+    showToast('✅ Contatos atualizados!');
   };
 
   const handleSaveProcedure = (proc: ProcedureItem, index: number | null) => {
