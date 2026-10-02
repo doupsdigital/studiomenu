@@ -658,6 +658,45 @@ body[data-theme="luxury"] .lm-cover-edit-btn,
   background: #ffe3e9 !important;
 }
 
+/* Dicas de fallback pro seletor de arquivo (achado real, 2026-10-02) —
+ *  discretas de propósito: só aparecem quando detectadas (in-app browser)
+ *  ou quando o clique não abriu o seletor de verdade (stuck hint), nunca
+ *  pra quem já usa normal. */
+.lm-filepicker-inapp-hint {
+  font-size: 0.72rem !important;
+  color: #7a525f !important;
+  background: #fdf0f3 !important;
+  border: 1px dashed #f2bdc9 !important;
+  border-radius: 10px !important;
+  padding: 8px 10px !important;
+  margin: 0 0 10px 0 !important;
+  line-height: 1.4 !important;
+  text-align: center !important;
+}
+
+.lm-filepicker-stuck-hint {
+  font-size: 0.74rem !important;
+  color: #8a5a3d !important;
+  background: #fff6e8 !important;
+  border: 1px solid #f0d8b0 !important;
+  border-radius: 10px !important;
+  padding: 8px 10px !important;
+  margin: 8px 0 0 0 !important;
+  line-height: 1.4 !important;
+  text-align: center !important;
+}
+
+.lm-filepicker-stuck-hint button {
+  background: none !important;
+  border: none !important;
+  color: #b0753d !important;
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+  cursor: pointer !important;
+  padding: 0 !important;
+  font-size: inherit !important;
+}
+
 /* Modal Action Buttons (Footer) */
 .lm-modal-actions {
   display: flex !important;
