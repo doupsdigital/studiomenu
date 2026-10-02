@@ -522,10 +522,20 @@ export default function AdminCatalogosPage() {
               return (
                 <div
                   key={cardKey}
-                  className="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between space-y-4 hover:border-slate-700 transition-all shadow-xl"
+                  className="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden hover:border-slate-700 transition-all shadow-xl"
                 >
-                  <div>
-                    <div className="flex items-center justify-between gap-2 mb-2.5 flex-wrap">
+                  {/* Card inteiro agora é retrátil (pedido real, 2026-10-02:
+                   *  rolar a tela procurando um catálogo específico, numa
+                   *  lista comprida, era ruim no celular) — só esse cabeçalho
+                   *  fica sempre visível; tudo mais (ações, links, toggles)
+                   *  mora dentro do corpo expansível logo abaixo. Mesmo
+                   *  padrão inline-expand já usado em /admin/funil-ads. */}
+                  <button
+                    type="button"
+                    onClick={() => toggleExpanded(cardKey)}
+                    className="w-full text-left p-5 flex flex-col gap-2.5"
+                  >
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
                       <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-rose-500/10 text-rose-400 border border-rose-500/20 flex items-center gap-1.5">
                         <Scissors className="w-3.5 h-3.5" />
                         <span>{item.niche || 'Lash'}</span>
@@ -553,100 +563,97 @@ export default function AdminCatalogosPage() {
                       </div>
                     </div>
 
-                    <h2 className="font-serif text-2xl font-bold text-white leading-tight">
-                      {item.studio_name || item.client_name}
-                    </h2>
-                    <div className="flex items-center gap-2 mt-1 flex-wrap">
-                      <p className="text-sm text-slate-300">Por {item.client_name}</p>
-                      {dateStr && (
-                        <span className="flex items-center gap-1 text-xs text-slate-400">
-                          <Clock className="w-3.5 h-3.5" />
-                          {dateStr}
-                        </span>
-                      )}
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <h2 className="font-serif text-2xl font-bold text-white leading-tight truncate">
+                          {item.studio_name || item.client_name}
+                        </h2>
+                        <div className="flex items-center gap-2 mt-1 flex-wrap">
+                          <p className="text-sm text-slate-300">Por {item.client_name}</p>
+                          {dateStr && (
+                            <span className="flex items-center gap-1 text-xs text-slate-400">
+                              <Clock className="w-3.5 h-3.5" />
+                              {dateStr}
+                            </span>
+                          )}
+                        </div>
+                        <div className="mt-1.5 flex items-center gap-2 text-sm text-slate-200">
+                          <Phone className="w-4 h-4 text-slate-400 flex-shrink-0" />
+                          <span className="truncate">{item.whatsapp_number || 'WhatsApp não informado'}</span>
+                        </div>
+                      </div>
+                      <ChevronDown
+                        className={`w-5 h-5 text-slate-500 flex-shrink-0 mt-1 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                      />
                     </div>
+                  </button>
 
-                    <div className="mt-2.5 flex items-center gap-2 text-sm text-slate-200">
-                      <Phone className="w-4 h-4 text-slate-400" />
-                      <span>{item.whatsapp_number || 'WhatsApp não informado'}</span>
-                    </div>
-
-                    <button
-                      onClick={() => toggleBookingEnabled(item)}
-                      className={`mt-3.5 w-full px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 border transition-all ${
-                        item.booking_enabled
-                          ? 'bg-rose-500/20 border-rose-500/60 text-rose-300'
-                          : 'bg-white/5 border-slate-700 text-slate-400'
-                      }`}
-                    >
-                      <CalendarClock className="w-3.5 h-3.5" />
-                      Agendamento automático: {item.booking_enabled ? 'Ligado' : 'Desligado'}
-                    </button>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <Link
-                        href={`/c/${item.slug}`}
-                        target="_blank"
-                        className="flex-1 px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm font-semibold text-white flex items-center justify-center gap-1.5 transition-all"
+                  {isExpanded && (
+                    <div className="px-5 pb-5 pt-1 space-y-2 border-t border-slate-800/80">
+                      <button
+                        onClick={() => toggleBookingEnabled(item)}
+                        className={`w-full px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 border transition-all ${
+                          item.booking_enabled
+                            ? 'bg-rose-500/20 border-rose-500/60 text-rose-300'
+                            : 'bg-white/5 border-slate-700 text-slate-400'
+                        }`}
                       >
-                        <span>Ver</span>
-                        <ExternalLink className="w-3.5 h-3.5" />
-                      </Link>
+                        <CalendarClock className="w-3.5 h-3.5" />
+                        Agendamento automático: {item.booking_enabled ? 'Ligado' : 'Desligado'}
+                      </button>
 
-                      {item.edit_token && (
+                      <div className="flex items-center gap-2">
                         <Link
-                          href={`/c/${item.slug}?edit=${item.edit_token}`}
+                          href={`/c/${item.slug}`}
                           target="_blank"
-                          className="flex-1 px-3 py-2.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 text-sm font-bold flex items-center justify-center gap-1.5 transition-all"
+                          className="flex-1 px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm font-semibold text-white flex items-center justify-center gap-1.5 transition-all"
                         >
-                          <span>Editar</span>
+                          <span>Ver</span>
+                          <ExternalLink className="w-3.5 h-3.5" />
                         </Link>
-                      )}
-                    </div>
 
-                    <a
-                      href={buildContactWhatsappUrl(item)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-emerald-500/30 text-emerald-300 text-sm font-bold flex items-center justify-center gap-2 transition-all"
-                    >
-                      <MessageCircle className="w-4 h-4" />
-                      <span>WhatsApp</span>
-                    </a>
+                        {item.edit_token && (
+                          <Link
+                            href={`/c/${item.slug}?edit=${item.edit_token}`}
+                            target="_blank"
+                            className="flex-1 px-3 py-2.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 text-sm font-bold flex items-center justify-center gap-1.5 transition-all"
+                          >
+                            <span>Editar</span>
+                          </Link>
+                        )}
+                      </div>
 
-                    {/* Some depois de aprovado — o badge "Aprovado" já confirma
-                     *  a entrega; reenviar o app (se precisar) fica na área
-                     *  expansível, junto das outras ações raras. */}
-                    {isPending && (
                       <a
-                        href={buildDeliveryWhatsappUrl(item)}
+                        href={buildContactWhatsappUrl(item)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        onClick={() => approveAndDeliver(item)}
-                        className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:opacity-95 text-white text-sm font-bold flex items-center justify-center gap-2 shadow-lg transition-all"
+                        className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-emerald-500/30 text-emerald-300 text-sm font-bold flex items-center justify-center gap-2 transition-all"
                       >
                         <MessageCircle className="w-4 h-4" />
-                        <span>Aprovar & Entregar</span>
+                        <span>WhatsApp</span>
                       </a>
-                    )}
 
-                    <button
-                      onClick={() => toggleExpanded(cardKey)}
-                      className="w-full py-2 flex items-center justify-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-slate-200 transition-all"
-                    >
-                      <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
-                      <span>{isExpanded ? 'Ocultar links e mais opções' : 'Mostrar links e mais opções'}</span>
-                    </button>
+                      {/* Some depois de aprovado — o badge "Aprovado" já confirma
+                       *  a entrega; reenviar o app (se precisar) continua
+                       *  disponível logo abaixo, entre as outras ações. */}
+                      {isPending && (
+                        <a
+                          href={buildDeliveryWhatsappUrl(item)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={() => approveAndDeliver(item)}
+                          className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:opacity-95 text-white text-sm font-bold flex items-center justify-center gap-2 shadow-lg transition-all"
+                        >
+                          <MessageCircle className="w-4 h-4" />
+                          <span>Aprovar & Entregar</span>
+                        </a>
+                      )}
 
-                    {isExpanded && (
-                      <div className="space-y-2 pt-1">
-                        <div className="text-xs text-slate-400 uppercase font-mono">
-                          {item.layout_model || 'mosaico'} / {item.theme_variant || 'rose'}
-                        </div>
+                      <div className="text-xs text-slate-400 uppercase font-mono pt-1">
+                        {item.layout_model || 'mosaico'} / {item.theme_variant || 'rose'}
+                      </div>
 
-                        <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 space-y-1.5">
+                      <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 space-y-1.5">
                           <div className="flex items-center justify-between">
                             <span className="text-xs font-bold uppercase tracking-wider text-rose-300 flex items-center gap-1.5">
                               <Globe className="w-3.5 h-3.5" />
@@ -810,8 +817,7 @@ export default function AdminCatalogosPage() {
                           </button>
                         </div>
                       </div>
-                    )}
-                  </div>
+                  )}
                 </div>
               );
             })}
