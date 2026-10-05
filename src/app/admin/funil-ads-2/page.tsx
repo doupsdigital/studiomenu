@@ -2,14 +2,26 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Megaphone, Copy, Video, Image as ImageIcon, ChevronDown } from 'lucide-react';
-import { FUNIL_ADS_DATA } from '@/data/funil-ads-scripts';
+import { ArrowLeft, Megaphone, Copy, Target, Clock, ShieldAlert, Lightbulb, ChevronDown } from 'lucide-react';
+import { FUNIL_ADS_V2_DATA, FunilV2Kind } from '@/data/funil-ads-v2-scripts';
 
-export default function AdminFunilAdsPage() {
-  // Cada funil abre/fecha independente (não é só 1 por vez) — uso real é no
-  // celular, ela pode querer comparar 2 abertos. Nenhum aberto por padrão,
-  // pra ela escolher rápido qual campanha é, sem rolar passado conteúdo que
-  // não é da vez (pedido real, 2026-10-01: 4 campanhas rodando ao mesmo tempo).
+const KIND_ICON: Record<FunilV2Kind, typeof Target> = {
+  funnel: Target,
+  followup: Clock,
+  objection: ShieldAlert,
+  strategy: Lightbulb,
+};
+
+const KIND_COLOR: Record<FunilV2Kind, string> = {
+  funnel: 'bg-emerald-500/20 text-emerald-300',
+  followup: 'bg-sky-500/20 text-sky-300',
+  objection: 'bg-rose-500/20 text-rose-300',
+  strategy: 'bg-purple-500/20 text-purple-300',
+};
+
+export default function AdminFunilAdsV2Page() {
+  // Mesmo comportamento do Funil ADS original: cada grupo abre/fecha independente, nenhum
+  // aberto por padrão (uso real é no celular, escolher rápido qual roteiro é da vez).
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [copiedStepId, setCopiedStepId] = useState<string | null>(null);
 
@@ -53,41 +65,37 @@ export default function AdminFunilAdsPage() {
                 <span className="text-xs text-slate-400">• StudioMenu Ads</span>
               </div>
               <h1 className="font-serif text-3xl md:text-4xl font-bold mt-1">
-                Funil - <em className="not-italic text-amber-400">ADS</em>
+                Funil - <em className="not-italic text-amber-400">ADS 2.0</em>
               </h1>
             </div>
           </div>
         </header>
 
-        {/* Funis — 1 card retrátil por campanha, empilhados */}
+        {/* Grupos — 1 card retrátil por funil/bloco, empilhados */}
         <div className="space-y-3">
-          {FUNIL_ADS_DATA.map((funnel) => {
-            const isExpanded = expandedIds.has(funnel.id);
-            const isVideo = funnel.id.startsWith('funil-video');
+          {FUNIL_ADS_V2_DATA.map((group) => {
+            const isExpanded = expandedIds.has(group.id);
+            const Icon = KIND_ICON[group.kind];
 
             return (
               <div
-                key={funnel.id}
+                key={group.id}
                 className={`rounded-2xl border transition-all overflow-hidden ${
                   isExpanded ? 'border-amber-400/60 bg-slate-900' : 'border-slate-800 bg-slate-900/50'
                 }`}
               >
                 <button
                   type="button"
-                  onClick={() => toggleExpanded(funnel.id)}
+                  onClick={() => toggleExpanded(group.id)}
                   className="w-full p-5 flex items-center gap-3 text-left"
                 >
-                  <span
-                    className={`p-2 rounded-xl flex-shrink-0 ${
-                      isVideo ? 'bg-purple-500/20 text-purple-300' : 'bg-emerald-500/20 text-emerald-300'
-                    }`}
-                  >
-                    {isVideo ? <Video className="w-5 h-5" /> : <ImageIcon className="w-5 h-5" />}
+                  <span className={`p-2 rounded-xl flex-shrink-0 ${KIND_COLOR[group.kind]}`}>
+                    <Icon className="w-5 h-5" />
                   </span>
 
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-white text-base">{funnel.title}</h3>
-                    <p className="text-xs text-slate-400 mt-0.5 truncate">&quot;{funnel.triggerMessage}&quot;</p>
+                    <h3 className="font-bold text-white text-base">{group.title}</h3>
+                    <p className="text-xs text-slate-400 mt-0.5 truncate">{group.subtitle}</p>
                   </div>
 
                   <ChevronDown
@@ -97,8 +105,8 @@ export default function AdminFunilAdsPage() {
 
                 {isExpanded && (
                   <div className="border-t border-slate-800 p-5 pt-4 space-y-5">
-                    {funnel.steps.map((step) => {
-                      const stepKey = `${funnel.id}-${step.stepNumber}-${step.title}`;
+                    {group.steps.map((step) => {
+                      const stepKey = `${group.id}-${step.title}`;
                       const isCopied = copiedStepId === stepKey;
 
                       return (
@@ -109,6 +117,10 @@ export default function AdminFunilAdsPage() {
                             </span>
                             <h4 className="font-bold text-white text-sm">{step.title}</h4>
                           </div>
+
+                          {step.tip && (
+                            <p className="text-xs text-slate-500 italic leading-relaxed">💡 {step.tip}</p>
+                          )}
 
                           <div className="bg-slate-900 border border-dashed border-slate-700 rounded-xl p-3.5 text-sm text-slate-200 whitespace-pre-wrap break-words leading-relaxed font-sans">
                             {step.content}
