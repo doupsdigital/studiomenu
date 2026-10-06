@@ -1,4 +1,4 @@
-import { BASICO_PRICE, PLUS_PRICE } from '@/lib/pricing';
+import { CATALOGO_PRICE, AGENDA_PRICE } from '@/lib/pricing';
 
 const WHATSAPP_NUMBER = '5562991083435';
 
@@ -38,8 +38,8 @@ function priceParts(price: number): { whole: string; cents: string } {
 }
 
 export function SalesLandingPage() {
-  const basicoParts = priceParts(BASICO_PRICE);
-  const plusParts = priceParts(PLUS_PRICE);
+  const catalogoParts = priceParts(CATALOGO_PRICE);
+  const agendaParts = priceParts(AGENDA_PRICE);
 
   return (
     <div className="lp-lashmenu">
@@ -237,19 +237,19 @@ export function SalesLandingPage() {
             </div>
 
             <div className="lp-pricing-tier-grid">
-              {/* Básico */}
+              {/* Catálogo */}
               <div className="lp-pricing-tier-card">
-                <div className="lp-tier-badge lp-tier-badge--basic">📱 SEU CATÁLOGO NO AR</div>
-                <h3 className="lp-tier-title">StudioMenu Básico</h3>
+                <div className="lp-tier-badge lp-tier-badge--basic">📱 PAGAMENTO ÚNICO</div>
+                <h3 className="lp-tier-title">StudioMenu Catálogo</h3>
                 <p className="lp-tier-desc">Catálogo digital com seu nome, fotos e preços, sempre no ar — edite pelo celular quando quiser.</p>
 
                 <div className="lp-tier-price-box">
                   <div className="lp-tier-price-main">
                     <span className="lp-tier-currency">R$</span>
-                    <span className="lp-tier-val">{basicoParts.whole}</span>
-                    <span className="lp-tier-cents">,{basicoParts.cents}</span>
+                    <span className="lp-tier-val">{catalogoParts.whole}</span>
+                    <span className="lp-tier-cents">,{catalogoParts.cents}</span>
                   </div>
-                  <div className="lp-tier-price-sub">por mês</div>
+                  <div className="lp-tier-price-sub">pagamento único</div>
                 </div>
 
                 <ul className="lp-tier-bullets">
@@ -260,44 +260,44 @@ export function SalesLandingPage() {
                 </ul>
 
                 <a
-                  href={whatsappLink('Olá! Quero saber como funciona o StudioMenu Básico.')}
+                  href={whatsappLink('Olá! Quero saber como funciona o StudioMenu Catálogo.')}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="lp-btn lp-btn--whatsapp"
                 >
-                  COMEÇAR NO BÁSICO
+                  QUERO MEU CATÁLOGO
                 </a>
               </div>
 
-              {/* Plus */}
+              {/* Agenda */}
               <div className="lp-pricing-tier-card lp-pricing-tier-card--vip">
                 <div className="lp-tier-badge lp-tier-badge--vip">⭐ MAIS POPULAR</div>
-                <h3 className="lp-tier-title">StudioMenu+</h3>
-                <p className="lp-tier-desc">Tudo do Básico, com agendamento automático — a cliente escolhe o dia e horário sozinha.</p>
+                <h3 className="lp-tier-title">StudioMenu Agenda</h3>
+                <p className="lp-tier-desc">Tudo do Catálogo, com agendamento automático — a cliente escolhe o dia e horário sozinha.</p>
 
                 <div className="lp-tier-price-box">
                   <div className="lp-tier-price-main">
                     <span className="lp-tier-currency">R$</span>
-                    <span className="lp-tier-val">{plusParts.whole}</span>
-                    <span className="lp-tier-cents">,{plusParts.cents}</span>
+                    <span className="lp-tier-val">{agendaParts.whole}</span>
+                    <span className="lp-tier-cents">,{agendaParts.cents}</span>
                   </div>
                   <div className="lp-tier-price-sub">por mês</div>
                 </div>
 
                 <ul className="lp-tier-bullets">
-                  <li>{CHECK_ICON}<span><strong>Tudo do StudioMenu Básico incluso</strong></span></li>
+                  <li>{CHECK_ICON}<span><strong>Tudo do StudioMenu Catálogo incluso</strong></span></li>
                   <li>{CHECK_ICON}<span><strong>Clientes agendam sozinhas, a qualquer hora</strong></span></li>
                   <li>{CHECK_ICON}<span>Agenda organizada com horários reais</span></li>
                   <li>{CHECK_ICON}<span>Menos ida e volta pelo WhatsApp</span></li>
                 </ul>
 
                 <a
-                  href={whatsappLink('Olá! Quero saber como funciona o StudioMenu+.')}
+                  href={whatsappLink('Olá! Quero saber como funciona o StudioMenu Agenda.')}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="lp-btn lp-btn--whatsapp"
                 >
-                  COMEÇAR NO PLUS
+                  ATIVAR AGENDAMENTO
                 </a>
               </div>
             </div>

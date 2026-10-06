@@ -1,8 +1,8 @@
-import { BASICO_PRICE, PLUS_PRICE } from '@/lib/pricing';
+import { CATALOGO_PRICE, AGENDA_PRICE } from '@/lib/pricing';
 
 const WHATSAPP_NUMBER = '5562991083435';
 
-/** Landing page de anúncio focada só no StudioMenu+ (agendamento
+/** Landing page de anúncio focada só no Plano Agenda (agendamento
  *  automático) — pra campanhas que atacam a dor de agenda manual pelo
  *  WhatsApp, em vez da dor do PDF/tabela de preços (essa é a home
  *  oficial, `SalesLandingPage.tsx`). Cópia estrutural quase 1:1 dela
@@ -36,8 +36,8 @@ function priceParts(price: number): { whole: string; cents: string } {
 }
 
 export function PlusLandingPage() {
-  const basicoParts = priceParts(BASICO_PRICE);
-  const plusParts = priceParts(PLUS_PRICE);
+  const catalogoParts = priceParts(CATALOGO_PRICE);
+  const agendaParts = priceParts(AGENDA_PRICE);
 
   return (
     <div className="lp-lashmenu">
@@ -193,7 +193,7 @@ export function PlusLandingPage() {
 
               <div className="lp-vs-box lp-vs-box--good">
                 <div className="lp-vs-box-head">
-                  <h3>Depois: Agenda Automática StudioMenu+</h3>
+                  <h3>Depois: Plano Agenda Automático</h3>
                 </div>
                 <ul className="lp-vs-bullet-list">
                   <li>
@@ -235,19 +235,19 @@ export function PlusLandingPage() {
             </div>
 
             <div className="lp-pricing-tier-grid">
-              {/* Básico */}
+              {/* Catálogo */}
               <div className="lp-pricing-tier-card">
                 <div className="lp-tier-badge lp-tier-badge--basic">📱 SÓ CATÁLOGO</div>
-                <h3 className="lp-tier-title">StudioMenu Básico</h3>
+                <h3 className="lp-tier-title">StudioMenu Catálogo</h3>
                 <p className="lp-tier-desc">Catálogo digital sempre no ar — sem agendamento automático, cliente ainda marca pelo WhatsApp.</p>
 
                 <div className="lp-tier-price-box">
                   <div className="lp-tier-price-main">
                     <span className="lp-tier-currency">R$</span>
-                    <span className="lp-tier-val">{basicoParts.whole}</span>
-                    <span className="lp-tier-cents">,{basicoParts.cents}</span>
+                    <span className="lp-tier-val">{catalogoParts.whole}</span>
+                    <span className="lp-tier-cents">,{catalogoParts.cents}</span>
                   </div>
-                  <div className="lp-tier-price-sub">por mês</div>
+                  <div className="lp-tier-price-sub">pagamento único</div>
                 </div>
 
                 <ul className="lp-tier-bullets">
@@ -258,26 +258,26 @@ export function PlusLandingPage() {
                 </ul>
 
                 <a
-                  href={whatsappLink('Olá! Quero saber como funciona o StudioMenu Básico — vocês têm agendamento automático?')}
+                  href={whatsappLink('Olá! Quero saber como funciona o StudioMenu Catálogo — vocês têm agendamento automático?')}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="lp-btn lp-btn--whatsapp"
                 >
-                  COMEÇAR NO BÁSICO
+                  QUERO MEU CATÁLOGO
                 </a>
               </div>
 
-              {/* Plus */}
+              {/* Agenda */}
               <div className="lp-pricing-tier-card lp-pricing-tier-card--vip">
                 <div className="lp-tier-badge lp-tier-badge--vip">⭐ AGENDAMENTO AUTOMÁTICO</div>
-                <h3 className="lp-tier-title">StudioMenu+</h3>
+                <h3 className="lp-tier-title">StudioMenu Agenda</h3>
                 <p className="lp-tier-desc">Sua agenda funciona sozinha — a cliente escolhe o dia e horário, sem trocar mensagem com você.</p>
 
                 <div className="lp-tier-price-box">
                   <div className="lp-tier-price-main">
                     <span className="lp-tier-currency">R$</span>
-                    <span className="lp-tier-val">{plusParts.whole}</span>
-                    <span className="lp-tier-cents">,{plusParts.cents}</span>
+                    <span className="lp-tier-val">{agendaParts.whole}</span>
+                    <span className="lp-tier-cents">,{agendaParts.cents}</span>
                   </div>
                   <div className="lp-tier-price-sub">por mês</div>
                 </div>
@@ -286,11 +286,11 @@ export function PlusLandingPage() {
                   <li>{CHECK_ICON}<span><strong>Clientes agendam sozinhas, a qualquer hora</strong></span></li>
                   <li>{CHECK_ICON}<span><strong>Agenda organizada com horários reais</strong></span></li>
                   <li>{CHECK_ICON}<span>Menos ida e volta pelo WhatsApp</span></li>
-                  <li>{CHECK_ICON}<span>Tudo do StudioMenu Básico incluso</span></li>
+                  <li>{CHECK_ICON}<span>Tudo do StudioMenu Catálogo incluso</span></li>
                 </ul>
 
                 <a
-                  href={whatsappLink('Olá! Quero saber como funciona o agendamento automático do StudioMenu+.')}
+                  href={whatsappLink('Olá! Quero saber como funciona o agendamento automático do StudioMenu Agenda.')}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="lp-btn lp-btn--whatsapp"
@@ -322,7 +322,7 @@ export function PlusLandingPage() {
        *  vendas ela mesma monta os catálogos, então todo CTA vai pro
        *  WhatsApp dela em vez do formulário self-service, 2026-09-24). */}
       <div className="lp-sticky-wa-bar">
-        <a href={whatsappLink('Olá! Vi a página do StudioMenu+ e gostaria de saber mais sobre o agendamento automático! 😊')} target="_blank" rel="noopener noreferrer" className="lp-sticky-wa-btn">
+        <a href={whatsappLink('Olá! Vi a página do StudioMenu Agenda e gostaria de saber mais sobre o agendamento automático! 😊')} target="_blank" rel="noopener noreferrer" className="lp-sticky-wa-btn">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
             <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l.278.444-1.157 4.226 4.326-1.134.42.259z" />
           </svg>

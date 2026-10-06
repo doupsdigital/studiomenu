@@ -45,9 +45,11 @@ export async function activateSubscription(orderId: string): Promise<void> {
 
   if (before && before.subscription_status !== 'ativo') {
     const nowStr = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
-    const planLabel = tier === 'basico' ? 'StudioMenu Básico' : 'StudioMenu+';
+    // Catálogo é pagamento único, não assinatura — "Nova assinatura" seria
+    // texto errado nesse caso.
+    const label = tier === 'basico' ? '💳 Novo pagamento (Plano Catálogo)!' : '💳 Nova assinatura (Plano Agenda)!';
     await sendTelegramMessage(
-      `💳 Nova assinatura ${planLabel}!\n\n👤 ${before.client_name}\n🔗 https://studiomenu.art/c/${before.slug}\n🕒 ${nowStr}`
+      `${label}\n\n👤 ${before.client_name}\n🔗 https://studiomenu.art/c/${before.slug}\n🕒 ${nowStr}`
     );
   }
 }

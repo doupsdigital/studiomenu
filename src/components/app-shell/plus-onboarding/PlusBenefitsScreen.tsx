@@ -17,7 +17,7 @@ export const PlusBenefitsScreen: React.FC<PlusBenefitsScreenProps> = ({ onNext }
       <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-rose-700 via-rose-600 to-rose-500 text-white flex items-center justify-center mb-4 shadow-lg shadow-rose-600/25">
         <Crown className="w-8 h-8" />
       </div>
-      <p className="text-[13px] font-bold tracking-widest uppercase text-rose-600 mb-1.5">StudioMenu+</p>
+      <p className="text-[13px] font-bold tracking-widest uppercase text-rose-600 mb-1.5">Plano Agenda</p>
       <h2 className="font-serif-pro font-bold text-2xl text-ink leading-snug mb-3">
         Imagine suas clientes agendando sozinhas, sem trocar uma mensagem no WhatsApp
       </h2>

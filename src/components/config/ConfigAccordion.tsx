@@ -44,7 +44,7 @@ type SectionKey = 'horarios' | 'bloqueios' | 'pausar' | 'assinatura' | 'conta' |
  *  `SectionCard`. Só controla abrir/fechar; nenhum dos formulários internos
  *  mudou de comportamento. Todas começam abertas (Fase 15 — antes só
  *  "Minha assinatura" abria sozinha via `#assinatura`, link do cartão de
- *  upsell do StudioMenu+; esse comportamento continua, só que agora não
+ *  upsell do Plano Agenda; esse comportamento continua, só que agora não
  *  muda nada já que tudo já vem aberto). */
 export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
   slug,
@@ -164,7 +164,7 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
               : []),
           ]
         : []),
-      buildStep('assinatura', 'Minha assinatura', 'Gerencie seu plano por aqui — assinar, trocar ou cancelar.'),
+      buildStep('assinatura', 'Plano', 'Veja seu plano por aqui — evolua pro Agenda ou gerencie sua assinatura.'),
       buildStep(
         'conta',
         'Minha conta',
@@ -190,7 +190,7 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
           isOpen={open.horarios}
           onToggle={() => toggle('horarios')}
           locked={!bookingEnabled}
-          lockedHint="Disponível quando o agendamento automático (StudioMenu+) estiver ativo."
+          lockedHint="Disponível quando o agendamento automático (Plano Agenda) estiver ativo."
           dataTour="horarios-header"
         >
           <BusinessHoursEditor slug={slug} initialHours={businessHours} />
@@ -204,7 +204,7 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
           isOpen={open.bloqueios}
           onToggle={() => toggle('bloqueios')}
           locked={!bookingEnabled}
-          lockedHint="Disponível quando o agendamento automático (StudioMenu+) estiver ativo."
+          lockedHint="Disponível quando o agendamento automático (Plano Agenda) estiver ativo."
           dataTour="bloqueios-header"
         >
           <ScheduleBlocksManager slug={slug} blocks={scheduleBlocks} />
@@ -218,7 +218,7 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
           isOpen={open.pausar}
           onToggle={() => toggle('pausar')}
           locked={!bookingEnabled}
-          lockedHint="Disponível quando o agendamento automático (StudioMenu+) estiver ativo."
+          lockedHint="Disponível quando o agendamento automático (Plano Agenda) estiver ativo."
           dataTour="pausar-header"
         >
           <AgendaPauseSection slug={slug} initialPaused={agendaPaused} />
@@ -233,7 +233,7 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
             isOpen={open.notificacoes}
             onToggle={() => toggle('notificacoes')}
             locked={!bookingEnabled}
-            lockedHint="Disponível quando o agendamento automático (StudioMenu+) estiver ativo."
+            lockedHint="Disponível quando o agendamento automático (Plano Agenda) estiver ativo."
             dataTour="notificacoes-header"
           >
             <NotificationsSection slug={slug} />
@@ -244,7 +244,7 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
       <div id="assinatura">
         <SectionCard
           icon={CreditCard}
-          title="Minha assinatura"
+          title="Plano"
           isOpen={open.assinatura}
           onToggle={() => toggle('assinatura')}
           dataTour="assinatura-header"

@@ -185,7 +185,7 @@ export function buildServicesPayload(procedures: ProcedureItem[], orderId: strin
       // Se não veio um valor numérico explícito (IA, preset de nicho ou
       // edição manual sem preencher o campo específico), tenta calcular a
       // partir do texto livre de duração — sem isso, o serviço nunca fica
-      // agendável no StudioMenu+ mesmo já mostrando "1h30" pro cliente.
+      // agendável no Plano Agenda mesmo já mostrando "1h30" pro cliente.
       duration_minutes: typeof p.duration_minutes === 'number' ? p.duration_minutes : parseDurationToMinutes(p.duration),
       bookable: p.bookable !== false,
       category: p.category || 'Geral',

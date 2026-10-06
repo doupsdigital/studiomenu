@@ -15,6 +15,9 @@ interface PlanSubscribeCardProps {
    *  assinante ativa (Básico → Plus): ali não tem cobrança nova, o método
    *  atual continua valendo. */
   showMethodChoice?: boolean;
+  /** Preço customizado do Plano Catálogo pra essa cliente (admin), em vez do
+   *  padrão de `PLAN_PRICING.basico`. Só usado quando `plan === 'basico'`. */
+  priceOverride?: { price: number; label: string };
 }
 
 type PaymentMethod = 'pix' | 'card';
@@ -33,9 +36,30 @@ interface CardState {
 const POLL_INTERVAL_MS = 5000;
 const POLL_TIMEOUT_MS = 5 * 60 * 1000;
 
-const PLAN_COPY: Record<PayablePlanTier, { icon: LucideIcon; headline: string; subheadline: string }> = {
-  basico: { icon: BookOpen, headline: 'Assine o StudioMenu Básico', subheadline: 'catálogo online + edição ilimitada' },
-  plus: { icon: Crown, headline: 'Assine o StudioMenu+', subheadline: 'libere o agendamento automático' },
+const PLAN_COPY: Record<PayablePlanTier, { icon: LucideIcon; headline: string; benefits: string[] }> = {
+  basico: {
+    icon: BookOpen,
+    headline: 'Garanta seu Catálogo',
+    // Momento de decisão (checkout) — reforço de valor em vez de só preço +
+    // descrição vaga, pedido real 2026-10-06 (sentia que "faltava algo pra
+    // impulsionar a decisão").
+    benefits: [
+      'Link profissional pra Bio do Instagram',
+      'Edite fotos, preços e serviços quando quiser',
+      'Layout Premium que seu Studio merece',
+    ],
+  },
+  plus: {
+    icon: Crown,
+    headline: 'Assine o Plano Agenda',
+    // Mesmo tratamento do Catálogo (2026-10-06): faixa de oferta, preço em
+    // destaque e benefícios reais em vez de uma linha solta.
+    benefits: [
+      'Clientes agendam sozinhas, a qualquer hora',
+      'Agenda organizada com horários reais',
+      'Menos ida e volta pelo WhatsApp',
+    ],
+  },
 };
 
 const formatShortDate = (iso: string) =>
@@ -46,7 +70,7 @@ const formatShortDate = (iso: string) =>
  *  plano (Básico → Plus, ativação direta, sem QR). */
 const SUCCESS_COPY: Record<PayablePlanTier, { headline: string; benefits: string[] }> = {
   basico: {
-    headline: 'Agora você tem o StudioMenu Básico',
+    headline: 'Agora você tem o Plano Catálogo',
     benefits: [
       'Catálogo online sempre no ar',
       'Edite fotos, preços e serviços quando quiser',
@@ -54,7 +78,7 @@ const SUCCESS_COPY: Record<PayablePlanTier, { headline: string; benefits: string
     ],
   },
   plus: {
-    headline: 'Agora você tem o StudioMenu+',
+    headline: 'Agora você tem o Plano Agenda',
     benefits: [
       'Clientes agendam sozinhas, a qualquer hora',
       'Agenda organizada com horários reais',
@@ -72,14 +96,24 @@ const SUCCESS_COPY: Record<PayablePlanTier, { headline: string; benefits: string
  *  Sempre termina numa confirmação de sucesso (Fase 20) — nunca leva a
  *  profissional de volta pra tela seguinte em silêncio, mesmo quando não
  *  tem QR pra mostrar (troca de plano ativa na hora). */
-export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan, billingEmail, billingCpfCnpj, showMethodChoice = true }) => {
+export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
+  slug,
+  plan,
+  billingEmail,
+  billingCpfCnpj,
+  showMethodChoice = true,
+  priceOverride,
+}) => {
   const router = useRouter();
   const copy = PLAN_COPY[plan];
-  const pricing = PLAN_PRICING[plan];
+  const pricing = priceOverride ?? PLAN_PRICING[plan];
   const successCopy = SUCCESS_COPY[plan];
   /** Sem seletor de método = troca de plano de quem já é assinante (Básico →
    *  Plus): ativa na hora, o novo valor só vale na próxima mensalidade. */
   const isUpgrade = !showMethodChoice;
+  /** Catálogo é pagamento único — "assinar"/"mensalidade" não fazem sentido
+   *  aqui, só pro Agenda (recorrente). */
+  const isOneTime = plan === 'basico';
 
   const [email, setEmail] = useState(billingEmail || '');
   const [cpfCnpj, setCpfCnpj] = useState(formatCpfCnpj(billingCpfCnpj || ''));
@@ -264,7 +298,16 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
   }
 
   return (
-    <div className="rounded-2xl bg-gradient-to-br from-rose-50 to-cream border border-rose-200 p-5">
+    <div className="relative overflow-hidden rounded-3xl bg-white border-2 border-rose-200 shadow-xl shadow-rose-900/10 p-6">
+      {/* Faixa de "escassez" — pedido real 2026-10-06: preço de lançamento,
+       *  honesto (os dois produtos acabaram de ser reposicionados), sem
+       *  data/contador fixo pra não virar promessa que não dá pra sustentar. */}
+      <div
+        className="absolute -left-11 top-6 w-40 -rotate-45 bg-rose-600 py-1.5 text-center shadow-md"
+        aria-hidden="true"
+      >
+        <span className="text-[11px] font-extrabold uppercase tracking-wider text-white">OFERTA 🔥</span>
+      </div>
       {qr ? (
         <div className="flex flex-col items-center gap-3">
           <img src={`data:image/png;base64,${qr.image}`} alt="QR Code Pix" className="w-48 h-48 rounded-xl bg-white p-2 shadow-sm" />
@@ -324,8 +367,18 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
               <copy.icon className="w-6 h-6" />
             </div>
             <p className="font-serif-pro font-bold text-lg text-ink">{copy.headline}</p>
-            <p className="text-[15px] text-ink-soft mt-0.5">{pricing.label} · {copy.subheadline}</p>
+            <div className="inline-flex items-center justify-center px-4 py-1.5 rounded-xl bg-rose-50 border border-rose-200 mt-2">
+              <span className="font-serif-pro font-bold text-2xl text-rose-700">{pricing.label}</span>
+            </div>
           </div>
+          <ul className="flex flex-col gap-1.5 mb-1">
+            {copy.benefits.map((benefit) => (
+              <li key={benefit} className="flex items-start gap-2 text-sm text-ink">
+                <Check className="w-4 h-4 mt-0.5 shrink-0 text-emerald-600" strokeWidth={3} />
+                <span className="font-bold italic">{benefit}</span>
+              </li>
+            ))}
+          </ul>
           <input
             type="text"
             inputMode="numeric"
@@ -402,7 +455,9 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
                 : 'Gerando Pix...'
               : showMethodChoice && method === 'card'
                 ? 'Continuar pro pagamento seguro'
-                : `Assinar por ${pricing.label}`}
+                : isOneTime
+                  ? `Pagar ${pricing.label} e garantir meu Catálogo`
+                  : `Assinar por ${pricing.label}`}
           </button>
         </form>
       )}

@@ -17,16 +17,31 @@ designer, estética, studios multi-serviço), com agendamento automático opcion
 código do LashMenu estático vive isolado em `legacy/` (não é lido pelo app) e a documentação
 dessa fase antiga está em `docs/historico/`.
 
-Dois planos pagos (cobrança recorrente via Asaas), mais um catálogo estático gratuito de base:
+**Por que o pivô pra multi-nicho:** durante a validação comercial do LashMenu (tráfego pago,
+funil de vendas), ficou claro que a maioria das profissionais que chegavam no funil não fazia só
+procedimentos de lash — muitas têm estúdio próprio ou atuam em várias frentes (unhas, estética,
+depilação). Limitar o posicionamento só a lash designers deixava de fora boa parte do mercado de
+beleza — daí o StudioMenu.
 
-| Plano | Preço | O que dá |
-|---|---|---|
-| **Catálogo** (gratuito) | — | Catálogo público, sem agendamento automático — cliente final fala com a profissional pelo WhatsApp. |
-| **StudioMenu Básico** | R$ 27,90/mês | Igual ao gratuito hoje em termos de agendamento (WhatsApp), mas assinado — é o "degrau" pro Plus. |
-| **StudioMenu+** | R$ 47,90/mês | Agendamento automático de verdade: wizard de horário no catálogo público + Agenda/Horários/Bloqueios liberados no app da profissional. |
+Dois planos pagos, mais um catálogo estático gratuito de base (modelo reformulado em
+2026-10-06, depois de identificar que leads de anúncio entravam esperando um produto
+"pago uma vez" — PDF/arte — e travavam na hora de ver uma mensalidade):
+
+| Plano | Preço | Cobrança | O que dá |
+|---|---|---|---|
+| **Catálogo** (gratuito) | — | — | Catálogo público, sem agendamento automático — cliente final fala com a profissional pelo WhatsApp. Estado inicial antes de pagar qualquer coisa. |
+| **Plano Catálogo** | R$ 89,90 (padrão, customizável por catálogo) | Pagamento único via Asaas | Mesma experiência do gratuito, só que pago — é o "degrau" pro Agenda. Nunca recorrente, nunca expira. |
+| **Plano Agenda** | R$ 47,90/mês | Assinatura recorrente via Asaas | Agendamento automático de verdade: wizard de horário no catálogo público + Agenda/Horários/Bloqueios liberados no app da profissional. Vendido como upsell dentro do app de quem já tem o Plano Catálogo. |
+
+Nomes internos no código/banco (`PayablePlanTier`/`orders.plan_tier`) continuam sendo
+`'basico'` (Plano Catálogo) e `'plus'` (Plano Agenda) — só a camada de apresentação foi
+renomeada, de propósito, pra não exigir migração de schema. `orders.plan_tier = 'catalog'`
+é um valor **diferente**, que sempre significou "grátis, nunca pagou nada" — não confundir
+com o produto "Plano Catálogo".
 
 Preços/labels centralizados em [`src/lib/pricing.ts`](../../src/lib/pricing.ts) — nunca
-hardcoded em outro lugar.
+hardcoded em outro lugar. Preço do Plano Catálogo é customizável por catálogo no admin
+(`billing_price_override`, sem teto, só piso de R$5) via `resolveCatalogPrice()`.
 
 A tela de primeiro contato (antes de assinar) pode vender o Plus em destaque ou o Básico em
 destaque, configurável por catálogo (`orders.first_offer_tier`) — ver `docs/historico/FASE22_OFERTA_PLUS_DIRETA.md`.
