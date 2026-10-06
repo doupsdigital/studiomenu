@@ -89,7 +89,7 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
   // `upgrade-plus` é um hash "extra", à parte das 5 seções: fica DENTRO da
   // seção "assinatura" (só existe no DOM pra quem já é Básico ativo — ver
   // `SubscriptionSection`) e rola direto pro formulário de assinar o Plus
-  // (e-mail/CPF já preenchidos, botão "Assinar por R$34,90"), em vez de
+  // (e-mail/CPF já preenchidos, botão "Assinar por R$47,90"), em vez de
   // parar no topo do card "Básico ativo" que fica acima dele — pedido
   // explícito do usuário, o CTA de upgrade deve levar direto pra ação, não
   // só pra seção genérica.
