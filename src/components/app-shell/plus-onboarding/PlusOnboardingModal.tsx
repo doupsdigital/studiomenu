@@ -15,7 +15,7 @@ interface PlusOnboardingModalProps {
 type Step = 'beneficios' | 'demo' | 'cta';
 const STEPS: Step[] = ['beneficios', 'demo', 'cta'];
 
-/** Onboarding em tela cheia do StudioMenu+, aberto pelo "Conheça" do
+/** Onboarding em tela cheia do Plano Agenda, aberto pelo "Conheça" do
  *  `PlusUpsellCard` — 3 telas (benefícios → demo do agendamento automático
  *  com o catálogo real da cliente → assinar), no lugar do link direto de
  *  antes pra `/config#upgrade-plus` (2026-09-24).
@@ -49,7 +49,7 @@ export const PlusOnboardingModal: React.FC<PlusOnboardingModalProps> = ({ slug, 
       className="fixed inset-0 z-50 flex flex-col bg-rose-200"
       role="dialog"
       aria-modal="true"
-      aria-label="Conheça o StudioMenu+"
+      aria-label="Conheça o Plano Agenda"
     >
       <div className="flex items-center justify-between px-5 pt-5 pb-2 shrink-0">
         <div className="flex gap-1.5">

@@ -7,7 +7,7 @@ import { EditCatalogCard } from './EditCatalogCard';
 import { CatalogReadyPreview } from './CatalogReadyPreview';
 import { PlanSubscribeCard } from '@/components/billing/PlanSubscribeCard';
 import { ProductTour } from '@/components/tour/ProductTour';
-import { PLAN_PRICING, type PayablePlanTier } from '@/lib/pricing';
+import { PLAN_PRICING, resolveCatalogPrice } from '@/lib/pricing';
 import type { ProfessionalOrderSummary } from '@/lib/professional-app-service';
 
 interface FirstContactScreenProps {
@@ -15,28 +15,28 @@ interface FirstContactScreenProps {
 }
 
 /** Primeira tela que a profissional vê ao abrir o link do app, antes de
- *  assinar qualquer plano — deliberadamente simples (sem `GradientHeader`,
+ *  pagar qualquer plano — deliberadamente simples (sem `GradientHeader`,
  *  sem `BottomNav`, sem menção a "login"): só os 2 links que ela já
- *  reconhece (ver/editar catálogo) e o card de assinar. A tela cheia de
+ *  reconhece (ver/editar catálogo) e o card de pagar. A tela cheia de
  *  hoje (Fase 19: `inicio/page.tsx`) só aparece depois que ela paga alguma
  *  coisa (`plan_tier !== 'catalog'`).
  *
- *  `order.first_offer_tier` (Fase 22) decide qual plano é o padrão aqui —
- *  'basico' pra quase todo mundo (comportamento de sempre, sem nenhuma
- *  mudança visual), 'plus' pra catálogos vendidos com o discurso de
- *  agendamento automático (ex: leads de anúncio, decisão comercial tomada
- *  na criação do catálogo pelo admin). Com 'plus', ela ainda pode trocar
- *  pro Básico por um link — nunca fica presa numa única opção, só muda
- *  qual vem em destaque. Client component só por causa desse toggle (o
- *  resto da tela continua igual ao que seria puramente estático).
+ *  Modelo novo (2026-10-06): não existe mais escolha entre 2 planos aqui —
+ *  o padrão é sempre o Plano Catálogo (pagamento único, preço vem de
+ *  `resolveCatalogPrice`, customizável por admin via `billing_price_override`).
+ *  `order.first_offer_tier` (Fase 22) continua decidindo o caso especial:
+ *  'plus' pula o Catálogo e mostra direto o Plano Agenda (assinatura) — pra
+ *  leads que já pedem agendamento automático de cara. Diferente de antes,
+ *  não existe mais botão pra ela trocar entre os dois nessa tela: a escolha
+ *  agora é do admin, feita na criação do catálogo.
  *
  *  Tour guiado próprio (Fase 20) — primeiro contato de verdade, então
  *  explica os 3 elementos da tela em vez de pular algum. Texto do 3º passo
- *  muda junto com o plano em destaque (Fase 22). */
+ *  muda conforme o plano ofertado (Fase 22). */
 export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order }) => {
   const firstName = order.client_name.split(' ')[0];
-  const [plan, setPlan] = useState<PayablePlanTier>(order.first_offer_tier);
-  const isPlusOffer = order.first_offer_tier === 'plus';
+  const isAgendaOffer = order.first_offer_tier === 'plus';
+  const catalogPrice = resolveCatalogPrice(order.billing_price_override);
   const [highlightView, setHighlightView] = useState(false);
 
   // Ao CONCLUIR o tour (não ao pular — intenção diferente): o último passo
@@ -53,7 +53,7 @@ export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order })
     () => [
       { target: '[data-tour="fc-view"]', title: 'Seu catálogo', content: 'Esse é o link que suas clientes veem — pode colocar na bio do Instagram, WhatsApp, onde quiser.' },
       { target: '[data-tour="fc-edit"]', title: 'Editar quando quiser', content: 'Aqui você atualiza fotos, preços e serviços a qualquer hora, sem precisar de ajuda.' },
-      plan === 'plus'
+      isAgendaOffer
         ? {
             target: '[data-tour="fc-subscribe"]',
             title: 'Assine pra liberar o agendamento',
@@ -61,11 +61,11 @@ export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order })
           }
         : {
             target: '[data-tour="fc-subscribe"]',
-            title: 'Assine pra manter tudo ativo',
-            content: `${PLAN_PRICING.basico.label}, sem compromisso — cancele quando quiser. É só preencher e pagar por Pix ou cartão de crédito.`,
+            title: 'Pague pra manter tudo ativo',
+            content: `${catalogPrice.label}, pagamento único — sem mensalidade. É só preencher e pagar por Pix ou cartão de crédito.`,
           },
     ],
-    [plan]
+    [isAgendaOffer, catalogPrice.label]
   );
 
   return (
@@ -88,44 +88,26 @@ export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order })
       <EditCatalogCard slug={order.slug} dataTour="fc-edit" />
 
       <div className="mt-2" data-tour="fc-subscribe">
-        {plan === 'plus' ? (
+        {isAgendaOffer ? (
           <p className="text-[15px] text-ink-soft text-center mb-3">
-            Suas clientes agendam sozinhas, sem trocar mensagem no WhatsApp — assine o StudioMenu+ e libere o agendamento automático.
+            Suas clientes agendam sozinhas, sem trocar mensagem no WhatsApp — assine o Plano Agenda e libere o agendamento automático.
           </p>
         ) : (
           <p className="text-[15px] text-ink-soft text-center mb-3">
-            Pra manter seu catálogo no ar e continuar editando quando quiser, assine o plano abaixo — sem compromisso, cancele quando quiser.
+            Pague uma vez e mantenha seu catálogo no ar pra sempre, editando quando quiser — sem mensalidade.
           </p>
         )}
 
-        <PlanSubscribeCard slug={order.slug} plan={plan} billingEmail={order.billing_email} billingCpfCnpj={order.billing_cpf_cnpj} />
-
-        {/* Troca entre planos só aparece pra catálogos marcados como oferta
-         *  Plus (Fase 22) — pra quem já vinha vendo só o Básico, a tela
-         *  continua idêntica a antes. Antes era um texto sublinhado solto
-         *  (sem parecer clicável) — agora é um botão de contorno (mesmo
-         *  padrão usado em outros CTAs secundários do app, ex: trocar forma
-         *  de pagamento em PlanSubscribeCard), com alvo de toque maior.
-         *  Pedido real, 2026-10-02. */}
-        {isPlusOffer && (
-          <button
-            type="button"
-            onClick={() => setPlan(plan === 'plus' ? 'basico' : 'plus')}
-            className="w-full mt-3 py-3 px-4 rounded-xl border border-rose-200 bg-surface text-center transition-colors hover:bg-rose-50 active:scale-[0.98]"
-          >
-            {plan === 'plus' ? (
-              <>
-                <span className="block text-sm font-bold text-ink-soft">
-                  Prefiro começar só com o catálogo ({PLAN_PRICING.basico.label})
-                </span>
-                <span className="block text-xs text-ink-faint mt-0.5">O agendamento continua pelo WhatsApp</span>
-              </>
-            ) : (
-              <span className="block text-sm font-bold text-rose-700">
-                ← Prefiro o agendamento automático ({PLAN_PRICING.plus.label})
-              </span>
-            )}
-          </button>
+        {isAgendaOffer ? (
+          <PlanSubscribeCard slug={order.slug} plan="plus" billingEmail={order.billing_email} billingCpfCnpj={order.billing_cpf_cnpj} />
+        ) : (
+          <PlanSubscribeCard
+            slug={order.slug}
+            plan="basico"
+            billingEmail={order.billing_email}
+            billingCpfCnpj={order.billing_cpf_cnpj}
+            priceOverride={catalogPrice}
+          />
         )}
       </div>
 

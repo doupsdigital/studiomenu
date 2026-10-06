@@ -15,6 +15,9 @@ interface PlanSubscribeCardProps {
    *  assinante ativa (Básico → Plus): ali não tem cobrança nova, o método
    *  atual continua valendo. */
   showMethodChoice?: boolean;
+  /** Preço customizado do Plano Catálogo pra essa cliente (admin), em vez do
+   *  padrão de `PLAN_PRICING.basico`. Só usado quando `plan === 'basico'`. */
+  priceOverride?: { price: number; label: string };
 }
 
 type PaymentMethod = 'pix' | 'card';
@@ -34,8 +37,8 @@ const POLL_INTERVAL_MS = 5000;
 const POLL_TIMEOUT_MS = 5 * 60 * 1000;
 
 const PLAN_COPY: Record<PayablePlanTier, { icon: LucideIcon; headline: string; subheadline: string }> = {
-  basico: { icon: BookOpen, headline: 'Assine o StudioMenu Básico', subheadline: 'catálogo online + edição ilimitada' },
-  plus: { icon: Crown, headline: 'Assine o StudioMenu+', subheadline: 'libere o agendamento automático' },
+  basico: { icon: BookOpen, headline: 'Garanta seu Plano Catálogo', subheadline: 'pagamento único, catálogo seu pra sempre' },
+  plus: { icon: Crown, headline: 'Assine o Plano Agenda', subheadline: 'libere o agendamento automático' },
 };
 
 const formatShortDate = (iso: string) =>
@@ -46,15 +49,15 @@ const formatShortDate = (iso: string) =>
  *  plano (Básico → Plus, ativação direta, sem QR). */
 const SUCCESS_COPY: Record<PayablePlanTier, { headline: string; benefits: string[] }> = {
   basico: {
-    headline: 'Agora você tem o StudioMenu Básico',
+    headline: 'Agora você tem o Plano Catálogo',
     benefits: [
-      'Catálogo online sempre no ar',
+      'Catálogo online sempre no ar, pra sempre — sem mensalidade',
       'Edite fotos, preços e serviços quando quiser',
       'Link profissional pra compartilhar com suas clientes',
     ],
   },
   plus: {
-    headline: 'Agora você tem o StudioMenu+',
+    headline: 'Agora você tem o Plano Agenda',
     benefits: [
       'Clientes agendam sozinhas, a qualquer hora',
       'Agenda organizada com horários reais',
@@ -72,14 +75,24 @@ const SUCCESS_COPY: Record<PayablePlanTier, { headline: string; benefits: string
  *  Sempre termina numa confirmação de sucesso (Fase 20) — nunca leva a
  *  profissional de volta pra tela seguinte em silêncio, mesmo quando não
  *  tem QR pra mostrar (troca de plano ativa na hora). */
-export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan, billingEmail, billingCpfCnpj, showMethodChoice = true }) => {
+export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
+  slug,
+  plan,
+  billingEmail,
+  billingCpfCnpj,
+  showMethodChoice = true,
+  priceOverride,
+}) => {
   const router = useRouter();
   const copy = PLAN_COPY[plan];
-  const pricing = PLAN_PRICING[plan];
+  const pricing = priceOverride ?? PLAN_PRICING[plan];
   const successCopy = SUCCESS_COPY[plan];
   /** Sem seletor de método = troca de plano de quem já é assinante (Básico →
    *  Plus): ativa na hora, o novo valor só vale na próxima mensalidade. */
   const isUpgrade = !showMethodChoice;
+  /** Catálogo é pagamento único — "assinar"/"mensalidade" não fazem sentido
+   *  aqui, só pro Agenda (recorrente). */
+  const isOneTime = plan === 'basico';
 
   const [email, setEmail] = useState(billingEmail || '');
   const [cpfCnpj, setCpfCnpj] = useState(formatCpfCnpj(billingCpfCnpj || ''));
@@ -402,7 +415,9 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({ slug, plan
                 : 'Gerando Pix...'
               : showMethodChoice && method === 'card'
                 ? 'Continuar pro pagamento seguro'
-                : `Assinar por ${pricing.label}`}
+                : isOneTime
+                  ? `Pagar ${pricing.label} e garantir meu Catálogo`
+                  : `Assinar por ${pricing.label}`}
           </button>
         </form>
       )}

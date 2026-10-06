@@ -2,12 +2,13 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { isProfessionalRequestAuthorized } from '@/lib/professional-session';
-import { PLAN_PRICING, type PayablePlanTier } from '@/lib/pricing';
+import { PLAN_PRICING, resolveCatalogPrice, type PayablePlanTier } from '@/lib/pricing';
 import { activateSubscription } from '@/lib/billing-service';
 import {
   AsaasConfigError,
   AsaasApiError,
   findOrCreateCustomer,
+  createPayment,
   createSubscription,
   updateSubscription,
   updateSubscriptionBillingType,
@@ -111,12 +112,18 @@ export async function POST(request: Request) {
 
     const pricing = PLAN_PRICING[plan];
 
-    // Preço reduzido só pra teste real em produção (ex: R$5 no catálogo de
-    // teste) — definido manualmente no banco, nunca pela tela. Só vale se
-    // estiver entre o mínimo do Asaas (R$5) e o preço de tabela: nunca cobra
-    // MAIS que o preço do plano, mesmo se o dado for editado errado.
-    const override = order.billing_price_override === null ? null : Number(order.billing_price_override);
-    const price = override !== null && Number.isFinite(override) && override >= 5 && override <= pricing.price ? override : pricing.price;
+    // Plano Catálogo (pagamento único): preço customizável livremente pelo
+    // admin por cliente, sem teto (resolveCatalogPrice, src/lib/pricing.ts).
+    // Plano Agenda (assinatura): `billing_price_override` continua sendo só
+    // um desconto de teste, nunca acima do preço de tabela — comportamento
+    // de sempre, intocado.
+    let price: number;
+    if (plan === 'basico') {
+      price = resolveCatalogPrice(order.billing_price_override).price;
+    } else {
+      const override = order.billing_price_override === null ? null : Number(order.billing_price_override);
+      price = override !== null && Number.isFinite(override) && override >= 5 && override <= pricing.price ? override : pricing.price;
+    }
 
     // Já tem assinatura Asaas e é um tier DIFERENTE do atual → troca de
     // plano (ex: Básico → Plus): atualiza valor/descrição em vez de criar
@@ -186,6 +193,27 @@ export async function POST(request: Request) {
       .update({ asaas_customer_id: customer.id, billing_email: email.trim(), billing_cpf_cnpj: cpfCnpjDigits })
       .eq('id', order.id);
 
+    // Plano Catálogo: cobrança avulsa, nunca cria assinatura/recorrência —
+    // quem compra isso aqui nunca ganha `asaas_subscription_id` (é assim que
+    // o upgrade pro Plano Agenda, mais abaixo no fluxo de troca de tier,
+    // reconhece que precisa criar uma assinatura nova em vez de atualizar
+    // uma existente).
+    if (plan === 'basico') {
+      await supabaseAdmin
+        .from('orders')
+        .update({ pending_plan_tier: plan, payment_method: method, manual_plan: false })
+        .eq('id', order.id);
+
+      const payment = await createPayment({
+        customerId: customer.id,
+        value: price,
+        description: pricing.description,
+        billingType: BILLING_TYPE[method],
+      });
+
+      return buildPaymentResponse(payment, method);
+    }
+
     const subscription = await createSubscription({
       customerId: customer.id,
       value: price,
@@ -193,9 +221,12 @@ export async function POST(request: Request) {
       billingType: BILLING_TYPE[method],
     });
 
+    // `manual_plan: false` fecha uma inconsistência latente: um perfil com
+    // plano concedido manualmente (Fase 26) que depois assina de verdade não
+    // pode continuar marcado como "sem cobrança" na tela de Plano.
     await supabaseAdmin
       .from('orders')
-      .update({ asaas_subscription_id: subscription.id, pending_plan_tier: plan, payment_method: method })
+      .update({ asaas_subscription_id: subscription.id, pending_plan_tier: plan, payment_method: method, manual_plan: false })
       .eq('id', order.id);
 
     const payment = await getFirstSubscriptionPayment(subscription.id);

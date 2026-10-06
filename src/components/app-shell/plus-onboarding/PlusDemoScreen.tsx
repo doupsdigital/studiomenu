@@ -16,7 +16,7 @@ interface PlusDemoScreenProps {
 
 const STEPS = ['Escolha um serviço', "Toque em 'Agendar agora'", 'Escolha o dia e o horário'];
 
-/** Tela 2 do onboarding do StudioMenu+: demonstra o agendamento automático
+/** Tela 2 do onboarding do Plano Agenda: demonstra o agendamento automático
  *  funcionando com o catálogo REAL da profissional (não um preset genérico
  *  de exemplo) — mesmo mecanismo de simulação local do showroom público
  *  (`FakeBookingModal`), só que aqui embutido dentro do app, pra quem já é

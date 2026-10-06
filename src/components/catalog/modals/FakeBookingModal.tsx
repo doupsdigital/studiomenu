@@ -13,7 +13,7 @@ interface BookedFake {
 interface FakeBookingModalProps {
   service: ProcedureItem;
   onClose: () => void;
-  /** Onboarding do StudioMenu+ dentro do app (2026-09-24): quando definido,
+  /** Onboarding do Plano Agenda dentro do app (2026-09-24): quando definido,
    *  ao escolher um horário chama isso em vez de mostrar a tela de sucesso
    *  interna — quem chamou assume a confirmação (no caso, uma prévia da
    *  Agenda de verdade). Sem esse prop (showroom público, mockups das
@@ -23,7 +23,7 @@ interface FakeBookingModalProps {
 
 /** Simulação 100% local do agendamento automático — usada no showroom
  *  (`/c/showcase/[niche]`, sem catálogo real por trás), no mockup de
- *  celular da home e no onboarding do StudioMenu+ dentro do app (aqui com
+ *  celular da home e no onboarding do Plano Agenda dentro do app (aqui com
  *  catálogo real, mas ainda sem gravar nada — só demonstração). Visual
  *  idêntico ao `BookingModal.tsx` de verdade (mesmas classes de
  *  scheduling-wizard.css), mas sem nenhuma chamada de rede: os horários são

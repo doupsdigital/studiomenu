@@ -55,7 +55,7 @@ export interface CatalogOrderData {
   booking_enabled?: boolean;
   /** Ela mesma pausou o agendamento automático temporariamente (Fase 23) —
    *  com `booking_enabled = true` mas isso em `true`, o catálogo se comporta
-   *  como se não tivesse o StudioMenu+ (WhatsApp em vez do wizard). */
+   *  como se não tivesse o Plano Agenda (WhatsApp em vez do wizard). */
   agenda_paused?: boolean;
   /** Desativado pelo admin (falta de pagamento, pausa a pedido dela, etc) —
    *  bloqueia o link público E o link mágico de edição; acesso ao app

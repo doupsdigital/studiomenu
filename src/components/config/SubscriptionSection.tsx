@@ -21,11 +21,13 @@ interface SubscriptionSectionProps {
   manualPlan?: boolean;
 }
 
-const TIER_LABEL: Record<PayablePlanTier, string> = { basico: 'StudioMenu Básico', plus: 'StudioMenu+' };
+const TIER_LABEL: Record<PayablePlanTier, string> = { basico: 'Plano Catálogo', plus: 'Plano Agenda' };
 
-/** Card "plano X ativo" com botão de cancelar — mesmo visual pro Básico e
- *  pro Plus, só troca o rótulo/preço/texto de aviso (Fase 19: antes só
- *  existia a versão Plus, hardcoded). */
+/** Card "plano X ativo" — mesmo visual pro Catálogo e pro Agenda, só troca o
+ *  rótulo/preço/texto de aviso (Fase 19: antes só existia a versão Plus,
+ *  hardcoded). Catálogo é sempre pagamento único ou manual, nunca
+ *  recorrente — por isso `isOneTime` é derivado direto do `tier`, sem
+ *  precisar de mais uma prop (modelo novo, 2026-10-06). */
 const ActivePlanCard: React.FC<{
   tier: PayablePlanTier;
   paymentMethod: 'pix' | 'card' | null;
@@ -43,6 +45,13 @@ const ActivePlanCard: React.FC<{
 }) => {
   const [confirming, setConfirming] = useState(false);
   const pricing = PLAN_PRICING[tier];
+  const isOneTime = tier === 'basico';
+
+  const subtitle = manualPlan
+    ? 'Ativado manualmente pela equipe StudioMenu'
+    : isOneTime
+      ? 'Pagamento único — sem mensalidade'
+      : `Cobrança recorrente ${paymentMethod === 'card' ? 'no cartão de crédito' : 'via Pix'}`;
 
   return (
     <div className="rounded-2xl bg-gradient-to-br from-rose-50 to-rose-100/60 border border-rose-200 p-5">
@@ -52,21 +61,23 @@ const ActivePlanCard: React.FC<{
         </div>
         <div className="min-w-0">
           <p className="font-serif-pro font-bold text-lg text-rose-800 leading-tight">{TIER_LABEL[tier]} ativo</p>
-          <p className="text-sm text-rose-800/70 mt-0.5">
-            {manualPlan
-              ? 'Ativado manualmente pela equipe StudioMenu'
-              : `Cobrança recorrente ${paymentMethod === 'card' ? 'no cartão de crédito' : 'via Pix'}`}
-          </p>
+          <p className="text-sm text-rose-800/70 mt-0.5">{subtitle}</p>
         </div>
       </div>
 
       <div className="bg-surface rounded-xl px-4 py-3 mb-4 border border-rose-200/60">
-        <p className="text-[13px] font-bold uppercase tracking-wider text-rose-700/70 mb-0.5">Mensalidade</p>
-        <p className="font-serif-pro font-bold text-lg text-rose-800 whitespace-nowrap">{manualPlan ? 'Sem cobrança' : pricing.label}</p>
+        <p className="text-[13px] font-bold uppercase tracking-wider text-rose-700/70 mb-0.5">
+          {isOneTime ? 'Plano' : 'Mensalidade'}
+        </p>
+        <p className="font-serif-pro font-bold text-lg text-rose-800 whitespace-nowrap">
+          {manualPlan ? 'Sem cobrança' : isOneTime ? 'Sem mensalidade' : pricing.label}
+        </p>
       </div>
 
       {manualPlan ? (
         <p className="text-sm text-ink-soft">Qualquer alteração nesse plano, é só falar com a gente.</p>
+      ) : isOneTime ? (
+        <p className="text-sm text-ink-soft">Pagamento único — nada recorrente pra cancelar aqui.</p>
       ) : (
         <>
           {error && <p className="text-sm text-rose-600 mb-3">{error}</p>}
@@ -74,8 +85,7 @@ const ActivePlanCard: React.FC<{
           {confirming ? (
             <div className="rounded-xl bg-surface border border-rose-200/60 p-4">
               <p className="text-sm text-ink-soft mb-3">
-                Cancelar sua assinatura do {TIER_LABEL[tier]}?{' '}
-                {tier === 'plus' ? 'Você perde acesso à agenda automática.' : 'Seu catálogo deixa de fazer parte do plano pago.'}
+                Cancelar sua assinatura do {TIER_LABEL[tier]}? Você perde acesso à agenda automática.
               </p>
               <div className="flex gap-2">
                 <button
@@ -165,7 +175,7 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
         <ActivePlanCard tier="basico" paymentMethod={paymentMethod} manualPlan={manualPlan} onCancel={handleCancel} loading={loading} error={error} />
         <div id="upgrade-plus">
           <p className="flex items-center gap-1.5 text-[15px] font-bold text-ink mb-2">
-            <Sparkles className="w-4 h-4 text-rose-600" /> Evolua pro StudioMenu+
+            <Sparkles className="w-4 h-4 text-rose-600" /> Evolua pro Plano Agenda
           </p>
           <PlanSubscribeCard slug={slug} plan="plus" billingEmail={billingEmail} billingCpfCnpj={billingCpfCnpj} showMethodChoice={false} />
         </div>
