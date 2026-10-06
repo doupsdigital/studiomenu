@@ -36,8 +36,20 @@ interface CardState {
 const POLL_INTERVAL_MS = 5000;
 const POLL_TIMEOUT_MS = 5 * 60 * 1000;
 
-const PLAN_COPY: Record<PayablePlanTier, { icon: LucideIcon; headline: string; subheadline: string }> = {
-  basico: { icon: BookOpen, headline: 'Garanta seu Plano Catálogo', subheadline: 'um catálogo digital profissional' },
+const PLAN_COPY: Record<PayablePlanTier, { icon: LucideIcon; headline: string; subheadline?: string; benefits?: string[] }> = {
+  basico: {
+    icon: BookOpen,
+    headline: 'Garanta seu Catálogo',
+    // Momento de decisão (checkout) — reforço de valor em vez de só preço +
+    // descrição vaga, pedido real 2026-10-06 (sentia que "faltava algo pra
+    // impulsionar a decisão"). Pro Agenda (recorrente) mantém o formato
+    // simples de antes, não é o foco desse pedido.
+    benefits: [
+      'Link profissional pra Bio do Instagram',
+      'Edite fotos, preços e serviços quando quiser',
+      'Layout Premium que seu Studio merece',
+    ],
+  },
   plus: { icon: Crown, headline: 'Assine o Plano Agenda', subheadline: 'libere o agendamento automático' },
 };
 
@@ -337,8 +349,22 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
               <copy.icon className="w-6 h-6" />
             </div>
             <p className="font-serif-pro font-bold text-lg text-ink">{copy.headline}</p>
-            <p className="text-[15px] text-ink-soft mt-0.5">{pricing.label} · {copy.subheadline}</p>
+            {copy.subheadline ? (
+              <p className="text-[15px] text-ink-soft mt-0.5">{pricing.label} · {copy.subheadline}</p>
+            ) : (
+              <p className="font-serif-pro font-bold text-2xl text-rose-700 mt-1">{pricing.label}</p>
+            )}
           </div>
+          {copy.benefits && (
+            <ul className="flex flex-col gap-1.5 mb-1">
+              {copy.benefits.map((benefit) => (
+                <li key={benefit} className="flex items-start gap-2 text-sm text-ink-soft">
+                  <Check className="w-4 h-4 mt-0.5 shrink-0 text-emerald-600" strokeWidth={3} />
+                  <span>{benefit}</span>
+                </li>
+              ))}
+            </ul>
+          )}
           <input
             type="text"
             inputMode="numeric"
