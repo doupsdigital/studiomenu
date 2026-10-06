@@ -239,7 +239,7 @@ export function PlusLandingPage() {
               <div className="lp-pricing-tier-card">
                 <div className="lp-tier-badge lp-tier-badge--basic">📱 SÓ CATÁLOGO</div>
                 <h3 className="lp-tier-title">StudioMenu Catálogo</h3>
-                <p className="lp-tier-desc">Catálogo digital sempre no ar, pagamento único — sem agendamento automático, cliente ainda marca pelo WhatsApp.</p>
+                <p className="lp-tier-desc">Catálogo digital sempre no ar — sem agendamento automático, cliente ainda marca pelo WhatsApp.</p>
 
                 <div className="lp-tier-price-box">
                   <div className="lp-tier-price-main">
@@ -251,7 +251,7 @@ export function PlusLandingPage() {
                 </div>
 
                 <ul className="lp-tier-bullets">
-                  <li>{CHECK_ICON}<span>Catálogo online sempre no ar, pra sempre</span></li>
+                  <li>{CHECK_ICON}<span>Catálogo online sempre no ar</span></li>
                   <li>{CHECK_ICON}<span>Link profissional pra bio do Instagram/WhatsApp</span></li>
                   <li>{CHECK_ICON}<span>Edite fotos, preços e serviços quando quiser</span></li>
                   <li>{CHECK_ICON}<span>Cliente ainda agenda pelo WhatsApp</span></li>

@@ -50,7 +50,7 @@ const ActivePlanCard: React.FC<{
   const subtitle = manualPlan
     ? 'Ativado manualmente pela equipe StudioMenu'
     : isOneTime
-      ? 'Pagamento único — sem mensalidade'
+      ? 'Catálogo digital profissional'
       : `Cobrança recorrente ${paymentMethod === 'card' ? 'no cartão de crédito' : 'via Pix'}`;
 
   return (
@@ -67,10 +67,10 @@ const ActivePlanCard: React.FC<{
 
       <div className="bg-surface rounded-xl px-4 py-3 mb-4 border border-rose-200/60">
         <p className="text-[13px] font-bold uppercase tracking-wider text-rose-700/70 mb-0.5">
-          {isOneTime ? 'Plano' : 'Mensalidade'}
+          {isOneTime ? 'Status' : 'Mensalidade'}
         </p>
         <p className="font-serif-pro font-bold text-lg text-rose-800 whitespace-nowrap">
-          {manualPlan ? 'Sem cobrança' : isOneTime ? 'Sem mensalidade' : pricing.label}
+          {manualPlan ? 'Sem cobrança' : isOneTime ? 'Ativo ✓' : pricing.label}
         </p>
       </div>
 

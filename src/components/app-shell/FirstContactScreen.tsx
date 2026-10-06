@@ -62,7 +62,7 @@ export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order })
         : {
             target: '[data-tour="fc-subscribe"]',
             title: 'Pague pra manter tudo ativo',
-            content: `${catalogPrice.label}, pagamento único — sem mensalidade. É só preencher e pagar por Pix ou cartão de crédito.`,
+            content: `${catalogPrice.label} — é só preencher e pagar por Pix ou cartão de crédito.`,
           },
     ],
     [isAgendaOffer, catalogPrice.label]
@@ -94,7 +94,7 @@ export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order })
           </p>
         ) : (
           <p className="text-[15px] text-ink-soft text-center mb-3">
-            Pague uma vez e mantenha seu catálogo no ar pra sempre, editando quando quiser — sem mensalidade.
+            Tenha um catálogo digital profissional — com fotos, preços e serviços personalizados pro seu Studio.
           </p>
         )}
 
