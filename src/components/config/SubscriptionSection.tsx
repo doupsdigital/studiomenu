@@ -175,7 +175,7 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
           <p className="flex items-center gap-1.5 text-[15px] font-bold text-ink mb-2">
             <Sparkles className="w-4 h-4 text-rose-600" /> Evolua pro Plano Agenda
           </p>
-          <PlanSubscribeCard slug={slug} plan="plus" billingEmail={billingEmail} billingCpfCnpj={billingCpfCnpj} showMethodChoice={false} />
+          <PlanSubscribeCard slug={slug} plan="plus" billingEmail={billingEmail} billingCpfCnpj={billingCpfCnpj} />
         </div>
       </div>
     );
