@@ -5,8 +5,9 @@ import { CatalogOrderData, ProcedureItem } from '@/types/catalog';
 import { normalizeWhatsappBR } from '@/lib/format';
 import { compressImageFiles } from '@/lib/image-compress-client';
 import Link from 'next/link';
-import { ArrowLeft, Sparkles, ExternalLink, Search, RefreshCw, Scissors, Plus, Trash2, MessageCircle, Phone, Clock, Smartphone, CalendarClock, Globe, Crown, ChevronDown, PauseCircle, PlayCircle, Gift, Bot, Upload, FileText, X } from 'lucide-react';
+import { ArrowLeft, Sparkles, ExternalLink, Search, RefreshCw, Scissors, Plus, Trash2, MessageCircle, Phone, Clock, Smartphone, CalendarClock, Globe, Crown, ChevronDown, PauseCircle, PlayCircle, Gift, Bot, Upload, FileText, X, Wallet } from 'lucide-react';
 import { usesSubdomainRouting, PRODUCTION_DOMAIN } from '@/lib/public-url';
+import { CATALOGO_PRICE_LABEL } from '@/lib/pricing';
 
 /** `res.json()` direto quebra quando o corpo não é JSON de verdade (ex: erro
  *  413 da Vercel antes mesmo da rota rodar) — mesmo utilitário já usado em
@@ -33,6 +34,9 @@ type AdminCatalog = CatalogOrderData & {
   /** Plano concedido manualmente pelo admin, fora do Asaas (Fase 26) —
    *  caso de borda tipo cliente pagando uma vez só, fora do sistema. */
   manual_plan?: boolean;
+  /** Preço customizado do Plano Catálogo pra essa cliente — `null`/ausente
+   *  usa o padrão (`CATALOGO_PRICE`, src/lib/pricing.ts). */
+  billing_price_override?: number | null;
 };
 
 export default function AdminCatalogosPage() {
@@ -344,11 +348,56 @@ export default function AdminCatalogosPage() {
         showToast('❌ Erro ao atualizar a oferta inicial.');
         return;
       }
-      showToast(next === 'plus' ? '👑 Vai oferecer o Plus direto agora.' : '📋 Voltou a oferecer o Básico primeiro.');
+      showToast(next === 'plus' ? '👑 Vai oferecer o Agenda direto agora.' : '📋 Voltou a oferecer o Catálogo primeiro.');
       fetchCatalogs();
     } catch (e) {
       console.error('Erro ao atualizar first_offer_tier:', e);
       showToast('❌ Erro ao atualizar a oferta inicial.');
+    }
+  };
+
+  // Preço customizado do Plano Catálogo (admin define livremente por
+  // cliente, sem teto — `billing_price_override`, reaproveitado da Fase 21).
+  // Rascunho de input mantido por id pra não perder o que ela digitou antes
+  // de clicar em Salvar, mesmo com re-render vindo de `fetchCatalogs`.
+  const [priceDrafts, setPriceDrafts] = useState<Record<string, string>>({});
+
+  const getPriceDraft = (item: AdminCatalog) => {
+    const id = item.id || '';
+    if (priceDrafts[id] !== undefined) return priceDrafts[id];
+    return item.billing_price_override != null ? String(item.billing_price_override) : '';
+  };
+
+  const savePriceOverride = async (item: AdminCatalog) => {
+    if (!item.id) return;
+    const raw = (priceDrafts[item.id] ?? '').trim();
+    const value = raw === '' ? null : Number(raw.replace(',', '.'));
+    if (value !== null && (!Number.isFinite(value) || value < 5)) {
+      showToast('❌ Preço inválido (mínimo R$5).');
+      return;
+    }
+    try {
+      const res = await fetch('/api/admin/catalog-actions', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ id: item.id, billing_price_override: value }),
+      });
+      const result = await res.json();
+      if (!result.success) {
+        showToast('❌ Erro ao salvar o preço.');
+        return;
+      }
+      showToast(value === null ? '🔄 Preço do Catálogo voltou ao padrão.' : '💰 Preço do Catálogo atualizado!');
+      setPriceDrafts((prev) => {
+        const next = { ...prev };
+        delete next[item.id!];
+        return next;
+      });
+      fetchCatalogs();
+    } catch (e) {
+      console.error('Erro ao salvar billing_price_override:', e);
+      showToast('❌ Erro ao salvar o preço.');
     }
   };
 
@@ -394,7 +443,7 @@ export default function AdminCatalogosPage() {
         showToast('❌ Erro ao conceder o plano manual.');
         return;
       }
-      showToast(`🎁 Plano ${tier === 'plus' ? 'Plus' : 'Básico'} concedido manualmente!`);
+      showToast(`🎁 Plano ${tier === 'plus' ? 'Agenda' : 'Catálogo'} concedido manualmente!`);
       fetchCatalogs();
     } catch (e) {
       console.error('Erro ao conceder plano manual:', e);
@@ -425,13 +474,13 @@ export default function AdminCatalogosPage() {
   };
 
   const PLAN_BADGE: Record<string, { label: string; className: string }> = {
-    catalog: { label: 'Catálogo', className: 'bg-slate-800 text-slate-400 border-slate-700' },
-    'basico-ativo': { label: 'Básico Ativo', className: 'bg-sky-500/10 text-sky-400 border-sky-500/30' },
-    'basico-suspenso': { label: 'Básico Suspenso', className: 'bg-amber-500/10 text-amber-400 border-amber-500/30' },
-    'basico-cancelado': { label: 'Básico Cancelado', className: 'bg-slate-800 text-slate-500 border-slate-700' },
-    'plus-ativo': { label: 'Plus Ativo', className: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' },
-    'plus-suspenso': { label: 'Plus Suspenso', className: 'bg-amber-500/10 text-amber-400 border-amber-500/30' },
-    'plus-cancelado': { label: 'Plus Cancelado', className: 'bg-slate-800 text-slate-500 border-slate-700' },
+    catalog: { label: 'Sem plano', className: 'bg-slate-800 text-slate-400 border-slate-700' },
+    'basico-ativo': { label: 'Catálogo Ativo', className: 'bg-sky-500/10 text-sky-400 border-sky-500/30' },
+    'basico-suspenso': { label: 'Catálogo Suspenso', className: 'bg-amber-500/10 text-amber-400 border-amber-500/30' },
+    'basico-cancelado': { label: 'Catálogo Cancelado', className: 'bg-slate-800 text-slate-500 border-slate-700' },
+    'plus-ativo': { label: 'Agenda Ativo', className: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' },
+    'plus-suspenso': { label: 'Agenda Suspenso', className: 'bg-amber-500/10 text-amber-400 border-amber-500/30' },
+    'plus-cancelado': { label: 'Agenda Cancelado', className: 'bg-slate-800 text-slate-500 border-slate-700' },
   };
 
   const getPlanBadge = (item: AdminCatalog) => {
@@ -720,17 +769,45 @@ export default function AdminCatalogosPage() {
                          *  disso a tela de primeiro contato nem existe mais pro link
                          *  dela, então o toggle não teria efeito nenhum. */}
                         {(!item.plan_tier || item.plan_tier === 'catalog') && (
-                          <button
-                            onClick={() => toggleFirstOfferTier(item)}
-                            className={`w-full px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 border transition-all ${
-                              item.first_offer_tier === 'plus'
-                                ? 'bg-amber-500/20 border-amber-500/60 text-amber-300'
-                                : 'bg-white/5 border-slate-700 text-slate-400'
-                            }`}
-                          >
-                            <Crown className="w-3.5 h-3.5" />
-                            Oferta inicial: {item.first_offer_tier === 'plus' ? 'Plus direto' : 'Básico (padrão)'}
-                          </button>
+                          <>
+                            <button
+                              onClick={() => toggleFirstOfferTier(item)}
+                              className={`w-full px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 border transition-all ${
+                                item.first_offer_tier === 'plus'
+                                  ? 'bg-amber-500/20 border-amber-500/60 text-amber-300'
+                                  : 'bg-white/5 border-slate-700 text-slate-400'
+                              }`}
+                            >
+                              <Crown className="w-3.5 h-3.5" />
+                              Oferta inicial: {item.first_offer_tier === 'plus' ? 'Agenda direto' : 'Catálogo (padrão)'}
+                            </button>
+
+                            <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 space-y-2">
+                              <span className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                                <Wallet className="w-3.5 h-3.5" />
+                                Preço do Plano Catálogo
+                              </span>
+                              <div className="flex items-center gap-1.5">
+                                <input
+                                  type="text"
+                                  inputMode="decimal"
+                                  placeholder={`Padrão (${CATALOGO_PRICE_LABEL})`}
+                                  value={getPriceDraft(item)}
+                                  onChange={(e) =>
+                                    setPriceDrafts((prev) => ({ ...prev, [item.id || '']: e.target.value }))
+                                  }
+                                  className="flex-1 bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-2 text-xs text-white placeholder-slate-500 focus:border-rose-500 focus:outline-none"
+                                />
+                                <button
+                                  onClick={() => savePriceOverride(item)}
+                                  className="px-3 py-2 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 text-xs font-bold"
+                                >
+                                  Salvar
+                                </button>
+                              </div>
+                              <p className="text-[11px] text-slate-500">Deixe em branco e salve pra voltar ao padrão.</p>
+                            </div>
+                          </>
                         )}
 
                         {/* Fase 26: caso de borda — cliente pagando fora do sistema (ex:
@@ -740,7 +817,7 @@ export default function AdminCatalogosPage() {
                             <div className="flex items-center justify-between">
                               <span className="text-xs font-bold uppercase tracking-wider text-emerald-300 flex items-center gap-1.5">
                                 <Gift className="w-3.5 h-3.5" />
-                                Manual: {item.plan_tier === 'plus' ? 'Plus' : 'Básico'} ativo
+                                Manual: {item.plan_tier === 'plus' ? 'Agenda' : 'Catálogo'} ativo
                               </span>
                               <button
                                 onClick={() => revokeManualPlan(item)}
@@ -758,14 +835,14 @@ export default function AdminCatalogosPage() {
                               className="flex-1 px-2 py-2 rounded-xl text-xs font-bold bg-white/5 border border-slate-700 text-slate-400 hover:border-emerald-500/60 hover:text-emerald-300 transition-all flex items-center justify-center gap-1"
                             >
                               <Gift className="w-3.5 h-3.5" />
-                              Conceder Básico (manual)
+                              Conceder Catálogo (manual)
                             </button>
                             <button
                               onClick={() => grantManualPlan(item, 'plus')}
                               className="flex-1 px-2 py-2 rounded-xl text-xs font-bold bg-white/5 border border-slate-700 text-slate-400 hover:border-amber-500/60 hover:text-amber-300 transition-all flex items-center justify-center gap-1"
                             >
                               <Gift className="w-3.5 h-3.5" />
-                              Conceder Plus (manual)
+                              Conceder Agenda (manual)
                             </button>
                           </div>
                         )}

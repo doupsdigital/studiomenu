@@ -255,7 +255,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
               ) : noSchedulingYet ? (
                 <div className="wizard__vazio">
                   <Sparkles className="w-6 h-6" />
-                  Assine o StudioMenu+ pra cadastrar seus horários e liberar a agenda.
+                  Assine o Plano Agenda pra cadastrar seus horários e liberar a agenda.
                 </div>
               ) : slots.length === 0 ? (
                 <div className="wizard__vazio">

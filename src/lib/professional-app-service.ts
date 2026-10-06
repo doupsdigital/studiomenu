@@ -34,6 +34,10 @@ export interface ProfessionalOrderSummary {
    *  muda o que a tela "Minha assinatura" mostra (sem texto de cobrança
    *  recorrente, sem botão de cancelar). Não afeta gating nenhum. */
   manual_plan: boolean;
+  /** Preço customizado do Plano Catálogo pra essa cliente específica,
+   *  definido pelo admin — `null` usa o padrão (`CATALOGO_PRICE`,
+   *  `src/lib/pricing.ts`, via `resolveCatalogPrice`). */
+  billing_price_override: number | null;
 }
 
 /** Busca os dados que o app da profissional (`/app/[slug]`) precisa — um
@@ -44,7 +48,7 @@ export async function getOrderForProfessionalApp(slug: string): Promise<Professi
 
   const { data, error } = await supabaseAdmin
     .from('orders')
-    .select('id, slug, edit_token, client_name, studio_name, whatsapp_number, plan_tier, subscription_status, billing_email, billing_cpf_cnpj, payment_method, booking_enabled, auth_user_id, first_offer_tier, agenda_paused, manual_plan')
+    .select('id, slug, edit_token, client_name, studio_name, whatsapp_number, plan_tier, subscription_status, billing_email, billing_cpf_cnpj, payment_method, booking_enabled, auth_user_id, first_offer_tier, agenda_paused, manual_plan, billing_price_override')
     .eq('slug', normalizedSlug)
     .single();
 
@@ -69,5 +73,6 @@ export async function getOrderForProfessionalApp(slug: string): Promise<Professi
     first_offer_tier: data.first_offer_tier === 'plus' ? 'plus' : 'basico',
     agenda_paused: Boolean(data.agenda_paused),
     manual_plan: Boolean(data.manual_plan),
+    billing_price_override: data.billing_price_override === null || data.billing_price_override === undefined ? null : Number(data.billing_price_override),
   };
 }

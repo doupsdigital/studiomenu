@@ -16,7 +16,7 @@ interface PlusUpsellCardProps {
   catalog: CatalogOrderData | null;
 }
 
-/** Conteúdo de upsell do StudioMenu+ — mesma peça usada bloqueada no Início
+/** Conteúdo de upsell do Plano Agenda — mesma peça usada bloqueada no Início
  *  (`variant="card"`) e como tela cheia na aba Agenda pra quem ainda não
  *  assina (`variant="full"`), duas portas de entrada pro mesmo onboarding.
  *
@@ -43,7 +43,7 @@ export const PlusUpsellCard: React.FC<PlusUpsellCardProps> = ({ variant, slug, c
           <Crown className="w-7 h-7" />
         </div>
         <p className="text-[13px] font-bold tracking-widest uppercase text-white/70 mb-1">Conheça</p>
-        <h3 className="font-serif-pro font-bold text-2xl mb-2">StudioMenu+</h3>
+        <h3 className="font-serif-pro font-bold text-2xl mb-2">Plano Agenda</h3>
         <p className="text-[15px] text-white/85 leading-snug mb-5 max-w-[280px] mx-auto">
           Imagine suas clientes agendando sozinhas, sem trocar uma mensagem no WhatsApp.
         </p>
@@ -54,14 +54,14 @@ export const PlusUpsellCard: React.FC<PlusUpsellCardProps> = ({ variant, slug, c
             onClick={() => setIsOnboardingOpen(true)}
             className="block w-full py-3 rounded-xl bg-white text-rose-700 text-[15px] font-bold shadow-sm hover:bg-rose-50 transition-colors"
           >
-            Conheça o StudioMenu+ →
+            Conheça o Plano Agenda →
           </button>
         ) : (
           <Link
             href={`/app/${slug}/config#upgrade-plus`}
             className="block w-full py-3 rounded-xl bg-white text-rose-700 text-[15px] font-bold shadow-sm hover:bg-rose-50 transition-colors"
           >
-            Conheça o StudioMenu+ →
+            Conheça o Plano Agenda →
           </Link>
         )}
       </div>

@@ -8,7 +8,17 @@ export async function PATCH(request: Request) {
   }
 
   try {
-    const { id, status, booking_enabled, first_offer_tier, catalog_disabled, plan_tier, subscription_status, manual_plan } = (await request.json()) as {
+    const {
+      id,
+      status,
+      booking_enabled,
+      first_offer_tier,
+      catalog_disabled,
+      plan_tier,
+      subscription_status,
+      manual_plan,
+      billing_price_override,
+    } = (await request.json()) as {
       id: string;
       status?: string;
       booking_enabled?: boolean;
@@ -17,6 +27,9 @@ export async function PATCH(request: Request) {
       plan_tier?: 'catalog' | 'basico' | 'plus';
       subscription_status?: 'none' | 'ativo' | 'suspenso' | 'cancelado';
       manual_plan?: boolean;
+      /** Preço customizado do Plano Catálogo pra essa cliente específica —
+       *  `null` volta ao padrão (`CATALOGO_PRICE`, src/lib/pricing.ts). */
+      billing_price_override?: number | null;
     };
     if (
       !id ||
@@ -26,12 +39,19 @@ export async function PATCH(request: Request) {
         catalog_disabled === undefined &&
         plan_tier === undefined &&
         subscription_status === undefined &&
-        manual_plan === undefined)
+        manual_plan === undefined &&
+        billing_price_override === undefined)
     ) {
       return NextResponse.json(
         { success: false, message: 'id e ao menos um campo pra atualizar são obrigatórios.' },
         { status: 400 }
       );
+    }
+
+    if (billing_price_override !== undefined && billing_price_override !== null) {
+      if (!Number.isFinite(billing_price_override) || billing_price_override < 5) {
+        return NextResponse.json({ success: false, message: 'Preço inválido (mínimo R$5).' }, { status: 400 });
+      }
     }
 
     const updates: {
@@ -42,6 +62,7 @@ export async function PATCH(request: Request) {
       plan_tier?: 'catalog' | 'basico' | 'plus';
       subscription_status?: 'none' | 'ativo' | 'suspenso' | 'cancelado';
       manual_plan?: boolean;
+      billing_price_override?: number | null;
     } = {};
     if (status !== undefined) updates.status = status;
     if (booking_enabled !== undefined) updates.booking_enabled = booking_enabled;
@@ -50,6 +71,7 @@ export async function PATCH(request: Request) {
     if (plan_tier !== undefined) updates.plan_tier = plan_tier;
     if (subscription_status !== undefined) updates.subscription_status = subscription_status;
     if (manual_plan !== undefined) updates.manual_plan = manual_plan;
+    if (billing_price_override !== undefined) updates.billing_price_override = billing_price_override;
 
     const { error } = await supabaseAdmin.from('orders').update(updates).eq('id', id);
     if (error) {

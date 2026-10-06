@@ -131,6 +131,27 @@ export async function createSubscription(input: {
   });
 }
 
+/** Cobrança avulsa (sem `cycle`/`subscription`) — pagamento único, usada pro
+ *  Plano Catálogo. Mesmo shape de resposta de uma cobrança de assinatura
+ *  (`AsaasPayment`), então encaixa direto em `buildPaymentResponse()` sem
+ *  nenhum código adicional no lado do checkout. */
+export async function createPayment(input: {
+  customerId: string;
+  value: number;
+  description: string;
+  billingType?: AsaasBillingType;
+  dueDate?: string;
+}): Promise<AsaasPayment> {
+  const dueDate = input.dueDate ?? new Date().toISOString().slice(0, 10);
+  return asaasRequest<AsaasPayment>('POST', '/payments', {
+    customer: input.customerId,
+    billingType: input.billingType ?? 'PIX',
+    value: input.value,
+    dueDate,
+    description: input.description,
+  });
+}
+
 /** O primeiro pagamento de uma assinatura recém-criada pode demorar alguns
  *  segundos pra aparecer — retry com backoff simples (mesmo padrão do
  *  LashAgenda: até 4 tentativas, 2s de intervalo). */

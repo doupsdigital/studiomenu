@@ -39,6 +39,12 @@ CREATE TABLE IF NOT EXISTS public.orders (
     categories TEXT[] DEFAULT '{}'::text[],
     -- Agendamento + StudioMenu+ (docs/PLANO_AGENDAMENTO_STUDIOMENU_PLUS.md, Fase 0)
     booking_enabled BOOLEAN DEFAULT false,
+    -- IMPORTANTE (modelo novo, 2026-10-06): 'catalog' aqui significa "catálogo
+    -- grátis, nunca pagou nada" (valor padrão, sempre existiu) — NÃO é o
+    -- mesmo que o produto "Plano Catálogo" vendido hoje (pagamento único),
+    -- que por baixo dos panos continua sendo 'basico'. 'plus' é o "Plano
+    -- Agenda" (assinatura recorrente). Só a camada de apresentação (copy)
+    -- foi renomeada; os 3 valores do enum não mudaram, de propósito.
     plan_tier TEXT DEFAULT 'catalog' CHECK (plan_tier IN ('catalog', 'basico', 'plus')),
     subscription_status TEXT DEFAULT 'none' CHECK (subscription_status IN ('none', 'ativo', 'suspenso', 'cancelado')),
     asaas_customer_id TEXT,
@@ -49,7 +55,12 @@ CREATE TABLE IF NOT EXISTS public.orders (
     pending_plan_tier TEXT CHECK (pending_plan_tier IN ('basico', 'plus')),
     -- Forma de pagamento da assinatura atual (Fase 21, docs/migrations/2026-09-21_fase21_cartao.sql)
     payment_method TEXT CHECK (payment_method IN ('pix', 'card')),
-    -- Preço reduzido só pra teste real em produção (Fase 21, docs/migrations/2026-09-21_fase21_preco_teste.sql)
+    -- Preço customizado por catálogo (Fase 21, docs/migrations/2026-09-21_fase21_preco_teste.sql
+    -- — originalmente só pra teste real em produção). Desde 2026-10-06 também
+    -- é o campo de preço livre do admin pro Plano Catálogo (pagamento único)
+    -- de uma cliente específica, editável em /admin/catalogos — sem teto, só
+    -- o piso de R$5 (mínimo do Asaas). Ver `resolveCatalogPrice` em
+    -- src/lib/pricing.ts.
     billing_price_override NUMERIC(10,2) CHECK (billing_price_override IS NULL OR billing_price_override >= 5),
     billing_email TEXT,
     billing_cpf_cnpj TEXT,
