@@ -289,7 +289,7 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
   }
 
   return (
-    <div className="rounded-2xl bg-gradient-to-br from-rose-50 to-cream border border-rose-200 p-5">
+    <div className="rounded-3xl bg-white border-2 border-rose-200 shadow-xl shadow-rose-900/10 p-6">
       {qr ? (
         <div className="flex flex-col items-center gap-3">
           <img src={`data:image/png;base64,${qr.image}`} alt="QR Code Pix" className="w-48 h-48 rounded-xl bg-white p-2 shadow-sm" />
@@ -352,7 +352,9 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
             {copy.subheadline ? (
               <p className="text-[15px] text-ink-soft mt-0.5">{pricing.label} · {copy.subheadline}</p>
             ) : (
-              <p className="font-serif-pro font-bold text-2xl text-rose-700 mt-1">{pricing.label}</p>
+              <div className="inline-flex items-center justify-center px-5 py-2 rounded-2xl bg-rose-600 shadow-sm shadow-rose-600/30 mt-2">
+                <span className="font-serif-pro font-extrabold text-2xl text-white">{pricing.label}</span>
+              </div>
             )}
           </div>
           {copy.benefits && (

@@ -88,13 +88,9 @@ export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order })
       <EditCatalogCard slug={order.slug} dataTour="fc-edit" />
 
       <div className="mt-2" data-tour="fc-subscribe">
-        {isAgendaOffer ? (
+        {isAgendaOffer && (
           <p className="text-[15px] text-ink-soft text-center mb-3">
             Suas clientes agendam sozinhas, sem trocar mensagem no WhatsApp — assine o Plano Agenda e libere o agendamento automático.
-          </p>
-        ) : (
-          <p className="text-[15px] text-ink-soft text-center mb-3">
-            Tenha um catálogo digital profissional — com fotos, preços e serviços personalizados pro seu Studio.
           </p>
         )}
 
