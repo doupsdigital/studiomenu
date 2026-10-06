@@ -289,7 +289,19 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
   }
 
   return (
-    <div className="rounded-3xl bg-white border-2 border-rose-200 shadow-xl shadow-rose-900/10 p-6">
+    <div className="relative overflow-hidden rounded-3xl bg-white border-2 border-rose-200 shadow-xl shadow-rose-900/10 p-6">
+      {/* Faixa de "escassez" — só no Catálogo (checkout), pedido real
+       *  2026-10-06: preço de lançamento, honesto (o produto acabou de ser
+       *  reposicionado), sem data/contador fixo pra não virar promessa que
+       *  não dá pra sustentar. */}
+      {copy.benefits && (
+        <div
+          className="absolute -left-11 top-6 w-40 -rotate-45 bg-rose-600 py-1.5 text-center shadow-md"
+          aria-hidden="true"
+        >
+          <span className="text-[11px] font-extrabold uppercase tracking-wider text-white">OFERTA 🔥</span>
+        </div>
+      )}
       {qr ? (
         <div className="flex flex-col items-center gap-3">
           <img src={`data:image/png;base64,${qr.image}`} alt="QR Code Pix" className="w-48 h-48 rounded-xl bg-white p-2 shadow-sm" />
