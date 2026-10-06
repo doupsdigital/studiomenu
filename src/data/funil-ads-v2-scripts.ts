@@ -9,7 +9,7 @@
 // nicho é a abertura (1️⃣A Lash / 1️⃣B Nail), porque é o único passo que depende de qual foto
 // enviar e qual link de exemplo mandar — o resto da conversa é idêntico pros dois nichos.
 //
-// Preços centralizados em `src/lib/pricing.ts` (R$29,90 Básico / R$59,90 Plus) — os valores
+// Preços centralizados em `src/lib/pricing.ts` (R$24,90 Básico / R$34,90 Plus) — os valores
 // usados aqui já refletem o preço atual.
 
 export interface FunilV2Step {
@@ -77,7 +77,7 @@ Você pode editar fotos, serviços e valores quando quiser. Você usaria algo as
         badge: 'Preço & Valor',
         content: `Perfeito ❤️
 
-Pra ter um catálogo assim, personalizado com a identidade do seu Studio, você paga *R$29,90 por mês*. Sem fidelidade e você pode cancelar quando quiser.
+Pra ter um catálogo assim, personalizado com a identidade do seu Studio, você paga *R$24,90 por mês*. Sem fidelidade e você pode cancelar quando quiser.
 
 A cliente escolhe o serviço e, ao clicar em Agendar, já vai direto pro seu WhatsApp.
 
@@ -131,7 +131,7 @@ Me passa só seu @ do Instagram que a nossa equipe vai buscar seus dados e já c
         title: '5️⃣ Preço + Comparação de Valor',
         badge: 'Preço & Valor',
         tip: 'Use se ela perguntar o preço antes de mandar o @, ou logo depois de mandar — a comparação com o volume brasileiro ajuda a justificar o valor.',
-        content: `É *R$ 29,90 por mês*, sem fidelidade, cancela quando quiser 😊
+        content: `É *R$ 24,90 por mês*, sem fidelidade, cancela quando quiser 😊
 
 Pra ter uma ideia: uma única cliente de volume brasileiro já paga uns 5 meses do seu site.
 
@@ -181,7 +181,7 @@ Você gostaria de ter um Link assim pra colocar na Bio do Instagram do seu Studi
         badge: 'Preço & Valor',
         content: `Perfeito ❤️
 
-Pra ter um catálogo assim, personalizado com a identidade do seu Studio, você paga *R$29,90 por mês*. Sem fidelidade e você pode cancelar quando quiser.
+Pra ter um catálogo assim, personalizado com a identidade do seu Studio, você paga *R$24,90 por mês*. Sem fidelidade e você pode cancelar quando quiser.
 
 A cliente escolhe o serviço e, ao clicar em Agendar, já vai direto pro seu WhatsApp.
 
@@ -243,7 +243,7 @@ Só pra eu entender e até melhorar nossa apresentação: ficou alguma dúvida o
 
 Por isso funciona como uma assinatura.
 
-É *R$29,90/mês*, sem fidelidade — você pode cancelar quando quiser.`,
+É *R$24,90/mês*, sem fidelidade — você pode cancelar quando quiser.`,
       },
     ],
   },
@@ -277,7 +277,7 @@ O que você deveria ter em mente é: "Isso faz sua cliente encontrar seu serviç
         title: '7 Dias Grátis',
         badge: 'Oferta Especial',
         tip: 'Use como última cartada com leads travadas no preço — reduz o risco percebido a praticamente zero.',
-        content: `É *R$ 29,90 por mês*, sem fidelidade. Mas você começa grátis: eu monto o seu, você usa 7 dias com suas clientes de verdade, e só assina se fizer sentido pra você 😊
+        content: `É *R$ 24,90 por mês*, sem fidelidade. Mas você começa grátis: eu monto o seu, você usa 7 dias com suas clientes de verdade, e só assina se fizer sentido pra você 😊
 Me passa seu @ que eu já deixo pronto hoje?`,
       },
     ],
