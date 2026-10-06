@@ -76,9 +76,7 @@ const ActivePlanCard: React.FC<{
 
       {manualPlan ? (
         <p className="text-sm text-ink-soft">Qualquer alteração nesse plano, é só falar com a gente.</p>
-      ) : isOneTime ? (
-        <p className="text-sm text-ink-soft">Pagamento único — nada recorrente pra cancelar aqui.</p>
-      ) : (
+      ) : isOneTime ? null : (
         <>
           {error && <p className="text-sm text-rose-600 mb-3">{error}</p>}
 
