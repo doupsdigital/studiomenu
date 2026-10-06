@@ -372,9 +372,9 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
           {copy.benefits && (
             <ul className="flex flex-col gap-1.5 mb-1">
               {copy.benefits.map((benefit) => (
-                <li key={benefit} className="flex items-start gap-2 text-sm text-ink-soft">
+                <li key={benefit} className="flex items-start gap-2 text-sm text-ink">
                   <Check className="w-4 h-4 mt-0.5 shrink-0 text-emerald-600" strokeWidth={3} />
-                  <span>{benefit}</span>
+                  <span className="font-bold italic">{benefit}</span>
                 </li>
               ))}
             </ul>
