@@ -37,7 +37,7 @@ const POLL_INTERVAL_MS = 5000;
 const POLL_TIMEOUT_MS = 5 * 60 * 1000;
 
 const PLAN_COPY: Record<PayablePlanTier, { icon: LucideIcon; headline: string; subheadline: string }> = {
-  basico: { icon: BookOpen, headline: 'Garanta seu Plano Catálogo', subheadline: 'pagamento único, catálogo seu pra sempre' },
+  basico: { icon: BookOpen, headline: 'Garanta seu Plano Catálogo', subheadline: 'um catálogo digital profissional' },
   plus: { icon: Crown, headline: 'Assine o Plano Agenda', subheadline: 'libere o agendamento automático' },
 };
 
@@ -51,7 +51,7 @@ const SUCCESS_COPY: Record<PayablePlanTier, { headline: string; benefits: string
   basico: {
     headline: 'Agora você tem o Plano Catálogo',
     benefits: [
-      'Catálogo online sempre no ar, pra sempre — sem mensalidade',
+      'Catálogo online sempre no ar',
       'Edite fotos, preços e serviços quando quiser',
       'Link profissional pra compartilhar com suas clientes',
     ],

@@ -241,7 +241,7 @@ export function SalesLandingPage() {
               <div className="lp-pricing-tier-card">
                 <div className="lp-tier-badge lp-tier-badge--basic">📱 PAGAMENTO ÚNICO</div>
                 <h3 className="lp-tier-title">StudioMenu Catálogo</h3>
-                <p className="lp-tier-desc">Catálogo digital com seu nome, fotos e preços, sempre no ar — edite pelo celular quando quiser. Pague uma vez, use pra sempre.</p>
+                <p className="lp-tier-desc">Catálogo digital com seu nome, fotos e preços, sempre no ar — edite pelo celular quando quiser.</p>
 
                 <div className="lp-tier-price-box">
                   <div className="lp-tier-price-main">
@@ -253,7 +253,7 @@ export function SalesLandingPage() {
                 </div>
 
                 <ul className="lp-tier-bullets">
-                  <li>{CHECK_ICON}<span>Catálogo online sempre no ar, pra sempre</span></li>
+                  <li>{CHECK_ICON}<span>Catálogo online sempre no ar</span></li>
                   <li>{CHECK_ICON}<span>Link profissional pra bio do Instagram/WhatsApp</span></li>
                   <li>{CHECK_ICON}<span>Edite fotos, preços e serviços quando quiser</span></li>
                   <li>{CHECK_ICON}<span>Cliente agenda direto pelo seu WhatsApp</span></li>
