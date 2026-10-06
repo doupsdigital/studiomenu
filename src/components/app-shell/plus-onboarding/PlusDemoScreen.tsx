@@ -31,6 +31,11 @@ export const PlusDemoScreen: React.FC<PlusDemoScreenProps> = ({ catalog, onNext 
   // público (`/c/showcase/[niche]/page.tsx`): sem isso, uma cliente Básico
   // real quase sempre tem `booking_enabled = false` e/ou procedimentos sem
   // `duration_minutes`, o que travaria o botão "Agendar agora" na demo.
+  // `bookable` também é forçado pra `true` (bug real, 2026-10-06: serviços
+  // marcados como não-agendáveis de verdade — ex: "Sob Consulta" — caíam
+  // pro link real de WhatsApp em vez de abrir a simulação, silenciosamente).
+  // Como aqui é só demonstração local (nunca grava nada), a flag de verdade
+  // do serviço não importa pro propósito da tela.
   const demoProcedures = useMemo<ProcedureItem[]>(
     () =>
       // Só 2 (não a lista toda) — pra não poluir a tela, pedido explícito
@@ -38,7 +43,7 @@ export const PlusDemoScreen: React.FC<PlusDemoScreenProps> = ({ catalog, onNext 
       catalog.procedures.slice(0, 2).map((p) => ({
         ...p,
         duration_minutes: p.duration_minutes ?? 60,
-        bookable: p.bookable !== false,
+        bookable: true,
       })),
     [catalog.procedures]
   );
