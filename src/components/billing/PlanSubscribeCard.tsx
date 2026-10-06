@@ -352,8 +352,8 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
             {copy.subheadline ? (
               <p className="text-[15px] text-ink-soft mt-0.5">{pricing.label} · {copy.subheadline}</p>
             ) : (
-              <div className="inline-flex items-center justify-center px-5 py-2 rounded-2xl bg-rose-600 shadow-sm shadow-rose-600/30 mt-2">
-                <span className="font-serif-pro font-extrabold text-2xl text-white">{pricing.label}</span>
+              <div className="inline-flex items-center justify-center px-4 py-1.5 rounded-xl bg-rose-50 border border-rose-200 mt-2">
+                <span className="font-serif-pro font-bold text-2xl text-rose-700">{pricing.label}</span>
               </div>
             )}
           </div>
