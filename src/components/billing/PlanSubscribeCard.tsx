@@ -447,7 +447,7 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
           </div>
           {isUpgrade && (
             <p className="text-sm text-ink-soft text-center leading-snug">
-              Você começa a usar agora, sem pagar nada a mais hoje. A partir da próxima mensalidade, o valor passa a ser {pricing.label}.
+              Ao assinar, seu plano evolui automaticamente. O novo valor só vale a partir da próxima mensalidade.
             </p>
           )}
           {showMethodChoice && (
@@ -498,9 +498,11 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
             className="h-11 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-[15px] font-bold disabled:opacity-50 transition-colors"
           >
             {loading
-              ? showMethodChoice && method === 'card'
-                ? 'Preparando pagamento...'
-                : 'Gerando Pix...'
+              ? isUpgrade
+                ? 'Confirmando...'
+                : showMethodChoice && method === 'card'
+                  ? 'Preparando pagamento...'
+                  : 'Gerando Pix...'
               : showMethodChoice && method === 'card'
                 ? 'Continuar pro pagamento seguro'
                 : isOneTime
