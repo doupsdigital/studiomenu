@@ -395,8 +395,7 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
           />
           <input
             type="email"
-            required
-            placeholder="Seu e-mail"
+            placeholder="Seu e-mail (opcional)"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="h-12 rounded-xl bg-surface border border-linen px-3 text-base text-ink placeholder:text-ink-faint"

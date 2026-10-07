@@ -95,17 +95,19 @@ export interface AsaasPixQrCode {
   expirationDate: string;
 }
 
-/** Busca um customer existente por e-mail; cria um novo se não achar —
+/** Busca um customer existente por CPF/CNPJ; cria um novo se não achar —
  *  evita duplicar customer no Asaas se a profissional tentar assinar de
- *  novo (ex: recarregou a página). */
-export async function findOrCreateCustomer(input: { name: string; email: string; cpfCnpj: string }): Promise<AsaasCustomer> {
-  const existing = await asaasRequest<{ data: AsaasCustomer[] }>('GET', `/customers?email=${encodeURIComponent(input.email)}`);
+ *  novo (ex: recarregou a página). Busca por CPF/CNPJ (sempre preenchido,
+ *  exigência da própria API do Asaas) em vez de e-mail (campo opcional no
+ *  app, 2026-10-07 — e-mail nem é exigido pelo Asaas pra criar cliente). */
+export async function findOrCreateCustomer(input: { name: string; email?: string; cpfCnpj: string }): Promise<AsaasCustomer> {
+  const existing = await asaasRequest<{ data: AsaasCustomer[] }>('GET', `/customers?cpfCnpj=${encodeURIComponent(input.cpfCnpj)}`);
   if (existing.data && existing.data.length > 0) {
     return existing.data[0];
   }
   return asaasRequest<AsaasCustomer>('POST', '/customers', {
     name: input.name,
-    email: input.email,
+    email: input.email || undefined,
     cpfCnpj: input.cpfCnpj,
   });
 }
