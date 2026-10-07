@@ -31,7 +31,7 @@ Dois planos pagos, mais um catálogo estático gratuito de base (modelo reformul
 |---|---|---|---|
 | **Catálogo** (gratuito) | — | — | Catálogo público, sem agendamento automático — cliente final fala com a profissional pelo WhatsApp. Estado inicial antes de pagar qualquer coisa. |
 | **Plano Catálogo** | R$ 89,90 (padrão, customizável por catálogo) | Pagamento único via Asaas | Mesma experiência do gratuito, só que pago — é o "degrau" pro Agenda. Nunca recorrente, nunca expira. |
-| **Plano Agenda** | R$ 47,90/mês | Assinatura recorrente via Asaas | Agendamento automático de verdade: wizard de horário no catálogo público + Agenda/Horários/Bloqueios liberados no app da profissional. Vendido como upsell dentro do app de quem já tem o Plano Catálogo. |
+| **Plano Agenda** | R$ 34,90/mês | Assinatura recorrente via Asaas | Agendamento automático de verdade: wizard de horário no catálogo público + Agenda/Horários/Bloqueios liberados no app da profissional. Vendido como upsell dentro do app de quem já tem o Plano Catálogo. |
 
 Nomes internos no código/banco (`PayablePlanTier`/`orders.plan_tier`) continuam sendo
 `'basico'` (Plano Catálogo) e `'plus'` (Plano Agenda) — só a camada de apresentação foi

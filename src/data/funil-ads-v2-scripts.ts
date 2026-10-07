@@ -9,7 +9,7 @@
 // nicho é a abertura (1️⃣A Lash / 1️⃣B Nail), porque é o único passo que depende de qual foto
 // enviar e qual link de exemplo mandar — o resto da conversa é idêntico pros dois nichos.
 //
-// Preços centralizados em `src/lib/pricing.ts` (R$27,90 Básico / R$47,90 Plus) — os valores
+// Preços centralizados em `src/lib/pricing.ts` (R$27,90 Básico / R$34,90 Plus) — os valores
 // usados aqui já refletem o preço atual.
 
 export interface FunilV2Step {

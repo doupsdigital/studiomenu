@@ -416,7 +416,7 @@ Se quiser, manda também uma foto sua ou do seu espaço pra capa — não é obr
 Você escolhe como continuar:
 
 📋 *Básico — R$27,90/mês*: link exclusivo com suas fotos, serviços e valores — a cliente chama você no WhatsApp pra agendar.
-📅 *Plus — R$47,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma.
+📅 *Plus — R$34,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma.
 
 Nos dois você edita tudo pelo celular, sem fidelidade — paga só enquanto estiver usando.
 
@@ -507,7 +507,7 @@ Se quiser, manda também uma foto sua ou do seu espaço pra capa — não é obr
 Você escolhe como continuar:
 
 📋 *Básico — R$27,90/mês*: link exclusivo com suas fotos, serviços e valores — a cliente chama você no WhatsApp pra agendar.
-📅 *Plus — R$47,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma.
+📅 *Plus — R$34,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma.
 
 Nos dois você edita tudo pelo celular, sem fidelidade — paga só enquanto estiver usando.
 
@@ -600,7 +600,7 @@ Se quiser, manda também uma foto sua ou do seu espaço pra capa — não é obr
 Você escolhe como continuar:
 
 📋 *Básico — R$27,90/mês*: link exclusivo com suas fotos, serviços e valores — a cliente chama você no WhatsApp pra agendar.
-📅 *Plus — R$47,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma.
+📅 *Plus — R$34,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma.
 
 Nos dois você edita tudo pelo celular, sem fidelidade — paga só enquanto estiver usando.
 
@@ -695,7 +695,7 @@ Se quiser, manda também uma foto sua ou do seu espaço pra capa — não é obr
 Você escolhe como continuar:
 
 📋 *Básico — R$27,90/mês*: link exclusivo com suas fotos, serviços e valores — a cliente chama você no WhatsApp pra agendar.
-📅 *Plus — R$47,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma.
+📅 *Plus — R$34,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma.
 
 Nos dois você edita tudo pelo celular, sem fidelidade — paga só enquanto estiver usando.
 
@@ -786,7 +786,7 @@ Se quiser, manda também uma foto sua ou do seu espaço pra capa — não é obr
 Você escolhe como continuar:
 
 📋 *Básico — R$27,90/mês*: link exclusivo com suas fotos, serviços e valores — a cliente chama você no WhatsApp pra agendar.
-📅 *Plus — R$47,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma.
+📅 *Plus — R$34,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma.
 
 Nos dois você edita tudo pelo celular, sem fidelidade — paga só enquanto estiver usando.
 
@@ -879,7 +879,7 @@ Se quiser, manda também uma foto sua ou do seu espaço pra capa — não é obr
 Você escolhe como continuar:
 
 📋 *Básico — R$27,90/mês*: link exclusivo com suas fotos, serviços e valores — a cliente chama você no WhatsApp pra agendar.
-📅 *Plus — R$47,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma.
+📅 *Plus — R$34,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma.
 
 Nos dois você edita tudo pelo celular, sem fidelidade — paga só enquanto estiver usando.
 
@@ -965,7 +965,7 @@ Coloquei alguns dos seus serviços pra você ter uma ideia. O que achou?`,
     content: `Que bom que gostou! 😍 Posso deixar esse no ar como seu link oficial. Você escolhe como continuar:
 
 📋 *Básico — R$27,90/mês*: link exclusivo com suas fotos, serviços e valores — a cliente chama você no WhatsApp pra agendar.
-📅 *Plus — R$47,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma.
+📅 *Plus — R$34,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma.
 
 Nos dois você edita tudo pelo celular, sem fidelidade — paga só enquanto estiver usando.
 
@@ -1062,7 +1062,7 @@ Usei seus serviços e valores e algumas fotos do seu Instagram. Assim a cliente 
     content: `Que bom que curtiu! Consigo deixar o seu completo no ar. Você escolhe como continuar:
 
 📋 *Básico — R$27,90/mês*: link exclusivo com suas fotos, serviços e valores — a cliente chama você no WhatsApp pra agendar.
-📅 *Plus — R$47,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma. É só trocar o link do botão "Agendar" do seu Linktree por esse.
+📅 *Plus — R$34,90/mês*: tudo isso + o agendamento automático que você viu no vídeo — a cliente marca sozinha, sem você responder uma por uma. É só trocar o link do botão "Agendar" do seu Linktree por esse.
 
 Nos dois você edita tudo pelo celular, sem fidelidade — paga só enquanto estiver usando.
 
@@ -1162,7 +1162,7 @@ Qualquer dúvida me chama! 💖`,
     tip: 'Use pra quem veio pelo Funil Anúncio 02 ou Abordagem 02 (agendamento) — mesma lógica da versão de catálogo, mas com o agendamento automático em destaque.',
     content: `Que bom que gostou! 😍
 
-Por esse link você já vê e compartilha seu catálogo, e sua cliente já pode agendar direto por ele. Pra manter o agendamento automático sempre ativo, é só assinar ali dentro — R$ 47,90/mês, Pix ou cartão, ativa na hora.
+Por esse link você já vê e compartilha seu catálogo, e sua cliente já pode agendar direto por ele. Pra manter o agendamento automático sempre ativo, é só assinar ali dentro — R$ 34,90/mês, Pix ou cartão, ativa na hora.
 
 Qualquer dúvida me chama! 💖`,
   },
