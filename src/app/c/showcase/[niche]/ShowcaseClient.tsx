@@ -14,9 +14,14 @@ interface ShowcaseClientProps {
    *  pra lead nunca tem esse parâmetro, então o comportamento de sempre
    *  (demo do Plus) continua intacto. */
   forceBasico?: boolean;
+  /** Capa fixa pras rotas duplicadas `lashs`/`nails` (pedido real,
+   *  2026-10-07) — substitui o Hero.webp genérico do layout escolhido.
+   *  `undefined` nas rotas de sempre (lash/nail/lashdesigner/naildesigner),
+   *  que continuam exatamente como eram. */
+  coverOverride?: string;
 }
 
-export function ShowcaseClient({ niche, forceBasico = false }: ShowcaseClientProps) {
+export function ShowcaseClient({ niche, forceBasico = false, coverOverride }: ShowcaseClientProps) {
   const basePreset = nichePresetsMap[niche];
 
   const [layoutModel, setLayoutModel] = useState<LayoutModel>(basePreset?.layout_model || 'mosaico');
@@ -60,8 +65,8 @@ export function ShowcaseClient({ niche, forceBasico = false }: ShowcaseClientPro
     ...basePreset,
     layout_model: layoutModel,
     theme_variant: themeVariant,
-    cover_media_url: layoutModel === 'classico' ? '/modelos/classico/assets/img/Hero.webp' : '/modelos/mosaico/assets/img/Hero.webp',
-    avatar_url: layoutModel === 'classico' ? '/modelos/classico/assets/img/Hero.webp' : '/modelos/mosaico/assets/img/Hero.webp',
+    cover_media_url: coverOverride || (layoutModel === 'classico' ? '/modelos/classico/assets/img/Hero.webp' : '/modelos/mosaico/assets/img/Hero.webp'),
+    avatar_url: coverOverride || (layoutModel === 'classico' ? '/modelos/classico/assets/img/Hero.webp' : '/modelos/mosaico/assets/img/Hero.webp'),
     // Liga o botão "Agendar agora" pra mostrar a simulação de agendamento
     // automático (`demoBookingOnly` no CatalogLayout abaixo) — o preset
     // não tem `booking_enabled`/`duration_minutes` de verdade porque não
