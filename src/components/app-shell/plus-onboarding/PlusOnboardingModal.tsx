@@ -11,6 +11,7 @@ interface PlusOnboardingModalProps {
   catalog: CatalogOrderData;
   billingEmail?: string;
   billingCpfCnpj?: string;
+  hasRealSubscription?: boolean;
   onClose: () => void;
 }
 
@@ -26,7 +27,7 @@ const STEPS: Step[] = ['beneficios', 'demo', 'cta'];
  *  dela) — pedido explícito, 2026-09-24: a paleta do app em si (topbar,
  *  cards, menu) é sempre rose, e um modal luxury (escuro) por cima destoava
  *  do resto da tela. */
-export const PlusOnboardingModal: React.FC<PlusOnboardingModalProps> = ({ slug, catalog, billingEmail, billingCpfCnpj, onClose }) => {
+export const PlusOnboardingModal: React.FC<PlusOnboardingModalProps> = ({ slug, catalog, billingEmail, billingCpfCnpj, hasRealSubscription, onClose }) => {
   const [step, setStep] = useState<Step>('beneficios');
 
   useEffect(() => {
@@ -80,7 +81,13 @@ export const PlusOnboardingModal: React.FC<PlusOnboardingModalProps> = ({ slug, 
             <button type="button" onClick={goBack} className="text-sm font-semibold text-rose-700 mb-4">
               ← Voltar
             </button>
-            <PlanSubscribeCard slug={slug} plan="plus" billingEmail={billingEmail} billingCpfCnpj={billingCpfCnpj} showMethodChoice />
+            <PlanSubscribeCard
+              slug={slug}
+              plan="plus"
+              billingEmail={billingEmail}
+              billingCpfCnpj={billingCpfCnpj}
+              showMethodChoice={!hasRealSubscription}
+            />
           </div>
         )}
       </div>
