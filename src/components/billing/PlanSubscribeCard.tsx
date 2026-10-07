@@ -72,8 +72,8 @@ const SUCCESS_COPY: Record<PayablePlanTier, { headline: string; subheadline?: st
   basico: {
     // "Plano Catálogo" é nome interno — nesse momento ela só sabe que pagou
     // pelo catálogo, pedido real 2026-10-07.
-    headline: 'Pagamento confirmado! ✅',
-    subheadline: 'Catálogo ativado com sucesso! 🎉',
+    headline: 'Pagamento confirmado! ✅',
+    subheadline: 'Catálogo ativado com sucesso! 🎉',
     benefits: [
       'Catálogo online sempre no ar',
       'Edite fotos, preços e serviços quando quiser',
