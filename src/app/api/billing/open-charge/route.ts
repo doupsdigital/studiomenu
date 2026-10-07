@@ -8,6 +8,20 @@ function todayInSaoPaulo(): string {
   return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
 }
 
+// O Asaas gera a cobrança Pix do próximo ciclo com bastante antecedência —
+// sem essa janela, o aviso "pague sua mensalidade" aparecia assim que a
+// cobrança existia, mesmo faltando quase um mês pro vencimento (achado
+// real, 2026-10-07). Cartão já não tinha esse problema (só avisa quando a
+// cobrança automática falha, ver `OpenChargeBanner.tsx`) — aqui aplica o
+// mesmo espírito pro Pix: só avisa vencida ou perto de vencer.
+const PIX_WARNING_WINDOW_DAYS = 10;
+
+function daysUntil(dateStr: string, todayStr: string): number {
+  const date = new Date(`${dateStr}T12:00:00`);
+  const today = new Date(`${todayStr}T12:00:00`);
+  return Math.round((date.getTime() - today.getTime()) / (24 * 60 * 60 * 1000));
+}
+
 /** POST /api/billing/open-charge
  *  Body: { slug, withQr? }
  *  Devolve a cobrança em aberto (pendente ou vencida) da assinatura dela, pro
@@ -50,13 +64,21 @@ export async function POST(request: Request) {
 
     const dueDate = charge.dueDate || null;
     const isPix = charge.billingType === 'PIX';
+    const overdue = dueDate ? dueDate < todayInSaoPaulo() : false;
+
+    // Ainda falta tempo demais pro vencimento — não é "em aberto" pro
+    // propósito desse aviso ainda, mesmo já existindo no Asaas.
+    if (isPix && dueDate && !overdue && daysUntil(dueDate, todayInSaoPaulo()) > PIX_WARNING_WINDOW_DAYS) {
+      return NextResponse.json({ success: true, open: false });
+    }
+
     const base = {
       success: true,
       open: true,
       paymentId: charge.id,
       value: charge.value,
       dueDate,
-      overdue: dueDate ? dueDate < todayInSaoPaulo() : false,
+      overdue,
       billingType: isPix ? 'pix' : 'card',
       invoiceUrl: charge.invoiceUrl || null,
     };
