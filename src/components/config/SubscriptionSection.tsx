@@ -105,7 +105,7 @@ const ActivePlanCard: React.FC<{
           {isOneTime ? 'Status' : 'Mensalidade'}
         </p>
         <p className="font-serif-pro font-bold text-lg text-rose-800 whitespace-nowrap">
-          {manualPlan ? 'Sem cobrança' : isOneTime ? 'Ativo ✓' : pricing.label}
+          {manualPlan ? 'Sem cobrança' : isOneTime ? 'Ativo ✓ - Sem mensalidade' : pricing.label}
         </p>
       </div>
 
