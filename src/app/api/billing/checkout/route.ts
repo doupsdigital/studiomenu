@@ -3,7 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { isProfessionalRequestAuthorized } from '@/lib/professional-session';
 import { PLAN_PRICING, resolveCatalogPrice, type PayablePlanTier } from '@/lib/pricing';
-import { activateSubscription } from '@/lib/billing-service';
+import { activateSubscription, buildPaymentResponse } from '@/lib/billing-service';
 import {
   AsaasConfigError,
   AsaasApiError,
@@ -15,38 +15,12 @@ import {
   getFirstSubscriptionPayment,
   getPayableSubscriptionPayment,
   getSubscription,
-  getPixQrCode,
-  type AsaasPayment,
   type AsaasBillingType,
 } from '@/lib/asaas';
 
 type PaymentMethod = 'pix' | 'card';
 
 const BILLING_TYPE: Record<PaymentMethod, AsaasBillingType> = { pix: 'PIX', card: 'CREDIT_CARD' };
-
-/** Resposta do checkout conforme o método — Pix devolve o QR na hora; cartão
- *  devolve o link da página de pagamento do Asaas (onde ela digita o cartão,
- *  nunca no nosso servidor). */
-async function buildPaymentResponse(payment: AsaasPayment, method: PaymentMethod) {
-  if (method === 'card') {
-    if (!payment.invoiceUrl) {
-      return NextResponse.json(
-        { success: false, message: 'Assinatura criada, mas o link de pagamento ainda não ficou pronto. Tente novamente em instantes.' },
-        { status: 202 }
-      );
-    }
-    return NextResponse.json({ success: true, method, paymentId: payment.id, invoiceUrl: payment.invoiceUrl });
-  }
-  const qr = await getPixQrCode(payment.id);
-  return NextResponse.json({
-    success: true,
-    method,
-    paymentId: payment.id,
-    pixQrCodeImage: qr.encodedImage,
-    pixKey: qr.payload,
-    expirationDate: qr.expirationDate,
-  });
-}
 
 /** POST /api/billing/checkout
  *  Body: { slug, email, cpf_cnpj, plan, method? ('pix' | 'card', padrão pix) }

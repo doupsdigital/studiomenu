@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CheckCircle2, AlertTriangle, Sparkles } from 'lucide-react';
-import { PLAN_PRICING, resolveCatalogPrice, type PayablePlanTier } from '@/lib/pricing';
+import { CheckCircle2, AlertTriangle, Sparkles, Gift } from 'lucide-react';
+import { PLAN_PRICING, resolveCatalogPrice, resolveLifetimePrice, type PayablePlanTier } from '@/lib/pricing';
 import { PlanSubscribeCard } from '@/components/billing/PlanSubscribeCard';
 
 interface SubscriptionSectionProps {
@@ -37,6 +37,9 @@ interface SubscriptionSectionProps {
    *  quem veio do Catálogo avulso de sempre (só "cancelar", sem nada a
    *  recuperar — o avulso já é dela pra sempre, pagamento único). */
   catalogBillingMode?: 'avulso' | 'recorrente';
+  /** Preço customizado da conversão de Catálogo recorrente pra vitalício
+   *  (Fase 28) — admin negocia por cliente. */
+  lifetimePriceOverride?: number | null;
 }
 
 const TIER_LABEL: Record<PayablePlanTier, string> = { basico: 'Plano Catálogo', plus: 'Plano Agenda' };
@@ -192,6 +195,7 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
   hasRealSubscription,
   billingPriceOverride,
   catalogBillingMode,
+  lifetimePriceOverride,
 }) => {
   const router = useRouter();
   const isPlusActive = planTier === 'plus' && subscriptionStatus === 'ativo';
@@ -296,6 +300,23 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
             showMethodChoice={!hasRealSubscription}
           />
         </div>
+        {/* Autoatendimento (Fase 28): só faz sentido pra quem tem mesmo uma
+         *  mensalidade real do Catálogo rodando — avulso já é dela pra
+         *  sempre, não tem o que "converter". */}
+        {hasRealSubscription && catalogBillingMode === 'recorrente' && (
+          <div id="upgrade-lifetime">
+            <p className="flex items-center gap-1.5 text-[15px] font-bold text-ink mb-2">
+              <Gift className="w-4 h-4 text-rose-600" /> Quer parar de pagar mensalidade?
+            </p>
+            <PlanSubscribeCard
+              slug={slug}
+              plan="basico"
+              billingCpfCnpj={billingCpfCnpj}
+              priceOverride={resolveLifetimePrice(lifetimePriceOverride)}
+              lifetimeConversion
+            />
+          </div>
+        )}
       </div>
     );
   }

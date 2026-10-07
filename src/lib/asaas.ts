@@ -168,7 +168,7 @@ export async function getFirstSubscriptionPayment(subscriptionId: string): Promi
   return null;
 }
 
-const UNPAID_STATUSES = new Set(['PENDING', 'OVERDUE']);
+export const UNPAID_STATUSES = new Set(['PENDING', 'OVERDUE']);
 
 /** Escolhe, entre as cobranças de uma assinatura, a que ainda dá pra pagar:
  *  `PENDING`/`OVERDUE`, a de vencimento mais antigo primeiro (quita a dívida

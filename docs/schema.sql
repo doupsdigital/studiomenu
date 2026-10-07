@@ -70,6 +70,16 @@ CREATE TABLE IF NOT EXISTS public.orders (
     -- coluna pra decidir o que mostrar — usa `asaas_subscription_id` (ver
     -- `SubscriptionSection.tsx`).
     catalog_billing_mode TEXT NOT NULL DEFAULT 'avulso' CHECK (catalog_billing_mode IN ('avulso', 'recorrente')),
+    -- Autoatendimento pra converter Catálogo recorrente em vitalício (Fase 28,
+    -- docs/migrations/2026-10-07_catalogo_vitalicio.sql) — id do pagamento
+    -- avulso da Asaas enquanto aguarda confirmação (evita duplicar cobrança
+    -- se ela recarregar a página antes de pagar). Limpo depois que
+    -- activateSubscription() processa a confirmação.
+    pending_lifetime_payment_id TEXT,
+    -- Preço customizado dessa conversão, por cliente — admin negocia caso a
+    -- caso. Valor PRÓPRIO, separado de `billing_price_override` (que é o
+    -- preço do Catálogo em si). Ver `resolveLifetimePrice` em src/lib/pricing.ts.
+    lifetime_price_override NUMERIC(10,2) CHECK (lifetime_price_override IS NULL OR lifetime_price_override >= 5),
     billing_email TEXT,
     billing_cpf_cnpj TEXT,
     cancellation_notice_hours INTEGER DEFAULT 24,
