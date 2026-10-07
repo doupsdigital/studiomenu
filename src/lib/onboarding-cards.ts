@@ -37,11 +37,16 @@ export function getOnboardingChecklistItems({ slug, planTier, subscriptionStatus
     items.push({ id: 'ver-agenda', label: 'Conhecer sua agenda', href: `/app/${slug}/agenda`, done: false, clientTracked: true });
   }
 
-  // Só pro Plano Agenda — pedido real, 2026-10-07: quem só tem o Plano
-  // Catálogo (pagamento único) não deve ver esse card de checklist de jeito
-  // nenhum, nem com um item só; lista vazia já faz o card sumir sozinho
-  // (ver `OnboardingCardStack`).
-  if (planTier === 'plus') {
+  // Só pro Plano Agenda ATIVO — pedido real, 2026-10-07: quem só tem o
+  // Plano Catálogo (pagamento único) não deve ver esse card de checklist de
+  // jeito nenhum, nem com um item só; lista vazia já faz o card sumir
+  // sozinho (ver `OnboardingCardStack`). Precisa checar `subscriptionStatus`
+  // também (não só `planTier`) — `plan_tier` continua 'plus' mesmo depois
+  // de cancelar a assinatura do Agenda (de propósito, é o que permite
+  // reofertar o Agenda em vez de cair pro Básico), então sem esse segundo
+  // check o card voltava a aparecer pra quem cancelou e ficou só com o
+  // Catálogo (achado real, 2026-10-07).
+  if (planTier === 'plus' && subscriptionStatus === 'ativo') {
     items.push({ id: 'criar-conta', label: 'Criar acesso com senha', href: `/app/${slug}/config#conta`, done: hasAccount });
   }
 
