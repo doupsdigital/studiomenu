@@ -38,6 +38,7 @@ export default async function ConfigPage({ params }: ConfigPageProps) {
           authUserId={order.auth_user_id}
           manualPlan={order.manual_plan}
           hasRealSubscription={order.has_real_subscription}
+          billingPriceOverride={order.billing_price_override}
         />
       </main>
     </>

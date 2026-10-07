@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { CheckCircle2, AlertTriangle, Sparkles } from 'lucide-react';
-import { PLAN_PRICING, type PayablePlanTier } from '@/lib/pricing';
+import { PLAN_PRICING, resolveCatalogPrice, type PayablePlanTier } from '@/lib/pricing';
 import { PlanSubscribeCard } from '@/components/billing/PlanSubscribeCard';
 
 interface SubscriptionSectionProps {
@@ -25,6 +25,11 @@ interface SubscriptionSectionProps {
    *  isso, `tier === 'basico'` sempre seria tratado como pagamento único,
    *  mesmo pra quem de fato tem uma mensalidade real cobrando. */
   hasRealSubscription?: boolean;
+  /** Preço customizado do Plano Catálogo pra essa cliente (admin) — fonte de
+   *  verdade pra mostrar a mensalidade real de quem é recorrente (Fase 27).
+   *  `PLAN_PRICING.basico` é só o padrão de tabela, mostraria valor errado
+   *  pra quem paga um preço diferente (achado real, 2026-10-07). */
+  billingPriceOverride?: number | null;
 }
 
 const TIER_LABEL: Record<PayablePlanTier, string> = { basico: 'Plano Catálogo', plus: 'Plano Agenda' };
@@ -39,6 +44,7 @@ const ActivePlanCard: React.FC<{
   paymentMethod: 'pix' | 'card' | null;
   manualPlan?: boolean;
   hasRealSubscription?: boolean;
+  billingPriceOverride?: number | null;
   onCancel: () => void;
   loading: boolean;
   error: string | null;
@@ -47,13 +53,22 @@ const ActivePlanCard: React.FC<{
   paymentMethod,
   manualPlan,
   hasRealSubscription,
+  billingPriceOverride,
   onCancel,
   loading,
   error,
 }) => {
   const [confirming, setConfirming] = useState(false);
-  const pricing = PLAN_PRICING[tier];
   const isOneTime = tier === 'basico' && !hasRealSubscription;
+  // Catálogo recorrente usa o preço customizado por admin (mesmo campo do
+  // avulso), nunca o padrão de tabela — ver nota acima do componente.
+  const pricing =
+    tier === 'basico'
+      ? (() => {
+          const resolved = resolveCatalogPrice(billingPriceOverride);
+          return { price: resolved.price, label: `${resolved.label}/mês` };
+        })()
+      : PLAN_PRICING.plus;
 
   const subtitle = manualPlan
     ? 'Ativado manualmente pela equipe StudioMenu'
@@ -143,6 +158,7 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
   paymentMethod,
   manualPlan,
   hasRealSubscription,
+  billingPriceOverride,
 }) => {
   const router = useRouter();
   const isPlusActive = planTier === 'plus' && subscriptionStatus === 'ativo';
@@ -195,6 +211,7 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
           paymentMethod={paymentMethod}
           manualPlan={manualPlan}
           hasRealSubscription={hasRealSubscription}
+          billingPriceOverride={billingPriceOverride}
           onCancel={handleCancel}
           loading={loading}
           error={error}
