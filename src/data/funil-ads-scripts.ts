@@ -7,7 +7,7 @@
 // a solução sem fricção" etc. atrasavam a conversa sem necessidade. Reescrito com base em
 // 2 conversas reais de produção (uma que travou, uma que converteu) seguindo a estratégia
 // de funil Front/Back: oferece sempre o Básico (R$27,90, agendamento manual via WhatsApp)
-// primeiro — é o produto de entrada, mais fácil de fechar. O Plus (R$47,90, agendamento
+// primeiro — é o produto de entrada, mais fácil de fechar. O Plus (R$34,90, agendamento
 // automático) só é oferecido de cara se a lead já pedir isso explicitamente; pro resto,
 // o upsell acontece sozinho depois, dentro do app dela (card do Plus na tela Início/Config
 // de quem está no Básico — mecanismo que já existe, não precisa de nada manual aqui).
@@ -77,7 +77,7 @@ Quer que eu monte a sua? ✨`,
 
 📋 *Básico*: a cliente escolhe o serviço e cai direto no seu WhatsApp pra combinar o horário. *R$27,90/mês*.
 
-📅 *Plus*: a cliente agenda sozinha, escolhendo dia e horário através do seu link, sem você precisar responder no WhatsApp. Você recebe o link de um App exclusivo seu pra controlar sua Agenda. *R$47,90/mês*.
+📅 *Plus*: a cliente agenda sozinha, escolhendo dia e horário através do seu link, sem você precisar responder no WhatsApp. Você recebe o link de um App exclusivo seu pra controlar sua Agenda. *R$34,90/mês*.
 
 Montamos sua prévia de graça. Se gostar, você recebe o link do seu App e assina por ele — *só paga se gostar*. 🥰
 
@@ -135,7 +135,7 @@ Qualquer dúvida, estou aqui! 💕`,
       title: '❓ Objeção/Dúvida — "E o agendamento automático?"',
       badge: 'Objeção',
       tip: 'Use se ela perguntar especificamente sobre agenda automática, mesmo depois de já ter escolhido o Básico — ou se o anúncio que trouxe ela já falava de agendamento.',
-      content: `Existem dois jeitos de usar: no *Básico (R$27,90)*, a cliente clica no serviço e chama você no WhatsApp pra combinar o horário. No *StudioMenu+ (R$47,90)*, ela tem um app exclusivo onde escolhe o dia e horário sozinha, sem trocar mensagem com você — sua agenda já fica organizada automaticamente.
+      content: `Existem dois jeitos de usar: no *Básico (R$27,90)*, a cliente clica no serviço e chama você no WhatsApp pra combinar o horário. No *StudioMenu+ (R$34,90)*, ela tem um app exclusivo onde escolhe o dia e horário sozinha, sem trocar mensagem com você — sua agenda já fica organizada automaticamente.
 
 Muita gente começa no Básico e evolui pro Plus depois que já está usando. Quer já começar com o agendamento automático?`,
     },

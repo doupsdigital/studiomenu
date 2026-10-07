@@ -13,8 +13,8 @@
 export const CATALOGO_PRICE = 89.9;
 export const CATALOGO_PRICE_LABEL = 'R$ 89,90';
 
-export const AGENDA_PRICE = 47.9;
-export const AGENDA_PRICE_LABEL = 'R$ 47,90/mês';
+export const AGENDA_PRICE = 34.9;
+export const AGENDA_PRICE_LABEL = 'R$ 34,90/mês';
 
 export type PayablePlanTier = 'basico' | 'plus';
 
