@@ -37,6 +37,7 @@ export default async function ConfigPage({ params }: ConfigPageProps) {
           agendaPaused={order.agenda_paused}
           authUserId={order.auth_user_id}
           manualPlan={order.manual_plan}
+          hasRealSubscription={order.has_real_subscription}
         />
       </main>
     </>

@@ -18,6 +18,7 @@ export async function PATCH(request: Request) {
       subscription_status,
       manual_plan,
       billing_price_override,
+      catalog_billing_mode,
     } = (await request.json()) as {
       id: string;
       status?: string;
@@ -30,6 +31,9 @@ export async function PATCH(request: Request) {
       /** Preço customizado do Plano Catálogo pra essa cliente específica —
        *  `null` volta ao padrão (`CATALOGO_PRICE`, src/lib/pricing.ts). */
       billing_price_override?: number | null;
+      /** Se o Plano Catálogo dessa cliente é vendido avulso ou como
+       *  assinatura mensal (Fase 27) — só tem efeito ANTES de ela pagar. */
+      catalog_billing_mode?: 'avulso' | 'recorrente';
     };
     if (
       !id ||
@@ -40,7 +44,8 @@ export async function PATCH(request: Request) {
         plan_tier === undefined &&
         subscription_status === undefined &&
         manual_plan === undefined &&
-        billing_price_override === undefined)
+        billing_price_override === undefined &&
+        catalog_billing_mode === undefined)
     ) {
       return NextResponse.json(
         { success: false, message: 'id e ao menos um campo pra atualizar são obrigatórios.' },
@@ -63,6 +68,7 @@ export async function PATCH(request: Request) {
       subscription_status?: 'none' | 'ativo' | 'suspenso' | 'cancelado';
       manual_plan?: boolean;
       billing_price_override?: number | null;
+      catalog_billing_mode?: 'avulso' | 'recorrente';
     } = {};
     if (status !== undefined) updates.status = status;
     if (booking_enabled !== undefined) updates.booking_enabled = booking_enabled;
@@ -72,6 +78,7 @@ export async function PATCH(request: Request) {
     if (subscription_status !== undefined) updates.subscription_status = subscription_status;
     if (manual_plan !== undefined) updates.manual_plan = manual_plan;
     if (billing_price_override !== undefined) updates.billing_price_override = billing_price_override;
+    if (catalog_billing_mode !== undefined) updates.catalog_billing_mode = catalog_billing_mode;
 
     const { error } = await supabaseAdmin.from('orders').update(updates).eq('id', id);
     if (error) {

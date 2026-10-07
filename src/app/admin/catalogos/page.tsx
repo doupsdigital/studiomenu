@@ -37,6 +37,9 @@ type AdminCatalog = CatalogOrderData & {
   /** Preço customizado do Plano Catálogo pra essa cliente — `null`/ausente
    *  usa o padrão (`CATALOGO_PRICE`, src/lib/pricing.ts). */
   billing_price_override?: number | null;
+  /** Se o Plano Catálogo dessa cliente é vendido avulso (padrão) ou como
+   *  assinatura mensal (Fase 27) — só tem efeito antes de ela pagar. */
+  catalog_billing_mode?: 'avulso' | 'recorrente';
 };
 
 export default function AdminCatalogosPage() {
@@ -353,6 +356,32 @@ export default function AdminCatalogosPage() {
     } catch (e) {
       console.error('Erro ao atualizar first_offer_tier:', e);
       showToast('❌ Erro ao atualizar a oferta inicial.');
+    }
+  };
+
+  /** Fase 27: pagamento único (padrão) ou assinatura mensal pro Plano
+   *  Catálogo dessa cliente — só muda o que o checkout oferece antes de ela
+   *  pagar (igual ao toggle de oferta inicial, acima). */
+  const toggleCatalogBillingMode = async (item: AdminCatalog) => {
+    if (!item.id) return;
+    const next = item.catalog_billing_mode === 'recorrente' ? 'avulso' : 'recorrente';
+    try {
+      const res = await fetch('/api/admin/catalog-actions', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ id: item.id, catalog_billing_mode: next }),
+      });
+      const result = await res.json();
+      if (!result.success) {
+        showToast('❌ Erro ao atualizar a cobrança do Catálogo.');
+        return;
+      }
+      showToast(next === 'recorrente' ? '🔁 Catálogo vai virar assinatura mensal.' : '💳 Catálogo volta a ser pagamento único.');
+      fetchCatalogs();
+    } catch (e) {
+      console.error('Erro ao atualizar catalog_billing_mode:', e);
+      showToast('❌ Erro ao atualizar a cobrança do Catálogo.');
     }
   };
 
@@ -807,6 +836,18 @@ export default function AdminCatalogosPage() {
                               </div>
                               <p className="text-xs text-slate-500">Deixe em branco e salve pra voltar ao padrão.</p>
                             </div>
+
+                            <button
+                              onClick={() => toggleCatalogBillingMode(item)}
+                              className={`w-full px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 border transition-all ${
+                                item.catalog_billing_mode === 'recorrente'
+                                  ? 'bg-sky-500/20 border-sky-500/60 text-sky-300'
+                                  : 'bg-white/5 border-slate-700 text-slate-400'
+                              }`}
+                            >
+                              <RefreshCw className="w-3.5 h-3.5" />
+                              Cobrança do Catálogo: {item.catalog_billing_mode === 'recorrente' ? 'Assinatura mensal' : 'Pagamento único (padrão)'}
+                            </button>
                           </>
                         )}
 

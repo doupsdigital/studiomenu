@@ -37,7 +37,14 @@ interface FirstContactScreenProps {
 export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order }) => {
   const firstName = order.client_name.split(' ')[0];
   const isAgendaOffer = order.first_offer_tier === 'plus';
+  const isCatalogoRecorrente = order.catalog_billing_mode === 'recorrente';
   const catalogPrice = resolveCatalogPrice(order.billing_price_override);
+  // Mesmo preço/campo de sempre (`billing_price_override`) — só o rótulo
+  // ganha "/mês" quando o admin marcou esse catálogo como recorrente (Fase
+  // 27), pra bater com o que o checkout de fato vai cobrar.
+  const catalogDisplayPrice = isCatalogoRecorrente
+    ? { price: catalogPrice.price, label: `${catalogPrice.label}/mês` }
+    : catalogPrice;
   const [highlightView, setHighlightView] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
 
@@ -67,10 +74,10 @@ export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order })
         : {
             target: '[data-tour="fc-subscribe"]',
             title: 'Pague pra manter tudo ativo',
-            content: `${catalogPrice.label} — é só preencher e pagar por Pix ou cartão de crédito.`,
+            content: `${catalogDisplayPrice.label} — é só preencher e pagar por Pix ou cartão de crédito.`,
           },
     ],
-    [isAgendaOffer, catalogPrice.label]
+    [isAgendaOffer, catalogDisplayPrice.label]
   );
 
   return (
@@ -108,7 +115,8 @@ export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order })
             plan="basico"
             billingEmail={order.billing_email}
             billingCpfCnpj={order.billing_cpf_cnpj}
-            priceOverride={catalogPrice}
+            priceOverride={catalogDisplayPrice}
+            billingMode={order.catalog_billing_mode}
           />
         )}
       </div>

@@ -91,7 +91,7 @@ export async function POST(request: Request) {
 
     const { data: order, error: orderErr } = await supabaseAdmin
       .from('orders')
-      .select('id, client_name, plan_tier, subscription_status, asaas_customer_id, asaas_subscription_id, payment_method, billing_price_override')
+      .select('id, client_name, plan_tier, subscription_status, asaas_customer_id, asaas_subscription_id, payment_method, billing_price_override, catalog_billing_mode')
       .eq('slug', normalizedSlug)
       .single();
 
@@ -197,12 +197,14 @@ export async function POST(request: Request) {
       .update({ asaas_customer_id: customer.id, billing_email: trimmedEmail ?? null, billing_cpf_cnpj: cpfCnpjDigits })
       .eq('id', order.id);
 
-    // Plano Catálogo: cobrança avulsa, nunca cria assinatura/recorrência —
-    // quem compra isso aqui nunca ganha `asaas_subscription_id` (é assim que
-    // o upgrade pro Plano Agenda, mais abaixo no fluxo de troca de tier,
-    // reconhece que precisa criar uma assinatura nova em vez de atualizar
-    // uma existente).
-    if (plan === 'basico') {
+    // Plano Catálogo avulso (padrão): cobrança única, nunca cria
+    // assinatura/recorrência — quem compra isso aqui nunca ganha
+    // `asaas_subscription_id` (é assim que o upgrade pro Plano Agenda, mais
+    // abaixo no fluxo de troca de tier, reconhece que precisa criar uma
+    // assinatura nova em vez de atualizar uma existente). Se o admin marcou
+    // esse catálogo como 'recorrente' (Fase 27), cai direto no branch de
+    // `createSubscription` abaixo — mesmo caminho que já existe pro Agenda.
+    if (plan === 'basico' && order.catalog_billing_mode !== 'recorrente') {
       await supabaseAdmin
         .from('orders')
         .update({ pending_plan_tier: plan, payment_method: method, manual_plan: false })
