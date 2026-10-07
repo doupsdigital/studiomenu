@@ -113,7 +113,12 @@ export async function POST(request: Request) {
     // tier direto aqui.
     if (order.asaas_subscription_id && order.plan_tier !== plan && order.plan_tier !== 'catalog') {
       const updated = await updateSubscription({ subscriptionId: order.asaas_subscription_id, value: price, description: pricing.description });
-      await supabaseAdmin.from('orders').update({ pending_plan_tier: plan }).eq('id', order.id);
+      // `pending_lifetime_payment_id` limpo junto (achado em auditoria, Fase
+      // 28): trocar de tier invalida qualquer conversão pra vitalício que
+      // tivesse ficado pendente (Pix gerado, não pago) — sem isso, pagar
+      // aquele Pix velho mais tarde cancelaria essa assinatura nova sem
+      // nenhum motivo, via `activateSubscription`.
+      await supabaseAdmin.from('orders').update({ pending_plan_tier: plan, pending_lifetime_payment_id: null }).eq('id', order.id);
       await activateSubscription(order.id);
       // `nextDueDate` só alimenta o aviso "a partir de dd/mm o valor passa a
       // ser X" no modal de sucesso — se o Asaas não devolver, o aviso sai sem data.
@@ -160,7 +165,7 @@ export async function POST(request: Request) {
           { status: total > 0 ? 409 : 202 }
         );
       }
-      await supabaseAdmin.from('orders').update({ asaas_subscription_id: null, pending_plan_tier: null }).eq('id', order.id);
+      await supabaseAdmin.from('orders').update({ asaas_subscription_id: null, pending_plan_tier: null, pending_lifetime_payment_id: null }).eq('id', order.id);
     }
 
     const trimmedEmail = email?.trim() || undefined;

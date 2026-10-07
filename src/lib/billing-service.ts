@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from './supabase-admin';
 import { sendTelegramMessage } from './telegram';
-import { cancelSubscription, getPixQrCode, type AsaasPayment } from './asaas';
+import { AsaasApiError, cancelSubscription, getPixQrCode, type AsaasPayment } from './asaas';
 
 type PaymentMethod = 'pix' | 'card';
 
@@ -39,8 +39,19 @@ export async function buildPaymentResponse(payment: AsaasPayment, method: Paymen
 /** Ativa a assinatura e avisa o dono do produto no Telegram — só na
  *  transição de verdade (não estava "ativo" antes), pra não duplicar o
  *  aviso quando o webhook e o check-payment confirmam o mesmo pagamento
- *  quase ao mesmo tempo. */
-export async function activateSubscription(orderId: string): Promise<void> {
+ *  quase ao mesmo tempo.
+ *
+ *  `confirmedPaymentId` (Fase 28, achado em auditoria antes de promover pra
+ *  main): esta função roda pra QUALQUER pagamento confirmado da order (ex:
+ *  a mensalidade normal) — sem saber qual foi, o bloco de "virar vitalício"
+ *  abaixo só checava "existe uma conversão pendente?", nunca "foi ESSE
+ *  pagamento que confirmou?". Isso cancelava a assinatura de graça se a
+ *  mensalidade normal confirmasse enquanto o Pix do vitalício ainda estava
+ *  pendente (não pago). Passado pelo webhook e pelo check-payment, que já
+ *  sabem qual pagamento confirmou; `undefined` (ex: chamada direta do
+ *  checkout na troca de tier, sem pagamento novo nenhum) nunca aciona esse
+ *  bloco, o que já é o comportamento certo pra esse caso. */
+export async function activateSubscription(orderId: string, confirmedPaymentId?: string): Promise<void> {
   const { data: before } = await supabaseAdmin
     .from('orders')
     .select('subscription_status, client_name, slug, pending_plan_tier, asaas_subscription_id, pending_lifetime_payment_id')
@@ -99,9 +110,18 @@ export async function activateSubscription(orderId: string): Promise<void> {
   // mostrar "Ativo ✓ - Sem mensalidade" sozinha assim que
   // `asaas_subscription_id` fica vazio (ver `hasRealSubscription` em
   // `SubscriptionSection.tsx`), sem precisar de nenhuma flag nova de exibição.
-  if (before?.pending_lifetime_payment_id) {
+  if (before?.pending_lifetime_payment_id && before.pending_lifetime_payment_id === confirmedPaymentId) {
     if (before.asaas_subscription_id) {
-      await cancelSubscription(before.asaas_subscription_id);
+      try {
+        await cancelSubscription(before.asaas_subscription_id);
+      } catch (cancelError) {
+        // Já cancelada/removida (ex: segunda confirmação quase simultânea
+        // do mesmo pagamento, webhook + check-payment) — não interrompe o
+        // resto da limpeza, que é o que importa pra não travar o fluxo.
+        if (!(cancelError instanceof AsaasApiError && cancelError.status === 404)) {
+          throw cancelError;
+        }
+      }
     }
     await supabaseAdmin
       .from('orders')
@@ -138,13 +158,25 @@ export async function setSubscriptionStatus(
   // de propósito — evita cortar o agendamento de clientes já em andamento
   // por um atraso pontual; o toggle manual do admin continua disponível
   // como via de escape se for preciso agir antes disso.
-  const updates: { subscription_status: string; booking_enabled?: boolean; asaas_subscription_id?: null; pending_plan_tier?: null } = {
+  const updates: {
+    subscription_status: string;
+    booking_enabled?: boolean;
+    asaas_subscription_id?: null;
+    pending_plan_tier?: null;
+    pending_lifetime_payment_id?: null;
+  } = {
     subscription_status: status,
   };
   if (status === 'cancelado') {
     updates.booking_enabled = false;
     updates.asaas_subscription_id = null;
     updates.pending_plan_tier = null;
+    // Fase 28, achado em auditoria: se ela cancelar tudo enquanto um Pix de
+    // "virar vitalício" ainda estava pendente (gerado, não pago), sem isso o
+    // id ficava órfão — e se esse Pix velho fosse pago depois por engano,
+    // `activateSubscription` reativava a assinatura do zero a partir de um
+    // pagamento que não tem mais nenhuma assinatura real por trás.
+    updates.pending_lifetime_payment_id = null;
   }
   await supabaseAdmin.from('orders').update(updates).eq('id', orderId);
 }

@@ -57,7 +57,9 @@ export async function POST(request: Request) {
 
     const active = CONFIRMED_STATUSES.has(payment.status);
     if (active) {
-      await activateSubscription(order.id);
+      // `payment.id` (== payment_id já validado acima) identifica qual
+      // pagamento confirmou — mesmo motivo do webhook, ver `activateSubscription`.
+      await activateSubscription(order.id, payment.id);
     }
 
     return NextResponse.json({ success: true, active, status: payment.status });

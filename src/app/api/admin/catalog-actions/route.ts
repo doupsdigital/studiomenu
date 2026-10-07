@@ -86,6 +86,7 @@ export async function PATCH(request: Request) {
        *  assinatura real cancelada ao conceder plano manual, ver abaixo. */
       asaas_subscription_id?: string | null;
       pending_plan_tier?: 'basico' | 'plus' | null;
+      pending_lifetime_payment_id?: string | null;
     } = {};
     if (status !== undefined) updates.status = status;
     if (booking_enabled !== undefined) updates.booking_enabled = booking_enabled;
@@ -135,6 +136,12 @@ export async function PATCH(request: Request) {
         }
         updates.asaas_subscription_id = null;
         updates.pending_plan_tier = null;
+        // Achado em auditoria (Fase 28): se ela tivesse um Pix de "virar
+        // vitalício" pendente (não pago) no momento da concessão manual,
+        // sem limpar esse id um pagamento futuro desse Pix velho reativaria
+        // a assinatura do zero (via activateSubscription) a partir de um
+        // pagamento que não tem mais nenhuma assinatura real por trás.
+        updates.pending_lifetime_payment_id = null;
       }
     }
 
