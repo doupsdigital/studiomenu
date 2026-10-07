@@ -129,7 +129,7 @@ export default async function InicioPage({ params }: InicioPageProps) {
           <p className="text-[15px] text-rose-800/70 mb-4 max-w-xs mx-auto">
             {schedulingLive
               ? 'Envie esse link pra suas clientes verem seus serviços e preços, e agendarem sozinhas.'
-              : 'Envie esse link pra suas clientes verem seus serviços e preços e agendarem pelo WhatsApp.'}
+              : 'Coloque esse link na Bio do seu Instagram ou compartilhe pelo WhatsApp pra suas clientes verem seus serviços e preços.'}
           </p>
           <ShareLinkButton slug={order.slug} />
         </div>
