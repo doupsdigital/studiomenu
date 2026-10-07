@@ -37,8 +37,11 @@ export function getOnboardingChecklistItems({ slug, planTier, subscriptionStatus
     items.push({ id: 'ver-agenda', label: 'Conhecer sua agenda', href: `/app/${slug}/agenda`, done: false, clientTracked: true });
   }
 
-  // Já pagou algo (Básico ou Plus): criar login real.
-  if (planTier !== 'catalog') {
+  // Só pro Plano Agenda — pedido real, 2026-10-07: quem só tem o Plano
+  // Catálogo (pagamento único) não deve ver esse card de checklist de jeito
+  // nenhum, nem com um item só; lista vazia já faz o card sumir sozinho
+  // (ver `OnboardingCardStack`).
+  if (planTier === 'plus') {
     items.push({ id: 'criar-conta', label: 'Criar acesso com senha', href: `/app/${slug}/config#conta`, done: hasAccount });
   }
 
