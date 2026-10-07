@@ -14,6 +14,11 @@ interface PlusUpsellCardProps {
    *  `null` só quando a busca falha — nesse caso o CTA volta a ser o link
    *  antigo direto pra `/config`, sem quebrar a tela. */
   catalog: CatalogOrderData | null;
+  /** CPF/e-mail já salvos dela (se já assinou algo antes) — repassados pro
+   *  formulário de assinar no fim do onboarding, pra não pedir de novo o
+   *  que ela já preencheu uma vez (igual já acontece na tela de Plano). */
+  billingEmail?: string;
+  billingCpfCnpj?: string;
 }
 
 /** Conteúdo de upsell do Plano Agenda — mesma peça usada bloqueada no Início
@@ -27,7 +32,7 @@ interface PlusUpsellCardProps {
  *  CTA único "Conheça" (sem preço no card, 2026-09-24) — abre um onboarding
  *  em tela cheia que demonstra o agendamento automático funcionando de
  *  verdade com o catálogo dela, terminando no formulário de assinar. */
-export const PlusUpsellCard: React.FC<PlusUpsellCardProps> = ({ variant, slug, catalog }) => {
+export const PlusUpsellCard: React.FC<PlusUpsellCardProps> = ({ variant, slug, catalog, billingEmail, billingCpfCnpj }) => {
   const isFull = variant === 'full';
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
 
@@ -72,7 +77,13 @@ export const PlusUpsellCard: React.FC<PlusUpsellCardProps> = ({ variant, slug, c
     <>
       {isFull ? <div className="flex items-center justify-center w-full px-2 py-6">{card}</div> : card}
       {isOnboardingOpen && catalog && (
-        <PlusOnboardingModal slug={slug} catalog={catalog} onClose={() => setIsOnboardingOpen(false)} />
+        <PlusOnboardingModal
+          slug={slug}
+          catalog={catalog}
+          billingEmail={billingEmail}
+          billingCpfCnpj={billingCpfCnpj}
+          onClose={() => setIsOnboardingOpen(false)}
+        />
       )}
     </>
   );
