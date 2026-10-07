@@ -787,7 +787,7 @@ export default function AdminCatalogosPage() {
                                 <Wallet className="w-4 h-4" />
                                 Preço do Plano Catálogo
                               </span>
-                              <div className="flex items-center gap-2">
+                              <div className="flex flex-col gap-2">
                                 <input
                                   type="text"
                                   inputMode="decimal"
@@ -796,11 +796,11 @@ export default function AdminCatalogosPage() {
                                   onChange={(e) =>
                                     setPriceDrafts((prev) => ({ ...prev, [item.id || '']: e.target.value }))
                                   }
-                                  className="flex-1 bg-slate-900 border border-slate-800 rounded-lg px-4 py-3 text-base text-white placeholder-slate-500 focus:border-rose-500 focus:outline-none"
+                                  className="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-3 text-base text-white placeholder-slate-500 focus:border-rose-500 focus:outline-none"
                                 />
                                 <button
                                   onClick={() => savePriceOverride(item)}
-                                  className="px-5 py-3 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 text-sm font-bold"
+                                  className="w-full py-3 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 text-sm font-bold"
                                 >
                                   Salvar
                                 </button>
