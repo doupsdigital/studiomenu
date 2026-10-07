@@ -436,7 +436,7 @@ export default function AdminCatalogosPage() {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'same-origin',
-        body: JSON.stringify({ id: item.id, plan_tier: tier, subscription_status: 'ativo', manual_plan: true }),
+        body: JSON.stringify({ id: item.id, plan_tier: tier, subscription_status: 'ativo', manual_plan: true, booking_enabled: tier === 'plus' }),
       });
       const result = await res.json();
       if (!result.success) {
@@ -458,7 +458,7 @@ export default function AdminCatalogosPage() {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'same-origin',
-        body: JSON.stringify({ id: item.id, plan_tier: 'catalog', subscription_status: 'none', manual_plan: false }),
+        body: JSON.stringify({ id: item.id, plan_tier: 'catalog', subscription_status: 'none', manual_plan: false, booking_enabled: false }),
       });
       const result = await res.json();
       if (!result.success) {
