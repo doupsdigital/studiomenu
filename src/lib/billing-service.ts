@@ -13,7 +13,7 @@ import { sendTelegramMessage } from './telegram';
 export async function activateSubscription(orderId: string): Promise<void> {
   const { data: before } = await supabaseAdmin
     .from('orders')
-    .select('subscription_status, client_name, slug, pending_plan_tier')
+    .select('subscription_status, client_name, slug, pending_plan_tier, asaas_subscription_id')
     .eq('id', orderId)
     .single();
 
@@ -45,9 +45,16 @@ export async function activateSubscription(orderId: string): Promise<void> {
 
   if (before && before.subscription_status !== 'ativo') {
     const nowStr = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
-    // Catálogo é pagamento único, não assinatura — "Nova assinatura" seria
-    // texto errado nesse caso.
-    const label = tier === 'basico' ? '💳 Novo pagamento (Plano Catálogo)!' : '💳 Nova assinatura (Plano Agenda)!';
+    // Catálogo é pagamento único por padrão — "Nova assinatura" seria texto
+    // errado nesse caso. Mas se o admin marcou esse catálogo como recorrente
+    // (Fase 27), já existe `asaas_subscription_id` nesse ponto (criado no
+    // checkout antes da confirmação chegar aqui) — aí é assinatura de verdade.
+    const label =
+      tier === 'basico' && !before.asaas_subscription_id
+        ? '💳 Novo pagamento (Plano Catálogo)!'
+        : tier === 'basico'
+          ? '💳 Nova assinatura (Plano Catálogo)!'
+          : '💳 Nova assinatura (Plano Agenda)!';
     await sendTelegramMessage(
       `${label}\n\n👤 ${before.client_name}\n🔗 https://studiomenu.art/c/${before.slug}\n🕒 ${nowStr}`
     );

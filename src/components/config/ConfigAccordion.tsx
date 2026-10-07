@@ -35,6 +35,9 @@ interface ConfigAccordionProps {
   authUserId: string | null;
   /** Plano concedido manualmente pelo admin, fora do Asaas (Fase 26). */
   manualPlan: boolean;
+  /** Existe uma assinatura Asaas de verdade por trás (Fase 27) — repassado
+   *  direto pra `SubscriptionSection`. */
+  hasRealSubscription: boolean;
 }
 
 type SectionKey = 'horarios' | 'bloqueios' | 'pausar' | 'assinatura' | 'conta' | 'notificacoes' | 'suporte';
@@ -59,6 +62,7 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
   agendaPaused,
   authUserId,
   manualPlan,
+  hasRealSubscription,
 }) => {
   const [open, setOpen] = useState<Record<SectionKey, boolean>>({
     horarios: false,
@@ -257,6 +261,7 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
             billingCpfCnpj={billingCpfCnpj}
             paymentMethod={paymentMethod}
             manualPlan={manualPlan}
+            hasRealSubscription={hasRealSubscription}
           />
         </SectionCard>
       </div>

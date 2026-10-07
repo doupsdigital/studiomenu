@@ -19,19 +19,26 @@ interface SubscriptionSectionProps {
    *  cancelamento exige um asaas_subscription_id que nunca vai existir
    *  aqui). */
   manualPlan?: boolean;
+  /** Existe uma assinatura Asaas de verdade por trás (Fase 27) — Plano
+   *  Agenda sempre, ou Plano Catálogo vendido como recorrente (admin) OU uma
+   *  assinatura legada de antes dessa escolha existir (ex: Kethleen). Sem
+   *  isso, `tier === 'basico'` sempre seria tratado como pagamento único,
+   *  mesmo pra quem de fato tem uma mensalidade real cobrando. */
+  hasRealSubscription?: boolean;
 }
 
 const TIER_LABEL: Record<PayablePlanTier, string> = { basico: 'Plano Catálogo', plus: 'Plano Agenda' };
 
 /** Card "plano X ativo" — mesmo visual pro Catálogo e pro Agenda, só troca o
  *  rótulo/preço/texto de aviso (Fase 19: antes só existia a versão Plus,
- *  hardcoded). Catálogo é sempre pagamento único ou manual, nunca
- *  recorrente — por isso `isOneTime` é derivado direto do `tier`, sem
- *  precisar de mais uma prop (modelo novo, 2026-10-06). */
+ *  hardcoded). Catálogo é pagamento único por padrão, mas pode ser
+ *  recorrente (Fase 27) — por isso `isOneTime` também depende de
+ *  `hasRealSubscription`, não só do `tier`. */
 const ActivePlanCard: React.FC<{
   tier: PayablePlanTier;
   paymentMethod: 'pix' | 'card' | null;
   manualPlan?: boolean;
+  hasRealSubscription?: boolean;
   onCancel: () => void;
   loading: boolean;
   error: string | null;
@@ -39,13 +46,14 @@ const ActivePlanCard: React.FC<{
   tier,
   paymentMethod,
   manualPlan,
+  hasRealSubscription,
   onCancel,
   loading,
   error,
 }) => {
   const [confirming, setConfirming] = useState(false);
   const pricing = PLAN_PRICING[tier];
-  const isOneTime = tier === 'basico';
+  const isOneTime = tier === 'basico' && !hasRealSubscription;
 
   const subtitle = manualPlan
     ? 'Ativado manualmente pela equipe StudioMenu'
@@ -83,7 +91,8 @@ const ActivePlanCard: React.FC<{
           {confirming ? (
             <div className="rounded-xl bg-surface border border-rose-200/60 p-4">
               <p className="text-sm text-ink-soft mb-3">
-                Cancelar sua assinatura do {TIER_LABEL[tier]}? Você perde acesso à agenda automática.
+                Cancelar sua assinatura do {TIER_LABEL[tier]}?{' '}
+                {tier === 'plus' ? 'Você perde acesso à agenda automática.' : 'Seu catálogo deixa de fazer parte do plano pago.'}
               </p>
               <div className="flex gap-2">
                 <button
@@ -133,6 +142,7 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
   billingCpfCnpj,
   paymentMethod,
   manualPlan,
+  hasRealSubscription,
 }) => {
   const router = useRouter();
   const isPlusActive = planTier === 'plus' && subscriptionStatus === 'ativo';
@@ -164,18 +174,46 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
   };
 
   if (isPlusActive) {
-    return <ActivePlanCard tier="plus" paymentMethod={paymentMethod} manualPlan={manualPlan} onCancel={handleCancel} loading={loading} error={error} />;
+    return (
+      <ActivePlanCard
+        tier="plus"
+        paymentMethod={paymentMethod}
+        manualPlan={manualPlan}
+        hasRealSubscription={hasRealSubscription}
+        onCancel={handleCancel}
+        loading={loading}
+        error={error}
+      />
+    );
   }
 
   if (isBasicoActive) {
     return (
       <div className="flex flex-col gap-4">
-        <ActivePlanCard tier="basico" paymentMethod={paymentMethod} manualPlan={manualPlan} onCancel={handleCancel} loading={loading} error={error} />
+        <ActivePlanCard
+          tier="basico"
+          paymentMethod={paymentMethod}
+          manualPlan={manualPlan}
+          hasRealSubscription={hasRealSubscription}
+          onCancel={handleCancel}
+          loading={loading}
+          error={error}
+        />
         <div id="upgrade-plus">
           <p className="flex items-center gap-1.5 text-[15px] font-bold text-ink mb-2">
             <Sparkles className="w-4 h-4 text-rose-600" /> Evolua pro Plano Agenda
           </p>
-          <PlanSubscribeCard slug={slug} plan="plus" billingEmail={billingEmail} billingCpfCnpj={billingCpfCnpj} />
+          {/* Quem já tem uma assinatura real por trás do Catálogo (recorrente,
+           *  Fase 27) troca de tier na MESMA assinatura — upgrade instantâneo,
+           *  sem cobrança nova hoje (`isUpgrade` em PlanSubscribeCard). Quem
+           *  é avulso precisa mesmo de uma assinatura nova pro Agenda. */}
+          <PlanSubscribeCard
+            slug={slug}
+            plan="plus"
+            billingEmail={billingEmail}
+            billingCpfCnpj={billingCpfCnpj}
+            showMethodChoice={!hasRealSubscription}
+          />
         </div>
       </div>
     );
