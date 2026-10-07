@@ -301,6 +301,17 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
   // sentido "regredir" ela pro Básico na tela de reativação); quem nunca
   // assinou nada ou só teve Básico entra pelo Básico.
   const reofferTier: PayablePlanTier = planTier === 'plus' ? 'plus' : 'basico';
+  // Reofertar o Catálogo precisa repassar o MESMO preço customizado e modo
+  // (avulso/recorrente) de antes — `billing_price_override`/`catalog_billing_mode`
+  // nunca são apagados pelo cancelamento, só o `PlanSubscribeCard` não
+  // recebia nenhum dos dois aqui (achado real, 2026-10-07: reofertava
+  // sempre o padrão de tabela em pagamento único, mesmo pra quem era
+  // recorrente com preço próprio).
+  const reofferCatalogPrice = resolveCatalogPrice(billingPriceOverride);
+  const reofferPriceOverride =
+    reofferTier === 'basico'
+      ? { price: reofferCatalogPrice.price, label: catalogBillingMode === 'recorrente' ? `${reofferCatalogPrice.label}/mês` : reofferCatalogPrice.label }
+      : undefined;
 
   return (
     <div className="flex flex-col gap-3">
@@ -315,7 +326,14 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
           </p>
         </div>
       )}
-      <PlanSubscribeCard slug={slug} plan={reofferTier} billingEmail={billingEmail} billingCpfCnpj={billingCpfCnpj} />
+      <PlanSubscribeCard
+        slug={slug}
+        plan={reofferTier}
+        billingEmail={billingEmail}
+        billingCpfCnpj={billingCpfCnpj}
+        priceOverride={reofferPriceOverride}
+        billingMode={reofferTier === 'basico' ? catalogBillingMode : undefined}
+      />
     </div>
   );
 };
