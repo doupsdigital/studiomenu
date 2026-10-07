@@ -45,7 +45,7 @@ export async function POST(request: Request) {
 
     const { data: order, error: orderErr } = await supabaseAdmin
       .from('orders')
-      .select('id, plan_tier, catalog_billing_mode, asaas_subscription_id, asaas_customer_id, lifetime_price_override, pending_lifetime_payment_id')
+      .select('id, plan_tier, subscription_status, catalog_billing_mode, asaas_subscription_id, asaas_customer_id, lifetime_price_override, pending_lifetime_payment_id')
       .eq('slug', normalizedSlug)
       .single();
 
@@ -62,6 +62,18 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+    // Com mensalidade atrasada (suspensa), bloqueia a conversão — pedido
+    // explícito, 2026-10-07: pagar o vitalício cancela a assinatura, e a
+    // dívida da mensalidade em aberto ficaria sem rastreamento nenhum
+    // depois disso (o app só sabe de cobrança em aberto via
+    // `asaas_subscription_id`, que deixa de existir). Precisa regularizar a
+    // mensalidade primeiro.
+    if (order.subscription_status !== 'ativo') {
+      return NextResponse.json(
+        { success: false, message: 'Regularize sua mensalidade em atraso antes de virar vitalício.' },
+        { status: 400 }
+      );
+    }
 
     const allowed = await checkRateLimit(`billing-lifetime:${order.id}`, 10, 15 * 60);
     if (!allowed) {
@@ -70,11 +82,20 @@ export async function POST(request: Request) {
 
     // Reaproveita a cobrança pendente, se ela recarregou a página antes de
     // pagar — evita cobrar a taxa de conversão duas vezes (mesmo cuidado do
-    // checkout genérico com assinaturas pendentes).
+    // checkout genérico com assinaturas pendentes). Se essa cobrança não
+    // existir mais no Asaas (404 — achado em auditoria: sem isso, qualquer
+    // tentativa futura travava pra sempre nesse mesmo erro, nunca criando
+    // uma cobrança nova), trata como se não tivesse nenhuma pendente.
     if (order.pending_lifetime_payment_id) {
-      const existingPayment = await getPayment(order.pending_lifetime_payment_id);
-      if (UNPAID_STATUSES.has(existingPayment.status)) {
-        return buildPaymentResponse(existingPayment, method);
+      try {
+        const existingPayment = await getPayment(order.pending_lifetime_payment_id);
+        if (UNPAID_STATUSES.has(existingPayment.status)) {
+          return buildPaymentResponse(existingPayment, method);
+        }
+      } catch (fetchError) {
+        if (!(fetchError instanceof AsaasApiError && fetchError.status === 404)) {
+          throw fetchError;
+        }
       }
     }
 
