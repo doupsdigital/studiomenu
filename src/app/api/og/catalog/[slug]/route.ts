@@ -1,5 +1,7 @@
 import sharp from 'sharp';
 import { getCatalogBySlug } from '@/lib/catalog-service';
+import { NICHE_DEFAULT_COVER } from '@/lib/catalog-covers';
+import { PRODUCTION_DOMAIN } from '@/lib/public-url';
 
 /** GET /api/og/catalog/[slug]
  *  Recorta a capa do catálogo (retrato, na maioria dos casos — selfie ou
@@ -26,7 +28,16 @@ export async function GET(_request: Request, { params }: { params: Promise<{ slu
 
   try {
     const catalog = await getCatalogBySlug(slug);
-    const sourceUrl = catalog?.cover_media_url || catalog?.avatar_url || fallbackUrl;
+    // Mesma cadeia de capa padrão por nicho de `HeaderCover.tsx` (pedido
+    // real, 2026-10-07) — sem isso, a página mostraria a capa nova (Lash/
+    // Nail) mas o preview do link no WhatsApp continuaria mostrando a foto
+    // genérica antiga, inconsistente.
+    const nicheDefaultCover = catalog?.niche ? NICHE_DEFAULT_COVER[catalog.niche] : undefined;
+    const sourceUrl =
+      catalog?.cover_media_url ||
+      catalog?.avatar_url ||
+      (nicheDefaultCover ? `https://${PRODUCTION_DOMAIN}${nicheDefaultCover}` : undefined) ||
+      fallbackUrl;
 
     const sourceRes = await fetch(sourceUrl);
     if (!sourceRes.ok) throw new Error(`Falha ao buscar imagem de origem: ${sourceRes.status}`);

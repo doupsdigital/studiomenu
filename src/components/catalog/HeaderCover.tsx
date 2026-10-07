@@ -1,6 +1,7 @@
 import React from 'react';
 import { CatalogOrderData } from '@/types/catalog';
 import { HeroParticles } from './HeroParticles';
+import { NICHE_DEFAULT_COVER } from '@/lib/catalog-covers';
 
 interface HeaderCoverProps {
   data: CatalogOrderData;
@@ -28,12 +29,16 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
   // não lê `cover_media_url` de propósito (bug real, 2026-09-22 — comentário
   // lá explica). Herdar nessa direção é seguro porque não é bidirecional: só
   // a capa cai pra trás na tela final, a tela final nunca cai pra trás na
-  // capa. Se nenhuma das duas foi definida, cai no asset genérico do modelo
-  // (local, não mais externo — a URL de lashmenu.com quebrava sem aviso se o
+  // capa. Lash/Nail (pedido real, 2026-10-07) pulam direto pra capa
+  // "padronizada" do nicho (`NICHE_DEFAULT_COVER`) em vez de cair na foto da
+  // tela final — nichos sem entrada ali continuam com o comportamento de
+  // sempre. Se nada disso existir, cai no asset genérico do modelo (local,
+  // não mais externo — a URL de lashmenu.com quebrava sem aviso se o
   // domínio antigo saísse do ar).
   const heroImage =
     data.cover_media_url ||
     data.avatar_url ||
+    NICHE_DEFAULT_COVER[data.niche] ||
     data.cta_bg_url ||
     data.final_screen_bg_url ||
     '/modelos/mosaico/assets/img/Hero.webp';

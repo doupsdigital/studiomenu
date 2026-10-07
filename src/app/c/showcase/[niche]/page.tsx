@@ -13,17 +13,24 @@ interface ShowcasePageProps {
  *  `.../lash` e `.../nail` continuam exatamente como sempre foram (Plus);
  *  `.../lashdesigner` e `.../naildesigner` são os novos, iguais em tudo
  *  menos o botão "Agendar" cair na simulação de WhatsApp. Nicho sem versão
- *  Básico (estetica/studio) só passa direto, sem mudar nada. */
-const SHOWCASE_SLUGS: Record<string, { niche: NicheType; forceBasico: boolean }> = {
+ *  Básico (estetica/studio) só passa direto, sem mudar nada.
+ *
+ *  `.../lashs` e `.../nails` (pedido real, 2026-10-07): duplicatas de
+ *  `lashdesigner`/`naildesigner` (mesmo plano Básico), só trocando a capa
+ *  genérica pela nova capa "padronizada" do nicho — os originais continuam
+ *  intocados, pra não perder os exemplos já em uso. */
+const SHOWCASE_SLUGS: Record<string, { niche: NicheType; forceBasico: boolean; coverOverride?: string }> = {
   lash: { niche: 'lash', forceBasico: false },
   nail: { niche: 'nail', forceBasico: false },
   lashdesigner: { niche: 'lash', forceBasico: true },
   naildesigner: { niche: 'nail', forceBasico: true },
+  lashs: { niche: 'lash', forceBasico: true, coverOverride: '/capa_lash.png' },
+  nails: { niche: 'nail', forceBasico: true, coverOverride: '/capa_nail.png' },
   estetica: { niche: 'estetica', forceBasico: false },
   studio: { niche: 'studio', forceBasico: false },
 };
 
-function resolveShowcaseSlug(slug: string): { niche: NicheType; forceBasico: boolean } {
+function resolveShowcaseSlug(slug: string): { niche: NicheType; forceBasico: boolean; coverOverride?: string } {
   return SHOWCASE_SLUGS[slug] || { niche: slug as NicheType, forceBasico: false };
 }
 
@@ -59,6 +66,6 @@ export async function generateMetadata({ params }: ShowcasePageProps): Promise<M
 
 export default async function ShowcasePage({ params }: ShowcasePageProps) {
   const { niche: nicheParam } = await params;
-  const { niche, forceBasico } = resolveShowcaseSlug(nicheParam);
-  return <ShowcaseClient niche={niche} forceBasico={forceBasico} />;
+  const { niche, forceBasico, coverOverride } = resolveShowcaseSlug(nicheParam);
+  return <ShowcaseClient niche={niche} forceBasico={forceBasico} coverOverride={coverOverride} />;
 }
