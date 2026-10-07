@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { isAdminRequestAuthorized } from '@/lib/admin-session';
+import { AsaasConfigError, AsaasApiError, cancelSubscription } from '@/lib/asaas';
 
 export async function PATCH(request: Request) {
   if (!(await isAdminRequestAuthorized())) {
@@ -69,6 +70,10 @@ export async function PATCH(request: Request) {
       manual_plan?: boolean;
       billing_price_override?: number | null;
       catalog_billing_mode?: 'avulso' | 'recorrente';
+      /** Só escrito internamente aqui (nunca vem do request) — limpa a
+       *  assinatura real cancelada ao conceder plano manual, ver abaixo. */
+      asaas_subscription_id?: string | null;
+      pending_plan_tier?: 'basico' | 'plus' | null;
     } = {};
     if (status !== undefined) updates.status = status;
     if (booking_enabled !== undefined) updates.booking_enabled = booking_enabled;
@@ -79,6 +84,46 @@ export async function PATCH(request: Request) {
     if (manual_plan !== undefined) updates.manual_plan = manual_plan;
     if (billing_price_override !== undefined) updates.billing_price_override = billing_price_override;
     if (catalog_billing_mode !== undefined) updates.catalog_billing_mode = catalog_billing_mode;
+
+    // Conceder plano manual (Fase 26) numa cliente que JÁ tem uma assinatura
+    // Asaas de verdade por trás (Fase 27: Plano Catálogo recorrente, ou um
+    // Plano Agenda ativo) precisa cancelar essa assinatura antes — senão o
+    // app passa a mostrar "Sem cobrança — concedido manualmente" enquanto o
+    // Asaas continua cobrando ela todo mês por baixo dos panos (achado real,
+    // 2026-10-07: só virou um risco de verdade depois que o Catálogo passou
+    // a poder ser recorrente). Se o cancelamento falhar, não aplica nada do
+    // PATCH — a admin fica sabendo na hora em vez de a cliente continuar
+    // sendo cobrada com a tela já dizendo "sem cobrança".
+    if (manual_plan === true) {
+      const { data: existing, error: fetchErr } = await supabaseAdmin
+        .from('orders')
+        .select('asaas_subscription_id')
+        .eq('id', id)
+        .single();
+      if (fetchErr) {
+        console.error('[Admin Catalog Actions] Erro ao buscar assinatura antes de conceder manual:', fetchErr);
+        return NextResponse.json({ success: false, message: 'Erro ao conceder o plano manual.' }, { status: 500 });
+      }
+      if (existing?.asaas_subscription_id) {
+        try {
+          await cancelSubscription(existing.asaas_subscription_id);
+        } catch (cancelError) {
+          if (cancelError instanceof AsaasConfigError) {
+            return NextResponse.json({ success: false, message: cancelError.message }, { status: 503 });
+          }
+          if (cancelError instanceof AsaasApiError) {
+            console.error('[Admin Catalog Actions] Erro do Asaas ao cancelar antes de conceder manual:', cancelError.status, cancelError.message);
+            return NextResponse.json(
+              { success: false, message: 'Ela tem uma assinatura real ativa e não foi possível cancelá-la agora. Tente de novo em instantes.' },
+              { status: 502 }
+            );
+          }
+          throw cancelError;
+        }
+        updates.asaas_subscription_id = null;
+        updates.pending_plan_tier = null;
+      }
+    }
 
     const { error } = await supabaseAdmin.from('orders').update(updates).eq('id', id);
     if (error) {
