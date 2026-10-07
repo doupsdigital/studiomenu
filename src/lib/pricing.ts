@@ -38,3 +38,19 @@ export function resolveCatalogPrice(billingPriceOverride: number | null | undefi
   const price = override !== null && Number.isFinite(override) && override >= 5 ? override : CATALOGO_PRICE;
   return { price, label: `R$ ${price.toFixed(2).replace('.', ',')}` };
 }
+
+/** Preço de converter um Catálogo recorrente em vitalício (pagamento único
+ *  que cancela a mensalidade e deixa o Catálogo permanente, Fase 28) — valor
+ *  PRÓPRIO, separado do preço do Catálogo em si (`CATALOGO_PRICE`/
+ *  `billing_price_override`), porque é uma oferta diferente (ela já paga a
+ *  mensalidade; isso é "pare de pagar pra sempre"). Customizável por admin
+ *  por cliente via `orders.lifetime_price_override`, mesmo padrão de
+ *  `resolveCatalogPrice`. */
+export const CATALOGO_VITALICIO_PRICE = 197.0;
+export const CATALOGO_VITALICIO_PRICE_LABEL = 'R$ 197,00';
+
+export function resolveLifetimePrice(lifetimePriceOverride: number | null | undefined): { price: number; label: string } {
+  const override = lifetimePriceOverride === null || lifetimePriceOverride === undefined ? null : Number(lifetimePriceOverride);
+  const price = override !== null && Number.isFinite(override) && override >= 5 ? override : CATALOGO_VITALICIO_PRICE;
+  return { price, label: `R$ ${price.toFixed(2).replace('.', ',')}` };
+}

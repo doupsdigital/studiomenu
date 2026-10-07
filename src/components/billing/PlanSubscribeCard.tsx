@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Crown, BookOpen, Check, CreditCard, QrCode, ExternalLink, Info, type LucideIcon } from 'lucide-react';
+import { Crown, BookOpen, Gift, Check, CreditCard, QrCode, ExternalLink, Info, type LucideIcon } from 'lucide-react';
 import { PLAN_PRICING, type PayablePlanTier } from '@/lib/pricing';
 import { formatCpfCnpj } from '@/lib/format';
 
@@ -23,6 +23,11 @@ interface PlanSubscribeCardProps {
    *  de pagamento único (padrão 'avulso'). Decide só o texto do botão aqui —
    *  quem monta o preço com "/mês" é quem chama (`priceOverride.label`). */
   billingMode?: 'avulso' | 'recorrente';
+  /** Autoatendimento pra converter Catálogo recorrente em vitalício (Fase
+   *  28) — submete pro endpoint dedicado em vez do checkout genérico, sem
+   *  pedir CPF/e-mail de novo (ela já é cliente paga confirmada) e com copy
+   *  própria. Só faz sentido com `plan === 'basico'`. */
+  lifetimeConversion?: boolean;
 }
 
 type PaymentMethod = 'pix' | 'card';
@@ -65,6 +70,21 @@ const PLAN_COPY: Record<PayablePlanTier, { icon: LucideIcon; headline: string; b
       'Menos ida e volta pelo WhatsApp',
     ],
   },
+};
+
+/** Copy própria do autoatendimento "virar vitalício" (Fase 28) — diferente
+ *  da oferta normal de Catálogo: ela já é cliente paga, isso é "pare de
+ *  pagar pra sempre", não "garanta seu catálogo". */
+const LIFETIME_COPY = {
+  icon: Gift,
+  headline: 'Catálogo Vitalício',
+  benefits: ['Sem mensalidade nunca mais', 'Catálogo seu, pra sempre', 'Pague uma vez só'],
+};
+
+const LIFETIME_SUCCESS_COPY = {
+  headline: 'Catálogo vitalício confirmado! ✅',
+  subheadline: '🎉 Sua mensalidade acabou de parar',
+  benefits: ['Catálogo online sempre no ar, sem cobrança nenhuma', 'Edite fotos, preços e serviços quando quiser', 'Link profissional pra compartilhar com suas clientes'],
 };
 
 const formatShortDate = (iso: string) =>
@@ -112,11 +132,12 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
   showMethodChoice = true,
   priceOverride,
   billingMode = 'avulso',
+  lifetimeConversion = false,
 }) => {
   const router = useRouter();
-  const copy = PLAN_COPY[plan];
+  const copy = lifetimeConversion ? LIFETIME_COPY : PLAN_COPY[plan];
   const pricing = priceOverride ?? PLAN_PRICING[plan];
-  const successCopy = SUCCESS_COPY[plan];
+  const successCopy = lifetimeConversion ? LIFETIME_SUCCESS_COPY : SUCCESS_COPY[plan];
   /** Sem seletor de método = troca de plano de quem já é assinante (Básico →
    *  Plus): ativa na hora, o novo valor só vale na próxima mensalidade. */
   const isUpgrade = !showMethodChoice;
@@ -224,11 +245,17 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/billing/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug, email: email.trim(), cpf_cnpj: cpfCnpj.trim(), plan, method: showMethodChoice ? method : undefined }),
-      });
+      const res = lifetimeConversion
+        ? await fetch('/api/billing/upgrade-to-lifetime', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ slug, method }),
+          })
+        : await fetch('/api/billing/checkout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ slug, email: email.trim(), cpf_cnpj: cpfCnpj.trim(), plan, method: showMethodChoice ? method : undefined }),
+          });
       const json = await res.json();
       if (!json.success) {
         setError(json.message || 'Não foi possível iniciar a assinatura.');
@@ -320,13 +347,17 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
     <div className="relative overflow-hidden rounded-3xl bg-white border-2 border-rose-200 shadow-xl shadow-rose-900/10 p-6">
       {/* Faixa de "escassez" — pedido real 2026-10-06: preço de lançamento,
        *  honesto (os dois produtos acabaram de ser reposicionados), sem
-       *  data/contador fixo pra não virar promessa que não dá pra sustentar. */}
-      <div
-        className="absolute -left-11 top-6 w-40 -rotate-45 bg-rose-600 py-1.5 text-center shadow-md"
-        aria-hidden="true"
-      >
-        <span className="text-[11px] font-extrabold uppercase tracking-wider text-white">OFERTA 🔥</span>
-      </div>
+       *  data/contador fixo pra não virar promessa que não dá pra sustentar.
+       *  Não faz sentido pro autoatendimento de vitalício (Fase 28) — ela já
+       *  é cliente paga, não é uma oferta de entrada. */}
+      {!lifetimeConversion && (
+        <div
+          className="absolute -left-11 top-6 w-40 -rotate-45 bg-rose-600 py-1.5 text-center shadow-md"
+          aria-hidden="true"
+        >
+          <span className="text-[11px] font-extrabold uppercase tracking-wider text-white">OFERTA 🔥</span>
+        </div>
+      )}
       {qr ? (
         <div className="flex flex-col items-center gap-3">
           <img src={`data:image/png;base64,${qr.image}`} alt="QR Code Pix" className="w-48 h-48 rounded-xl bg-white p-2 shadow-sm" />
@@ -398,53 +429,57 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
               </li>
             ))}
           </ul>
-          <div className="relative">
-            <input
-              type="text"
-              inputMode="numeric"
-              required
-              placeholder="CPF ou CNPJ"
-              value={cpfCnpj}
-              onChange={(e) => setCpfCnpj(formatCpfCnpj(e.target.value))}
-              maxLength={18}
-              className="h-12 w-full rounded-xl bg-surface border border-linen pl-3 pr-10 text-base text-ink placeholder:text-ink-faint"
-            />
-            <button
-              type="button"
-              onClick={() => setActiveInfo(activeInfo === 'cpf' ? null : 'cpf')}
-              aria-label="Por que pedimos o CPF/CNPJ?"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-faint hover:text-rose-600"
-            >
-              <Info className="w-[18px] h-[18px]" />
-            </button>
-            {activeInfo === 'cpf' && (
-              <div className="absolute right-0 top-full mt-1.5 z-20 w-full max-w-[280px] rounded-xl bg-ink text-white text-xs leading-relaxed p-3 shadow-lg">
-                Exigido pelo sistema de pagamentos (Asaas) pra processar sua cobrança com segurança — seus dados não são compartilhados com mais ninguém.
+          {!lifetimeConversion && (
+            <>
+              <div className="relative">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  required
+                  placeholder="CPF ou CNPJ"
+                  value={cpfCnpj}
+                  onChange={(e) => setCpfCnpj(formatCpfCnpj(e.target.value))}
+                  maxLength={18}
+                  className="h-12 w-full rounded-xl bg-surface border border-linen pl-3 pr-10 text-base text-ink placeholder:text-ink-faint"
+                />
+                <button
+                  type="button"
+                  onClick={() => setActiveInfo(activeInfo === 'cpf' ? null : 'cpf')}
+                  aria-label="Por que pedimos o CPF/CNPJ?"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-faint hover:text-rose-600"
+                >
+                  <Info className="w-[18px] h-[18px]" />
+                </button>
+                {activeInfo === 'cpf' && (
+                  <div className="absolute right-0 top-full mt-1.5 z-20 w-full max-w-[280px] rounded-xl bg-ink text-white text-xs leading-relaxed p-3 shadow-lg">
+                    Exigido pelo sistema de pagamentos (Asaas) pra processar sua cobrança com segurança — seus dados não são compartilhados com mais ninguém.
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-          <div className="relative">
-            <input
-              type="email"
-              placeholder="Seu e-mail (opcional)"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="h-12 w-full rounded-xl bg-surface border border-linen pl-3 pr-10 text-base text-ink placeholder:text-ink-faint"
-            />
-            <button
-              type="button"
-              onClick={() => setActiveInfo(activeInfo === 'email' ? null : 'email')}
-              aria-label="Por que pedimos o e-mail?"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-faint hover:text-rose-600"
-            >
-              <Info className="w-[18px] h-[18px]" />
-            </button>
-            {activeInfo === 'email' && (
-              <div className="absolute right-0 top-full mt-1.5 z-20 w-full max-w-[280px] rounded-xl bg-ink text-white text-xs leading-relaxed p-3 shadow-lg">
-                Opcional. Se preencher, você recebe a confirmação do pagamento por e-mail — usamos só pra isso, nunca pra enviar spam.
+              <div className="relative">
+                <input
+                  type="email"
+                  placeholder="Seu e-mail (opcional)"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="h-12 w-full rounded-xl bg-surface border border-linen pl-3 pr-10 text-base text-ink placeholder:text-ink-faint"
+                />
+                <button
+                  type="button"
+                  onClick={() => setActiveInfo(activeInfo === 'email' ? null : 'email')}
+                  aria-label="Por que pedimos o e-mail?"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-faint hover:text-rose-600"
+                >
+                  <Info className="w-[18px] h-[18px]" />
+                </button>
+                {activeInfo === 'email' && (
+                  <div className="absolute right-0 top-full mt-1.5 z-20 w-full max-w-[280px] rounded-xl bg-ink text-white text-xs leading-relaxed p-3 shadow-lg">
+                    Opcional. Se preencher, você recebe a confirmação do pagamento por e-mail — usamos só pra isso, nunca pra enviar spam.
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            </>
+          )}
           {isUpgrade && (
             <p className="text-sm text-ink-soft text-center leading-snug">
               Ao assinar, seu plano evolui automaticamente. O novo valor só vale a partir da próxima mensalidade.
@@ -505,9 +540,11 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
                   : 'Gerando Pix...'
               : showMethodChoice && method === 'card'
                 ? 'Continuar pro pagamento seguro'
-                : isOneTime
-                  ? `Pagar ${pricing.label} e garantir meu Catálogo`
-                  : `Assinar por ${pricing.label}`}
+                : lifetimeConversion
+                  ? `Pagar ${pricing.label} e virar vitalício`
+                  : isOneTime
+                    ? `Pagar ${pricing.label} e garantir meu Catálogo`
+                    : `Assinar por ${pricing.label}`}
           </button>
         </form>
       )}

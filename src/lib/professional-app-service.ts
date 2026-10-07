@@ -50,6 +50,10 @@ export interface ProfessionalOrderSummary {
    *  diretamente fora daqui (não expomos o id do Asaas pro front-end além
    *  disso). */
   has_real_subscription: boolean;
+  /** Preço customizado da conversão de Catálogo recorrente pra vitalício
+   *  (Fase 28) — `null` usa o padrão (`CATALOGO_VITALICIO_PRICE`,
+   *  `src/lib/pricing.ts`, via `resolveLifetimePrice`). */
+  lifetime_price_override: number | null;
 }
 
 /** Busca os dados que o app da profissional (`/app/[slug]`) precisa — um
@@ -60,7 +64,7 @@ export async function getOrderForProfessionalApp(slug: string): Promise<Professi
 
   const { data, error } = await supabaseAdmin
     .from('orders')
-    .select('id, slug, edit_token, client_name, studio_name, whatsapp_number, plan_tier, subscription_status, billing_email, billing_cpf_cnpj, payment_method, booking_enabled, auth_user_id, first_offer_tier, agenda_paused, manual_plan, billing_price_override, catalog_billing_mode, asaas_subscription_id')
+    .select('id, slug, edit_token, client_name, studio_name, whatsapp_number, plan_tier, subscription_status, billing_email, billing_cpf_cnpj, payment_method, booking_enabled, auth_user_id, first_offer_tier, agenda_paused, manual_plan, billing_price_override, catalog_billing_mode, asaas_subscription_id, lifetime_price_override')
     .eq('slug', normalizedSlug)
     .single();
 
@@ -88,5 +92,6 @@ export async function getOrderForProfessionalApp(slug: string): Promise<Professi
     billing_price_override: data.billing_price_override === null || data.billing_price_override === undefined ? null : Number(data.billing_price_override),
     catalog_billing_mode: data.catalog_billing_mode === 'recorrente' ? 'recorrente' : 'avulso',
     has_real_subscription: Boolean(data.asaas_subscription_id),
+    lifetime_price_override: data.lifetime_price_override === null || data.lifetime_price_override === undefined ? null : Number(data.lifetime_price_override),
   };
 }
