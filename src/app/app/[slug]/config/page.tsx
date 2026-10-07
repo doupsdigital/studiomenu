@@ -39,6 +39,7 @@ export default async function ConfigPage({ params }: ConfigPageProps) {
           manualPlan={order.manual_plan}
           hasRealSubscription={order.has_real_subscription}
           billingPriceOverride={order.billing_price_override}
+          catalogBillingMode={order.catalog_billing_mode}
         />
       </main>
     </>

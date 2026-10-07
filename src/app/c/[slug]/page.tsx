@@ -100,8 +100,11 @@ export default async function CatalogPage({ params, searchParams }: CatalogPageP
   // Bloqueia tanto o link público quanto o link mágico de edição — a
   // profissional e a cliente dela veem a mesma mensagem amigável, sem
   // distinção (Fase 24). O acesso ao app (/app/slug) não passa por aqui,
-  // continua normal de propósito.
-  if (catalog.catalog_disabled) {
+  // continua normal de propósito. `catalog_payment_lapsed` (Fase 27) é o
+  // equivalente automático disso pra Catálogo recorrente com cobrança
+  // atrasada/cancelada — mesma tela, mesmo motivo de fundo (sem pagar, sem
+  // catálogo no ar), só que sem precisar a admin desativar na mão.
+  if (catalog.catalog_disabled || catalog.catalog_payment_lapsed) {
     return (
       <main className="min-h-screen flex items-center justify-center p-6 bg-rose-50 text-center">
         <div className="max-w-sm w-full p-8 rounded-3xl bg-white border border-rose-100 shadow-2xl">

@@ -61,6 +61,16 @@ export interface CatalogOrderData {
    *  bloqueia o link público E o link mágico de edição; acesso ao app
    *  continua normal. */
   catalog_disabled?: boolean;
+  /** Catálogo que veio de uma assinatura recorrente (Fase 27 — Catálogo
+   *  avulso ou vendido como Plano Agenda a partir dele) cuja cobrança não
+   *  está em dia agora (cancelada/suspensa), sem plano manual por trás.
+   *  Diferente de `catalog_disabled` (toggle manual do admin): esse aqui é
+   *  automático, a mesma consequência que cancelar o Plano Agenda sempre
+   *  teve (perder o que dependia de cobrança), só que agora também se
+   *  aplica ao Catálogo quando ELE é a coisa recorrente. Catálogo avulso
+   *  (pagamento único, o padrão) nunca liga essa flag — é pra sempre dela,
+   *  por definição. */
+  catalog_payment_lapsed?: boolean;
   categories?: string[];
   procedures: ProcedureItem[];
   instructions?: CatalogInstructions;
