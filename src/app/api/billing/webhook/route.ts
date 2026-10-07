@@ -19,6 +19,7 @@ function isValidWebhookToken(received: string | null): boolean {
 interface AsaasWebhookPayload {
   event: string;
   payment?: {
+    id?: string;
     status?: string;
     customer?: string;
     subscription?: string;
@@ -68,7 +69,11 @@ export async function POST(request: Request) {
     // pagou por fora) vira status `RECEIVED_IN_CASH` — não dependo só do nome
     // do evento pra ativar, olho também o status da cobrança.
     if (ACTIVATE_EVENTS.has(event) || (payment?.status && ACTIVATE_STATUSES.has(payment.status))) {
-      await activateSubscription(orderId);
+      // `payment.id` identifica qual pagamento confirmou, não só "algum
+      // pagamento dessa order" — essencial pro bloco de "virar vitalício"
+      // em `activateSubscription` não disparar por engano numa confirmação
+      // de mensalidade normal (achado em auditoria, Fase 28).
+      await activateSubscription(orderId, payment?.id);
     } else if (SUSPEND_EVENTS.has(event)) {
       await setSubscriptionStatus(orderId, 'suspenso');
     } else if (CANCEL_EVENTS.has(event)) {

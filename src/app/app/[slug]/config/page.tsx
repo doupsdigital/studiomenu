@@ -37,6 +37,10 @@ export default async function ConfigPage({ params }: ConfigPageProps) {
           agendaPaused={order.agenda_paused}
           authUserId={order.auth_user_id}
           manualPlan={order.manual_plan}
+          hasRealSubscription={order.has_real_subscription}
+          billingPriceOverride={order.billing_price_override}
+          catalogBillingMode={order.catalog_billing_mode}
+          lifetimePriceOverride={order.lifetime_price_override}
         />
       </main>
     </>

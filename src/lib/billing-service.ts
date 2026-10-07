@@ -1,5 +1,35 @@
+import { NextResponse } from 'next/server';
 import { supabaseAdmin } from './supabase-admin';
 import { sendTelegramMessage } from './telegram';
+import { AsaasApiError, cancelSubscription, getPixQrCode, type AsaasPayment } from './asaas';
+
+type PaymentMethod = 'pix' | 'card';
+
+/** Resposta do checkout conforme o método — Pix devolve o QR na hora; cartão
+ *  devolve o link da página de pagamento do Asaas (onde ela digita o cartão,
+ *  nunca no nosso servidor). Compartilhada entre `/api/billing/checkout` e
+ *  `/api/billing/upgrade-to-lifetime` (Fase 28) — mesmo shape de resposta
+ *  pra qualquer cobrança avulsa ou de assinatura. */
+export async function buildPaymentResponse(payment: AsaasPayment, method: PaymentMethod) {
+  if (method === 'card') {
+    if (!payment.invoiceUrl) {
+      return NextResponse.json(
+        { success: false, message: 'Assinatura criada, mas o link de pagamento ainda não ficou pronto. Tente novamente em instantes.' },
+        { status: 202 }
+      );
+    }
+    return NextResponse.json({ success: true, method, paymentId: payment.id, invoiceUrl: payment.invoiceUrl });
+  }
+  const qr = await getPixQrCode(payment.id);
+  return NextResponse.json({
+    success: true,
+    method,
+    paymentId: payment.id,
+    pixQrCodeImage: qr.encodedImage,
+    pixKey: qr.payload,
+    expirationDate: qr.expirationDate,
+  });
+}
 
 /** Lógica de ativação/desativação da assinatura — usada tanto pelo webhook
  *  quanto pelo polling de fallback (check-payment), pra garantir que os dois
@@ -9,11 +39,22 @@ import { sendTelegramMessage } from './telegram';
 /** Ativa a assinatura e avisa o dono do produto no Telegram — só na
  *  transição de verdade (não estava "ativo" antes), pra não duplicar o
  *  aviso quando o webhook e o check-payment confirmam o mesmo pagamento
- *  quase ao mesmo tempo. */
-export async function activateSubscription(orderId: string): Promise<void> {
+ *  quase ao mesmo tempo.
+ *
+ *  `confirmedPaymentId` (Fase 28, achado em auditoria antes de promover pra
+ *  main): esta função roda pra QUALQUER pagamento confirmado da order (ex:
+ *  a mensalidade normal) — sem saber qual foi, o bloco de "virar vitalício"
+ *  abaixo só checava "existe uma conversão pendente?", nunca "foi ESSE
+ *  pagamento que confirmou?". Isso cancelava a assinatura de graça se a
+ *  mensalidade normal confirmasse enquanto o Pix do vitalício ainda estava
+ *  pendente (não pago). Passado pelo webhook e pelo check-payment, que já
+ *  sabem qual pagamento confirmou; `undefined` (ex: chamada direta do
+ *  checkout na troca de tier, sem pagamento novo nenhum) nunca aciona esse
+ *  bloco, o que já é o comportamento certo pra esse caso. */
+export async function activateSubscription(orderId: string, confirmedPaymentId?: string): Promise<void> {
   const { data: before } = await supabaseAdmin
     .from('orders')
-    .select('subscription_status, client_name, slug, pending_plan_tier')
+    .select('subscription_status, client_name, slug, pending_plan_tier, asaas_subscription_id, pending_lifetime_payment_id')
     .eq('id', orderId)
     .single();
 
@@ -45,12 +86,59 @@ export async function activateSubscription(orderId: string): Promise<void> {
 
   if (before && before.subscription_status !== 'ativo') {
     const nowStr = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
-    // Catálogo é pagamento único, não assinatura — "Nova assinatura" seria
-    // texto errado nesse caso.
-    const label = tier === 'basico' ? '💳 Novo pagamento (Plano Catálogo)!' : '💳 Nova assinatura (Plano Agenda)!';
+    // Catálogo é pagamento único por padrão — "Nova assinatura" seria texto
+    // errado nesse caso. Mas se o admin marcou esse catálogo como recorrente
+    // (Fase 27), já existe `asaas_subscription_id` nesse ponto (criado no
+    // checkout antes da confirmação chegar aqui) — aí é assinatura de verdade.
+    const label =
+      tier === 'basico' && !before.asaas_subscription_id
+        ? '💳 Novo pagamento (Plano Catálogo)!'
+        : tier === 'basico'
+          ? '💳 Nova assinatura (Plano Catálogo)!'
+          : '💳 Nova assinatura (Plano Agenda)!';
     await sendTelegramMessage(
       `${label}\n\n👤 ${before.client_name}\n🔗 https://studiomenu.art/c/${before.slug}\n🕒 ${nowStr}`
     );
+  }
+
+  // Confirmação do pagamento avulso de "virar vitalício" (Fase 28) — setado
+  // em `pending_lifetime_payment_id` por `/api/billing/upgrade-to-lifetime`
+  // antes de criar a cobrança. Cancela a mensalidade de verdade só agora,
+  // depois do pagamento confirmado (nunca antes — mesma cautela antifraude
+  // do resto do fluxo). `catalog_billing_mode` volta pra 'avulso': ela não
+  // tem mais assinatura nenhuma por trás, e a tela de Plano já passa a
+  // mostrar "Ativo ✓ - Sem mensalidade" sozinha assim que
+  // `asaas_subscription_id` fica vazio (ver `hasRealSubscription` em
+  // `SubscriptionSection.tsx`), sem precisar de nenhuma flag nova de exibição.
+  if (before?.pending_lifetime_payment_id && before.pending_lifetime_payment_id === confirmedPaymentId) {
+    if (before.asaas_subscription_id) {
+      try {
+        await cancelSubscription(before.asaas_subscription_id);
+      } catch (cancelError) {
+        // Já cancelada/removida (ex: segunda confirmação quase simultânea
+        // do mesmo pagamento, webhook + check-payment) — não interrompe o
+        // resto da limpeza, que é o que importa pra não travar o fluxo.
+        if (!(cancelError instanceof AsaasApiError && cancelError.status === 404)) {
+          throw cancelError;
+        }
+      }
+    }
+    await supabaseAdmin
+      .from('orders')
+      .update({
+        asaas_subscription_id: null,
+        pending_plan_tier: null,
+        pending_lifetime_payment_id: null,
+        catalog_billing_mode: 'avulso',
+      })
+      .eq('id', orderId);
+
+    if (before) {
+      const nowStr = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+      await sendTelegramMessage(
+        `💰 Catálogo virou vitalício!\n\n👤 ${before.client_name}\n🔗 https://studiomenu.art/c/${before.slug}\n🕒 ${nowStr}`
+      );
+    }
   }
 }
 
@@ -70,13 +158,25 @@ export async function setSubscriptionStatus(
   // de propósito — evita cortar o agendamento de clientes já em andamento
   // por um atraso pontual; o toggle manual do admin continua disponível
   // como via de escape se for preciso agir antes disso.
-  const updates: { subscription_status: string; booking_enabled?: boolean; asaas_subscription_id?: null; pending_plan_tier?: null } = {
+  const updates: {
+    subscription_status: string;
+    booking_enabled?: boolean;
+    asaas_subscription_id?: null;
+    pending_plan_tier?: null;
+    pending_lifetime_payment_id?: null;
+  } = {
     subscription_status: status,
   };
   if (status === 'cancelado') {
     updates.booking_enabled = false;
     updates.asaas_subscription_id = null;
     updates.pending_plan_tier = null;
+    // Fase 28, achado em auditoria: se ela cancelar tudo enquanto um Pix de
+    // "virar vitalício" ainda estava pendente (gerado, não pago), sem isso o
+    // id ficava órfão — e se esse Pix velho fosse pago depois por engano,
+    // `activateSubscription` reativava a assinatura do zero a partir de um
+    // pagamento que não tem mais nenhuma assinatura real por trás.
+    updates.pending_lifetime_payment_id = null;
   }
   await supabaseAdmin.from('orders').update(updates).eq('id', orderId);
 }

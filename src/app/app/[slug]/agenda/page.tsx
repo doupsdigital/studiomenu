@@ -224,7 +224,14 @@ export default async function AgendaPage({ params, searchParams }: AgendaPagePro
         // que está à vista, e os insets de 60px/68px deixam o card livre da
         // barra de título e do menu inferior (ambos fixos também).
         <div className="fixed top-[60px] bottom-[68px] left-0 right-0 z-20 flex items-center justify-center px-5">
-          <PlusUpsellCard variant="full" slug={slug} catalog={plusUpsellCatalog} />
+          <PlusUpsellCard
+            variant="full"
+            slug={slug}
+            catalog={plusUpsellCatalog}
+            billingEmail={order.billing_email}
+            billingCpfCnpj={order.billing_cpf_cnpj}
+            hasRealSubscription={order.has_real_subscription}
+          />
         </div>
       )}
       </main>

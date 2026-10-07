@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { isAdminRequestAuthorized } from '@/lib/admin-session';
+import { AsaasConfigError, AsaasApiError, cancelSubscription } from '@/lib/asaas';
 
 export async function PATCH(request: Request) {
   if (!(await isAdminRequestAuthorized())) {
@@ -18,6 +19,8 @@ export async function PATCH(request: Request) {
       subscription_status,
       manual_plan,
       billing_price_override,
+      catalog_billing_mode,
+      lifetime_price_override,
     } = (await request.json()) as {
       id: string;
       status?: string;
@@ -30,6 +33,13 @@ export async function PATCH(request: Request) {
       /** Preço customizado do Plano Catálogo pra essa cliente específica —
        *  `null` volta ao padrão (`CATALOGO_PRICE`, src/lib/pricing.ts). */
       billing_price_override?: number | null;
+      /** Se o Plano Catálogo dessa cliente é vendido avulso ou como
+       *  assinatura mensal (Fase 27) — só tem efeito ANTES de ela pagar. */
+      catalog_billing_mode?: 'avulso' | 'recorrente';
+      /** Preço customizado da conversão de Catálogo recorrente pra vitalício
+       *  (Fase 28) — `null` volta ao padrão (`CATALOGO_VITALICIO_PRICE`,
+       *  src/lib/pricing.ts). */
+      lifetime_price_override?: number | null;
     };
     if (
       !id ||
@@ -40,7 +50,9 @@ export async function PATCH(request: Request) {
         plan_tier === undefined &&
         subscription_status === undefined &&
         manual_plan === undefined &&
-        billing_price_override === undefined)
+        billing_price_override === undefined &&
+        catalog_billing_mode === undefined &&
+        lifetime_price_override === undefined)
     ) {
       return NextResponse.json(
         { success: false, message: 'id e ao menos um campo pra atualizar são obrigatórios.' },
@@ -50,6 +62,11 @@ export async function PATCH(request: Request) {
 
     if (billing_price_override !== undefined && billing_price_override !== null) {
       if (!Number.isFinite(billing_price_override) || billing_price_override < 5) {
+        return NextResponse.json({ success: false, message: 'Preço inválido (mínimo R$5).' }, { status: 400 });
+      }
+    }
+    if (lifetime_price_override !== undefined && lifetime_price_override !== null) {
+      if (!Number.isFinite(lifetime_price_override) || lifetime_price_override < 5) {
         return NextResponse.json({ success: false, message: 'Preço inválido (mínimo R$5).' }, { status: 400 });
       }
     }
@@ -63,6 +80,13 @@ export async function PATCH(request: Request) {
       subscription_status?: 'none' | 'ativo' | 'suspenso' | 'cancelado';
       manual_plan?: boolean;
       billing_price_override?: number | null;
+      catalog_billing_mode?: 'avulso' | 'recorrente';
+      lifetime_price_override?: number | null;
+      /** Só escrito internamente aqui (nunca vem do request) — limpa a
+       *  assinatura real cancelada ao conceder plano manual, ver abaixo. */
+      asaas_subscription_id?: string | null;
+      pending_plan_tier?: 'basico' | 'plus' | null;
+      pending_lifetime_payment_id?: string | null;
     } = {};
     if (status !== undefined) updates.status = status;
     if (booking_enabled !== undefined) updates.booking_enabled = booking_enabled;
@@ -72,6 +96,54 @@ export async function PATCH(request: Request) {
     if (subscription_status !== undefined) updates.subscription_status = subscription_status;
     if (manual_plan !== undefined) updates.manual_plan = manual_plan;
     if (billing_price_override !== undefined) updates.billing_price_override = billing_price_override;
+    if (catalog_billing_mode !== undefined) updates.catalog_billing_mode = catalog_billing_mode;
+    if (lifetime_price_override !== undefined) updates.lifetime_price_override = lifetime_price_override;
+
+    // Conceder plano manual (Fase 26) numa cliente que JÁ tem uma assinatura
+    // Asaas de verdade por trás (Fase 27: Plano Catálogo recorrente, ou um
+    // Plano Agenda ativo) precisa cancelar essa assinatura antes — senão o
+    // app passa a mostrar "Sem cobrança — concedido manualmente" enquanto o
+    // Asaas continua cobrando ela todo mês por baixo dos panos (achado real,
+    // 2026-10-07: só virou um risco de verdade depois que o Catálogo passou
+    // a poder ser recorrente). Se o cancelamento falhar, não aplica nada do
+    // PATCH — a admin fica sabendo na hora em vez de a cliente continuar
+    // sendo cobrada com a tela já dizendo "sem cobrança".
+    if (manual_plan === true) {
+      const { data: existing, error: fetchErr } = await supabaseAdmin
+        .from('orders')
+        .select('asaas_subscription_id')
+        .eq('id', id)
+        .single();
+      if (fetchErr) {
+        console.error('[Admin Catalog Actions] Erro ao buscar assinatura antes de conceder manual:', fetchErr);
+        return NextResponse.json({ success: false, message: 'Erro ao conceder o plano manual.' }, { status: 500 });
+      }
+      if (existing?.asaas_subscription_id) {
+        try {
+          await cancelSubscription(existing.asaas_subscription_id);
+        } catch (cancelError) {
+          if (cancelError instanceof AsaasConfigError) {
+            return NextResponse.json({ success: false, message: cancelError.message }, { status: 503 });
+          }
+          if (cancelError instanceof AsaasApiError) {
+            console.error('[Admin Catalog Actions] Erro do Asaas ao cancelar antes de conceder manual:', cancelError.status, cancelError.message);
+            return NextResponse.json(
+              { success: false, message: 'Ela tem uma assinatura real ativa e não foi possível cancelá-la agora. Tente de novo em instantes.' },
+              { status: 502 }
+            );
+          }
+          throw cancelError;
+        }
+        updates.asaas_subscription_id = null;
+        updates.pending_plan_tier = null;
+        // Achado em auditoria (Fase 28): se ela tivesse um Pix de "virar
+        // vitalício" pendente (não pago) no momento da concessão manual,
+        // sem limpar esse id um pagamento futuro desse Pix velho reativaria
+        // a assinatura do zero (via activateSubscription) a partir de um
+        // pagamento que não tem mais nenhuma assinatura real por trás.
+        updates.pending_lifetime_payment_id = null;
+      }
+    }
 
     const { error } = await supabaseAdmin.from('orders').update(updates).eq('id', id);
     if (error) {

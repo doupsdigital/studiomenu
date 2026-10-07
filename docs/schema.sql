@@ -62,6 +62,24 @@ CREATE TABLE IF NOT EXISTS public.orders (
     -- o piso de R$5 (mínimo do Asaas). Ver `resolveCatalogPrice` em
     -- src/lib/pricing.ts.
     billing_price_override NUMERIC(10,2) CHECK (billing_price_override IS NULL OR billing_price_override >= 5),
+    -- Define, ANTES do pagamento, se o Plano Catálogo dessa cliente é vendido
+    -- avulso (padrão) ou como assinatura mensal (Fase 27,
+    -- docs/migrations/2026-10-07_catalogo_recorrente.sql) — escolha do admin,
+    -- pra casos que preferem recorrência (ex: cliente legada mantida por
+    -- assinatura). Depois que ela paga, a tela "Plano" não usa mais essa
+    -- coluna pra decidir o que mostrar — usa `asaas_subscription_id` (ver
+    -- `SubscriptionSection.tsx`).
+    catalog_billing_mode TEXT NOT NULL DEFAULT 'avulso' CHECK (catalog_billing_mode IN ('avulso', 'recorrente')),
+    -- Autoatendimento pra converter Catálogo recorrente em vitalício (Fase 28,
+    -- docs/migrations/2026-10-07_catalogo_vitalicio.sql) — id do pagamento
+    -- avulso da Asaas enquanto aguarda confirmação (evita duplicar cobrança
+    -- se ela recarregar a página antes de pagar). Limpo depois que
+    -- activateSubscription() processa a confirmação.
+    pending_lifetime_payment_id TEXT,
+    -- Preço customizado dessa conversão, por cliente — admin negocia caso a
+    -- caso. Valor PRÓPRIO, separado de `billing_price_override` (que é o
+    -- preço do Catálogo em si). Ver `resolveLifetimePrice` em src/lib/pricing.ts.
+    lifetime_price_override NUMERIC(10,2) CHECK (lifetime_price_override IS NULL OR lifetime_price_override >= 5),
     billing_email TEXT,
     billing_cpf_cnpj TEXT,
     cancellation_notice_hours INTEGER DEFAULT 24,

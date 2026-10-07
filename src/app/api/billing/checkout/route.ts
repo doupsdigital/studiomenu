@@ -3,7 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { isProfessionalRequestAuthorized } from '@/lib/professional-session';
 import { PLAN_PRICING, resolveCatalogPrice, type PayablePlanTier } from '@/lib/pricing';
-import { activateSubscription } from '@/lib/billing-service';
+import { activateSubscription, buildPaymentResponse } from '@/lib/billing-service';
 import {
   AsaasConfigError,
   AsaasApiError,
@@ -15,38 +15,12 @@ import {
   getFirstSubscriptionPayment,
   getPayableSubscriptionPayment,
   getSubscription,
-  getPixQrCode,
-  type AsaasPayment,
   type AsaasBillingType,
 } from '@/lib/asaas';
 
 type PaymentMethod = 'pix' | 'card';
 
 const BILLING_TYPE: Record<PaymentMethod, AsaasBillingType> = { pix: 'PIX', card: 'CREDIT_CARD' };
-
-/** Resposta do checkout conforme o método — Pix devolve o QR na hora; cartão
- *  devolve o link da página de pagamento do Asaas (onde ela digita o cartão,
- *  nunca no nosso servidor). */
-async function buildPaymentResponse(payment: AsaasPayment, method: PaymentMethod) {
-  if (method === 'card') {
-    if (!payment.invoiceUrl) {
-      return NextResponse.json(
-        { success: false, message: 'Assinatura criada, mas o link de pagamento ainda não ficou pronto. Tente novamente em instantes.' },
-        { status: 202 }
-      );
-    }
-    return NextResponse.json({ success: true, method, paymentId: payment.id, invoiceUrl: payment.invoiceUrl });
-  }
-  const qr = await getPixQrCode(payment.id);
-  return NextResponse.json({
-    success: true,
-    method,
-    paymentId: payment.id,
-    pixQrCodeImage: qr.encodedImage,
-    pixKey: qr.payload,
-    expirationDate: qr.expirationDate,
-  });
-}
 
 /** POST /api/billing/checkout
  *  Body: { slug, email, cpf_cnpj, plan, method? ('pix' | 'card', padrão pix) }
@@ -91,7 +65,7 @@ export async function POST(request: Request) {
 
     const { data: order, error: orderErr } = await supabaseAdmin
       .from('orders')
-      .select('id, client_name, plan_tier, subscription_status, asaas_customer_id, asaas_subscription_id, payment_method, billing_price_override')
+      .select('id, client_name, plan_tier, subscription_status, asaas_customer_id, asaas_subscription_id, payment_method, billing_price_override, catalog_billing_mode')
       .eq('slug', normalizedSlug)
       .single();
 
@@ -139,7 +113,12 @@ export async function POST(request: Request) {
     // tier direto aqui.
     if (order.asaas_subscription_id && order.plan_tier !== plan && order.plan_tier !== 'catalog') {
       const updated = await updateSubscription({ subscriptionId: order.asaas_subscription_id, value: price, description: pricing.description });
-      await supabaseAdmin.from('orders').update({ pending_plan_tier: plan }).eq('id', order.id);
+      // `pending_lifetime_payment_id` limpo junto (achado em auditoria, Fase
+      // 28): trocar de tier invalida qualquer conversão pra vitalício que
+      // tivesse ficado pendente (Pix gerado, não pago) — sem isso, pagar
+      // aquele Pix velho mais tarde cancelaria essa assinatura nova sem
+      // nenhum motivo, via `activateSubscription`.
+      await supabaseAdmin.from('orders').update({ pending_plan_tier: plan, pending_lifetime_payment_id: null }).eq('id', order.id);
       await activateSubscription(order.id);
       // `nextDueDate` só alimenta o aviso "a partir de dd/mm o valor passa a
       // ser X" no modal de sucesso — se o Asaas não devolver, o aviso sai sem data.
@@ -186,7 +165,7 @@ export async function POST(request: Request) {
           { status: total > 0 ? 409 : 202 }
         );
       }
-      await supabaseAdmin.from('orders').update({ asaas_subscription_id: null, pending_plan_tier: null }).eq('id', order.id);
+      await supabaseAdmin.from('orders').update({ asaas_subscription_id: null, pending_plan_tier: null, pending_lifetime_payment_id: null }).eq('id', order.id);
     }
 
     const trimmedEmail = email?.trim() || undefined;
@@ -197,12 +176,14 @@ export async function POST(request: Request) {
       .update({ asaas_customer_id: customer.id, billing_email: trimmedEmail ?? null, billing_cpf_cnpj: cpfCnpjDigits })
       .eq('id', order.id);
 
-    // Plano Catálogo: cobrança avulsa, nunca cria assinatura/recorrência —
-    // quem compra isso aqui nunca ganha `asaas_subscription_id` (é assim que
-    // o upgrade pro Plano Agenda, mais abaixo no fluxo de troca de tier,
-    // reconhece que precisa criar uma assinatura nova em vez de atualizar
-    // uma existente).
-    if (plan === 'basico') {
+    // Plano Catálogo avulso (padrão): cobrança única, nunca cria
+    // assinatura/recorrência — quem compra isso aqui nunca ganha
+    // `asaas_subscription_id` (é assim que o upgrade pro Plano Agenda, mais
+    // abaixo no fluxo de troca de tier, reconhece que precisa criar uma
+    // assinatura nova em vez de atualizar uma existente). Se o admin marcou
+    // esse catálogo como 'recorrente' (Fase 27), cai direto no branch de
+    // `createSubscription` abaixo — mesmo caminho que já existe pro Agenda.
+    if (plan === 'basico' && order.catalog_billing_mode !== 'recorrente') {
       await supabaseAdmin
         .from('orders')
         .update({ pending_plan_tier: plan, payment_method: method, manual_plan: false })

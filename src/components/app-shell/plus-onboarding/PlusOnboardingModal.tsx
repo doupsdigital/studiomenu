@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { CatalogOrderData } from '@/types/catalog';
 import { PlanSubscribeCard } from '@/components/billing/PlanSubscribeCard';
 import { PlusBenefitsScreen } from './PlusBenefitsScreen';
@@ -9,6 +10,9 @@ import { PlusDemoScreen } from './PlusDemoScreen';
 interface PlusOnboardingModalProps {
   slug: string;
   catalog: CatalogOrderData;
+  billingEmail?: string;
+  billingCpfCnpj?: string;
+  hasRealSubscription?: boolean;
   onClose: () => void;
 }
 
@@ -24,7 +28,7 @@ const STEPS: Step[] = ['beneficios', 'demo', 'cta'];
  *  dela) — pedido explícito, 2026-09-24: a paleta do app em si (topbar,
  *  cards, menu) é sempre rose, e um modal luxury (escuro) por cima destoava
  *  do resto da tela. */
-export const PlusOnboardingModal: React.FC<PlusOnboardingModalProps> = ({ slug, catalog, onClose }) => {
+export const PlusOnboardingModal: React.FC<PlusOnboardingModalProps> = ({ slug, catalog, billingEmail, billingCpfCnpj, hasRealSubscription, onClose }) => {
   const [step, setStep] = useState<Step>('beneficios');
 
   useEffect(() => {
@@ -43,7 +47,21 @@ export const PlusOnboardingModal: React.FC<PlusOnboardingModalProps> = ({ slug, 
   const goNext = () => setStep(STEPS[Math.min(stepIndex + 1, STEPS.length - 1)]);
   const goBack = () => setStep(STEPS[Math.max(stepIndex - 1, 0)]);
 
-  return (
+  // Portal direto pro <body> — na Agenda, esse modal é aberto de dentro de
+  // um wrapper `fixed ... z-20` (o placeholder do card quando o
+  // agendamento ainda não está liberado, ver `agenda/page.tsx`), que cria
+  // seu próprio contexto de empilhamento: mesmo o modal tendo `z-50`, ele
+  // competia só DENTRO desse z-20, nunca contra o menu inferior (`z-40`,
+  // fora dele) — por isso o botão "Agendar agora" da demo ficava escondido
+  // atrás da tabbar só quando aberto por ali, nunca pelo card do Início
+  // (que não tem esse wrapper). Renderizando direto no body, o modal nunca
+  // mais fica preso num contexto de empilhamento de um ancestral.
+  const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
+  useEffect(() => {
+    setPortalTarget(document.body);
+  }, []);
+
+  const modal = (
     <div
       data-theme="rose"
       className="fixed inset-0 z-50 flex flex-col bg-rose-200"
@@ -78,10 +96,19 @@ export const PlusOnboardingModal: React.FC<PlusOnboardingModalProps> = ({ slug, 
             <button type="button" onClick={goBack} className="text-sm font-semibold text-rose-700 mb-4">
               ← Voltar
             </button>
-            <PlanSubscribeCard slug={slug} plan="plus" showMethodChoice />
+            <PlanSubscribeCard
+              slug={slug}
+              plan="plus"
+              billingEmail={billingEmail}
+              billingCpfCnpj={billingCpfCnpj}
+              showMethodChoice={!hasRealSubscription}
+            />
           </div>
         )}
       </div>
     </div>
   );
+
+  if (!portalTarget) return null;
+  return createPortal(modal, portalTarget);
 };

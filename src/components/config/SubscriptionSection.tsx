@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CheckCircle2, AlertTriangle, Sparkles } from 'lucide-react';
-import { PLAN_PRICING, type PayablePlanTier } from '@/lib/pricing';
+import { CheckCircle2, AlertTriangle, Sparkles, Gift } from 'lucide-react';
+import { PLAN_PRICING, resolveCatalogPrice, resolveLifetimePrice, type PayablePlanTier } from '@/lib/pricing';
 import { PlanSubscribeCard } from '@/components/billing/PlanSubscribeCard';
 
 interface SubscriptionSectionProps {
@@ -19,33 +19,71 @@ interface SubscriptionSectionProps {
    *  cancelamento exige um asaas_subscription_id que nunca vai existir
    *  aqui). */
   manualPlan?: boolean;
+  /** Existe uma assinatura Asaas de verdade por trás (Fase 27) — Plano
+   *  Agenda sempre, ou Plano Catálogo vendido como recorrente (admin) OU uma
+   *  assinatura legada de antes dessa escolha existir (ex: Kethleen). Sem
+   *  isso, `tier === 'basico'` sempre seria tratado como pagamento único,
+   *  mesmo pra quem de fato tem uma mensalidade real cobrando. */
+  hasRealSubscription?: boolean;
+  /** Preço customizado do Plano Catálogo pra essa cliente (admin) — fonte de
+   *  verdade pra mostrar a mensalidade real de quem é recorrente (Fase 27).
+   *  `PLAN_PRICING.basico` é só o padrão de tabela, mostraria valor errado
+   *  pra quem paga um preço diferente (achado real, 2026-10-07). */
+  billingPriceOverride?: number | null;
+  /** Se o Catálogo dessa cliente nasceu recorrente (Fase 27) — nunca é
+   *  apagado na troca de tier, então continua valendo mesmo depois dela
+   *  evoluir pro Agenda. É o que diferencia, no cancelamento do Agenda,
+   *  quem tem um Catálogo recorrente pra "voltar" (oferece as 2 opções) de
+   *  quem veio do Catálogo avulso de sempre (só "cancelar", sem nada a
+   *  recuperar — o avulso já é dela pra sempre, pagamento único). */
+  catalogBillingMode?: 'avulso' | 'recorrente';
+  /** Preço customizado da conversão de Catálogo recorrente pra vitalício
+   *  (Fase 28) — admin negocia por cliente. */
+  lifetimePriceOverride?: number | null;
 }
 
 const TIER_LABEL: Record<PayablePlanTier, string> = { basico: 'Plano Catálogo', plus: 'Plano Agenda' };
 
 /** Card "plano X ativo" — mesmo visual pro Catálogo e pro Agenda, só troca o
  *  rótulo/preço/texto de aviso (Fase 19: antes só existia a versão Plus,
- *  hardcoded). Catálogo é sempre pagamento único ou manual, nunca
- *  recorrente — por isso `isOneTime` é derivado direto do `tier`, sem
- *  precisar de mais uma prop (modelo novo, 2026-10-06). */
+ *  hardcoded). Catálogo é pagamento único por padrão, mas pode ser
+ *  recorrente (Fase 27) — por isso `isOneTime` também depende de
+ *  `hasRealSubscription`, não só do `tier`. */
 const ActivePlanCard: React.FC<{
   tier: PayablePlanTier;
   paymentMethod: 'pix' | 'card' | null;
   manualPlan?: boolean;
+  hasRealSubscription?: boolean;
+  billingPriceOverride?: number | null;
+  catalogBillingMode?: 'avulso' | 'recorrente';
   onCancel: () => void;
+  onDowngradeToCatalogo?: () => void;
   loading: boolean;
   error: string | null;
 }> = ({
   tier,
   paymentMethod,
   manualPlan,
+  hasRealSubscription,
+  billingPriceOverride,
+  catalogBillingMode,
   onCancel,
+  onDowngradeToCatalogo,
   loading,
   error,
 }) => {
   const [confirming, setConfirming] = useState(false);
-  const pricing = PLAN_PRICING[tier];
-  const isOneTime = tier === 'basico';
+  const isOneTime = tier === 'basico' && !hasRealSubscription;
+  // Catálogo recorrente usa o preço customizado por admin (mesmo campo do
+  // avulso), nunca o padrão de tabela — ver nota acima do componente.
+  const catalogPrice = resolveCatalogPrice(billingPriceOverride);
+  const pricing = tier === 'basico' ? { price: catalogPrice.price, label: `${catalogPrice.label}/mês` } : PLAN_PRICING.plus;
+  // Ela upgradeou pro Agenda a partir de um Catálogo recorrente (mesma
+  // assinatura reaproveitada, nunca duas em paralelo) — cancelar "tudo" de
+  // uma vez perderia também o Catálogo que ela paga à parte. Oferece as 2
+  // opções só nesse caso; quem veio do avulso não tem nada a recuperar (o
+  // avulso já é dela pra sempre, então só existe "cancelar").
+  const showDowngradeOption = tier === 'plus' && catalogBillingMode === 'recorrente' && !manualPlan && Boolean(onDowngradeToCatalogo);
 
   const subtitle = manualPlan
     ? 'Ativado manualmente pela equipe StudioMenu'
@@ -70,7 +108,7 @@ const ActivePlanCard: React.FC<{
           {isOneTime ? 'Status' : 'Mensalidade'}
         </p>
         <p className="font-serif-pro font-bold text-lg text-rose-800 whitespace-nowrap">
-          {manualPlan ? 'Sem cobrança' : isOneTime ? 'Ativo ✓' : pricing.label}
+          {manualPlan ? 'Sem cobrança' : isOneTime ? 'Ativo ✓ - Sem mensalidade' : pricing.label}
         </p>
       </div>
 
@@ -81,10 +119,27 @@ const ActivePlanCard: React.FC<{
           {error && <p className="text-sm text-rose-600 mb-3">{error}</p>}
 
           {confirming ? (
-            <div className="rounded-xl bg-surface border border-rose-200/60 p-4">
-              <p className="text-sm text-ink-soft mb-3">
-                Cancelar sua assinatura do {TIER_LABEL[tier]}? Você perde acesso à agenda automática.
+            <div className="rounded-xl bg-surface border border-rose-200/60 p-4 flex flex-col gap-3">
+              <p className="text-sm text-ink-soft">
+                {showDowngradeOption ? (
+                  'Você tem o Plano Catálogo por trás dessa assinatura. O que você quer fazer?'
+                ) : (
+                  <>
+                    Cancelar sua assinatura do {TIER_LABEL[tier]}?{' '}
+                    {tier === 'plus' ? 'Você perde acesso à agenda automática.' : 'Seu catálogo deixa de fazer parte do plano pago.'}
+                  </>
+                )}
               </p>
+              {showDowngradeOption && (
+                <button
+                  type="button"
+                  onClick={onDowngradeToCatalogo}
+                  disabled={loading}
+                  className="w-full h-11 rounded-xl bg-rose-50 border-2 border-rose-600 text-rose-700 text-[15px] font-bold shadow-sm disabled:opacity-50 hover:bg-rose-100 transition-colors"
+                >
+                  {loading ? 'Processando...' : `Voltar pro Plano Catálogo (${catalogPrice.label}/mês)`}
+                </button>
+              )}
               <div className="flex gap-2">
                 <button
                   type="button"
@@ -92,7 +147,11 @@ const ActivePlanCard: React.FC<{
                   disabled={loading}
                   className="flex-1 h-11 rounded-xl bg-linen text-ink-soft text-[15px] font-bold disabled:opacity-50"
                 >
-                  Voltar
+                  {/* "Voltar" sozinho colidia com o botão "Voltar pro Plano
+                   *  Catálogo" logo acima — ela clicou nesse achando que era
+                   *  a mesma ação (achado real, 2026-10-07). Esse aqui só
+                   *  fecha o mini-modal sem fazer nada. */}
+                  {showDowngradeOption ? 'Fechar' : 'Voltar'}
                 </button>
                 <button
                   type="button"
@@ -100,7 +159,7 @@ const ActivePlanCard: React.FC<{
                   disabled={loading}
                   className="flex-1 h-11 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-[15px] font-bold disabled:opacity-50 transition-colors"
                 >
-                  {loading ? 'Cancelando...' : 'Sim, cancelar'}
+                  {loading ? 'Cancelando...' : showDowngradeOption ? 'Cancelar tudo' : 'Sim, cancelar'}
                 </button>
               </div>
             </div>
@@ -133,6 +192,10 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
   billingCpfCnpj,
   paymentMethod,
   manualPlan,
+  hasRealSubscription,
+  billingPriceOverride,
+  catalogBillingMode,
+  lifetimePriceOverride,
 }) => {
   const router = useRouter();
   const isPlusActive = planTier === 'plus' && subscriptionStatus === 'ativo';
@@ -163,20 +226,97 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
     }
   };
 
+  // "Voltar pro Plano Catálogo" (Fase 27) — reaproveita a mesma troca de
+  // tier genérica do checkout (`asaas_subscription_id` já existe, só muda
+  // o valor/descrição da MESMA assinatura em vez de cancelar e criar outra),
+  // só que de cima pra baixo. Não passa por `PlanSubscribeCard` porque ela
+  // já é cliente paga confirmada — CPF/e-mail já salvos, não precisa pedir
+  // de novo nem mostrar seletor de Pix/Cartão.
+  const handleDowngradeToCatalogo = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/billing/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug, email: billingEmail, cpf_cnpj: billingCpfCnpj, plan: 'basico', method: paymentMethod || 'pix' }),
+      });
+      const json = await res.json();
+      if (!json.success) {
+        setError(json.message || 'Não foi possível voltar pro Plano Catálogo.');
+        return;
+      }
+      router.refresh();
+    } catch {
+      setError('Falha na conexão.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (isPlusActive) {
-    return <ActivePlanCard tier="plus" paymentMethod={paymentMethod} manualPlan={manualPlan} onCancel={handleCancel} loading={loading} error={error} />;
+    return (
+      <ActivePlanCard
+        tier="plus"
+        paymentMethod={paymentMethod}
+        manualPlan={manualPlan}
+        hasRealSubscription={hasRealSubscription}
+        billingPriceOverride={billingPriceOverride}
+        catalogBillingMode={catalogBillingMode}
+        onCancel={handleCancel}
+        onDowngradeToCatalogo={handleDowngradeToCatalogo}
+        loading={loading}
+        error={error}
+      />
+    );
   }
 
   if (isBasicoActive) {
     return (
       <div className="flex flex-col gap-4">
-        <ActivePlanCard tier="basico" paymentMethod={paymentMethod} manualPlan={manualPlan} onCancel={handleCancel} loading={loading} error={error} />
+        <ActivePlanCard
+          tier="basico"
+          paymentMethod={paymentMethod}
+          manualPlan={manualPlan}
+          hasRealSubscription={hasRealSubscription}
+          billingPriceOverride={billingPriceOverride}
+          onCancel={handleCancel}
+          loading={loading}
+          error={error}
+        />
         <div id="upgrade-plus">
           <p className="flex items-center gap-1.5 text-[15px] font-bold text-ink mb-2">
             <Sparkles className="w-4 h-4 text-rose-600" /> Evolua pro Plano Agenda
           </p>
-          <PlanSubscribeCard slug={slug} plan="plus" billingEmail={billingEmail} billingCpfCnpj={billingCpfCnpj} />
+          {/* Quem já tem uma assinatura real por trás do Catálogo (recorrente,
+           *  Fase 27) troca de tier na MESMA assinatura — upgrade instantâneo,
+           *  sem cobrança nova hoje (`isUpgrade` em PlanSubscribeCard). Quem
+           *  é avulso precisa mesmo de uma assinatura nova pro Agenda. */}
+          <PlanSubscribeCard
+            slug={slug}
+            plan="plus"
+            billingEmail={billingEmail}
+            billingCpfCnpj={billingCpfCnpj}
+            showMethodChoice={!hasRealSubscription}
+          />
         </div>
+        {/* Autoatendimento (Fase 28): só faz sentido pra quem tem mesmo uma
+         *  mensalidade real do Catálogo rodando — avulso já é dela pra
+         *  sempre, não tem o que "converter". */}
+        {hasRealSubscription && catalogBillingMode === 'recorrente' && (
+          <div id="upgrade-lifetime">
+            <p className="flex items-center gap-1.5 text-[15px] font-bold text-ink mb-2">
+              <Gift className="w-4 h-4 text-rose-600" /> Quer parar de pagar mensalidade?
+            </p>
+            <PlanSubscribeCard
+              slug={slug}
+              plan="basico"
+              billingCpfCnpj={billingCpfCnpj}
+              priceOverride={resolveLifetimePrice(lifetimePriceOverride)}
+              lifetimeConversion
+            />
+          </div>
+        )}
       </div>
     );
   }
@@ -186,6 +326,17 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
   // sentido "regredir" ela pro Básico na tela de reativação); quem nunca
   // assinou nada ou só teve Básico entra pelo Básico.
   const reofferTier: PayablePlanTier = planTier === 'plus' ? 'plus' : 'basico';
+  // Reofertar o Catálogo precisa repassar o MESMO preço customizado e modo
+  // (avulso/recorrente) de antes — `billing_price_override`/`catalog_billing_mode`
+  // nunca são apagados pelo cancelamento, só o `PlanSubscribeCard` não
+  // recebia nenhum dos dois aqui (achado real, 2026-10-07: reofertava
+  // sempre o padrão de tabela em pagamento único, mesmo pra quem era
+  // recorrente com preço próprio).
+  const reofferCatalogPrice = resolveCatalogPrice(billingPriceOverride);
+  const reofferPriceOverride =
+    reofferTier === 'basico'
+      ? { price: reofferCatalogPrice.price, label: catalogBillingMode === 'recorrente' ? `${reofferCatalogPrice.label}/mês` : reofferCatalogPrice.label }
+      : undefined;
 
   return (
     <div className="flex flex-col gap-3">
@@ -200,7 +351,14 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
           </p>
         </div>
       )}
-      <PlanSubscribeCard slug={slug} plan={reofferTier} billingEmail={billingEmail} billingCpfCnpj={billingCpfCnpj} />
+      <PlanSubscribeCard
+        slug={slug}
+        plan={reofferTier}
+        billingEmail={billingEmail}
+        billingCpfCnpj={billingCpfCnpj}
+        priceOverride={reofferPriceOverride}
+        billingMode={reofferTier === 'basico' ? catalogBillingMode : undefined}
+      />
     </div>
   );
 };

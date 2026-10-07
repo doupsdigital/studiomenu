@@ -143,7 +143,16 @@ export default async function InicioPage({ params }: InicioPageProps) {
       {/* Suspensa (mensalidade em atraso): oferecer "Assinar o Plus" aqui só
        *  confunde — o que ela precisa é pagar a cobrança em aberto, que já
        *  aparece no aviso lá no topo (Fase 21). */}
-      {showPlusUpsell && <PlusUpsellCard variant="card" slug={slug} catalog={plusUpsellCatalog} />}
+      {showPlusUpsell && (
+        <PlusUpsellCard
+          variant="card"
+          slug={slug}
+          catalog={plusUpsellCatalog}
+          billingEmail={order.billing_email}
+          billingCpfCnpj={order.billing_cpf_cnpj}
+          hasRealSubscription={order.has_real_subscription}
+        />
+      )}
 
       <OnboardingCardStack slug={slug} planTier={order.plan_tier} subscriptionStatus={order.subscription_status} hasAccount={Boolean(order.auth_user_id)} hoursDone={hoursDone} />
 

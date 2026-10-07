@@ -7,7 +7,7 @@ import { compressImageFiles } from '@/lib/image-compress-client';
 import Link from 'next/link';
 import { ArrowLeft, Sparkles, ExternalLink, Search, RefreshCw, Scissors, Plus, Trash2, MessageCircle, Phone, Clock, Smartphone, CalendarClock, Globe, Crown, ChevronDown, PauseCircle, PlayCircle, Gift, Bot, Upload, FileText, X, Wallet } from 'lucide-react';
 import { usesSubdomainRouting, PRODUCTION_DOMAIN } from '@/lib/public-url';
-import { CATALOGO_PRICE_LABEL } from '@/lib/pricing';
+import { CATALOGO_PRICE_LABEL, CATALOGO_VITALICIO_PRICE_LABEL } from '@/lib/pricing';
 
 /** `res.json()` direto quebra quando o corpo não é JSON de verdade (ex: erro
  *  413 da Vercel antes mesmo da rota rodar) — mesmo utilitário já usado em
@@ -37,6 +37,13 @@ type AdminCatalog = CatalogOrderData & {
   /** Preço customizado do Plano Catálogo pra essa cliente — `null`/ausente
    *  usa o padrão (`CATALOGO_PRICE`, src/lib/pricing.ts). */
   billing_price_override?: number | null;
+  /** Se o Plano Catálogo dessa cliente é vendido avulso (padrão) ou como
+   *  assinatura mensal (Fase 27) — só tem efeito antes de ela pagar. */
+  catalog_billing_mode?: 'avulso' | 'recorrente';
+  /** Preço customizado da conversão de Catálogo recorrente pra vitalício
+   *  (Fase 28) — `null`/ausente usa o padrão (`CATALOGO_VITALICIO_PRICE`,
+   *  src/lib/pricing.ts). */
+  lifetime_price_override?: number | null;
 };
 
 export default function AdminCatalogosPage() {
@@ -356,6 +363,32 @@ export default function AdminCatalogosPage() {
     }
   };
 
+  /** Fase 27: pagamento único (padrão) ou assinatura mensal pro Plano
+   *  Catálogo dessa cliente — só muda o que o checkout oferece antes de ela
+   *  pagar (igual ao toggle de oferta inicial, acima). */
+  const toggleCatalogBillingMode = async (item: AdminCatalog) => {
+    if (!item.id) return;
+    const next = item.catalog_billing_mode === 'recorrente' ? 'avulso' : 'recorrente';
+    try {
+      const res = await fetch('/api/admin/catalog-actions', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ id: item.id, catalog_billing_mode: next }),
+      });
+      const result = await res.json();
+      if (!result.success) {
+        showToast('❌ Erro ao atualizar a cobrança do Catálogo.');
+        return;
+      }
+      showToast(next === 'recorrente' ? '🔁 Catálogo vai virar assinatura mensal.' : '💳 Catálogo volta a ser pagamento único.');
+      fetchCatalogs();
+    } catch (e) {
+      console.error('Erro ao atualizar catalog_billing_mode:', e);
+      showToast('❌ Erro ao atualizar a cobrança do Catálogo.');
+    }
+  };
+
   // Preço customizado do Plano Catálogo (admin define livremente por
   // cliente, sem teto — `billing_price_override`, reaproveitado da Fase 21).
   // Rascunho de input mantido por id pra não perder o que ela digitou antes
@@ -397,6 +430,50 @@ export default function AdminCatalogosPage() {
       fetchCatalogs();
     } catch (e) {
       console.error('Erro ao salvar billing_price_override:', e);
+      showToast('❌ Erro ao salvar o preço.');
+    }
+  };
+
+  // Preço customizado da conversão de Catálogo recorrente pra vitalício
+  // (Fase 28) — mesmo padrão do preço do Catálogo acima, campo PRÓPRIO
+  // (`lifetime_price_override`), já que é uma oferta diferente.
+  const [lifetimePriceDrafts, setLifetimePriceDrafts] = useState<Record<string, string>>({});
+
+  const getLifetimePriceDraft = (item: AdminCatalog) => {
+    const id = item.id || '';
+    if (lifetimePriceDrafts[id] !== undefined) return lifetimePriceDrafts[id];
+    return item.lifetime_price_override != null ? item.lifetime_price_override.toFixed(2).replace('.', ',') : '';
+  };
+
+  const saveLifetimePriceOverride = async (item: AdminCatalog) => {
+    if (!item.id) return;
+    const raw = (lifetimePriceDrafts[item.id] ?? '').trim();
+    const value = raw === '' ? null : Number(raw.replace(',', '.'));
+    if (value !== null && (!Number.isFinite(value) || value < 5)) {
+      showToast('❌ Preço inválido (mínimo R$5).');
+      return;
+    }
+    try {
+      const res = await fetch('/api/admin/catalog-actions', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ id: item.id, lifetime_price_override: value }),
+      });
+      const result = await res.json();
+      if (!result.success) {
+        showToast('❌ Erro ao salvar o preço.');
+        return;
+      }
+      showToast(value === null ? '🔄 Preço do vitalício voltou ao padrão.' : '💰 Preço do vitalício atualizado!');
+      setLifetimePriceDrafts((prev) => {
+        const next = { ...prev };
+        delete next[item.id!];
+        return next;
+      });
+      fetchCatalogs();
+    } catch (e) {
+      console.error('Erro ao salvar lifetime_price_override:', e);
       showToast('❌ Erro ao salvar o preço.');
     }
   };
@@ -807,7 +884,53 @@ export default function AdminCatalogosPage() {
                               </div>
                               <p className="text-xs text-slate-500">Deixe em branco e salve pra voltar ao padrão.</p>
                             </div>
+
+                            <button
+                              onClick={() => toggleCatalogBillingMode(item)}
+                              className={`w-full px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 border transition-all ${
+                                item.catalog_billing_mode === 'recorrente'
+                                  ? 'bg-sky-500/20 border-sky-500/60 text-sky-300'
+                                  : 'bg-white/5 border-slate-700 text-slate-400'
+                              }`}
+                            >
+                              <RefreshCw className="w-3.5 h-3.5" />
+                              Cobrança do Catálogo: {item.catalog_billing_mode === 'recorrente' ? 'Assinatura mensal' : 'Pagamento único (padrão)'}
+                            </button>
                           </>
+                        )}
+
+                        {/* Fase 28: só faz sentido pra quem JÁ é recorrente —
+                         *  é o preço de "parar de pagar mensalidade", oferecido
+                         *  pela própria cliente dentro do app dela. Ao contrário
+                         *  do preço do Catálogo acima, continua editável depois
+                         *  de ela já estar pagando (a admin pode negociar a
+                         *  qualquer momento). */}
+                        {item.catalog_billing_mode === 'recorrente' && (
+                          <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800 space-y-3">
+                            <span className="text-sm font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+                              <Wallet className="w-4 h-4" />
+                              Preço do Catálogo Vitalício
+                            </span>
+                            <div className="flex flex-col gap-2">
+                              <input
+                                type="text"
+                                inputMode="decimal"
+                                placeholder={`Padrão (${CATALOGO_VITALICIO_PRICE_LABEL})`}
+                                value={getLifetimePriceDraft(item)}
+                                onChange={(e) =>
+                                  setLifetimePriceDrafts((prev) => ({ ...prev, [item.id || '']: e.target.value }))
+                                }
+                                className="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-3 text-base text-white placeholder-slate-500 focus:border-rose-500 focus:outline-none"
+                              />
+                              <button
+                                onClick={() => saveLifetimePriceOverride(item)}
+                                className="w-full py-3 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 text-sm font-bold"
+                              >
+                                Salvar
+                              </button>
+                            </div>
+                            <p className="text-xs text-slate-500">Deixe em branco e salve pra voltar ao padrão.</p>
+                          </div>
                         )}
 
                         {/* Fase 26: caso de borda — cliente pagando fora do sistema (ex:
