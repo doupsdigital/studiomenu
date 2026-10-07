@@ -5,6 +5,7 @@ import type { Step } from 'react-joyride';
 import { ViewCatalogCard } from './ViewCatalogCard';
 import { EditCatalogCard } from './EditCatalogCard';
 import { CatalogReadyPreview } from './CatalogReadyPreview';
+import { ConfettiBurst } from './ConfettiBurst';
 import { PlanSubscribeCard } from '@/components/billing/PlanSubscribeCard';
 import { ProductTour } from '@/components/tour/ProductTour';
 import { PLAN_PRICING, resolveCatalogPrice } from '@/lib/pricing';
@@ -70,6 +71,7 @@ export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order })
 
   return (
     <main className="max-w-md mx-auto px-5 pt-8 pb-6 flex flex-col gap-4">
+      <ConfettiBurst />
       <div className="text-center">
         <h1 className="font-serif-pro font-bold text-2xl text-ink">Olá, {firstName}! ✨</h1>
       </div>
