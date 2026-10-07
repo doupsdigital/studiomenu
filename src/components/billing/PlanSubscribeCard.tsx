@@ -289,6 +289,11 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
           <button
             type="button"
             onClick={() => {
+              // Mesma URL de onde ela já estava (essa tela é a própria
+              // `/inicio`, só que antes de pagar) — o Next não restaura o
+              // scroll sozinho nesse caso, então o painel novo "acordava" no
+              // meio da tela em vez de no topo (achado real, 2026-10-07).
+              window.scrollTo({ top: 0 });
               router.push(`/app/${slug}/inicio`);
               router.refresh();
             }}
