@@ -68,9 +68,12 @@ const formatShortDate = (iso: string) =>
 /** Copy do modal de "parabéns" pós-assinatura — mostrado tanto quando ela
  *  assina pela primeira vez (Básico, via QR/polling) quanto quando troca de
  *  plano (Básico → Plus, ativação direta, sem QR). */
-const SUCCESS_COPY: Record<PayablePlanTier, { headline: string; benefits: string[] }> = {
+const SUCCESS_COPY: Record<PayablePlanTier, { headline: string; subheadline?: string; benefits: string[] }> = {
   basico: {
-    headline: 'Agora você tem o Plano Catálogo',
+    // "Plano Catálogo" é nome interno — nesse momento ela só sabe que pagou
+    // pelo catálogo, pedido real 2026-10-07.
+    headline: 'Pagamento confirmado! ✅',
+    subheadline: 'Catálogo ativado com sucesso! 🎉',
     benefits: [
       'Catálogo online sempre no ar',
       'Edite fotos, preços e serviços quando quiser',
@@ -267,7 +270,8 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
             <copy.icon className="w-7 h-7" />
           </div>
           <p className="text-[13px] font-bold tracking-widest uppercase text-white/70 mb-1">Parabéns</p>
-          <h3 className="font-serif-pro font-bold text-2xl mb-3">{successCopy.headline}</h3>
+          <h3 className="font-serif-pro font-bold text-2xl mb-1">{successCopy.headline}</h3>
+          {successCopy.subheadline && <p className="text-sm italic text-white/80 mb-3">{successCopy.subheadline}</p>}
           <ul className="text-left mx-auto max-w-[290px] flex flex-col gap-2.5 mb-6">
             {successCopy.benefits.map((benefit) => (
               <li key={benefit} className="flex items-start gap-2.5 text-base text-white leading-snug">
