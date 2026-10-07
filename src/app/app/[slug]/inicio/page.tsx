@@ -150,6 +150,7 @@ export default async function InicioPage({ params }: InicioPageProps) {
           catalog={plusUpsellCatalog}
           billingEmail={order.billing_email}
           billingCpfCnpj={order.billing_cpf_cnpj}
+          hasRealSubscription={order.has_real_subscription}
         />
       )}
 

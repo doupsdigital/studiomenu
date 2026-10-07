@@ -19,6 +19,13 @@ interface PlusUpsellCardProps {
    *  que ela já preencheu uma vez (igual já acontece na tela de Plano). */
   billingEmail?: string;
   billingCpfCnpj?: string;
+  /** Existe uma assinatura Asaas de verdade por trás (Fase 27) — se ela já
+   *  é recorrente (ex: Catálogo recorrente), evoluir pro Agenda troca a
+   *  MESMA assinatura em vez de pedir um pagamento novo (sem seletor de
+   *  Pix/Cartão, sem "Gerando Pix..." — achado real, 2026-10-07: esse CTA
+   *  sempre tratava como assinatura nova, diferente do mesmo fluxo na tela
+   *  de Plano). */
+  hasRealSubscription?: boolean;
 }
 
 /** Conteúdo de upsell do Plano Agenda — mesma peça usada bloqueada no Início
@@ -32,7 +39,7 @@ interface PlusUpsellCardProps {
  *  CTA único "Conheça" (sem preço no card, 2026-09-24) — abre um onboarding
  *  em tela cheia que demonstra o agendamento automático funcionando de
  *  verdade com o catálogo dela, terminando no formulário de assinar. */
-export const PlusUpsellCard: React.FC<PlusUpsellCardProps> = ({ variant, slug, catalog, billingEmail, billingCpfCnpj }) => {
+export const PlusUpsellCard: React.FC<PlusUpsellCardProps> = ({ variant, slug, catalog, billingEmail, billingCpfCnpj, hasRealSubscription }) => {
   const isFull = variant === 'full';
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
 
@@ -82,6 +89,7 @@ export const PlusUpsellCard: React.FC<PlusUpsellCardProps> = ({ variant, slug, c
           catalog={catalog}
           billingEmail={billingEmail}
           billingCpfCnpj={billingCpfCnpj}
+          hasRealSubscription={hasRealSubscription}
           onClose={() => setIsOnboardingOpen(false)}
         />
       )}

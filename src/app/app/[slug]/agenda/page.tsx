@@ -230,6 +230,7 @@ export default async function AgendaPage({ params, searchParams }: AgendaPagePro
             catalog={plusUpsellCatalog}
             billingEmail={order.billing_email}
             billingCpfCnpj={order.billing_cpf_cnpj}
+            hasRealSubscription={order.has_real_subscription}
           />
         </div>
       )}
