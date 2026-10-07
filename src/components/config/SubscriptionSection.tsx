@@ -132,7 +132,7 @@ const ActivePlanCard: React.FC<{
                   type="button"
                   onClick={onDowngradeToCatalogo}
                   disabled={loading}
-                  className="w-full h-11 rounded-xl bg-surface border-2 border-rose-600 text-rose-700 text-[15px] font-bold disabled:opacity-50 transition-colors"
+                  className="w-full h-11 rounded-xl bg-rose-50 border-2 border-rose-600 text-rose-700 text-[15px] font-bold shadow-sm disabled:opacity-50 hover:bg-rose-100 transition-colors"
                 >
                   {loading ? 'Processando...' : `Voltar pro Plano Catálogo (${catalogPrice.label}/mês)`}
                 </button>
