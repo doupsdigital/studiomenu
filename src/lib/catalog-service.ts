@@ -103,6 +103,18 @@ export async function getCatalogBySlug(slug: string): Promise<CatalogOrderData |
       booking_enabled: Boolean(orderData.booking_enabled),
       agenda_paused: Boolean(orderData.agenda_paused),
       catalog_disabled: Boolean(orderData.catalog_disabled),
+      // Origem recorrente (Catálogo vendido como assinatura, ou um Plano
+      // Agenda que veio de um Catálogo recorrente — `catalog_billing_mode`
+      // nunca é apagado na troca de tier) com a cobrança não em dia agora,
+      // sem plano manual por trás: trata igual ao `catalog_disabled`
+      // manual, só que automático. `plan_tier === 'catalog'` (nunca pagou
+      // nada) fica de fora de propósito — já cai no fallback de
+      // procedimentos de exemplo, não faz sentido também "desativar".
+      catalog_payment_lapsed:
+        orderData.catalog_billing_mode === 'recorrente' &&
+        orderData.plan_tier !== 'catalog' &&
+        !orderData.manual_plan &&
+        orderData.subscription_status !== 'ativo',
       client_name: orderData.client_name || orderData.name || normalizedSlug,
       studio_name: orderData.studio_name || `Studio ${orderData.client_name || normalizedSlug}`,
       hero_phrase: orderData.hero_phrase || 'A arte de transformar a sua beleza com leveza e precisão.',

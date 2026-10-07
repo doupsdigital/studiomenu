@@ -41,6 +41,9 @@ interface ConfigAccordionProps {
   /** Preço customizado do Plano Catálogo (admin) — repassado direto pra
    *  `SubscriptionSection` mostrar a mensalidade real de quem é recorrente. */
   billingPriceOverride: number | null;
+  /** Se o Catálogo dessa cliente nasceu recorrente (Fase 27) — repassado
+   *  direto pra `SubscriptionSection` decidir as opções de cancelamento. */
+  catalogBillingMode: 'avulso' | 'recorrente';
 }
 
 type SectionKey = 'horarios' | 'bloqueios' | 'pausar' | 'assinatura' | 'conta' | 'notificacoes' | 'suporte';
@@ -67,6 +70,7 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
   manualPlan,
   hasRealSubscription,
   billingPriceOverride,
+  catalogBillingMode,
 }) => {
   const [open, setOpen] = useState<Record<SectionKey, boolean>>({
     horarios: false,
@@ -267,6 +271,7 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
             manualPlan={manualPlan}
             hasRealSubscription={hasRealSubscription}
             billingPriceOverride={billingPriceOverride}
+            catalogBillingMode={catalogBillingMode}
           />
         </SectionCard>
       </div>
