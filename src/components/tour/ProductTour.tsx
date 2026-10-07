@@ -18,10 +18,11 @@ interface ProductTourProps {
    *  scroll que o link já tinha feito). Ignorado se não bater com nenhum
    *  step. */
   initialStepId?: string;
-  /** Chamado só quando ela CONCLUI o tour de verdade (clica em "Concluir"
-   *  no último passo) — não quando pula ("Pular" também fecha o tour, mas
-   *  não é a mesma intenção). Usado pelo `primeiro-contato` pra voltar o
-   *  scroll pro topo e destacar o próximo passo esperado. */
+  /** Chamado quando o tour termina de qualquer jeito — conclui ("Concluir"
+   *  no último passo) ou pula ("Pular"). Usado pelo `primeiro-contato` pra
+   *  voltar o scroll pro topo, destacar o próximo passo esperado e disparar
+   *  o confete (pedido real, 2026-10-07: antes só disparava no "Concluir",
+   *  mas ela quer o mesmo resultado nos dois casos). */
   onFinish?: () => void;
   /** Distância extra ao rolar até o alvo — padrão 90px por causa da barra
    *  fixa do topo (`PageTitleBar`) que as outras telas têm. Telas sem essa
@@ -93,7 +94,7 @@ export const ProductTour: React.FC<ProductTourProps> = ({ tourId, slug, steps, e
       } catch {
         // localStorage indisponível (modo privado, etc.) — só não persiste entre sessões.
       }
-      if (data.status === STATUS.FINISHED) onFinish?.();
+      onFinish?.();
     }
   };
 

@@ -70,8 +70,11 @@ export async function POST(request: Request) {
       method?: string;
     };
 
-    if (!slug || !email?.trim() || !cpf_cnpj?.trim()) {
-      return NextResponse.json({ success: false, message: 'Preencha e-mail e CPF/CNPJ.' }, { status: 400 });
+    // E-mail é opcional (2026-10-07: não é exigido pela própria API do Asaas
+    // pra criar cliente, e quem vende já tem o contato da profissional pelo
+    // WhatsApp) — só o CPF/CNPJ é obrigatório de verdade.
+    if (!slug || !cpf_cnpj?.trim()) {
+      return NextResponse.json({ success: false, message: 'Preencha o CPF/CNPJ.' }, { status: 400 });
     }
     if (plan !== 'basico' && plan !== 'plus') {
       return NextResponse.json({ success: false, message: 'Plano inválido.' }, { status: 400 });
@@ -186,11 +189,12 @@ export async function POST(request: Request) {
       await supabaseAdmin.from('orders').update({ asaas_subscription_id: null, pending_plan_tier: null }).eq('id', order.id);
     }
 
-    const customer = await findOrCreateCustomer({ name: order.client_name, email: email.trim(), cpfCnpj: cpfCnpjDigits });
+    const trimmedEmail = email?.trim() || undefined;
+    const customer = await findOrCreateCustomer({ name: order.client_name, email: trimmedEmail, cpfCnpj: cpfCnpjDigits });
 
     await supabaseAdmin
       .from('orders')
-      .update({ asaas_customer_id: customer.id, billing_email: email.trim(), billing_cpf_cnpj: cpfCnpjDigits })
+      .update({ asaas_customer_id: customer.id, billing_email: trimmedEmail ?? null, billing_cpf_cnpj: cpfCnpjDigits })
       .eq('id', order.id);
 
     // Plano Catálogo: cobrança avulsa, nunca cria assinatura/recorrência —

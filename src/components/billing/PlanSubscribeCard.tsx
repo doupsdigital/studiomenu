@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Crown, BookOpen, Check, CreditCard, QrCode, ExternalLink, type LucideIcon } from 'lucide-react';
+import { Crown, BookOpen, Check, CreditCard, QrCode, ExternalLink, Info, type LucideIcon } from 'lucide-react';
 import { PLAN_PRICING, type PayablePlanTier } from '@/lib/pricing';
 import { formatCpfCnpj } from '@/lib/format';
 
@@ -68,9 +68,12 @@ const formatShortDate = (iso: string) =>
 /** Copy do modal de "parabéns" pós-assinatura — mostrado tanto quando ela
  *  assina pela primeira vez (Básico, via QR/polling) quanto quando troca de
  *  plano (Básico → Plus, ativação direta, sem QR). */
-const SUCCESS_COPY: Record<PayablePlanTier, { headline: string; benefits: string[] }> = {
+const SUCCESS_COPY: Record<PayablePlanTier, { headline: string; subheadline?: string; benefits: string[] }> = {
   basico: {
-    headline: 'Agora você tem o Plano Catálogo',
+    // "Plano Catálogo" é nome interno — nesse momento ela só sabe que pagou
+    // pelo catálogo, pedido real 2026-10-07.
+    headline: 'Pagamento confirmado! ✅',
+    subheadline: '🎉 Agora você tem acesso:',
     benefits: [
       'Catálogo online sempre no ar',
       'Edite fotos, preços e serviços quando quiser',
@@ -117,6 +120,9 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
 
   const [email, setEmail] = useState(billingEmail || '');
   const [cpfCnpj, setCpfCnpj] = useState(formatCpfCnpj(billingCpfCnpj || ''));
+  /** Bolha explicando por que pedimos CPF/e-mail — toque no "i" de cada
+   *  campo, só um aberto por vez. Pedido real, 2026-10-07. */
+  const [activeInfo, setActiveInfo] = useState<'cpf' | 'email' | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [qr, setQr] = useState<QrState | null>(null);
@@ -267,7 +273,8 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
             <copy.icon className="w-7 h-7" />
           </div>
           <p className="text-[13px] font-bold tracking-widest uppercase text-white/70 mb-1">Parabéns</p>
-          <h3 className="font-serif-pro font-bold text-2xl mb-3">{successCopy.headline}</h3>
+          <h3 className="font-serif-pro font-bold text-2xl mb-1">{successCopy.headline}</h3>
+          {successCopy.subheadline && <p className="text-sm italic text-white/80 mb-3">{successCopy.subheadline}</p>}
           <ul className="text-left mx-auto max-w-[290px] flex flex-col gap-2.5 mb-6">
             {successCopy.benefits.map((benefit) => (
               <li key={benefit} className="flex items-start gap-2.5 text-base text-white leading-snug">
@@ -285,6 +292,11 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
           <button
             type="button"
             onClick={() => {
+              // Mesma URL de onde ela já estava (essa tela é a própria
+              // `/inicio`, só que antes de pagar) — o Next não restaura o
+              // scroll sozinho nesse caso, então o painel novo "acordava" no
+              // meio da tela em vez de no topo (achado real, 2026-10-07).
+              window.scrollTo({ top: 0 });
               router.push(`/app/${slug}/inicio`);
               router.refresh();
             }}
@@ -379,24 +391,53 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
               </li>
             ))}
           </ul>
-          <input
-            type="text"
-            inputMode="numeric"
-            required
-            placeholder="CPF ou CNPJ"
-            value={cpfCnpj}
-            onChange={(e) => setCpfCnpj(formatCpfCnpj(e.target.value))}
-            maxLength={18}
-            className="h-12 rounded-xl bg-surface border border-linen px-3 text-base text-ink placeholder:text-ink-faint"
-          />
-          <input
-            type="email"
-            required
-            placeholder="Seu e-mail"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="h-12 rounded-xl bg-surface border border-linen px-3 text-base text-ink placeholder:text-ink-faint"
-          />
+          <div className="relative">
+            <input
+              type="text"
+              inputMode="numeric"
+              required
+              placeholder="CPF ou CNPJ"
+              value={cpfCnpj}
+              onChange={(e) => setCpfCnpj(formatCpfCnpj(e.target.value))}
+              maxLength={18}
+              className="h-12 w-full rounded-xl bg-surface border border-linen pl-3 pr-10 text-base text-ink placeholder:text-ink-faint"
+            />
+            <button
+              type="button"
+              onClick={() => setActiveInfo(activeInfo === 'cpf' ? null : 'cpf')}
+              aria-label="Por que pedimos o CPF/CNPJ?"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-faint hover:text-rose-600"
+            >
+              <Info className="w-[18px] h-[18px]" />
+            </button>
+            {activeInfo === 'cpf' && (
+              <div className="absolute right-0 top-full mt-1.5 z-20 w-full max-w-[280px] rounded-xl bg-ink text-white text-xs leading-relaxed p-3 shadow-lg">
+                Exigido pelo sistema de pagamentos (Asaas) pra processar sua cobrança com segurança — seus dados não são compartilhados com mais ninguém.
+              </div>
+            )}
+          </div>
+          <div className="relative">
+            <input
+              type="email"
+              placeholder="Seu e-mail (opcional)"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="h-12 w-full rounded-xl bg-surface border border-linen pl-3 pr-10 text-base text-ink placeholder:text-ink-faint"
+            />
+            <button
+              type="button"
+              onClick={() => setActiveInfo(activeInfo === 'email' ? null : 'email')}
+              aria-label="Por que pedimos o e-mail?"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-faint hover:text-rose-600"
+            >
+              <Info className="w-[18px] h-[18px]" />
+            </button>
+            {activeInfo === 'email' && (
+              <div className="absolute right-0 top-full mt-1.5 z-20 w-full max-w-[280px] rounded-xl bg-ink text-white text-xs leading-relaxed p-3 shadow-lg">
+                Opcional. Se preencher, você recebe a confirmação do pagamento por e-mail — usamos só pra isso, nunca pra enviar spam.
+              </div>
+            )}
+          </div>
           {isUpgrade && (
             <p className="text-sm text-ink-soft text-center leading-snug">
               Você começa a usar agora, sem pagar nada a mais hoje. A partir da próxima mensalidade, o valor passa a ser {pricing.label}.

@@ -5,6 +5,7 @@ import type { Step } from 'react-joyride';
 import { ViewCatalogCard } from './ViewCatalogCard';
 import { EditCatalogCard } from './EditCatalogCard';
 import { CatalogReadyPreview } from './CatalogReadyPreview';
+import { ConfettiBurst } from './ConfettiBurst';
 import { PlanSubscribeCard } from '@/components/billing/PlanSubscribeCard';
 import { ProductTour } from '@/components/tour/ProductTour';
 import { PLAN_PRICING, resolveCatalogPrice } from '@/lib/pricing';
@@ -38,14 +39,18 @@ export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order })
   const isAgendaOffer = order.first_offer_tier === 'plus';
   const catalogPrice = resolveCatalogPrice(order.billing_price_override);
   const [highlightView, setHighlightView] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
 
-  // Ao CONCLUIR o tour (não ao pular — intenção diferente): o último passo
-  // fica lá embaixo, perto do card de assinar. Ela pediu, 2026-09-24, pra
-  // voltar o foco pro topo e destacar o card de "Ver catálogo" nesse
-  // momento, já que é o próximo passo natural (ver como ficou de verdade).
+  // Quando o tour termina, concluído ou pulado: o último passo fica lá
+  // embaixo, perto do card de assinar. Ela pediu, 2026-09-24, pra voltar o
+  // foco pro topo e destacar o card de "Ver catálogo" nesse momento, já que
+  // é o próximo passo natural (ver como ficou de verdade). O confete
+  // (2026-10-07) dispara só aqui, depois do tour — antes disparava junto
+  // com os balões de tooltip e os dois competiam por atenção.
   const handleTourFinish = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setHighlightView(true);
+    setShowConfetti(true);
     setTimeout(() => setHighlightView(false), 6000);
   };
 
@@ -70,6 +75,7 @@ export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order })
 
   return (
     <main className="max-w-md mx-auto px-5 pt-8 pb-6 flex flex-col gap-4">
+      {showConfetti && <ConfettiBurst />}
       <div className="text-center">
         <h1 className="font-serif-pro font-bold text-2xl text-ink">Olá, {firstName}! ✨</h1>
       </div>

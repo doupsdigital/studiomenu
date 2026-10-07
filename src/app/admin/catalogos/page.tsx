@@ -365,7 +365,7 @@ export default function AdminCatalogosPage() {
   const getPriceDraft = (item: AdminCatalog) => {
     const id = item.id || '';
     if (priceDrafts[id] !== undefined) return priceDrafts[id];
-    return item.billing_price_override != null ? String(item.billing_price_override) : '';
+    return item.billing_price_override != null ? item.billing_price_override.toFixed(2).replace('.', ',') : '';
   };
 
   const savePriceOverride = async (item: AdminCatalog) => {
@@ -436,7 +436,7 @@ export default function AdminCatalogosPage() {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'same-origin',
-        body: JSON.stringify({ id: item.id, plan_tier: tier, subscription_status: 'ativo', manual_plan: true }),
+        body: JSON.stringify({ id: item.id, plan_tier: tier, subscription_status: 'ativo', manual_plan: true, booking_enabled: tier === 'plus' }),
       });
       const result = await res.json();
       if (!result.success) {
@@ -458,7 +458,7 @@ export default function AdminCatalogosPage() {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'same-origin',
-        body: JSON.stringify({ id: item.id, plan_tier: 'catalog', subscription_status: 'none', manual_plan: false }),
+        body: JSON.stringify({ id: item.id, plan_tier: 'catalog', subscription_status: 'none', manual_plan: false, booking_enabled: false }),
       });
       const result = await res.json();
       if (!result.success) {
@@ -782,12 +782,12 @@ export default function AdminCatalogosPage() {
                               Oferta inicial: {item.first_offer_tier === 'plus' ? 'Agenda direto' : 'Catálogo (padrão)'}
                             </button>
 
-                            <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 space-y-2">
-                              <span className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-                                <Wallet className="w-3.5 h-3.5" />
+                            <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800 space-y-3">
+                              <span className="text-sm font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+                                <Wallet className="w-4 h-4" />
                                 Preço do Plano Catálogo
                               </span>
-                              <div className="flex items-center gap-1.5">
+                              <div className="flex flex-col gap-2">
                                 <input
                                   type="text"
                                   inputMode="decimal"
@@ -796,16 +796,16 @@ export default function AdminCatalogosPage() {
                                   onChange={(e) =>
                                     setPriceDrafts((prev) => ({ ...prev, [item.id || '']: e.target.value }))
                                   }
-                                  className="flex-1 bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-2 text-xs text-white placeholder-slate-500 focus:border-rose-500 focus:outline-none"
+                                  className="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-3 text-base text-white placeholder-slate-500 focus:border-rose-500 focus:outline-none"
                                 />
                                 <button
                                   onClick={() => savePriceOverride(item)}
-                                  className="px-3 py-2 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 text-xs font-bold"
+                                  className="w-full py-3 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 text-sm font-bold"
                                 >
                                   Salvar
                                 </button>
                               </div>
-                              <p className="text-[11px] text-slate-500">Deixe em branco e salve pra voltar ao padrão.</p>
+                              <p className="text-xs text-slate-500">Deixe em branco e salve pra voltar ao padrão.</p>
                             </div>
                           </>
                         )}
