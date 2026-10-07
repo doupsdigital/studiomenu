@@ -144,7 +144,11 @@ const ActivePlanCard: React.FC<{
                   disabled={loading}
                   className="flex-1 h-11 rounded-xl bg-linen text-ink-soft text-[15px] font-bold disabled:opacity-50"
                 >
-                  Voltar
+                  {/* "Voltar" sozinho colidia com o botão "Voltar pro Plano
+                   *  Catálogo" logo acima — ela clicou nesse achando que era
+                   *  a mesma ação (achado real, 2026-10-07). Esse aqui só
+                   *  fecha o mini-modal sem fazer nada. */}
+                  {showDowngradeOption ? 'Fechar' : 'Voltar'}
                 </button>
                 <button
                   type="button"
