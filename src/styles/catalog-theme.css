@@ -248,6 +248,41 @@ button {
   color: var(--etiqueta-color);
 }
 
+/* Showroom (pedido real, 2026-10-08): botões de Mosaico/Clássico
+ *  flanqueando a etiqueta, mesma ideia do Rosé/Luxury no HeaderCover.
+ *  Reaproveita as variáveis de cor do `.filtro-chip` (já responsivas por
+ *  tema) em vez de cores fixas. */
+.etiqueta-linha--with-switcher {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.layout-pill {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--chip-color);
+  background: var(--chip-bg);
+  border: 1px solid var(--chip-border);
+  box-shadow: var(--chip-shadow);
+  padding: 4px 11px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.layout-pill--active {
+  color: var(--chip-active-color);
+  background: var(--chip-active-bg);
+  border-color: var(--chip-active-border);
+  box-shadow: var(--chip-active-shadow);
+}
+
 /* ---------- Entrance Animations & Stagger (Lento, Fluido & Sofisticado) ---------- */
 .anim-fade-up {
   opacity: 0;
@@ -477,6 +512,53 @@ button {
   border-radius: 999px;
   border: 1px solid var(--hero-selo-border);
   box-shadow: var(--hero-selo-shadow);
+}
+
+/* Showroom (pedido real, 2026-10-08): botões de Rosé/Luxury flanqueando o
+ *  selo, no lugar do painel flutuante "Personalizar" pra essa escolha. */
+.hero__selo--with-switcher {
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Cada botão sempre mostra a paleta do SEU tema (não a do tema atual da
+ *  tela) — pedido real, 2026-10-08: no Rosé, o botão Luxury já aparece
+ *  escuro/dourado (e vice-versa), funcionando como prévia/convite pra
+ *  pessoa clicar e ver como fica no outro tema, em vez de um botão "apagado"
+ *  genérico quando inativo. `--is-active` só acrescenta um destaque (anel)
+ *  pra indicar qual é o tema atual, sem mudar a paleta de base. */
+.hero__theme-pill {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 4px 11px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  white-space: nowrap;
+}
+
+.hero__theme-pill:hover {
+  transform: translateY(-1px);
+}
+
+.hero__theme-pill--rose {
+  background: linear-gradient(135deg, #f43f5e 0%, #fb7185 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(244, 63, 94, 0.4);
+}
+
+.hero__theme-pill--luxury {
+  background: #15110e;
+  border-color: rgba(201, 163, 137, 0.5);
+  color: #c9a389;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+.hero__theme-pill--is-active {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.85), 0 4px 14px rgba(0, 0, 0, 0.3);
+  transform: scale(1.06);
 }
 
 .hero__studio-line {

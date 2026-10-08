@@ -40,6 +40,11 @@ interface ProcedureGridProps {
   bookingEnabled?: boolean;
   onRequestBooking?: (item: ProcedureItem) => void;
   onFakeWhatsapp?: (item: ProcedureItem) => void;
+  /** Só o showroom (`/c/showcase/[niche]`) passa isso (pedido real,
+   *  2026-10-08) — botões Mosaico/Clássico flanqueando a etiqueta do
+   *  cabeçalho, mesma ideia do Rosé/Luxury no `HeaderCover`. `undefined`
+   *  em catálogos reais, que continuam sem alteração nenhuma aqui. */
+  layoutSwitcher?: { value: LayoutModel; onChange: (layout: LayoutModel) => void };
 }
 
 /** Envolve um card de procedimento (mosaico OU clássico) pra deixar arrastar
@@ -106,6 +111,7 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
   bookingEnabled = false,
   onRequestBooking,
   onFakeWhatsapp,
+  layoutSwitcher,
 }) => {
   const [selectedProcedure, setSelectedProcedure] = useState<ProcedureItem | null>(null);
 
@@ -191,7 +197,27 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
       <div className="container">
 
         <header className="secao-catalogo__header anim-fade-up delay-1">
-          <span className="etiqueta">{isClassico ? 'Menu de Serviços' : 'Catálogo de Procedimentos'}</span>
+          <div className={`etiqueta-linha${layoutSwitcher ? ' etiqueta-linha--with-switcher' : ''}`}>
+            {layoutSwitcher && (
+              <button
+                type="button"
+                onClick={() => layoutSwitcher.onChange('mosaico')}
+                className={`layout-pill ${layoutSwitcher.value === 'mosaico' ? 'layout-pill--active' : ''}`}
+              >
+                Mosaico
+              </button>
+            )}
+            <span className="etiqueta">{isClassico ? 'Menu de Serviços' : 'Catálogo de Procedimentos'}</span>
+            {layoutSwitcher && (
+              <button
+                type="button"
+                onClick={() => layoutSwitcher.onChange('classico')}
+                className={`layout-pill ${layoutSwitcher.value === 'classico' ? 'layout-pill--active' : ''}`}
+              >
+                Clássico
+              </button>
+            )}
+          </div>
           <h2 className="secao-catalogo__titulo">
             {isClassico ? <>Procedimentos &amp; <em>Valores</em></> : <>Escolha o seu <em>estilo</em></>}
           </h2>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { CatalogOrderData } from '@/types/catalog';
+import { CatalogOrderData, ThemeVariant } from '@/types/catalog';
 import { HeroParticles } from './HeroParticles';
 import { NICHE_DEFAULT_COVER } from '@/lib/catalog-covers';
 
@@ -10,6 +10,12 @@ interface HeaderCoverProps {
   onOpenCoverModal?: () => void;
   onUpdateClientName?: (newName: string) => void;
   onUpdateHeroPhrase?: (newPhrase: string) => void;
+  /** Só o showroom (`/c/showcase/[niche]`) passa isso (pedido real,
+   *  2026-10-08: testar os botões de Rosé/Luxury flanqueando o selo "Seja
+   *  Bem Vinda" em vez do painel flutuante "Personalizar"). `undefined`
+   *  em catálogos reais, que continuam mostrando só o selo, sem alteração
+   *  nenhuma. */
+  themeSwitcher?: { value: ThemeVariant; onChange: (variant: ThemeVariant) => void };
 }
 
 export const HeaderCover: React.FC<HeaderCoverProps> = ({
@@ -19,6 +25,7 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
   onOpenCoverModal,
   onUpdateClientName,
   onUpdateHeroPhrase,
+  themeSwitcher,
 }) => {
   const wspText = encodeURIComponent(`Olá! Vim pelo seu catálogo digital e gostaria de tirar uma dúvida.`);
   const wspUrl = `https://wa.me/${data.whatsapp_number}?text=${wspText}`;
@@ -110,9 +117,27 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
 
       {/* 4. Conteúdo Sobreposto */}
       <div className="hero__conteudo">
-        {/* Selo Seja Bem Vinda */}
-        <div className="hero__selo anim-fade-up delay-1">
+        {/* Selo Seja Bem Vinda — com showroom, flanqueado pelos botões de tema */}
+        <div className={`hero__selo anim-fade-up delay-1${themeSwitcher ? ' hero__selo--with-switcher' : ''}`}>
+          {themeSwitcher && (
+            <button
+              type="button"
+              onClick={() => themeSwitcher.onChange('rose')}
+              className={`hero__theme-pill hero__theme-pill--rose${themeSwitcher.value === 'rose' ? ' hero__theme-pill--is-active' : ''}`}
+            >
+              🌸 Rosé
+            </button>
+          )}
           <span>Seja Bem Vinda</span>
+          {themeSwitcher && (
+            <button
+              type="button"
+              onClick={() => themeSwitcher.onChange('luxury')}
+              className={`hero__theme-pill hero__theme-pill--luxury${themeSwitcher.value === 'luxury' ? ' hero__theme-pill--is-active' : ''}`}
+            >
+              👑 Luxury
+            </button>
+          )}
         </div>
 
         {/* Título & Nome */}
