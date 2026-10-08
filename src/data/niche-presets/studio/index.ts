@@ -2,7 +2,7 @@ import { CatalogOrderData } from '@/types/catalog';
 
 export const studioPreset: CatalogOrderData = {
   slug: 'modelo-studio',
-  client_name: 'Juliana & Equipe',
+  client_name: 'Mariana Alves',
   studio_name: 'Beauty Lounge Studio',
   hero_phrase: 'Seu espaço completo de beleza: Lash, Nails, Cabelo e Estética em um só lugar.',
   bio_description: 'Studio de Beleza Multi-disciplinar com especialistas de alto padrão.',
