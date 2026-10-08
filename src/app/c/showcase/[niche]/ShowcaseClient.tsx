@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { LayoutModel, ThemeVariant, NicheType, CatalogOrderData } from '@/types/catalog';
 import { CatalogLayout } from '@/components/catalog/CatalogLayout';
-import { StylePickerPanel } from '@/components/catalog/StylePickerPanel';
 import { nichePresetsMap } from '@/data/niche-presets';
 
 interface ShowcaseClientProps {
@@ -33,27 +32,12 @@ export function ShowcaseClient({ niche, forceBasico = false, coverOverride, pres
   // Sempre abre no Rose, mesmo pra nichos cujo preset é Luxury por padrão
   // (ex: Nail, Estética, Studio) — pedido real, 2026-10-01: ela manda esse
   // link pra leads de anúncio como primeiro contato, e quer sempre o mesmo
-  // tema de abertura (ela mesma troca pelo painel Personalizar se quiser
+  // tema de abertura (ela mesma troca pelos botões Rosé/Luxury se quiser
   // mostrar o Luxury depois). Chegou a abrir Studio direto em Luxury
   // (2026-10-08), mas testando na prática no celular não ficou legal —
   // revertido no mesmo dia. Layout (Mosaico/Clássico) continua herdando do
   // preset normalmente — só o tema foi fixado.
   const [themeVariant, setThemeVariant] = useState<ThemeVariant>('rose');
-  // Na capa (#hero) faz mais sentido mostrar o seletor de Tema; a partir da tela
-  // de procedimentos (#catalogo) em diante, o que se destaca é o Modelo (grid vs lista).
-  const [onCoverScreen, setOnCoverScreen] = useState(true);
-
-  useEffect(() => {
-    const heroEl = document.getElementById('hero');
-    if (!heroEl) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => setOnCoverScreen(entry.isIntersecting),
-      { threshold: 0.5 }
-    );
-    observer.observe(heroEl);
-    return () => observer.disconnect();
-  }, [niche, layoutModel, themeVariant]);
 
   // Avisa o pai (mockup da landing page) qual tela está visível, pro
   // indicador de deslize/toque trocar de lado — pedido real, 2026-10-08,
@@ -130,23 +114,17 @@ export function ShowcaseClient({ niche, forceBasico = false, coverOverride, pres
       {themeVariant === 'luxury' && (
         <style>{`html, body { background: #0a0807; color: #f3efe9; }`}</style>
       )}
-      <StylePickerPanel
-        layoutModel={layoutModel}
-        themeVariant={themeVariant}
-        onChangeLayout={setLayoutModel}
-        onChangeTheme={setThemeVariant}
-        onCoverScreen={onCoverScreen}
-        // Começa aberto de propósito (pedido, 2026-09-23) — é o link que
-        // ela manda pra cliente testar os modelos, então o controle de
-        // tema/layout precisa já estar visível de cara, não escondido
-        // atrás de um toque. Mesmo comportamento também usado no mockup
-        // de celular da home (`SalesLandingPage.tsx`).
-        defaultOpen
+      {/* Painel flutuante "Personalizar" removido (pedido real, 2026-10-08) —
+       *  Tema (Rosé/Luxury) e Modelo (Mosaico/Clássico) agora são botões
+       *  inline, flanqueando o selo "Seja Bem Vinda" e a etiqueta do
+       *  catálogo, respectivamente. Ver `themeSwitcher`/`layoutSwitcher`
+       *  abaixo, repassados até `HeaderCover`/`ProcedureGrid`. */}
+      <CatalogLayout
+        data={catalog}
+        demoBookingOnly
+        themeSwitcher={{ value: themeVariant, onChange: setThemeVariant }}
+        layoutSwitcher={{ value: layoutModel, onChange: setLayoutModel }}
       />
-
-      {/* Renderização do Catálogo Real — mesmo componente usado nos catálogos de clientes.
-          CatalogLayout re-sincroniza sozinho ao trocar modelo/tema, preservando o scroll. */}
-      <CatalogLayout data={catalog} demoBookingOnly />
     </div>
   );
 }
