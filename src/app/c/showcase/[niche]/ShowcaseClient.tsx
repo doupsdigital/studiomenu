@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { LayoutModel, ThemeVariant, NicheType } from '@/types/catalog';
+import { LayoutModel, ThemeVariant, NicheType, CatalogOrderData } from '@/types/catalog';
 import { CatalogLayout } from '@/components/catalog/CatalogLayout';
 import { StylePickerPanel } from '@/components/catalog/StylePickerPanel';
 import { nichePresetsMap } from '@/data/niche-presets';
@@ -19,10 +19,15 @@ interface ShowcaseClientProps {
    *  `undefined` nas rotas de sempre (lash/nail/lashdesigner/naildesigner),
    *  que continuam exatamente como eram. */
   coverOverride?: string;
+  /** Preset próprio pra rotas dedicadas (ex: `landingpage`, pedido real,
+   *  2026-10-08) — substitui o preset padrão do nicho (`nichePresetsMap`),
+   *  pra poder editar serviços/textos livremente sem afetar o showroom
+   *  real do nicho nem catálogos de clientes. */
+  presetOverride?: CatalogOrderData;
 }
 
-export function ShowcaseClient({ niche, forceBasico = false, coverOverride }: ShowcaseClientProps) {
-  const basePreset = nichePresetsMap[niche];
+export function ShowcaseClient({ niche, forceBasico = false, coverOverride, presetOverride }: ShowcaseClientProps) {
+  const basePreset = presetOverride || nichePresetsMap[niche];
 
   const [layoutModel, setLayoutModel] = useState<LayoutModel>(basePreset?.layout_model || 'mosaico');
   // Sempre abre no Rose, mesmo pra nichos cujo preset é Luxury por padrão
