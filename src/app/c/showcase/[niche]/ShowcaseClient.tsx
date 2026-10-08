@@ -26,14 +26,14 @@ export function ShowcaseClient({ niche, forceBasico = false, coverOverride }: Sh
 
   const [layoutModel, setLayoutModel] = useState<LayoutModel>(basePreset?.layout_model || 'mosaico');
   // Sempre abre no Rose, mesmo pra nichos cujo preset é Luxury por padrão
-  // (ex: Nail, Estética) — pedido real, 2026-10-01: ela manda esse link pra
-  // leads de anúncio como primeiro contato, e quer sempre o mesmo tema de
-  // abertura (ela mesma troca pelo painel Personalizar se quiser mostrar o
-  // Luxury depois). Exceção: Studio começa em Luxury mesmo (pedido real,
-  // 2026-10-08) — o ambiente do studio combina mais com esse tema. Layout
-  // (Mosaico/Clássico) continua herdando do preset normalmente — só o tema
-  // foi fixado.
-  const [themeVariant, setThemeVariant] = useState<ThemeVariant>(niche === 'studio' ? 'luxury' : 'rose');
+  // (ex: Nail, Estética, Studio) — pedido real, 2026-10-01: ela manda esse
+  // link pra leads de anúncio como primeiro contato, e quer sempre o mesmo
+  // tema de abertura (ela mesma troca pelo painel Personalizar se quiser
+  // mostrar o Luxury depois). Chegou a abrir Studio direto em Luxury
+  // (2026-10-08), mas testando na prática no celular não ficou legal —
+  // revertido no mesmo dia. Layout (Mosaico/Clássico) continua herdando do
+  // preset normalmente — só o tema foi fixado.
+  const [themeVariant, setThemeVariant] = useState<ThemeVariant>('rose');
   // Na capa (#hero) faz mais sentido mostrar o seletor de Tema; a partir da tela
   // de procedimentos (#catalogo) em diante, o que se destaca é o Modelo (grid vs lista).
   const [onCoverScreen, setOnCoverScreen] = useState(true);

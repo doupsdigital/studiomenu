@@ -363,12 +363,7 @@
   height: var(--lp-screen-h);
   border-radius: 29px;
   overflow: hidden;
-  /* Neutro de propósito (achado real, 2026-10-08) — era rosa fixo (#f2cad5),
-     pensado só pro mockup mostrar sempre lash/nail (tema Rose). Hoje o
-     mockup pode apontar pra qualquer nicho, inclusive Luxury (escuro) — um
-     placeholder rosa fica um flash visível antes do iframe pintar por cima
-     nesse caso. Neutro escuro combina com os dois temas sem destoar. */
-  background: #1a1412;
+  background: #f2cad5;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4) inset;
 }
 
@@ -380,7 +375,7 @@
   height: var(--lp-base-h);
   transform-origin: 0 0;
   transform: scale(calc(var(--lp-screen-w) / var(--lp-base-w)), calc(var(--lp-screen-h) / var(--lp-base-h)));
-  background: #1a1412;
+  background: #f2cad5;
 }
 
 .lp-testdrive-screen-scaler iframe {
@@ -390,7 +385,7 @@
   margin: 0 !important;
   padding: 0 !important;
   display: block;
-  background: #1a1412;
+  background: #f2cad5;
 }
 
 @media (min-width: 600px) {
