@@ -917,6 +917,15 @@
 
 .lp-tier-bullets li svg { color: #c84b72; flex-shrink: 0; }
 
+.lp-tier-guarantee {
+  margin: 12px 0 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #7a6a70;
+  text-align: center;
+  line-height: 1.4;
+}
+
 /* ==========================================================================
    RODAPÉ
    ========================================================================== */
