@@ -64,9 +64,16 @@
 }
 
 .lp-text-gradient {
-  background: linear-gradient(135deg, var(--lp-accent), #e88faa);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--lp-accent);
+}
+
+.lp-text-wine {
+  color: #6d1430;
+}
+
+.lp-hero-title-line2 {
+  display: block;
+  margin-top: 8px;
 }
 
 /* Botões */
@@ -698,6 +705,8 @@
 }
 
 .lp-vs-box {
+  position: relative;
+  overflow: hidden;
   border-radius: var(--lp-radius-lg);
   padding: 28px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.03);
@@ -706,10 +715,31 @@
 .lp-vs-box--bad { background: #fef2f2; border: 1.5px solid #fecaca; }
 .lp-vs-box--good { background: #f0fdf4; border: 1.5px solid #bbf7d0; }
 
-.lp-vs-box-head { margin-bottom: 20px; }
+.lp-vs-box-head { margin-top: 10px; margin-bottom: 20px; }
 
-.lp-vs-box--bad .lp-vs-box-head h3 { color: #dc2626; font-size: 1.2rem; font-weight: 800; margin: 0; }
-.lp-vs-box--good .lp-vs-box-head h3 { color: #16a34a; font-size: 1.2rem; font-weight: 800; margin: 0; }
+.lp-vs-box--bad .lp-vs-box-head h3 { color: #dc2626; font-size: 1.2rem; font-weight: 800; margin: 0 0 0 28px; }
+.lp-vs-box--good .lp-vs-box-head h3 { color: #16a34a; font-size: 1.2rem; font-weight: 800; margin: 0 0 0 28px; }
+
+/* Badge diagonal "Antes/Depois" no canto, tipo etiqueta de oferta. */
+.lp-vs-ribbon {
+  position: absolute;
+  top: 16px;
+  left: -34px;
+  width: 135px;
+  transform: rotate(-45deg);
+  text-align: center;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 0;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  z-index: 2;
+}
+
+.lp-vs-ribbon--bad { background: #dc2626; }
+.lp-vs-ribbon--good { background: #16a34a; }
 
 .lp-vs-bullet-list {
   list-style: none;
