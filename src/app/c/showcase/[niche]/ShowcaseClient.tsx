@@ -26,12 +26,14 @@ export function ShowcaseClient({ niche, forceBasico = false, coverOverride }: Sh
 
   const [layoutModel, setLayoutModel] = useState<LayoutModel>(basePreset?.layout_model || 'mosaico');
   // Sempre abre no Rose, mesmo pra nichos cujo preset é Luxury por padrão
-  // (ex: Nail, Estética, Studio) — pedido real, 2026-10-01: ela manda esse
-  // link pra leads de anúncio como primeiro contato, e quer sempre o mesmo
-  // tema de abertura (ela mesma troca pelo painel Personalizar se quiser
-  // mostrar o Luxury depois). Layout (Mosaico/Clássico) continua herdando
-  // do preset normalmente — só o tema foi fixado.
-  const [themeVariant, setThemeVariant] = useState<ThemeVariant>('rose');
+  // (ex: Nail, Estética) — pedido real, 2026-10-01: ela manda esse link pra
+  // leads de anúncio como primeiro contato, e quer sempre o mesmo tema de
+  // abertura (ela mesma troca pelo painel Personalizar se quiser mostrar o
+  // Luxury depois). Exceção: Studio começa em Luxury mesmo (pedido real,
+  // 2026-10-08) — o ambiente do studio combina mais com esse tema. Layout
+  // (Mosaico/Clássico) continua herdando do preset normalmente — só o tema
+  // foi fixado.
+  const [themeVariant, setThemeVariant] = useState<ThemeVariant>(niche === 'studio' ? 'luxury' : 'rose');
   // Na capa (#hero) faz mais sentido mostrar o seletor de Tema; a partir da tela
   // de procedimentos (#catalogo) em diante, o que se destaca é o Modelo (grid vs lista).
   const [onCoverScreen, setOnCoverScreen] = useState(true);
@@ -88,6 +90,16 @@ export function ShowcaseClient({ niche, forceBasico = false, coverOverride }: Sh
 
   return (
     <div className="relative min-h-screen">
+      {/* Mesma correção já aplicada na página pública (`/c/[slug]/page.tsx`)
+       *  — sem isso, o fundo do html/body fica no Rosé padrão do
+       *  globals.css por uma fração de segundo antes do tema Luxury
+       *  "pintar" por cima, um flash visível ao carregar ou recarregar a
+       *  página (achado real, 2026-10-08: nunca tinha chegado no showroom,
+       *  só na página real). Aqui reage a `themeVariant` (estado, pode
+       *  mudar pelo seletor), não só ao nicho inicial. */}
+      {themeVariant === 'luxury' && (
+        <style>{`html, body { background: #0a0807; color: #f3efe9; }`}</style>
+      )}
       <StylePickerPanel
         layoutModel={layoutModel}
         themeVariant={themeVariant}

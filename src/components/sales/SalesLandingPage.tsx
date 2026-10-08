@@ -118,7 +118,7 @@ export function SalesLandingPage() {
                     <div className="lp-testdrive-notch" />
                     <div className="lp-testdrive-screen">
                       <div className="lp-testdrive-screen-scaler">
-                        <iframe src="/c/showcase/lash" title="Prévia ao vivo do catálogo StudioMenu" />
+                        <iframe src="/c/showcase/studiodesigner" title="Prévia ao vivo do catálogo StudioMenu" />
                       </div>
                     </div>
                   </div>
@@ -245,7 +245,6 @@ export function SalesLandingPage() {
           <div className="lp-container">
             <div className="lp-pricing-header-title">
               <h2 className="lp-section-title">Escolha o Plano Ideal para o Seu Studio</h2>
-              <p className="lp-section-subtitle">Sem contrato de fidelidade · Cancele quando quiser</p>
             </div>
 
             <div className="lp-pricing-tier-grid">
