@@ -27,7 +27,11 @@ const SHOWCASE_SLUGS: Record<string, { niche: NicheType; forceBasico: boolean; c
   lashs: { niche: 'lash', forceBasico: true, coverOverride: '/capa_lash.png' },
   nails: { niche: 'nail', forceBasico: true, coverOverride: '/capa_nail.png' },
   estetica: { niche: 'estetica', forceBasico: false },
-  studio: { niche: 'studio', forceBasico: false },
+  // Capa padronizada do Studio direto na rota existente (pedido real,
+  // 2026-10-08), e versão Básico (WhatsApp) nova — igual lashdesigner/
+  // naildesigner, que o Studio ainda não tinha.
+  studio: { niche: 'studio', forceBasico: false, coverOverride: '/capa_studio.png' },
+  studiodesigner: { niche: 'studio', forceBasico: true, coverOverride: '/capa_studio.png' },
 };
 
 function resolveShowcaseSlug(slug: string): { niche: NicheType; forceBasico: boolean; coverOverride?: string } {
