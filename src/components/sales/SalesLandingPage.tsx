@@ -1,4 +1,4 @@
-import { CATALOGO_PRICE, AGENDA_PRICE } from '@/lib/pricing';
+import { AGENDA_PRICE } from '@/lib/pricing';
 
 const WHATSAPP_NUMBER = '5562991083435';
 
@@ -37,8 +37,16 @@ function priceParts(price: number): { whole: string; cents: string } {
   return { whole, cents };
 }
 
+// Teste de X1, 2026-10-08 (temporário, só pra essa campanha): manda os leads
+// direto pra landing em vez do script de WhatsApp — por isso os preços aqui
+// são valores de teste à parte, não os de verdade (`CATALOGO_PRICE`) usados
+// no checkout/admin.
+const TEST_CATALOGO_PRICE = 24.9;
+const TEST_VITALICIO_PRICE = 197;
+
 export function SalesLandingPage() {
-  const catalogoParts = priceParts(CATALOGO_PRICE);
+  const catalogoParts = priceParts(TEST_CATALOGO_PRICE);
+  const vitalicioParts = priceParts(TEST_VITALICIO_PRICE);
   const agendaParts = priceParts(AGENDA_PRICE);
 
   return (
@@ -82,6 +90,9 @@ export function SalesLandingPage() {
                   Fotos, preços e seu nome — num link só, pra Lash, Nails, Estética ou qualquer studio de beleza.
                 </p>
 
+                {/* Botão "Criar Meu Catálogo Agora" removido (teste de X1,
+                 *  2026-10-08) — deixado comentado, não apagado, pra
+                 *  reativar rápido se quiser voltar.
                 <div className="lp-hero-actions">
                   <a
                     href={whatsappLink('Olá! Quero saber como funciona o StudioMenu e criar meu catálogo digital 😊')}
@@ -95,8 +106,9 @@ export function SalesLandingPage() {
                     </svg>
                   </a>
                 </div>
+                */}
 
-                <p className="lp-hero-swipe-hint">👇 Teste a experiência real do catálogo rolando a tela do celular ao lado:</p>
+                <p className="lp-hero-swipe-hint lp-hero-swipe-hint--emphasis">👇 Teste a experiência real do catálogo rolando a tela do celular:</p>
               </div>
 
               {/* Mockup: catálogo real embutido */}
@@ -237,9 +249,10 @@ export function SalesLandingPage() {
             </div>
 
             <div className="lp-pricing-tier-grid">
-              {/* Catálogo */}
+              {/* Catálogo (assinatura) — teste de X1, 2026-10-08: preço de
+               *  teste 24,90/mês, "/mês" ao lado do valor (não embaixo). */}
               <div className="lp-pricing-tier-card">
-                <div className="lp-tier-badge lp-tier-badge--basic">📱 PAGAMENTO ÚNICO</div>
+                <div className="lp-tier-badge lp-tier-badge--basic">🔁 ASSINATURA MENSAL</div>
                 <h3 className="lp-tier-title">StudioMenu Catálogo</h3>
                 <p className="lp-tier-desc">Catálogo digital com seu nome, fotos e preços, sempre no ar — edite pelo celular quando quiser.</p>
 
@@ -248,8 +261,8 @@ export function SalesLandingPage() {
                     <span className="lp-tier-currency">R$</span>
                     <span className="lp-tier-val">{catalogoParts.whole}</span>
                     <span className="lp-tier-cents">,{catalogoParts.cents}</span>
+                    <span className="lp-tier-period">/mês</span>
                   </div>
-                  <div className="lp-tier-price-sub">pagamento único</div>
                 </div>
 
                 <ul className="lp-tier-bullets">
@@ -260,7 +273,7 @@ export function SalesLandingPage() {
                 </ul>
 
                 <a
-                  href={whatsappLink('Olá! Quero saber como funciona o StudioMenu Catálogo.')}
+                  href={whatsappLink('Olá! Vi a página do StudioMenu e quero o Plano Catálogo por R$24,90/mês')}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="lp-btn lp-btn--whatsapp"
@@ -269,7 +282,45 @@ export function SalesLandingPage() {
                 </a>
               </div>
 
-              {/* Agenda */}
+              {/* Vitalício — teste de X1, 2026-10-08: card próprio, separado
+               *  do Catálogo recorrente de propósito — o CTA manda uma
+               *  mensagem de WhatsApp que já menciona "vitalício", pra ela
+               *  saber na hora qual oferta o lead quer sem precisar perguntar. */}
+              <div className="lp-pricing-tier-card lp-pricing-tier-card--vip">
+                <div className="lp-tier-badge lp-tier-badge--vip">⭐ RECOMENDADO</div>
+                <h3 className="lp-tier-title">StudioMenu Vitalício</h3>
+                <p className="lp-tier-desc">Tudo do Catálogo, pagando uma vez só — sem mensalidade.</p>
+
+                <div className="lp-tier-price-box">
+                  <div className="lp-tier-price-main">
+                    <span className="lp-tier-currency">R$</span>
+                    <span className="lp-tier-val">{vitalicioParts.whole}</span>
+                    <span className="lp-tier-cents">,{vitalicioParts.cents}</span>
+                  </div>
+                  <div className="lp-tier-price-sub">pagamento único</div>
+                </div>
+
+                <ul className="lp-tier-bullets">
+                  <li>{CHECK_ICON}<span><strong>Pague uma vez só, sem mensalidade</strong></span></li>
+                  <li>{CHECK_ICON}<span>Catálogo online sempre no ar</span></li>
+                  <li>{CHECK_ICON}<span>Edite fotos, preços e serviços quando quiser</span></li>
+                  <li>{CHECK_ICON}<span>Link profissional pra bio do Instagram/WhatsApp</span></li>
+                </ul>
+
+                <a
+                  href={whatsappLink('Olá! Vi a página do StudioMenu e quero o Plano Vitalício por R$197,00, pagamento único')}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="lp-btn lp-btn--whatsapp"
+                >
+                  QUERO O VITALÍCIO
+                </a>
+              </div>
+
+              {/* Agenda — removido do teste de X1 (2026-10-08), de propósito
+               *  deixado comentado (não apagado) pra reativar rápido se
+               *  quiser voltar: é só descomentar este bloco e tirar o
+               *  modificador "--single" da div acima.
               <div className="lp-pricing-tier-card lp-pricing-tier-card--vip">
                 <div className="lp-tier-badge lp-tier-badge--vip">⭐ MAIS POPULAR</div>
                 <h3 className="lp-tier-title">StudioMenu Agenda</h3>
@@ -300,6 +351,7 @@ export function SalesLandingPage() {
                   ATIVAR AGENDAMENTO
                 </a>
               </div>
+              */}
             </div>
           </div>
         </section>
@@ -324,7 +376,7 @@ export function SalesLandingPage() {
        *  vendas ela mesma monta os catálogos, então todo CTA vai pro
        *  WhatsApp dela em vez do formulário self-service, 2026-09-24). */}
       <div className="lp-sticky-wa-bar">
-        <a href={whatsappLink('Olá! Vi o StudioMenu no site e gostaria de saber mais informações! 😊')} target="_blank" rel="noopener noreferrer" className="lp-sticky-wa-btn">
+        <a href={whatsappLink('Olá! Vi a página do StudioMenu e fiquei com uma dúvida antes de assinar')} target="_blank" rel="noopener noreferrer" className="lp-sticky-wa-btn">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
             <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l.278.444-1.157 4.226 4.326-1.134.42.259z" />
           </svg>
