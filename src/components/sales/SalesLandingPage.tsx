@@ -16,7 +16,7 @@ const TESTIMONIALS = [
   { name: 'Mariana A.', avatar: AVATARS[0], quote: 'Parei de mandar PDF no Canva. Minhas clientes amaram o link na bio!' },
   { name: 'Camila R.', avatar: AVATARS[1], quote: 'Ninguém mais pede desconto. Valorizou muito o meu studio!' },
   { name: 'Juliana S.', avatar: AVATARS[2], quote: 'Entregaram tudo pronto no meu WhatsApp em menos de 24 horas!' },
-  { name: 'Fernanda M.', avatar: AVATARS[0], quote: 'As clientes leem os cuidados pós e já agendam muito mais rápido.' },
+  { name: 'Fernanda M.', avatar: AVATARS[0], quote: 'Parei de mandar tabela de preço no WhatsApp. Agora é só o link e pronto!' },
   { name: 'Beatriz K.', avatar: AVATARS[1], quote: 'Melhor investimento do ano pro meu studio. Pagou-se no 1º dia!' },
 ];
 
@@ -83,8 +83,10 @@ export function SalesLandingPage() {
                 </div>
 
                 <h2 className="lp-hero-title">
-                  Chega de mandar Tabelas de preços e PDFs. Seu{' '}
-                  <span className="lp-text-gradient">Catálogo Digital Interativo</span>, pronto em minutos.
+                  Chega de mandar Tabelas de preços e <span className="lp-text-wine">PDFs</span>.
+                  <span className="lp-hero-title-line2">
+                    Seu <span className="lp-text-gradient">Catálogo Digital Interativo</span>, pronto em minutos.
+                  </span>
                 </h2>
 
                 <p className="lp-hero-subtitle">
@@ -148,8 +150,9 @@ export function SalesLandingPage() {
 
             <div className="lp-vs-grid">
               <div className="lp-vs-box lp-vs-box--bad">
+                <span className="lp-vs-ribbon lp-vs-ribbon--bad">Antes</span>
                 <div className="lp-vs-box-head">
-                  <h3>Antes: PDFs estáticos / Mensagens Soltas</h3>
+                  <h3>PDFs estáticos /{' '}Mensagens Soltas</h3>
                 </div>
                 <ul className="lp-vs-bullet-list">
                   <li>
@@ -180,8 +183,9 @@ export function SalesLandingPage() {
               </div>
 
               <div className="lp-vs-box lp-vs-box--good">
+                <span className="lp-vs-ribbon lp-vs-ribbon--good">Depois</span>
                 <div className="lp-vs-box-head">
-                  <h3>Depois: Seu StudioMenu Profissional</h3>
+                  <h3>Seu StudioMenu{' '}Profissional</h3>
                 </div>
                 <ul className="lp-vs-bullet-list">
                   <li>
