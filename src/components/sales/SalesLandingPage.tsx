@@ -83,12 +83,12 @@ export function SalesLandingPage() {
                 </div>
 
                 <h2 className="lp-hero-title">
-                  Chega de PDF do Canva. Seu{' '}
+                  Chega de mandar Tabelas de preços e PDFs. Seu{' '}
                   <span className="lp-text-gradient">Catálogo Digital Interativo</span>, pronto em minutos.
                 </h2>
 
                 <p className="lp-hero-subtitle">
-                  Fotos, preços e seu nome — num link só, pra Lash, Nails, Estética ou qualquer studio de beleza.
+                  Fotos e preços em um <strong>Link</strong> com o seu nome. Perfeito pra <strong>Lash</strong>, <strong>Nail</strong>, <strong>Estética</strong> ou qualquer Studio de Beleza.
                 </p>
 
                 {/* Botão "Criar Meu Catálogo Agora" removido (teste de X1,
@@ -143,13 +143,13 @@ export function SalesLandingPage() {
           <div className="lp-container">
             <div className="lp-section-header">
               <p className="lp-section-kicker">Evolução do Seu Atendimento</p>
-              <h2 className="lp-section-title">Por que você deve parar de mandar PDF no Canva?</h2>
+              <h2 className="lp-section-title">Por que você deve parar de mandar Tabelas e PDFs?</h2>
             </div>
 
             <div className="lp-vs-grid">
               <div className="lp-vs-box lp-vs-box--bad">
                 <div className="lp-vs-box-head">
-                  <h3>Antes: PDF do Canva / Mensagens Soltas</h3>
+                  <h3>Antes: PDFs estáticos / Mensagens Soltas</h3>
                 </div>
                 <ul className="lp-vs-bullet-list">
                   <li>
@@ -188,7 +188,7 @@ export function SalesLandingPage() {
                     <svg className="lp-vs-svg-good" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
                       <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                     </svg>
-                    <span>Abre instantaneamente igual um aplicativo de luxo</span>
+                    <span>Um Link com seu nome que abre instantaneamente</span>
                   </li>
                   <li>
                     <svg className="lp-vs-svg-good" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
@@ -288,6 +288,8 @@ export function SalesLandingPage() {
                 >
                   QUERO O VITALÍCIO
                 </a>
+
+                <p className="lp-tier-guarantee">🔒 Garantia de 7 dias — não gostou, devolvemos 100% do seu dinheiro.</p>
               </div>
 
               {/* Agenda — removido do teste de X1 (2026-10-08), de propósito
