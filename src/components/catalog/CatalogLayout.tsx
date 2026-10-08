@@ -32,6 +32,12 @@ interface CatalogLayoutProps {
    *  profissional fake no banco (2026-09-24). Não muda nada em catálogos
    *  reais — default `false`. */
   demoBookingOnly?: boolean;
+  /** Repassado direto pro `HeaderCover` — ver o comentário lá. Só o
+   *  showroom usa (pedido real, 2026-10-08). */
+  themeSwitcher?: { value: ThemeVariant; onChange: (variant: ThemeVariant) => void };
+  /** Repassado direto pro `ProcedureGrid` — ver o comentário lá. Só o
+   *  showroom usa (pedido real, 2026-10-08). */
+  layoutSwitcher?: { value: LayoutModel; onChange: (layout: LayoutModel) => void };
 }
 
 export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
@@ -41,6 +47,8 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
   isNewCatalog = false,
   onThemeChange,
   demoBookingOnly = false,
+  themeSwitcher,
+  layoutSwitcher,
 }) => {
   const [showWelcomeOverlay, setShowWelcomeOverlay] = useState(isNewCatalog);
   const [catalogState, setCatalogState] = useState<CatalogOrderData>(data);
@@ -524,6 +532,7 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
           onOpenCoverModal={() => setActiveModal('cover')}
           onUpdateClientName={handleUpdateClientName}
           onUpdateHeroPhrase={handleUpdateHeroPhrase}
+          themeSwitcher={themeSwitcher}
         />
 
         {/* Seção Mosaico/Clássico de Procedimentos */}
@@ -564,6 +573,7 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
           onFakeWhatsapp={
             demoBookingOnly && (!catalogState.booking_enabled || catalogState.agenda_paused) ? setFakeWhatsappItem : undefined
           }
+          layoutSwitcher={layoutSwitcher}
         />
 
         {/* Seção Orientações */}

@@ -36,7 +36,10 @@ const SHOWCASE_SLUGS: Record<string, { niche: NicheType; forceBasico: boolean; c
   // Preset próprio, só pro mockup de celular da landing page de vendas
   // (pedido real, 2026-10-08) — editável à vontade sem afetar o showroom
   // real do Studio (`studio`/`studiodesigner` acima continuam intactos).
-  landingpage: { niche: 'studio', forceBasico: true, presetOverride: landingMockupPreset },
+  // `coverOverride` fixo (pedido real, 2026-10-08): diferente dos outros
+  // showrooms, aqui a foto NÃO deve trocar ao alternar Mosaico/Clássico —
+  // sempre a mesma mulher morena, independente do modelo escolhido.
+  landingpage: { niche: 'studio', forceBasico: true, coverOverride: '/modelos/mosaico/assets/img/Hero.webp', presetOverride: landingMockupPreset },
 };
 
 function resolveShowcaseSlug(slug: string): { niche: NicheType; forceBasico: boolean; coverOverride?: string; presetOverride?: CatalogOrderData } {
