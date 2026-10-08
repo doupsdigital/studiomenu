@@ -50,6 +50,31 @@ export function ShowcaseClient({ niche, forceBasico = false, coverOverride }: Sh
     return () => observer.disconnect();
   }, [niche, layoutModel, themeVariant]);
 
+  // Avisa o pai (mockup da landing page) qual tela está visível, pro
+  // indicador de deslize/toque trocar de lado — pedido real, 2026-10-08,
+  // re-port do indicador dinâmico que só existia no legado. Observa TODAS
+  // as seções (não só a capa) pra sumir também fora da tela de
+  // procedimentos (ex: Orientações, Contato), não só na capa.
+  useEffect(() => {
+    if (window.parent === window) return;
+    const sections = document.querySelectorAll('[data-screen-label]');
+    if (!sections.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const label = entry.target.getAttribute('data-screen-label') || entry.target.id;
+            window.parent.postMessage({ type: 'VITRINE_SCREEN_CHANGE', label }, '*');
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+    sections.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [niche, layoutModel, themeVariant]);
+
   if (!basePreset) {
     return (
       <main className="min-h-screen flex items-center justify-center p-6 bg-slate-950 text-white text-center">
