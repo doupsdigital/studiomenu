@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
-import { NicheType } from '@/types/catalog';
+import { NicheType, CatalogOrderData } from '@/types/catalog';
 import { ShowcaseClient } from './ShowcaseClient';
+import { landingMockupPreset } from '@/data/niche-presets/landing-mockup';
 
 interface ShowcasePageProps {
   params: Promise<{ niche: string }>;
@@ -19,7 +20,7 @@ interface ShowcasePageProps {
  *  `lashdesigner`/`naildesigner` (mesmo plano Básico), só trocando a capa
  *  genérica pela nova capa "padronizada" do nicho — os originais continuam
  *  intocados, pra não perder os exemplos já em uso. */
-const SHOWCASE_SLUGS: Record<string, { niche: NicheType; forceBasico: boolean; coverOverride?: string }> = {
+const SHOWCASE_SLUGS: Record<string, { niche: NicheType; forceBasico: boolean; coverOverride?: string; presetOverride?: CatalogOrderData }> = {
   lash: { niche: 'lash', forceBasico: false },
   nail: { niche: 'nail', forceBasico: false },
   lashdesigner: { niche: 'lash', forceBasico: true },
@@ -32,9 +33,13 @@ const SHOWCASE_SLUGS: Record<string, { niche: NicheType; forceBasico: boolean; c
   // naildesigner, que o Studio ainda não tinha.
   studio: { niche: 'studio', forceBasico: false, coverOverride: '/capa_studio.png' },
   studiodesigner: { niche: 'studio', forceBasico: true, coverOverride: '/capa_studio.png' },
+  // Preset próprio, só pro mockup de celular da landing page de vendas
+  // (pedido real, 2026-10-08) — editável à vontade sem afetar o showroom
+  // real do Studio (`studio`/`studiodesigner` acima continuam intactos).
+  landingpage: { niche: 'studio', forceBasico: true, presetOverride: landingMockupPreset },
 };
 
-function resolveShowcaseSlug(slug: string): { niche: NicheType; forceBasico: boolean; coverOverride?: string } {
+function resolveShowcaseSlug(slug: string): { niche: NicheType; forceBasico: boolean; coverOverride?: string; presetOverride?: CatalogOrderData } {
   return SHOWCASE_SLUGS[slug] || { niche: slug as NicheType, forceBasico: false };
 }
 
@@ -70,6 +75,6 @@ export async function generateMetadata({ params }: ShowcasePageProps): Promise<M
 
 export default async function ShowcasePage({ params }: ShowcasePageProps) {
   const { niche: nicheParam } = await params;
-  const { niche, forceBasico, coverOverride } = resolveShowcaseSlug(nicheParam);
-  return <ShowcaseClient niche={niche} forceBasico={forceBasico} coverOverride={coverOverride} />;
+  const { niche, forceBasico, coverOverride, presetOverride } = resolveShowcaseSlug(nicheParam);
+  return <ShowcaseClient niche={niche} forceBasico={forceBasico} coverOverride={coverOverride} presetOverride={presetOverride} />;
 }
