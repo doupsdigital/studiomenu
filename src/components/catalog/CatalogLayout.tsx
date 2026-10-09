@@ -108,10 +108,6 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
   const [agendaDemo, setAgendaDemo] = useState<{ service: ProcedureItem; time: string; dateLabel: string } | null>(null);
   // Par do agendaDemo pro modo "Básico" do showroom — ver FakeWhatsappScreen.
   const [fakeWhatsappItem, setFakeWhatsappItem] = useState<ProcedureItem | null>(null);
-  // Mesma simulação, mas pro botão de Contato (tela final, sem procedimento
-  // específico) — bug real, 2026-10-09: esse botão não tinha proteção
-  // nenhuma e abria o WhatsApp real no showroom.
-  const [fakeWhatsappMessage, setFakeWhatsappMessage] = useState<string | null>(null);
 
   // Toast discreto pra cada edição local (feedback imediato antes de "Salvar")
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -658,7 +654,7 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
             setEditingSocialType(type);
             setActiveModal('social');
           }}
-          onFakeWhatsapp={demoBookingOnly ? setFakeWhatsappMessage : undefined}
+          demoMode={demoBookingOnly}
         />
       </div>
 
@@ -690,10 +686,6 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
 
       {fakeWhatsappItem && (
         <FakeWhatsappScreen item={fakeWhatsappItem} onClose={() => setFakeWhatsappItem(null)} />
-      )}
-
-      {fakeWhatsappMessage && (
-        <FakeWhatsappScreen message={fakeWhatsappMessage} onClose={() => setFakeWhatsappMessage(null)} />
       )}
     </div>
   );

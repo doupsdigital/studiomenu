@@ -5,13 +5,7 @@ import { ArrowLeft, Phone, Video, MoreVertical, Check, CheckCheck } from 'lucide
 import { ProcedureItem } from '@/types/catalog';
 
 interface FakeWhatsappScreenProps {
-  /** Mensagem de um procedimento específico (botão "Agendar" do card). Omitir
-   *  junto com usar `message` pro botão genérico de Contato (tela final). */
-  item?: ProcedureItem;
-  /** Mensagem pronta pro botão de Contato (tela final, sem procedimento
-   *  específico) — bug real, 2026-10-09: esse botão linkava pro WhatsApp
-   *  real mesmo no showroom, sem essa simulação. */
-  message?: string;
+  item: ProcedureItem;
   onClose: () => void;
 }
 
@@ -72,8 +66,8 @@ const HISTORY: FakeDay[] = [
  *  expor o WhatsApp real da profissional na gravação. Um pequeno histórico
  *  fictício de agendamentos anteriores (2026-10-02) dá a sensação de
  *  cliente recorrente de verdade, em vez de uma conversa vazia. */
-export const FakeWhatsappScreen: React.FC<FakeWhatsappScreenProps> = ({ item, message: messageProp, onClose }) => {
-  const message = messageProp || `Olá! Gostaria de agendar o procedimento: *${item?.title}* (${formatPrice(item?.price || '')}).`;
+export const FakeWhatsappScreen: React.FC<FakeWhatsappScreenProps> = ({ item, onClose }) => {
+  const message = `Olá! Gostaria de agendar o procedimento: *${item.title}* (${formatPrice(item.price)}).`;
 
   const renderBubble = (msg: FakeMessage, key: string, highlight = false) => {
     const isClient = msg.from === 'client';
