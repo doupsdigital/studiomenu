@@ -1,5 +1,7 @@
 import { AGENDA_PRICE } from '@/lib/pricing';
 import { HeroMockup } from './HeroMockup';
+import { FaqSection } from './FaqSection';
+import { LiveShowcaseCta } from './LiveShowcaseCta';
 
 const WHATSAPP_NUMBER = '5562991083435';
 
@@ -116,6 +118,12 @@ export function SalesLandingPage() {
 
               {/* Mockup: catálogo real embutido */}
               <HeroMockup />
+            </div>
+
+            <div className="lp-hero-delivery-badge-wrap">
+              <div className="lp-hero-delivery-badge">
+                <span>⚡ <strong>Entrega Expressa:</strong> Montamos seu Catálogo em até 24h (ou bem antes 😉)</span>
+              </div>
             </div>
           </div>
         </section>
@@ -334,6 +342,12 @@ export function SalesLandingPage() {
             </div>
           </div>
         </section>
+
+        {/* 5. DÚVIDAS FREQUENTES */}
+        <FaqSection />
+
+        {/* 6. SEÇÃO MATADORA (CTA SHOWCASE AO VIVO) */}
+        <LiveShowcaseCta />
       </main>
 
       <footer className="lp-site-footer">
