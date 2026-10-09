@@ -22,12 +22,26 @@ export interface ProcedureItem {
   specs?: [string, string][];
 }
 
+export interface CatalogInstructionItem {
+  id: string;
+  title: string;
+  description: string;
+}
+
 export interface CatalogInstructions {
   pre_care?: string[];
   post_care?: string[];
   tolerances?: string;
   location_notes?: string;
   custom_policies?: string[];
+  /** Lista livre de itens (título + descrição) da tela de Orientações
+   *  (pedido real, 2026-10-09) — substitui os 4 bullets fixos que
+   *  existiam antes. A profissional adiciona/edita/remove à vontade pelo
+   *  Editor Visual. Catálogos que nunca editaram essa tela continuam
+   *  vendo um array-padrão montado a partir de `tolerances`/`pre_care`
+   *  (ver `getCatalogBySlug` em `catalog-service.ts`) — essas colunas
+   *  antigas continuam existindo só pra esse fallback. */
+  items?: CatalogInstructionItem[];
 }
 
 export interface CatalogOrderData {

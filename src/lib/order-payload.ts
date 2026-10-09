@@ -118,6 +118,7 @@ export function buildOrderInsertPayload(input: OrderInsertInput) {
     tolerances: preset.instructions?.tolerances || 'Tolerância máxima de 15 minutos de atraso.',
     pre_care: preset.instructions?.pre_care || [],
     post_care: preset.instructions?.post_care || [],
+    instructions_items: preset.instructions?.items || [],
     categories: [] as string[],
     first_offer_tier: input.firstOfferTier || 'basico',
   };
@@ -151,6 +152,7 @@ export function buildOrderUpdatePayload(data: CatalogOrderData) {
     pre_care: data.instructions?.pre_care || [],
     post_care: data.instructions?.post_care || [],
     tolerances: data.instructions?.tolerances || '',
+    instructions_items: data.instructions?.items || [],
     categories: data.categories || [],
     updated_at: new Date().toISOString(),
   };

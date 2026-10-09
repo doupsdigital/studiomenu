@@ -137,6 +137,26 @@ export async function getCatalogBySlug(slug: string): Promise<CatalogOrderData |
         pre_care: Array.isArray(orderData.pre_care) ? orderData.pre_care : ['Venha sem maquiagem na região do procedimento.'],
         post_care: Array.isArray(orderData.post_care) ? orderData.post_care : ['Higienizar diariamente conforme as recomendações.'],
         tolerances: orderData.tolerances || 'Tolerância máxima de 15 minutos de atraso.',
+        // Catálogos que nunca editaram a tela de Orientações pelo novo
+        // sistema de itens livres (pedido real, 2026-10-09) caem num
+        // array-padrão montado a partir das colunas legadas acima — é
+        // assim que Jessica/Kethellen/Milena (e qualquer catálogo
+        // existente) continuam vendo exatamente os mesmos 4 bullets de
+        // sempre, sem precisar editar nada. IMPORTANTE: só cai no
+        // fallback quando a coluna é NULL (nunca foi salva) — um array
+        // vazio `[]` é diferente de "nunca editado", é "ela apagou tudo
+        // de propósito" (bug real, 2026-10-09: checar `.length > 0` em
+        // vez de só `Array.isArray` fazia a tela "ressuscitar" os 4
+        // itens padrão mesmo depois dela esvaziar e salvar).
+        items:
+          Array.isArray(orderData.instructions_items)
+            ? orderData.instructions_items
+            : [
+                { id: 'confirmacao', title: 'Confirmação', description: 'Até um dia antes do seu horário marcado.' },
+                { id: 'pontualidade', title: 'Pontualidade', description: orderData.tolerances || 'Tolerância máxima de 15 minutos de atraso.' },
+                { id: 'preparacao', title: 'Preparação', description: (Array.isArray(orderData.pre_care) && orderData.pre_care[0]) || 'Venha com a região dos olhos sem maquiagem.' },
+                { id: 'pagamento', title: 'Pagamento', description: 'Dinheiro, Pix, cartão de débito ou crédito.' },
+              ],
       },
     };
 

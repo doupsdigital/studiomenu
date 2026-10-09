@@ -2,7 +2,7 @@
 
 import React, { useMemo, useEffect, useState } from 'react';
 import type { Step } from 'react-joyride';
-import { CatalogOrderData, ProcedureItem, ThemeVariant, LayoutModel } from '@/types/catalog';
+import { CatalogOrderData, ProcedureItem, ThemeVariant, LayoutModel, CatalogInstructionItem } from '@/types/catalog';
 import { HeaderCover } from './HeaderCover';
 import { ProcedureGrid } from './ProcedureGrid';
 import { InstructionsSection } from './InstructionsSection';
@@ -75,6 +75,8 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
     | 'cover'
     | 'procedure'
     | 'social'
+    | 'instruction_item'
+    | 'instruction_delete_confirm'
     | 'category'
     | 'save_confirm'
     | 'save_success'
@@ -87,8 +89,11 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
   const [editingProc, setEditingProc] = useState<ProcedureItem | null>(null);
   const [editingProcIndex, setEditingProcIndex] = useState<number | null>(null);
   const [editingSocialType, setEditingSocialType] = useState<'whatsapp' | 'instagram' | 'address' | 'maps' | null>(null);
+  const [editingInstructionItem, setEditingInstructionItem] = useState<CatalogInstructionItem | null>(null);
+  const [editingInstructionItemIndex, setEditingInstructionItemIndex] = useState<number | null>(null);
   const [categoryToDelete, setCategoryToDelete] = useState<{ name: string; count: number } | null>(null);
   const [procToDelete, setProcToDelete] = useState<ProcedureItem | null>(null);
+  const [instructionItemToDelete, setInstructionItemToDelete] = useState<CatalogInstructionItem | null>(null);
   const [saveErrorMessage, setSaveErrorMessage] = useState<string>('');
 
   // Item em processo de agendamento (wizard do cliente final) — estado
@@ -280,6 +285,50 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
       maps_url: values.maps,
     });
     showToast('✅ Contatos atualizados!');
+  };
+
+  // Lista livre de itens (título + descrição) da tela de Orientações
+  // (pedido real, 2026-10-09) — mesmo padrão de handleSaveProcedure/
+  // handleDeleteProcedure abaixo, só que o array vive em
+  // `catalogState.instructions.items` em vez de `catalogState.procedures`.
+  const handleOpenAddInstructionItemModal = () => {
+    setEditingInstructionItem(null);
+    setEditingInstructionItemIndex(null);
+    setActiveModal('instruction_item');
+  };
+
+  const handleEditInstructionItem = (item: CatalogInstructionItem, index: number) => {
+    setEditingInstructionItem(item);
+    setEditingInstructionItemIndex(index);
+    setActiveModal('instruction_item');
+  };
+
+  const handleSaveInstructionItem = (values: { title: string; description: string }, index: number | null) => {
+    const currentItems = catalogState.instructions?.items || [];
+    const newItems = [...currentItems];
+    const isNew = index === null || index < 0;
+    if (!isNew) {
+      newItems[index as number] = { ...newItems[index as number], ...values };
+    } else {
+      newItems.push({ id: String(Date.now()), ...values });
+    }
+    pushState({ ...catalogState, instructions: { ...catalogState.instructions, items: newItems } });
+    showToast(isNew ? '✨ Informação adicionada!' : '✅ Informação salva!');
+  };
+
+  const handleDeleteInstructionItem = (item: CatalogInstructionItem) => {
+    setInstructionItemToDelete(item);
+    setActiveModal('instruction_delete_confirm');
+  };
+
+  const handleConfirmDeleteInstructionItem = () => {
+    if (!instructionItemToDelete) return;
+    const currentItems = catalogState.instructions?.items || [];
+    const newItems = currentItems.filter((i) => i.id !== instructionItemToDelete.id);
+    pushState({ ...catalogState, instructions: { ...catalogState.instructions, items: newItems } });
+    setInstructionItemToDelete(null);
+    setActiveModal('none');
+    showToast('🗑️ Informação excluída!');
   };
 
   const handleSaveProcedure = (proc: ProcedureItem, index: number | null) => {
@@ -505,15 +554,20 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
           editingProc={editingProc}
           editingProcIndex={editingProcIndex}
           editingSocialType={editingSocialType}
+          editingInstructionItem={editingInstructionItem}
+          editingInstructionItemIndex={editingInstructionItemIndex}
           categoryToDelete={categoryToDelete}
           procToDelete={procToDelete}
+          instructionItemToDelete={instructionItemToDelete}
           onClose={() => setActiveModal('none')}
           onSaveProcedure={handleSaveProcedure}
           onSaveCoverUrl={handleSaveCoverUrl}
           onSaveSocial={handleSaveSocial}
+          onSaveInstructionItem={handleSaveInstructionItem}
           onAddCategory={handleAddCategory}
           onConfirmDeleteCategory={handleConfirmDeleteCategory}
           onConfirmDeleteProc={handleConfirmDeleteProcedure}
+          onConfirmDeleteInstructionItem={handleConfirmDeleteInstructionItem}
           onConfirmDiscard={handleConfirmDiscard}
           onOpenAddCatModal={() => setActiveModal('category')}
           onConfirmSaveDatabase={handleConfirmSaveDatabase}
@@ -576,12 +630,21 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
           layoutSwitcher={layoutSwitcher}
         />
 
-        {/* Seção Orientações */}
-        <InstructionsSection
-          instructions={catalogState.instructions}
-          bgUrl={catalogState.instructions_bg_url}
-          coverUrl={catalogState.cover_media_url}
-        />
+        {/* Seção Orientações — some de vez na visualização pública se a
+         *  profissional apagou todos os itens (pedido real, 2026-10-09);
+         *  em modo de edição continua visível pra ela poder adicionar de
+         *  novo. */}
+        {(isEditMode || (catalogState.instructions?.items?.length || 0) > 0) && (
+          <InstructionsSection
+            instructions={catalogState.instructions}
+            bgUrl={catalogState.instructions_bg_url}
+            coverUrl={catalogState.cover_media_url}
+            isEditMode={isEditMode}
+            onOpenAddInstructionItemModal={handleOpenAddInstructionItemModal}
+            onEditInstructionItem={handleEditInstructionItem}
+            onDeleteInstructionItem={handleDeleteInstructionItem}
+          />
+        )}
 
         {/* Seção Contato & Localização */}
         <CTASection
