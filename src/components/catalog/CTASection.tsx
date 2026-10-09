@@ -6,15 +6,21 @@ interface CTASectionProps {
   data: CatalogOrderData;
   isEditMode?: boolean;
   onOpenSocialModal?: (type: 'whatsapp' | 'instagram' | 'address' | 'maps') => void;
+  /** Só o showroom (`demoBookingOnly`) usa isso — mostra a simulação visual
+   *  do WhatsApp em vez de abrir o número de verdade (bug real, 2026-10-09:
+   *  esse botão não tinha essa proteção e mandava gente clicando na demo
+   *  direto pro WhatsApp real da profissional). */
+  onFakeWhatsapp?: (message: string) => void;
 }
 
 export const CTASection: React.FC<CTASectionProps> = ({
   data,
   isEditMode = false,
   onOpenSocialModal,
+  onFakeWhatsapp,
 }) => {
-  const wspText = encodeURIComponent(`Olá ${data.client_name}! Vim através do seu catálogo digital e gostaria de agendar um horário.`);
-  const wspUrl = `https://wa.me/${data.whatsapp_number}?text=${wspText}`;
+  const wspMessage = `Olá ${data.client_name}! Vim através do seu catálogo digital e gostaria de agendar um horário.`;
+  const wspUrl = `https://wa.me/${data.whatsapp_number}?text=${encodeURIComponent(wspMessage)}`;
   const instagramHandle = data.instagram_handle ? (data.instagram_handle.startsWith('@') ? data.instagram_handle : `@${data.instagram_handle}`) : '@instagram';
   const instagramUrl = data.instagram_handle ? `https://instagram.com/${data.instagram_handle.replace('@', '')}` : '#';
 
@@ -62,12 +68,13 @@ export const CTASection: React.FC<CTASectionProps> = ({
           <div className="secao-contato__acoes">
             {/* Botão Principal WhatsApp */}
             <a
-              href={isEditMode ? '#' : wspUrl}
+              href={isEditMode || onFakeWhatsapp ? '#' : wspUrl}
               target={isEditMode ? '_self' : '_blank'}
               rel="noopener noreferrer"
               className={`btn-whatsapp anim-fade-up delay-4 ${isEditMode ? 'lm-social-wrapper' : ''}`}
               onClick={(e) => {
-                if (isEditMode) e.preventDefault();
+                if (isEditMode || onFakeWhatsapp) e.preventDefault();
+                if (!isEditMode && onFakeWhatsapp) onFakeWhatsapp(wspMessage);
               }}
             >
               {isEditMode && (
