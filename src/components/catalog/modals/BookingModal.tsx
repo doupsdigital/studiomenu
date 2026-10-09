@@ -11,6 +11,10 @@ import '@/styles/scheduling-wizard.css';
 interface BookingModalProps {
   service: ProcedureItem;
   slug: string;
+  /** Nome da profissional/studio (não confundir com o `clientName` abaixo,
+   *  que é o da CLIENTE preenchendo o formulário) — só pro placeholder de
+   *  foto ausente/quebrada, mesma composição "STUDIO" + nome da capa. */
+  professionalName?: string;
   onClose: () => void;
 }
 
@@ -60,6 +64,7 @@ function formatPrice(val: string): string {
 export const BookingModal: React.FC<BookingModalProps> = ({
   service,
   slug,
+  professionalName,
   onClose,
 }) => {
   const days = useState(() => buildNextDays(DAYS_AHEAD))[0];
@@ -213,7 +218,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       <div className="modal-detalhe__backdrop" onClick={onClose} />
       <div className="modal-detalhe__sheet">
         <div className="modal__foto-wrap">
-          <ProcedureImage src={service.image_url} alt={service.title} className="modal__foto" variant="detail" />
+          <ProcedureImage src={service.image_url} alt={service.title} className="modal__foto" variant="detail" clientName={professionalName} />
           <div className="modal__scrim" />
           <button type="button" className="modal__fechar" aria-label="Fechar" onClick={onClose}>
             ✕

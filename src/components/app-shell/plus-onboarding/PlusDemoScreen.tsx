@@ -117,6 +117,7 @@ export const PlusDemoScreen: React.FC<PlusDemoScreenProps> = ({ catalog, onNext 
       {bookingItem && (
         <FakeBookingModal
           service={bookingItem}
+          professionalName={catalog.client_name}
           onClose={() => setBookingItem(null)}
           onBooked={(info) => {
             setAgendaPreview({ service: bookingItem, ...info });

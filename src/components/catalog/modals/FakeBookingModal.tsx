@@ -13,6 +13,9 @@ interface BookedFake {
 
 interface FakeBookingModalProps {
   service: ProcedureItem;
+  /** Nome da profissional/studio, só pro placeholder de foto ausente/
+   *  quebrada (mesma composição "STUDIO" + nome da capa). */
+  professionalName?: string;
   onClose: () => void;
   /** Onboarding do Plano Agenda dentro do app (2026-09-24): quando definido,
    *  ao escolher um horário chama isso em vez de mostrar a tela de sucesso
@@ -69,7 +72,7 @@ function formatPrice(val: string): string {
   return `R$ ${val}`;
 }
 
-export const FakeBookingModal: React.FC<FakeBookingModalProps> = ({ service, onClose, onBooked }) => {
+export const FakeBookingModal: React.FC<FakeBookingModalProps> = ({ service, professionalName, onClose, onBooked }) => {
   const days = useState(() => buildNextDays(DAYS_AHEAD))[0];
   const [selectedDate, setSelectedDate] = useState<string>(days[0].key);
   const [booked, setBooked] = useState<BookedFake | null>(null);
@@ -121,7 +124,7 @@ export const FakeBookingModal: React.FC<FakeBookingModalProps> = ({ service, onC
       <div className="modal-detalhe__backdrop" onClick={onClose} />
       <div className="modal-detalhe__sheet">
         <div className="modal__foto-wrap">
-          <ProcedureImage src={service.image_url} alt={service.title} className="modal__foto" variant="detail" />
+          <ProcedureImage src={service.image_url} alt={service.title} className="modal__foto" variant="detail" clientName={professionalName} />
           <div className="modal__scrim" />
           <button type="button" className="modal__fechar" aria-label="Fechar" onClick={onClose}>
             ✕
