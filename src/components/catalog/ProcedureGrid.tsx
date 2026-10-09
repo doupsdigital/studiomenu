@@ -22,6 +22,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { ProcedureItem, LayoutModel } from '@/types/catalog';
 import { ProcedureCard } from './ProcedureCard';
 import { ProcedureDetailModal } from './ProcedureDetailModal';
+import { ProcedureImage } from './ProcedureImage';
 
 interface ProcedureGridProps {
   procedures: ProcedureItem[];
@@ -90,6 +91,39 @@ const SortableProcCard: React.FC<{
         </>
       )}
       {children}
+    </div>
+  );
+};
+
+/** Card do layout Clássico (lista) — próprio componente, não inline, pra
+ *  poder ter estado isolado do `onError` da foto por item (pedido real,
+ *  2026-10-09: mesmo tratamento de foto ausente/quebrada do Mosaico, ver
+ *  `ProcedureCard.tsx`). */
+const ServicoCardLista: React.FC<{
+  item: ProcedureItem;
+  clientName?: string;
+  isEditMode: boolean;
+  formatPrice: (val: string) => string;
+  onClick: () => void;
+}> = ({ item, clientName, isEditMode, formatPrice, onClick }) => {
+  return (
+    <div
+      className={`servico-card ${isEditMode ? 'lm-service-card-wrapper' : ''}`}
+      onClick={onClick}
+    >
+      <div className="servico-card__foto-box">
+        <ProcedureImage src={item.image_url} alt={item.title} className="servico-card__foto" variant="thumb" clientName={clientName} />
+      </div>
+      <div className="servico-card__conteudo">
+        {item.category && <span className="servico-card__cat">{item.category}</span>}
+        <h3 className="servico-card__titulo">{item.title}</h3>
+        {item.description && <p className="servico-card__desc">{item.description}</p>}
+      </div>
+      <div className="servico-card__lado-dir">
+        <span className="servico-card__preco">{formatPrice(item.price)}</span>
+        {item.duration && <span className="servico-card__duracao">{item.duration}</span>}
+        <span className="servico-card__seta">→</span>
+      </div>
     </div>
   );
 };
@@ -187,8 +221,6 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
     }
     return `R$ ${val}`;
   };
-
-  const fallbackImage = 'https://images.unsplash.com/photo-1583001809873-a1284d563391?auto=format&fit=crop&w=400&q=80';
 
   const isClassico = layoutModel === 'classico';
 
@@ -317,31 +349,15 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
                     onDelete={() => onDeleteProc?.(item)}
                     dataTour={idx === 0 ? 'cat-edit-proc' : undefined}
                   >
-                    <div
-                      className={`servico-card ${isEditMode ? 'lm-service-card-wrapper' : ''}`}
+                    <ServicoCardLista
+                      item={item}
+                      clientName={clientName}
+                      isEditMode={isEditMode}
+                      formatPrice={formatPrice}
                       onClick={() => {
                         if (!isEditMode) setSelectedProcedure(item);
                       }}
-                    >
-                      <div className="servico-card__foto-box">
-                        <img
-                          src={item.image_url || fallbackImage}
-                          alt={item.title}
-                          className="servico-card__foto"
-                          loading="lazy"
-                        />
-                      </div>
-                      <div className="servico-card__conteudo">
-                        {item.category && <span className="servico-card__cat">{item.category}</span>}
-                        <h3 className="servico-card__titulo">{item.title}</h3>
-                        {item.description && <p className="servico-card__desc">{item.description}</p>}
-                      </div>
-                      <div className="servico-card__lado-dir">
-                        <span className="servico-card__preco">{formatPrice(item.price)}</span>
-                        {item.duration && <span className="servico-card__duracao">{item.duration}</span>}
-                        <span className="servico-card__seta">→</span>
-                      </div>
-                    </div>
+                    />
                   </SortableProcCard>
                 ))}
               </div>
@@ -359,6 +375,7 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
                     <ProcedureCard
                       item={item}
                       whatsappNumber={whatsappNumber}
+                      clientName={clientName}
                       isEditMode={isEditMode}
                       onSelect={(proc) => setSelectedProcedure(proc)}
                     />

@@ -2,6 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { ProcedureItem } from '@/types/catalog';
+import { ProcedureImage } from './ProcedureImage';
 
 interface ProcedureDetailModalProps {
   item: ProcedureItem;
@@ -73,19 +74,12 @@ export const ProcedureDetailModal: React.FC<ProcedureDetailModalProps> = ({
 
   const canBook = bookingEnabled && item.bookable !== false && !!item.duration_minutes && item.duration_minutes > 0;
 
-  const fallbackImage = 'https://images.unsplash.com/photo-1583001809873-a1284d563391?auto=format&fit=crop&w=400&q=80';
-
   return (
     <div className="modal-detalhe" role="dialog" aria-modal="true" aria-label={item.title}>
       <div className="modal-detalhe__backdrop" onClick={onClose} />
       <div className="modal-detalhe__sheet">
         <div className="modal__foto-wrap">
-          <img
-            src={item.image_url || fallbackImage}
-            alt={item.title}
-            className="modal__foto"
-            loading="lazy"
-          />
+          <ProcedureImage src={item.image_url} alt={item.title} className="modal__foto" variant="detail" />
           <div className="modal__scrim" />
           <button
             type="button"
