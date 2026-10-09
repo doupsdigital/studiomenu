@@ -86,5 +86,11 @@ export const studioPreset: CatalogOrderData = {
       'Seguir os guias de cuidados pós fornecidos por cada profissional.',
     ],
     tolerances: 'Tolerância de 15 minutos de atraso.',
+    items: [
+      { id: 'confirmacao', title: 'Confirmação', description: 'Até um dia antes do seu horário marcado.' },
+      { id: 'pontualidade', title: 'Pontualidade', description: 'Tolerância de 15 minutos de atraso.' },
+      { id: 'preparacao', title: 'Preparação', description: 'Chegue com 5 a 10 minutos de antecedência.' },
+      { id: 'pagamento', title: 'Pagamento', description: 'Dinheiro, Pix, cartão de débito ou crédito.' },
+    ],
   },
 };

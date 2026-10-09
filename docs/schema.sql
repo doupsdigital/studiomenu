@@ -30,6 +30,13 @@ CREATE TABLE IF NOT EXISTS public.orders (
     tolerances TEXT DEFAULT 'Tolerância máxima de 15 minutos de atraso.',
     pre_care JSONB DEFAULT '[]'::jsonb,
     post_care JSONB DEFAULT '[]'::jsonb,
+    -- Lista livre de itens (título + descrição) da tela de Orientações
+    -- (pedido real, 2026-10-09) — substitui os 4 bullets fixos. NULL/vazio
+    -- cai no fallback montado a partir de tolerances/pre_care (ver
+    -- getCatalogBySlug em catalog-service.ts) — por isso as 3 colunas
+    -- acima continuam existindo, mesmo não sendo mais editadas por nenhuma
+    -- tela nova.
+    instructions_items JSONB DEFAULT NULL,
     procedures JSONB DEFAULT '[]'::jsonb,
     edit_token TEXT UNIQUE DEFAULT encode(gen_random_bytes(16), 'hex'),
     status TEXT DEFAULT 'active',

@@ -1150,6 +1150,41 @@ button {
   border-bottom: none;
 }
 
+/* Lista livre de itens (pedido real, 2026-10-09) — botões de editar/excluir
+ *  por item, só em modo edição. 3ª coluna no grid (ícone | texto | ações). */
+.orientacao__item--editable {
+  grid-template-columns: 46px 1fr auto;
+}
+
+.orientacao__item-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.orientacao__item-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  cursor: pointer;
+  border: 1.5px solid rgba(0, 0, 0, 0.12);
+  background: rgba(0, 0, 0, 0.04);
+  flex-shrink: 0;
+}
+
+.orientacao__item-btn--danger {
+  background: rgba(220, 38, 38, 0.1);
+  border-color: rgba(220, 38, 38, 0.3);
+  color: #dc2626;
+}
+
+.orientacoes__add-item {
+  margin-top: 14px;
+}
+
 .orientacao__icon-box {
   width: 46px;
   height: 46px;

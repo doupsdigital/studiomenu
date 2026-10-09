@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { ProcedureItem } from '@/types/catalog';
+import { ProcedureItem, CatalogInstructionItem } from '@/types/catalog';
 import { CheckCircle } from 'lucide-react';
 
 type ConfirmModalType =
@@ -11,6 +11,7 @@ type ConfirmModalType =
   | 'category_delete_confirm'
   | 'category_delete_blocked'
   | 'proc_delete_confirm'
+  | 'instruction_delete_confirm'
   | 'discard_confirm';
 
 interface ConfirmModalsProps {
@@ -20,10 +21,12 @@ interface ConfirmModalsProps {
   errorMessage: string;
   categoryToDelete?: { name: string; count: number } | null;
   procToDelete?: ProcedureItem | null;
+  instructionItemToDelete?: CatalogInstructionItem | null;
   onClose: () => void;
   onConfirmSaveDatabase: () => void;
   onConfirmDeleteCategory?: () => void;
   onConfirmDeleteProc?: () => void;
+  onConfirmDeleteInstructionItem?: () => void;
   onConfirmDiscard?: () => void;
 }
 
@@ -34,10 +37,12 @@ export const ConfirmModals: React.FC<ConfirmModalsProps> = ({
   errorMessage,
   categoryToDelete,
   procToDelete,
+  instructionItemToDelete,
   onClose,
   onConfirmSaveDatabase,
   onConfirmDeleteCategory,
   onConfirmDeleteProc,
+  onConfirmDeleteInstructionItem,
   onConfirmDiscard,
 }) => {
   if (activeModal === 'save_confirm') {
@@ -239,6 +244,33 @@ export const ConfirmModals: React.FC<ConfirmModalsProps> = ({
             }}
           >
             🗑️ Excluir Procedimento
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (activeModal === 'instruction_delete_confirm') {
+    return (
+      <div className="lm-modal-card">
+        <h3 className="lm-modal-title">🗑️ Excluir Informação</h3>
+        <p className="lm-modal-desc">
+          Tem certeza que deseja excluir <strong>"{instructionItemToDelete?.title}"</strong>?
+        </p>
+
+        <div className="lm-modal-actions">
+          <button type="button" className="lm-modal-btn lm-modal-btn-cancel" onClick={onClose}>
+            Cancelar
+          </button>
+          <button
+            type="button"
+            className="lm-modal-btn lm-modal-btn-confirm"
+            style={{ background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)' }}
+            onClick={() => {
+              if (onConfirmDeleteInstructionItem) onConfirmDeleteInstructionItem();
+            }}
+          >
+            🗑️ Excluir Informação
           </button>
         </div>
       </div>
