@@ -654,6 +654,7 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
             setEditingSocialType(type);
             setActiveModal('social');
           }}
+          demoMode={demoBookingOnly}
         />
       </div>
 
