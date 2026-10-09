@@ -8,11 +8,13 @@ import { CatalogReadyPreview } from './CatalogReadyPreview';
 import { ConfettiBurst } from './ConfettiBurst';
 import { PlanSubscribeCard } from '@/components/billing/PlanSubscribeCard';
 import { ProductTour } from '@/components/tour/ProductTour';
+import { UrgencyTimerBanner } from './UrgencyTimerBanner';
 import { PLAN_PRICING, resolveCatalogPrice } from '@/lib/pricing';
 import type { ProfessionalOrderSummary } from '@/lib/professional-app-service';
 
 interface FirstContactScreenProps {
   order: ProfessionalOrderSummary;
+  isAdmin?: boolean;
 }
 
 /** Primeira tela que a profissional vê ao abrir o link do app, antes de
@@ -34,7 +36,7 @@ interface FirstContactScreenProps {
  *  Tour guiado próprio (Fase 20) — primeiro contato de verdade, então
  *  explica os 3 elementos da tela em vez de pular algum. Texto do 3º passo
  *  muda conforme o plano ofertado (Fase 22). */
-export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order }) => {
+export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order, isAdmin = false }) => {
   const isAgendaOffer = order.first_offer_tier === 'plus';
   const isCatalogoRecorrente = order.catalog_billing_mode === 'recorrente';
   const catalogPrice = resolveCatalogPrice(order.billing_price_override);
@@ -118,6 +120,8 @@ export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order })
             billingMode={order.catalog_billing_mode}
           />
         )}
+
+        <UrgencyTimerBanner createdAt={order.created_at} slug={order.slug} isAdmin={isAdmin} />
       </div>
 
       <ProductTour tourId="primeiro-contato" slug={order.slug} steps={steps} enabled onFinish={handleTourFinish} />

@@ -4,6 +4,7 @@ import { getOrderForProfessionalApp } from '@/lib/professional-app-service';
 import { getCatalogBySlug } from '@/lib/catalog-service';
 import { getAppointmentsForDay, getPendingAppointments } from '@/lib/scheduling/agenda-service';
 import { getBusinessHours } from '@/lib/scheduling/config-service';
+import { isAdminRequestAuthorized } from '@/lib/admin-session';
 import { GradientHeader } from '@/components/app-shell/GradientHeader';
 import { StatCard } from '@/components/app-shell/StatCard';
 import { ViewCatalogCard } from '@/components/app-shell/ViewCatalogCard';
@@ -52,7 +53,8 @@ export default async function InicioPage({ params }: InicioPageProps) {
   // "Início" e botão de instalar não fazia sentido ainda. Volta normalmente
   // assim que ela assina (branch abaixo, que já tem a sua própria).
   if (order.plan_tier === 'catalog') {
-    return <FirstContactScreen order={order} />;
+    const isAdmin = await isAdminRequestAuthorized();
+    return <FirstContactScreen order={order} isAdmin={isAdmin} />;
   }
 
   const isPlusAtivo = order.plan_tier === 'plus' && order.subscription_status === 'ativo';
