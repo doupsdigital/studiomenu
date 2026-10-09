@@ -662,6 +662,7 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
         demoBookingOnly ? (
           <FakeBookingModal
             service={bookingItem}
+            professionalName={catalogState.client_name}
             onClose={() => setBookingItem(null)}
             onBooked={(info) => {
               setAgendaDemo({ service: bookingItem, ...info });
@@ -672,6 +673,7 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
           <BookingModal
             service={bookingItem}
             slug={catalogState.slug}
+            professionalName={catalogState.client_name}
             onClose={() => setBookingItem(null)}
           />
         )

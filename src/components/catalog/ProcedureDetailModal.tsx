@@ -79,7 +79,7 @@ export const ProcedureDetailModal: React.FC<ProcedureDetailModalProps> = ({
       <div className="modal-detalhe__backdrop" onClick={onClose} />
       <div className="modal-detalhe__sheet">
         <div className="modal__foto-wrap">
-          <ProcedureImage src={item.image_url} alt={item.title} className="modal__foto" variant="detail" />
+          <ProcedureImage src={item.image_url} alt={item.title} className="modal__foto" variant="detail" clientName={clientName} />
           <div className="modal__scrim" />
           <button
             type="button"
