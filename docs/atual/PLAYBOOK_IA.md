@@ -60,6 +60,14 @@ exceção:
 4. **Nunca promove pra `main` sozinho.** Só abre caminho pra produção quando ela disser,
    separadamente e pra aquela mudança específica, algo como "pode subir pra main" — uma aprovação
    anterior (de outra mudança, ou "em geral") **não vale** pra essa. Pergunte de novo toda vez.
+   - **Exceção explícita (confirmado 2026-10-09):** se ela já pedir as duas etapas na mesma frase
+     ("suba pra desenv e já deixa a PR pronta pra main"), isso **conta** como autorização
+     explícita pras duas — não precisa parar no meio pra perguntar de novo antes de criar a PR.
+     Isso não reduz a proteção real: a PR fica só aberta, nunca mergeada (regra 5 continua valendo
+     igual). Essa combinação vale bem pra ajustes simples (copy, texto, cor, pequeno ajuste
+     visual); pra mudanças maiores (schema, pagamento, lógica de negócio, feature grande), mesmo
+     que ela peça assim, é mais seguro oferecer manter os dois pedidos separados — ela confirmou
+     que prefere isso só pros casos simples.
 5. **Mecânica da promoção pra `main`** (nunca faz merge direto de `desenv` inteira):
    ```
    git fetch origin
