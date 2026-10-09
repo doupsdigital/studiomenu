@@ -957,6 +957,276 @@
 }
 
 /* ==========================================================================
+   BADGE DE ENTREGA NO HERO
+   ========================================================================== */
+.lp-hero-delivery-badge-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.lp-hero-delivery-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--lp-accent-light);
+  border: 1px solid rgba(200, 75, 114, 0.3);
+  padding: 10px 20px;
+  border-radius: var(--lp-radius-pill);
+  font-size: 0.92rem;
+  color: var(--lp-accent-dark);
+  box-shadow: 0 4px 14px rgba(200, 75, 114, 0.1);
+  text-align: center;
+}
+
+.lp-hero-delivery-badge strong {
+  color: var(--lp-accent);
+}
+
+/* ==========================================================================
+   FAIXA DE DESTAQUE: ENTREGA 24H
+   ========================================================================== */
+.lp-delivery-banner-section {
+  padding: 24px 0;
+  background: #fbf0f3;
+  border-top: 1px solid rgba(200, 75, 114, 0.15);
+  border-bottom: 1px solid rgba(200, 75, 114, 0.15);
+}
+
+.lp-delivery-banner-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: #ffffff;
+  border: 1.5px solid rgba(200, 75, 114, 0.25);
+  border-radius: var(--lp-radius-md);
+  padding: 16px 24px;
+  box-shadow: 0 6px 20px rgba(200, 75, 114, 0.08);
+  text-align: center;
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+.lp-db-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.lp-db-text {
+  font-size: 0.98rem;
+  color: var(--lp-text);
+  line-height: 1.45;
+  font-weight: 500;
+}
+
+.lp-db-text strong {
+  color: var(--lp-accent);
+  font-weight: 800;
+}
+
+@media (max-width: 600px) {
+  .lp-hero-delivery-badge { font-size: 0.82rem; padding: 7px 12px; }
+  .lp-delivery-banner-box { gap: 8px; padding: 14px 16px; }
+  .lp-db-text { font-size: 0.88rem; }
+}
+
+/* ==========================================================================
+   DÚVIDAS FREQUENTES (FAQ)
+   ========================================================================== */
+.lp-faq-section {
+  padding: 64px 0 80px;
+  background: var(--lp-bg);
+}
+
+.lp-faq-list {
+  max-width: 780px;
+  margin: 32px auto 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.lp-faq-item {
+  background: #ffffff;
+  border: 1.5px solid var(--lp-border);
+  border-radius: var(--lp-radius-md);
+  overflow: hidden;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+}
+
+.lp-faq-item:hover {
+  border-color: rgba(200, 75, 114, 0.35);
+  box-shadow: 0 6px 20px rgba(200, 75, 114, 0.06);
+}
+
+.lp-faq-item.is-open {
+  border-color: var(--lp-accent);
+  box-shadow: 0 8px 25px rgba(200, 75, 114, 0.12);
+  background: #ffffff;
+}
+
+.lp-faq-question {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--lp-text);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.lp-faq-item.is-open .lp-faq-question {
+  color: var(--lp-accent);
+}
+
+.lp-faq-question-text {
+  line-height: 1.35;
+}
+
+.lp-faq-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--lp-bg-subtle);
+  color: var(--lp-accent);
+  flex-shrink: 0;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease, color 0.2s ease;
+}
+
+.lp-faq-item.is-open .lp-faq-icon {
+  transform: rotate(180deg);
+  background: var(--lp-accent);
+  color: #ffffff;
+}
+
+.lp-faq-answer {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lp-faq-item.is-open .lp-faq-answer {
+  grid-template-rows: 1fr;
+}
+
+.lp-faq-answer-inner {
+  overflow: hidden;
+}
+
+.lp-faq-answer-inner p {
+  padding: 0 24px 22px;
+  font-size: 0.93rem;
+  line-height: 1.6;
+  color: #554852;
+  margin: 0;
+  font-weight: 500;
+}
+
+@media (max-width: 600px) {
+  .lp-faq-section { padding: 44px 0 60px; }
+  .lp-faq-question { padding: 16px 18px; font-size: 0.92rem; }
+  .lp-faq-answer-inner p { padding: 0 18px 18px; font-size: 0.88rem; }
+  .lp-faq-icon { width: 28px; height: 28px; }
+}
+
+/* ==========================================================================
+   SEÇÃO MATADORA (CTA SHOWCASE AO VIVO)
+   ========================================================================== */
+.lp-live-cta-section {
+  padding: 0 0 80px;
+  background: var(--lp-bg);
+}
+
+.lp-live-cta-box {
+  background: linear-gradient(135deg, var(--lp-accent) 0%, var(--lp-accent-dark) 100%);
+  border-radius: 28px;
+  padding: clamp(32px, 4.5vw, 48px) clamp(20px, 4vw, 40px);
+  text-align: center;
+  color: #ffffff;
+  box-shadow: 0 16px 40px rgba(200, 75, 114, 0.28);
+  position: relative;
+  overflow: hidden;
+  max-width: 920px;
+  margin: 0 auto;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.lp-live-cta-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  padding: 6px 16px;
+  border-radius: 100px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: #ffffff;
+  margin-bottom: 18px;
+  text-transform: uppercase;
+}
+
+.lp-live-cta-title {
+  font-size: clamp(1.2rem, 3.2vw, 1.8rem);
+  font-weight: 600;
+  color: #ffffff !important;
+  line-height: 1.35;
+  margin-bottom: 22px;
+  letter-spacing: -0.01em;
+}
+
+.lp-live-cta-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.lp-live-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #ffffff;
+  color: var(--lp-accent-dark) !important;
+  font-size: 1rem;
+  font-weight: 800;
+  padding: 16px 36px;
+  border-radius: var(--lp-radius-md);
+  text-decoration: none;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.18);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  letter-spacing: 0.02em;
+}
+
+.lp-live-cta-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  background: #ffffff;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.28);
+  color: var(--lp-accent) !important;
+}
+
+@media (max-width: 600px) {
+  .lp-live-cta-section { padding-bottom: 50px; }
+  .lp-live-cta-box { border-radius: 20px; padding: 26px 18px; }
+  .lp-live-cta-btn { width: 100%; font-size: 0.92rem; padding: 15px 20px; }
+}
+
+/* ==========================================================================
    RODAPÉ
    ========================================================================== */
 .lp-site-footer {
