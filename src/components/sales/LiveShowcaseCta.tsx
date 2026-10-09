@@ -18,7 +18,7 @@ export function LiveShowcaseCta() {
 
           <div className="lp-live-cta-actions">
             <Link
-              href="/c/showcase/studio"
+              href="/c/showcase/studiodesigner"
               target="_blank"
               rel="noopener noreferrer"
               className="lp-live-cta-btn"
