@@ -63,7 +63,7 @@ export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order })
   const steps = useMemo<Step[]>(
     () => [
       { target: '[data-tour="fc-view"]', title: 'Seu catálogo', content: 'Esse é o link que suas clientes veem — pode colocar na bio do Instagram, WhatsApp, onde quiser.' },
-      { target: '[data-tour="fc-edit"]', title: 'Editar quando quiser', content: 'Aqui você atualiza fotos, preços e serviços a qualquer hora, sem precisar de ajuda.' },
+      { target: '[data-tour="fc-edit"]', title: 'Edite quando quiser', content: 'Aqui você atualiza fotos, preços e serviços a qualquer hora, é muito fácil e intuitivo.' },
       isAgendaOffer
         ? {
             target: '[data-tour="fc-subscribe"]',
