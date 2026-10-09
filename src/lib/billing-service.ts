@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from './supabase-admin';
 import { sendTelegramMessage } from './telegram';
+import { sendMetaCapiEvent } from './meta-capi';
 import { AsaasApiError, cancelSubscription, getPixQrCode, type AsaasPayment } from './asaas';
 
 type PaymentMethod = 'pix' | 'card';
@@ -54,7 +55,7 @@ export async function buildPaymentResponse(payment: AsaasPayment, method: Paymen
 export async function activateSubscription(orderId: string, confirmedPaymentId?: string): Promise<void> {
   const { data: before } = await supabaseAdmin
     .from('orders')
-    .select('subscription_status, client_name, slug, pending_plan_tier, asaas_subscription_id, pending_lifetime_payment_id')
+    .select('subscription_status, client_name, whatsapp_number, slug, pending_plan_tier, asaas_subscription_id, pending_lifetime_payment_id')
     .eq('id', orderId)
     .single();
 
@@ -99,6 +100,14 @@ export async function activateSubscription(orderId: string, confirmedPaymentId?:
     await sendTelegramMessage(
       `${label}\n\n👤 ${before.client_name}\n🔗 https://studiomenu.art/c/${before.slug}\n🕒 ${nowStr}`
     );
+    // Dispara evento CAPI Purchase no Meta Ads para nova assinatura
+    sendMetaCapiEvent({
+      eventName: 'Purchase',
+      value: tier === 'basico' ? 24.90 : 69.90,
+      currency: 'BRL',
+      phone: before.whatsapp_number || undefined,
+      contentName: tier === 'basico' ? 'Plano Básico StudioMenu' : 'Plano Plus StudioMenu',
+    }).catch((err) => console.error('[Meta CAPI Async Error]:', err));
   }
 
   // Confirmação do pagamento avulso de "virar vitalício" (Fase 28) — setado
@@ -138,6 +147,14 @@ export async function activateSubscription(orderId: string, confirmedPaymentId?:
       await sendTelegramMessage(
         `💰 Catálogo virou vitalício!\n\n👤 ${before.client_name}\n🔗 https://studiomenu.art/c/${before.slug}\n🕒 ${nowStr}`
       );
+      // Dispara evento CAPI Purchase no Meta Ads para Plano Vitalício (R$ 197,00)
+      sendMetaCapiEvent({
+        eventName: 'Purchase',
+        value: 197.00,
+        currency: 'BRL',
+        phone: before.whatsapp_number || undefined,
+        contentName: 'Plano Vitalício StudioMenu',
+      }).catch((err) => console.error('[Meta CAPI Async Error]:', err));
     }
   }
 }
