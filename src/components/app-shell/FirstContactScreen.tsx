@@ -35,7 +35,6 @@ interface FirstContactScreenProps {
  *  explica os 3 elementos da tela em vez de pular algum. Texto do 3º passo
  *  muda conforme o plano ofertado (Fase 22). */
 export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order }) => {
-  const firstName = order.client_name.split(' ')[0];
   const isAgendaOffer = order.first_offer_tier === 'plus';
   const isCatalogoRecorrente = order.catalog_billing_mode === 'recorrente';
   const catalogPrice = resolveCatalogPrice(order.billing_price_override);
@@ -84,7 +83,7 @@ export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order })
     <main className="max-w-md mx-auto px-5 pt-8 pb-6 flex flex-col gap-4">
       {showConfetti && <ConfettiBurst />}
       <div className="text-center">
-        <h1 className="font-serif-pro font-bold text-2xl text-ink">Olá, {firstName}! ✨</h1>
+        <h1 className="font-serif-pro font-bold text-2xl text-ink">Olá, {order.client_name}! ✨</h1>
       </div>
 
       <CatalogReadyPreview slug={order.slug} />
