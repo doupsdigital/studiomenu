@@ -79,13 +79,18 @@ export const esteticaPreset: CatalogOrderData = {
   ],
   instructions: {
     pre_care: [
-      'Evite exposição solar intensa no dia anterior ao procedimento.',
-      'Não use ácidos na pele 3 dias antes da sessão.',
+      'Chegue com 5 a 10 minutos de antecedência.',
+      'Siga as orientações prévias de cada procedimento agendado.',
     ],
     post_care: [
-      'Use protetor solar FPS 50+ a cada 3 horas religiosamente.',
-      'Mantenha a pele hidratada com o dermocosmético indicado.',
+      'Seguir os guias de cuidados pós fornecidos por cada profissional.',
     ],
     tolerances: 'Tolerância de 15 minutos de atraso.',
+    items: [
+      { id: 'confirmacao', title: 'Confirmação', description: 'Até um dia antes do seu horário marcado.' },
+      { id: 'pontualidade', title: 'Pontualidade', description: 'Tolerância de 15 minutos de atraso.' },
+      { id: 'preparacao', title: 'Preparação', description: 'Chegue com 5 a 10 minutos de antecedência.' },
+      { id: 'pagamento', title: 'Pagamento', description: 'Dinheiro, Pix, cartão de débito ou crédito.' },
+    ],
   },
 };

@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { CatalogOrderData, ProcedureItem } from '@/types/catalog';
+import { CatalogOrderData, ProcedureItem, CatalogInstructionItem } from '@/types/catalog';
 import { compressImageFile } from '@/lib/image-compress';
 import { CoverModal } from './modals/CoverModal';
 import { ProcedureModal } from './modals/ProcedureModal';
 import { SocialModal } from './modals/SocialModal';
+import { InstructionItemModal } from './modals/InstructionItemModal';
 import { CategoryModal } from './modals/CategoryModal';
 import { ConfirmModals } from './modals/ConfirmModals';
 
@@ -19,6 +20,8 @@ interface VisualEditorModalsProps {
     | 'cover'
     | 'procedure'
     | 'social'
+    | 'instruction_item'
+    | 'instruction_delete_confirm'
     | 'category'
     | 'save_confirm'
     | 'save_success'
@@ -31,15 +34,20 @@ interface VisualEditorModalsProps {
   editingProc: ProcedureItem | null;
   editingProcIndex: number | null;
   editingSocialType: 'whatsapp' | 'instagram' | 'address' | 'maps' | null;
+  editingInstructionItem: CatalogInstructionItem | null;
+  editingInstructionItemIndex: number | null;
   categoryToDelete?: { name: string; count: number } | null;
   procToDelete?: ProcedureItem | null;
+  instructionItemToDelete?: CatalogInstructionItem | null;
   onClose: () => void;
   onSaveProcedure: (proc: ProcedureItem, index: number | null) => void;
   onSaveCoverUrl: (url: string) => void;
   onSaveSocial: (values: { whatsapp: string; instagram: string; address: string; maps: string }) => void;
+  onSaveInstructionItem: (item: { title: string; description: string }, index: number | null) => void;
   onAddCategory: (categoryName: string) => void;
   onConfirmDeleteCategory?: () => void;
   onConfirmDeleteProc?: () => void;
+  onConfirmDeleteInstructionItem?: () => void;
   onConfirmDiscard?: () => void;
   onOpenAddCatModal?: () => void;
   onConfirmSaveDatabase: () => void;
@@ -56,15 +64,20 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
   errorMessage = '',
   editingProc,
   editingProcIndex,
+  editingInstructionItem,
+  editingInstructionItemIndex,
   categoryToDelete,
   procToDelete,
+  instructionItemToDelete,
   onClose,
   onSaveProcedure,
   onSaveCoverUrl,
   onSaveSocial,
+  onSaveInstructionItem,
   onAddCategory,
   onConfirmDeleteCategory,
   onConfirmDeleteProc,
+  onConfirmDeleteInstructionItem,
   onConfirmDiscard,
   onOpenAddCatModal,
   onConfirmSaveDatabase,
@@ -173,6 +186,12 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
     maps: catalogData.maps_url || '',
   });
 
+  // Instruction Item Form State (um item por vez: título + descrição)
+  const [instructionItemForm, setInstructionItemForm] = useState({
+    title: editingInstructionItem?.title || '',
+    description: editingInstructionItem?.description || '',
+  });
+
   // Category State
   const [newCatName, setNewCatName] = useState('');
 
@@ -213,6 +232,16 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
       maps: catalogData.maps_url || '',
     });
   }, [catalogData]);
+
+  // Sincronizar form do item de orientação (mesmo padrão do procForm acima —
+  // reage a qual item está sendo editado, não ao catalogData inteiro, senão
+  // digitar no campo seria sobrescrito a cada re-render).
+  React.useEffect(() => {
+    setInstructionItemForm({
+      title: editingInstructionItem?.title || '',
+      description: editingInstructionItem?.description || '',
+    });
+  }, [editingInstructionItem, activeModal]);
 
   // Upload de Imagem para Supabase Storage — comprime no navegador antes de
   // enviar (capa maior que a foto de um procedimento, pois ocupa a tela
@@ -280,6 +309,16 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
         <SocialModal socialForm={socialForm} setSocialForm={setSocialForm} onSaveSocial={onSaveSocial} onClose={onClose} />
       )}
 
+      {activeModal === 'instruction_item' && (
+        <InstructionItemModal
+          itemForm={instructionItemForm}
+          setItemForm={setInstructionItemForm}
+          isNew={editingInstructionItem === null}
+          onSaveItem={(values) => onSaveInstructionItem(values, editingInstructionItemIndex)}
+          onClose={onClose}
+        />
+      )}
+
       {activeModal === 'category' && (
         <CategoryModal newCatName={newCatName} setNewCatName={setNewCatName} onAddCategory={onAddCategory} onClose={onClose} />
       )}
@@ -287,6 +326,7 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
       {activeModal !== 'cover' &&
         activeModal !== 'procedure' &&
         activeModal !== 'social' &&
+        activeModal !== 'instruction_item' &&
         activeModal !== 'category' && (
           <ConfirmModals
             activeModal={activeModal}
@@ -295,10 +335,12 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
             errorMessage={errorMessage}
             categoryToDelete={categoryToDelete}
             procToDelete={procToDelete}
+            instructionItemToDelete={instructionItemToDelete}
             onClose={onClose}
             onConfirmSaveDatabase={onConfirmSaveDatabase}
             onConfirmDeleteCategory={onConfirmDeleteCategory}
             onConfirmDeleteProc={onConfirmDeleteProc}
+            onConfirmDeleteInstructionItem={onConfirmDeleteInstructionItem}
             onConfirmDiscard={onConfirmDiscard}
           />
         )}

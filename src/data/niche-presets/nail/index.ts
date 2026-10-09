@@ -80,14 +80,18 @@ export const nailPreset: CatalogOrderData = {
   ],
   instructions: {
     pre_care: [
-      'Venha com as unhas limpas e sem esmalte tradicional.',
-      'Evite usar cremes nas mãos 1 hora antes do procedimento.',
+      'Chegue com 5 a 10 minutos de antecedência.',
+      'Siga as orientações prévias de cada procedimento agendado.',
     ],
     post_care: [
-      'Não use as unhas como ferramentas para abrir recipientes.',
-      'Hidrate as cutículas com óleo reparador diariamente.',
-      'Realize a manutenção a cada 20 a 25 dias.',
+      'Seguir os guias de cuidados pós fornecidos por cada profissional.',
     ],
-    tolerances: 'Tolerância máxima de 10 minutos de atraso.',
+    tolerances: 'Tolerância de 15 minutos de atraso.',
+    items: [
+      { id: 'confirmacao', title: 'Confirmação', description: 'Até um dia antes do seu horário marcado.' },
+      { id: 'pontualidade', title: 'Pontualidade', description: 'Tolerância de 15 minutos de atraso.' },
+      { id: 'preparacao', title: 'Preparação', description: 'Chegue com 5 a 10 minutos de antecedência.' },
+      { id: 'pagamento', title: 'Pagamento', description: 'Dinheiro, Pix, cartão de débito ou crédito.' },
+    ],
   },
 };

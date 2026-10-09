@@ -166,14 +166,18 @@ export const lashPreset: CatalogOrderData = {
   ],
   instructions: {
     pre_care: [
-      'Venha com a região dos olhos sem maquiagem ou rímel.',
-      'Evite café ou bebidas estimulantes antes do procedimento.',
+      'Chegue com 5 a 10 minutos de antecedência.',
+      'Siga as orientações prévias de cada procedimento agendado.',
     ],
     post_care: [
-      'Não molhar a extensão nas primeiras 24 horas.',
-      'Higienizar diariamente com shampoo neutro infantil.',
-      'Escovar os cílios diariamente com a escovinha fornecida.',
+      'Seguir os guias de cuidados pós fornecidos por cada profissional.',
     ],
-    tolerances: 'Tolerância máxima de 15 minutos de atraso.',
+    tolerances: 'Tolerância de 15 minutos de atraso.',
+    items: [
+      { id: 'confirmacao', title: 'Confirmação', description: 'Até um dia antes do seu horário marcado.' },
+      { id: 'pontualidade', title: 'Pontualidade', description: 'Tolerância de 15 minutos de atraso.' },
+      { id: 'preparacao', title: 'Preparação', description: 'Chegue com 5 a 10 minutos de antecedência.' },
+      { id: 'pagamento', title: 'Pagamento', description: 'Dinheiro, Pix, cartão de débito ou crédito.' },
+    ],
   },
 };
