@@ -1,14 +1,16 @@
 import React from 'react';
 import { ProcedureItem } from '@/types/catalog';
+import { ProcedureImage } from './ProcedureImage';
 
 interface ProcedureCardProps {
   item: ProcedureItem;
   whatsappNumber: string;
+  clientName?: string;
   isEditMode?: boolean;
   onSelect?: (item: ProcedureItem) => void;
 }
 
-export const ProcedureCard: React.FC<ProcedureCardProps> = ({ item, whatsappNumber, isEditMode = false, onSelect }) => {
+export const ProcedureCard: React.FC<ProcedureCardProps> = ({ item, whatsappNumber, clientName, isEditMode = false, onSelect }) => {
   const formatPrice = (val: string) => {
     if (!val) return 'Sob Consulta';
     const lower = val.toLowerCase();
@@ -28,19 +30,12 @@ export const ProcedureCard: React.FC<ProcedureCardProps> = ({ item, whatsappNumb
     window.open(`https://wa.me/${whatsappNumber}?text=${text}`, '_blank');
   };
 
-  const fallbackImage = 'https://images.unsplash.com/photo-1583001809873-a1284d563391?auto=format&fit=crop&w=400&q=80';
-
   return (
     <div
       className={`tile ${item.is_highlight ? 'tile--destaque' : ''} is-revealed ${isEditMode ? 'lm-service-card-wrapper' : ''}`}
       onClick={handleBooking}
     >
-      <img
-        src={item.image_url || fallbackImage}
-        alt={item.title}
-        className="tile__foto"
-        loading="lazy"
-      />
+      <ProcedureImage src={item.image_url} alt={item.title} className="tile__foto" variant="tile" clientName={clientName} />
       <div className="tile__scrim"></div>
       <div className="tile__conteudo">
         {item.category && <span className="tile__cat">{item.category}</span>}

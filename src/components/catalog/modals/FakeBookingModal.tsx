@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { CheckCircle } from 'lucide-react';
 import { ProcedureItem } from '@/types/catalog';
+import { ProcedureImage } from '../ProcedureImage';
 import '@/styles/scheduling-wizard.css';
 
 interface BookedFake {
@@ -73,8 +74,6 @@ export const FakeBookingModal: React.FC<FakeBookingModalProps> = ({ service, onC
   const [selectedDate, setSelectedDate] = useState<string>(days[0].key);
   const [booked, setBooked] = useState<BookedFake | null>(null);
 
-  const fallbackImage = 'https://images.unsplash.com/photo-1583001809873-a1284d563391?auto=format&fit=crop&w=400&q=80';
-
   if (booked) {
     return (
       <div className="wizard-success" role="dialog" aria-modal="true" aria-label="Agendamento reservado">
@@ -122,7 +121,7 @@ export const FakeBookingModal: React.FC<FakeBookingModalProps> = ({ service, onC
       <div className="modal-detalhe__backdrop" onClick={onClose} />
       <div className="modal-detalhe__sheet">
         <div className="modal__foto-wrap">
-          <img src={service.image_url || fallbackImage} alt={service.title} className="modal__foto" loading="lazy" />
+          <ProcedureImage src={service.image_url} alt={service.title} className="modal__foto" variant="detail" />
           <div className="modal__scrim" />
           <button type="button" className="modal__fechar" aria-label="Fechar" onClick={onClose}>
             ✕

@@ -5,6 +5,7 @@ import { CheckCircle, CalendarX, Sparkles } from 'lucide-react';
 import { ProcedureItem } from '@/types/catalog';
 import type { AvailabilitySlot } from '@/lib/scheduling/availability';
 import { formatPhoneBR } from '@/lib/format';
+import { ProcedureImage } from '../ProcedureImage';
 import '@/styles/scheduling-wizard.css';
 
 interface BookingModalProps {
@@ -158,8 +159,6 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     }
   };
 
-  const fallbackImage = 'https://images.unsplash.com/photo-1583001809873-a1284d563391?auto=format&fit=crop&w=400&q=80';
-
   // Passo 3 (confirmado) não é mais parte do bottom sheet do wizard — é um
   // evento concluído, não um passo do formulário, por isso vira um modal
   // centralizado próprio (ver comentário em scheduling-wizard.css). Sem
@@ -214,7 +213,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       <div className="modal-detalhe__backdrop" onClick={onClose} />
       <div className="modal-detalhe__sheet">
         <div className="modal__foto-wrap">
-          <img src={service.image_url || fallbackImage} alt={service.title} className="modal__foto" loading="lazy" />
+          <ProcedureImage src={service.image_url} alt={service.title} className="modal__foto" variant="detail" />
           <div className="modal__scrim" />
           <button type="button" className="modal__fechar" aria-label="Fechar" onClick={onClose}>
             ✕
