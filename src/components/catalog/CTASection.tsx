@@ -1,24 +1,48 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { MapPin } from 'lucide-react';
 import { CatalogOrderData } from '@/types/catalog';
+
+type DemoInfoType = 'whatsapp' | 'instagram' | 'maps';
+
+const DEMO_INFO: Record<DemoInfoType, { icon: string; title: string; desc: string }> = {
+  whatsapp: {
+    icon: '💬',
+    title: 'Botão do WhatsApp',
+    desc: 'Esse botão abre o WhatsApp pra sua cliente agendar diretamente com você.',
+  },
+  instagram: {
+    icon: '📷',
+    title: 'Botão do Instagram',
+    desc: 'Esse botão leva direto pro Instagram do seu estúdio.',
+  },
+  maps: {
+    icon: '📍',
+    title: 'Botão de Localização',
+    desc: 'Esse botão mostra a localização do seu estúdio no mapa.',
+  },
+};
 
 interface CTASectionProps {
   data: CatalogOrderData;
   isEditMode?: boolean;
   onOpenSocialModal?: (type: 'whatsapp' | 'instagram' | 'address' | 'maps') => void;
-  /** Só o showroom (`demoBookingOnly`) usa isso — mostra a simulação visual
-   *  do WhatsApp em vez de abrir o número de verdade (bug real, 2026-10-09:
-   *  esse botão não tinha essa proteção e mandava gente clicando na demo
-   *  direto pro WhatsApp real da profissional). */
-  onFakeWhatsapp?: (message: string) => void;
+  /** Só o showroom (`demoBookingOnly`) usa isso — em vez de abrir os links de
+   *  verdade (bug real, 2026-10-09: o botão de WhatsApp não tinha nenhuma
+   *  proteção e mandava gente clicando na demo direto pro WhatsApp real da
+   *  profissional), mostra um aviso explicando o que cada botão faz. Trocado
+   *  da simulação visual do WhatsApp (2026-10-09) por pedido — ficava
+   *  "fingindo" demais; um aviso simples e amigável é mais direto. */
+  demoMode?: boolean;
 }
 
 export const CTASection: React.FC<CTASectionProps> = ({
   data,
   isEditMode = false,
   onOpenSocialModal,
-  onFakeWhatsapp,
+  demoMode = false,
 }) => {
+  const [demoInfo, setDemoInfo] = useState<DemoInfoType | null>(null);
+
   const wspMessage = `Olá ${data.client_name}! Vim através do seu catálogo digital e gostaria de agendar um horário.`;
   const wspUrl = `https://wa.me/${data.whatsapp_number}?text=${encodeURIComponent(wspMessage)}`;
   const instagramHandle = data.instagram_handle ? (data.instagram_handle.startsWith('@') ? data.instagram_handle : `@${data.instagram_handle}`) : '@instagram';
@@ -68,13 +92,13 @@ export const CTASection: React.FC<CTASectionProps> = ({
           <div className="secao-contato__acoes">
             {/* Botão Principal WhatsApp */}
             <a
-              href={isEditMode || onFakeWhatsapp ? '#' : wspUrl}
+              href={isEditMode || demoMode ? '#' : wspUrl}
               target={isEditMode ? '_self' : '_blank'}
               rel="noopener noreferrer"
               className={`btn-whatsapp anim-fade-up delay-4 ${isEditMode ? 'lm-social-wrapper' : ''}`}
               onClick={(e) => {
-                if (isEditMode || onFakeWhatsapp) e.preventDefault();
-                if (!isEditMode && onFakeWhatsapp) onFakeWhatsapp(wspMessage);
+                if (isEditMode || demoMode) e.preventDefault();
+                if (!isEditMode && demoMode) setDemoInfo('whatsapp');
               }}
             >
               {isEditMode && (
@@ -103,12 +127,13 @@ export const CTASection: React.FC<CTASectionProps> = ({
 
             {/* Botão Secundário Instagram */}
             <a
-              href={isEditMode ? '#' : instagramUrl}
+              href={isEditMode || demoMode ? '#' : instagramUrl}
               target={isEditMode ? '_self' : '_blank'}
               rel="noopener noreferrer"
               className={`btn-instagram anim-fade-up delay-5 ${isEditMode ? 'lm-social-wrapper' : ''}`}
               onClick={(e) => {
-                if (isEditMode) e.preventDefault();
+                if (isEditMode || demoMode) e.preventDefault();
+                if (!isEditMode && demoMode) setDemoInfo('instagram');
               }}
             >
               {isEditMode && (
@@ -141,12 +166,13 @@ export const CTASection: React.FC<CTASectionProps> = ({
                 outros dois botões). */}
             {(isEditMode || data.maps_url) && (
               <a
-                href={isEditMode ? '#' : data.maps_url || '#'}
+                href={isEditMode || demoMode ? '#' : data.maps_url || '#'}
                 target={isEditMode ? '_self' : '_blank'}
                 rel="noopener noreferrer"
                 className={`btn-maps anim-fade-up delay-6 ${isEditMode ? 'lm-social-wrapper' : ''}`}
                 onClick={(e) => {
-                  if (isEditMode) e.preventDefault();
+                  if (isEditMode || demoMode) e.preventDefault();
+                  if (!isEditMode && demoMode) setDemoInfo('maps');
                 }}
               >
                 {isEditMode && (
@@ -174,6 +200,45 @@ export const CTASection: React.FC<CTASectionProps> = ({
           </div>
         </div>
       </div>
+
+      {demoInfo && (
+        <div className="lm-modal-overlay is-open" onClick={() => setDemoInfo(null)}>
+          <div className="lm-modal-card" style={{ textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+            <div
+              style={{
+                width: '54px',
+                height: '54px',
+                borderRadius: '50%',
+                background: 'rgba(192, 75, 107, 0.12)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 14px auto',
+                fontSize: '24px',
+              }}
+            >
+              {DEMO_INFO[demoInfo].icon}
+            </div>
+            <h3 className="lm-modal-title" style={{ fontSize: '1.2rem' }}>
+              {DEMO_INFO[demoInfo].title}
+            </h3>
+            <p className="lm-modal-desc" style={{ marginBottom: '22px' }}>
+              {DEMO_INFO[demoInfo].desc}
+            </p>
+
+            <div className="lm-modal-actions">
+              <button
+                type="button"
+                className="lm-modal-btn lm-modal-btn-confirm"
+                onClick={() => setDemoInfo(null)}
+                style={{ width: '100%', flex: '1 1 100%' }}
+              >
+                Entendi
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };
