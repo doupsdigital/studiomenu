@@ -148,14 +148,15 @@ export default function EstudioVideosPage() {
         </div>
       </div>
 
-      {/* Botão Sair do Modo Gravação */}
+      {/* Botão Sair do Modo Gravação — X discreto no canto inferior direito para não atrapalhar a gravação */}
       {recordingMode && (
         <button
           onClick={() => setRecordingMode(false)}
-          className="fixed top-3.5 right-3.5 z-[9999] px-4 py-2 rounded-full text-xs font-extrabold bg-black/85 border-[1.5px] border-rose-500 text-white shadow-2xl flex items-center gap-1.5"
+          className="fixed bottom-3.5 right-3.5 z-[9999] w-7 h-7 rounded-full bg-black/60 hover:bg-black/90 text-white/70 hover:text-white flex items-center justify-center transition-all shadow-md backdrop-blur-sm"
+          title="Sair do Modo Gravação (ESC)"
+          aria-label="Sair do Modo Gravação"
         >
           <X className="w-3.5 h-3.5" />
-          Sair do Modo Gravação (ESC)
         </button>
       )}
 
