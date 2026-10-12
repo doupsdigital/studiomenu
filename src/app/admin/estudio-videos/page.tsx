@@ -41,13 +41,13 @@ export default function EstudioVideosPage() {
   // caso essa escolha volte a ser necessária no futuro.
   const bgMode: BgMode = 'light';
   const [recordingMode, setRecordingMode] = useState(false);
-  const [scale, setScale] = useState(1);
+  const [scale, setScale] = useState(0.9);
   const stageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const updateScale = () => {
       const maxW = Math.min(window.innerWidth * 0.9, PHONE_W);
-      setScale(maxW / PHONE_W);
+      setScale((maxW / PHONE_W) * 0.9);
     };
     updateScale();
     window.addEventListener('resize', updateScale);
@@ -66,7 +66,9 @@ export default function EstudioVideosPage() {
 
   return (
     <div
-      className="min-h-screen flex flex-col items-center pt-4 px-4 transition-colors duration-300"
+      className={`min-h-screen flex flex-col items-center transition-colors duration-300 ${
+        recordingMode ? "h-screen justify-center p-0 overflow-hidden" : "pt-4 px-4"
+      }`}
       style={{ background: bg.background, color: bg.color }}
     >
       {/* Cabeçalho + Controles — bem compacto de propósito (pedido real,
@@ -161,7 +163,12 @@ export default function EstudioVideosPage() {
       )}
 
       {/* Palco com o Mockup de iPhone */}
-      <div ref={stageRef} className="relative flex items-center justify-center w-full">
+      <div
+        ref={stageRef}
+        className={`relative flex items-center justify-center w-full ${
+          recordingMode ? "flex-1 my-auto" : ""
+        }`}
+      >
         <div
           className="relative bg-black overflow-hidden mx-auto"
           style={{
