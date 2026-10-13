@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import posthog from 'posthog-js';
 import { Crown, Sparkles } from 'lucide-react';
 import { CatalogOrderData } from '@/types/catalog';
 import { PlusOnboardingModal } from './plus-onboarding/PlusOnboardingModal';
@@ -63,7 +64,10 @@ export const PlusUpsellCard: React.FC<PlusUpsellCardProps> = ({ variant, slug, c
         {catalog ? (
           <button
             type="button"
-            onClick={() => setIsOnboardingOpen(true)}
+            onClick={() => {
+              posthog.capture('agenda_upsell_click', { slug, source: 'onboarding_modal' });
+              setIsOnboardingOpen(true);
+            }}
             className="block w-full py-3 rounded-xl bg-white text-rose-700 text-[15px] font-bold shadow-sm hover:bg-rose-50 transition-colors"
           >
             Conheça o Plano Agenda →
@@ -71,6 +75,7 @@ export const PlusUpsellCard: React.FC<PlusUpsellCardProps> = ({ variant, slug, c
         ) : (
           <Link
             href={`/app/${slug}/config#upgrade-plus`}
+            onClick={() => posthog.capture('agenda_upsell_click', { slug, source: 'config_link' })}
             className="block w-full py-3 rounded-xl bg-white text-rose-700 text-[15px] font-bold shadow-sm hover:bg-rose-50 transition-colors"
           >
             Conheça o Plano Agenda →
