@@ -3,6 +3,7 @@ import { nichePresetsMap } from '@/data/niche-presets';
 import { normalizeWhatsappBR, parseDurationToMinutes } from './format';
 import { supabaseAdmin } from './supabase-admin';
 import { RESERVED_SLUGS } from './reserved-slugs';
+import { CATALOGO_RECORRENTE_DEFAULT_PRICE } from './pricing';
 
 /** Uma "palavra" do nome, normalizada pra virar pedaço de slug/subdomínio:
  *  minúscula, sem acento, só letras e números (sem espaço, sem traço —
@@ -121,6 +122,11 @@ export function buildOrderInsertPayload(input: OrderInsertInput) {
     instructions_items: preset.instructions?.items || [],
     categories: [] as string[],
     first_offer_tier: input.firstOfferTier || 'basico',
+    // Cobrança padrão pra catálogo novo (2026-10-13): assinatura mensal, não
+    // mais pagamento único avulso — admin continua podendo trocar por
+    // cliente em /admin/catalogos.
+    catalog_billing_mode: 'recorrente' as const,
+    billing_price_override: CATALOGO_RECORRENTE_DEFAULT_PRICE,
   };
 }
 

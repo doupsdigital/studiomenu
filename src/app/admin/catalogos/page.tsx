@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { CatalogOrderData, ProcedureItem } from '@/types/catalog';
 import { normalizeWhatsappBR } from '@/lib/format';
 import { compressImageFiles } from '@/lib/image-compress-client';
 import Link from 'next/link';
-import { ArrowLeft, Sparkles, ExternalLink, Search, RefreshCw, Scissors, Plus, Trash2, MessageCircle, Phone, Clock, Smartphone, CalendarClock, Globe, Crown, ChevronDown, PauseCircle, PlayCircle, Gift, Bot, Upload, FileText, X, Wallet } from 'lucide-react';
+import { ArrowLeft, Sparkles, ExternalLink, Search, RefreshCw, Plus, Trash2, MessageCircle, Phone, Smartphone, CalendarClock, Globe, Crown, ChevronDown, PauseCircle, PlayCircle, Gift, Bot, Upload, FileText, X, Wallet, Settings2, AlertTriangle, type LucideIcon } from 'lucide-react';
 import { usesSubdomainRouting, PRODUCTION_DOMAIN } from '@/lib/public-url';
 import { CATALOGO_PRICE_LABEL, CATALOGO_VITALICIO_PRICE_LABEL } from '@/lib/pricing';
 
@@ -46,6 +46,60 @@ type AdminCatalog = CatalogOrderData & {
   lifetime_price_override?: number | null;
 };
 
+type SectionTone = 'rose' | 'sky' | 'amber' | 'red';
+
+/** Mesma linguagem visual do Funil ADS 3.0 (pedido real, 2026-10-13: "está
+ *  boa, use ela como referência") — ícone num selo colorido + título em
+ *  branco; a borda de destaque ao abrir é sempre dourada (igual lá, onde
+ *  todo bloco expandido usa a mesma borda âmbar independente da categoria),
+ *  só o ícone muda de cor por seção pra ficar diferenciável. */
+const SECTION_TONE: Record<SectionTone, { badge: string }> = {
+  rose: { badge: 'bg-rose-500/10 text-rose-400 border border-rose-500/20' },
+  sky: { badge: 'bg-sky-500/10 text-sky-400 border border-sky-500/20' },
+  amber: { badge: 'bg-amber-500/10 text-amber-400 border border-amber-500/20' },
+  red: { badge: 'bg-red-500/10 text-red-400 border border-red-500/20' },
+};
+
+/** Sub-bloco expansível dentro do card já expandido de um catálogo (pedido
+ *  real, 2026-10-13) — organiza as ações em 4 grupos (Principal/Links/Ações
+ *  raras/Desativação) em vez de tudo solto numa lista só. "Principal" abre
+ *  por padrão (é o que ela mexe no dia-a-dia); os outros 3 começam
+ *  fechados. */
+function AdminCardSection({
+  label,
+  subtitle,
+  icon: Icon,
+  tone,
+  isOpen,
+  onToggle,
+  children,
+}: {
+  label: string;
+  subtitle: string;
+  icon: LucideIcon;
+  tone: SectionTone;
+  isOpen: boolean;
+  onToggle: () => void;
+  children: ReactNode;
+}) {
+  const { badge } = SECTION_TONE[tone];
+  return (
+    <div className={`rounded-2xl border transition-all overflow-hidden ${isOpen ? 'border-amber-400/60 bg-slate-900' : 'border-slate-800 bg-slate-900/50'}`}>
+      <button type="button" onClick={onToggle} className="w-full p-3.5 flex items-center gap-3 text-left">
+        <span className={`p-2 rounded-xl flex-shrink-0 ${badge}`}>
+          <Icon className="w-4 h-4" />
+        </span>
+        <div className="flex-1 min-w-0">
+          <h3 className="font-bold text-white text-sm">{label}</h3>
+          <p className="text-xs text-slate-400 mt-0.5 truncate">{subtitle}</p>
+        </div>
+        <ChevronDown className={`w-4 h-4 text-slate-500 flex-shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+      {isOpen && <div className="border-t border-slate-800 p-3 space-y-3">{children}</div>}
+    </div>
+  );
+}
+
 export default function AdminCatalogosPage() {
   const [catalogs, setCatalogs] = useState<AdminCatalog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -56,6 +110,24 @@ export default function AdminCatalogosPage() {
   // raras (copiar link mágico/app, oferta inicial, excluir) ficam atrás
   // desse toggle. Pedido pra reduzir a poluição visual, 2026-09-23.
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  // Sub-blocos dentro do card já expandido (Principal/Links/Ações raras/
+  // Desativação) — guarda só as mudanças EM RELAÇÃO ao padrão de cada um
+  // ("Principal" abre sozinho, os outros 3 começam fechados), não o estado
+  // em si, pra não precisar de uma entrada por seção por catálogo de cara.
+  const [toggledSections, setToggledSections] = useState<Set<string>>(new Set());
+  const isSectionOpen = (cardKey: string, section: string, defaultOpen: boolean) => {
+    const isToggled = toggledSections.has(`${cardKey}::${section}`);
+    return isToggled ? !defaultOpen : defaultOpen;
+  };
+  const toggleSection = (cardKey: string, section: string) => {
+    const key = `${cardKey}::${section}`;
+    setToggledSections((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
 
   // "Cadastrar Serviços com IA" (2026-10-01) — exclusivo do admin: extrai
   // serviços de um print/PDF enviado pelo lead e SUBSTITUI os serviços atuais
@@ -260,31 +332,8 @@ export default function AdminCatalogosPage() {
     const cleanPhone = normalizeWhatsappBR(item.whatsapp_number);
     const firstName = (item.client_name || '').split(' ')[0];
     const links = buildProfessionalLinks(item);
-    // Fase 22: catálogo marcado pra vender o Plus direto entra com o
-    // agendamento automático como assunto principal, não o catálogo em si.
-    const message =
-      item.first_offer_tier === 'plus'
-        ? `Olá, ${firstName}! ✨\n\nSeu catálogo digital StudioMenu está pronto — e com ele você já pode liberar o *agendamento automático*: suas clientes escolhem o dia e o horário sozinhas, sem trocar mensagem com você. 📅\n\n🔗 *Seu Link Exclusivo:*\n👉 ${links.official}\n\n📌 *O que fazer agora:*\n1. Abra o link no seu celular e confira seu catálogo completo.\n2. Coloque este link na bio do seu Instagram e no seu perfil do WhatsApp Business.\n3. Pra ativar o agendamento automático, é só assinar — te mando o acesso em seguida.\n\nQualquer dúvida ou ajuste que precisar, nossa equipe está à sua inteira disposição. Parabéns pelo seu novo posicionamento! 💖✨`
-        : `Olá, ${firstName}! ✨\n\nSeu catálogo digital oficial StudioMenu está pronto, calibrado e no ar! 🚀\n\n🔗 *Seu Link Exclusivo:*\n👉 ${links.official}\n\n📌 *O que fazer agora:*\n1. Abra o link no seu celular e confira seu catálogo completo.\n2. Coloque este link na bio do seu Instagram e no seu perfil do WhatsApp Business.\n3. Comece a enviar para suas clientes no momento do agendamento!\n\nQualquer dúvida ou ajuste que precisar, nossa equipe está à sua inteira disposição. Parabéns pelo seu novo posicionamento! 💖✨`;
+    const message = `Prontinho ${firstName}! Seu catálogo já está no ar.🎉\n\n👉 ${links.app}\n\nLá dentro, toque em *"Visualizar catálogo"* pra ver como ficou. Se quiser mudar algo, é só tocar em *"Editar meu catálogo"* 💕\n\nOs serviços que estão aí agora são só exemplos, pra você já ver tudo funcionando de verdade — você troca pelos seus quando quiser, no seu ritmo. ✨\n\nQuando você fizer o pagamento esse link vira um App exclusivo seu. E dentro dele você tem acesso a todos os recursos do seu Catálogo.📲\n\nQualquer dúvida é só nos chamar aqui. ☺️`;
     return `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(message)}`;
-  };
-
-  /** Segunda mensagem, enviada separada da entrega do catálogo: apresenta o
-   *  app dela (o Link do App abre a tela de primeiro contato, com dicas). */
-  const buildAppWhatsappUrl = (item: AdminCatalog) => {
-    const cleanPhone = normalizeWhatsappBR(item.whatsapp_number);
-    const firstName = (item.client_name || '').split(' ')[0];
-    const links = buildProfessionalLinks(item);
-    const message = `Oi, ${firstName}! ✨\n\nAgora quero te apresentar o *app do seu StudioMenu* 📱\n\nÉ por ele que você:\n• vê e compartilha o link do seu catálogo\n• edita fotos, serviços e preços quando quiser, sem depender de ninguém\n• assina o plano pra manter tudo no ar\n\n👉 *Seu acesso ao app:*\n${links.app}\n\n📌 *Dicas:*\n1. Abra pelo celular. Ao abrir, aparecem umas dicas rápidas te mostrando cada parte.\n2. Esse link é só seu e já te deixa logada, então não compartilhe com ninguém.\n3. Dá pra instalar na tela inicial do celular, como um app de verdade.\n\nQualquer dúvida é só me chamar por aqui! 💖`;
-    return `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(message)}`;
-  };
-
-  /** Botão de WhatsApp sempre visível no card — abre a conversa direto, sem
-   *  mensagem pré-pronta de entrega/app (aquelas são ações pontuais, essa é
-   *  o "preciso falar com ela agora" do dia-a-dia). */
-  const buildContactWhatsappUrl = (item: AdminCatalog) => {
-    const cleanPhone = normalizeWhatsappBR(item.whatsapp_number);
-    return `https://api.whatsapp.com/send?phone=${cleanPhone}`;
   };
 
   /** Os 3 links que a profissional pode receber, todos no mesmo formato de
@@ -366,9 +415,8 @@ export default function AdminCatalogosPage() {
   /** Fase 27: pagamento único (padrão) ou assinatura mensal pro Plano
    *  Catálogo dessa cliente — só muda o que o checkout oferece antes de ela
    *  pagar (igual ao toggle de oferta inicial, acima). */
-  const toggleCatalogBillingMode = async (item: AdminCatalog) => {
-    if (!item.id) return;
-    const next = item.catalog_billing_mode === 'recorrente' ? 'avulso' : 'recorrente';
+  const toggleCatalogBillingMode = async (item: AdminCatalog, next: 'avulso' | 'recorrente') => {
+    if (!item.id || item.catalog_billing_mode === next) return;
     try {
       const res = await fetch('/api/admin/catalog-actions', {
         method: 'PATCH',
@@ -634,14 +682,6 @@ export default function AdminCatalogosPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {filteredCatalogs.map((item) => {
               const isPending = item.status !== 'aprovado';
-              const dateStr = item.created_at
-                ? new Date(item.created_at).toLocaleDateString('pt-BR', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })
-                : null;
               const cardKey = item.id || item.slug || '';
               const isExpanded = expandedIds.has(cardKey);
 
@@ -661,11 +701,7 @@ export default function AdminCatalogosPage() {
                     onClick={() => toggleExpanded(cardKey)}
                     className="w-full text-left p-5 flex flex-col gap-2.5"
                   >
-                    <div className="flex items-center justify-between gap-2 flex-wrap">
-                      <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-rose-500/10 text-rose-400 border border-rose-500/20 flex items-center gap-1.5">
-                        <Scissors className="w-3.5 h-3.5" />
-                        <span>{item.niche || 'Lash'}</span>
-                      </span>
+                    <div className="flex items-center justify-start gap-2 flex-wrap">
                       <div className="flex items-center gap-1.5">
                         <span
                           className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ${getPlanBadge(item).className}`}
@@ -694,15 +730,6 @@ export default function AdminCatalogosPage() {
                         <h2 className="font-serif text-2xl font-bold text-white leading-tight truncate">
                           {item.studio_name || item.client_name}
                         </h2>
-                        <div className="flex items-center gap-2 mt-1 flex-wrap">
-                          <p className="text-sm text-slate-300">Por {item.client_name}</p>
-                          {dateStr && (
-                            <span className="flex items-center gap-1 text-xs text-slate-400">
-                              <Clock className="w-3.5 h-3.5" />
-                              {dateStr}
-                            </span>
-                          )}
-                        </div>
                         <div className="mt-1.5 flex items-center gap-2 text-sm text-slate-200">
                           <Phone className="w-4 h-4 text-slate-400 flex-shrink-0" />
                           <span className="truncate">{item.whatsapp_number || 'WhatsApp não informado'}</span>
@@ -715,67 +742,148 @@ export default function AdminCatalogosPage() {
                   </button>
 
                   {isExpanded && (
-                    <div className="px-5 pb-5 pt-1 space-y-2 border-t border-slate-800/80">
-                      <button
-                        onClick={() => toggleBookingEnabled(item)}
-                        className={`w-full px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 border transition-all ${
-                          item.booking_enabled
-                            ? 'bg-rose-500/20 border-rose-500/60 text-rose-300'
-                            : 'bg-white/5 border-slate-700 text-slate-400'
-                        }`}
+                    <div className="px-5 pb-5 pt-1 space-y-3 border-t border-slate-800/80">
+                      {/* 4 sub-blocos expansíveis (pedido real, 2026-10-13), na ordem de
+                       *  uso real: Principal (aberto por padrão) → Links → Ações raras
+                       *  → Desativação (esses 3 últimos começam fechados). */}
+                      <AdminCardSection
+                        label="Principal"
+                        subtitle="Ver, editar, cadastrar serviços e aprovar a entrega"
+                        icon={Sparkles}
+                        tone="rose"
+                        isOpen={isSectionOpen(cardKey, 'principal', true)}
+                        onToggle={() => toggleSection(cardKey, 'principal')}
                       >
-                        <CalendarClock className="w-3.5 h-3.5" />
-                        Agendamento automático: {item.booking_enabled ? 'Ligado' : 'Desligado'}
-                      </button>
-
-                      <div className="flex items-center gap-2">
-                        <Link
-                          href={`/c/${item.slug}`}
-                          target="_blank"
-                          className="flex-1 px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm font-semibold text-white flex items-center justify-center gap-1.5 transition-all"
-                        >
-                          <span>Ver</span>
-                          <ExternalLink className="w-3.5 h-3.5" />
-                        </Link>
-
-                        {item.edit_token && (
+                      <div className="rounded-2xl border border-slate-700/70 bg-slate-900/60 divide-y divide-slate-800 overflow-hidden">
+                        <div className="p-3 flex items-center gap-2">
                           <Link
-                            href={`/c/${item.slug}?edit=${item.edit_token}`}
+                            href={`/c/${item.slug}`}
                             target="_blank"
-                            className="flex-1 px-3 py-2.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 text-sm font-bold flex items-center justify-center gap-1.5 transition-all"
+                            className="flex-1 px-3 py-3 rounded-xl bg-slate-800/80 border border-slate-700 hover:bg-slate-700 text-sm font-semibold text-slate-300 flex items-center justify-center gap-1.5 transition-all"
                           >
-                            <span>Editar</span>
+                            <span>Ver</span>
+                            <ExternalLink className="w-3.5 h-3.5" />
                           </Link>
+
+                          {item.edit_token && (
+                            <Link
+                              href={`/c/${item.slug}?edit=${item.edit_token}`}
+                              target="_blank"
+                              className="flex-1 px-3 py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-sm font-bold flex items-center justify-center gap-1.5 transition-all shadow-sm shadow-amber-400/30"
+                            >
+                              <span>Editar</span>
+                            </Link>
+                          )}
+                        </div>
+
+                        {/* Admin-only (2026-10-01): extrai serviços de um print/PDF que
+                         *  a cliente mandou e SUBSTITUI os serviços atuais do catálogo
+                         *  dela — nunca exposto no self-edit da profissional. */}
+                        <div className="p-3">
+                          <button
+                            onClick={() => openServicesModal(item)}
+                            className="w-full py-3 rounded-xl bg-violet-500/15 hover:bg-violet-500/25 border border-violet-500/40 text-violet-200 text-sm font-bold flex items-center justify-center gap-2 transition-all"
+                          >
+                            <Bot className="w-4 h-4" />
+                            <span>Cadastrar Serviços com IA</span>
+                          </button>
+                        </div>
+
+                        {/* Só faz sentido enquanto ela ainda não assinou nada — depois
+                         *  disso a tela de primeiro contato nem existe mais pro link
+                         *  dela, então o toggle não teria efeito nenhum. */}
+                        {(!item.plan_tier || item.plan_tier === 'catalog') && (
+                          <div className="p-4 space-y-3 bg-slate-950/40">
+                            <div>
+                              <span className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5 mb-2">
+                                <RefreshCw className="w-3.5 h-3.5" />
+                                Cobrança do Catálogo
+                              </span>
+                              <div className="grid grid-cols-2 gap-1 p-1 rounded-xl bg-slate-900 border border-slate-800">
+                                <button
+                                  onClick={() => toggleCatalogBillingMode(item, 'avulso')}
+                                  className={`py-2.5 rounded-lg text-xs font-bold transition-all ${
+                                    item.catalog_billing_mode !== 'recorrente'
+                                      ? 'bg-rose-500 text-white shadow-sm'
+                                      : 'text-slate-400 hover:text-slate-200'
+                                  }`}
+                                >
+                                  Pagamento único
+                                </button>
+                                <button
+                                  onClick={() => toggleCatalogBillingMode(item, 'recorrente')}
+                                  className={`py-2.5 rounded-lg text-xs font-bold transition-all ${
+                                    item.catalog_billing_mode === 'recorrente'
+                                      ? 'bg-sky-500 text-white shadow-sm'
+                                      : 'text-slate-400 hover:text-slate-200'
+                                  }`}
+                                >
+                                  Assinatura
+                                </button>
+                              </div>
+                            </div>
+
+                            <div>
+                              <span className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5 mb-2">
+                                <Wallet className="w-3.5 h-3.5" />
+                                Preço
+                              </span>
+                              <div className="flex gap-2">
+                                <div className="relative flex-1">
+                                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-300 font-bold text-base pointer-events-none">
+                                    R$
+                                  </span>
+                                  <input
+                                    type="text"
+                                    inputMode="decimal"
+                                    placeholder={CATALOGO_PRICE_LABEL.replace('R$ ', '')}
+                                    value={getPriceDraft(item)}
+                                    onChange={(e) =>
+                                      setPriceDrafts((prev) => ({ ...prev, [item.id || '']: e.target.value }))
+                                    }
+                                    className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-10 pr-3 py-3 text-base font-semibold text-white placeholder-slate-400 focus:border-rose-500 focus:outline-none"
+                                  />
+                                </div>
+                                <button
+                                  onClick={() => savePriceOverride(item)}
+                                  className="px-5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-sm font-bold transition-all"
+                                >
+                                  Salvar
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Some depois de aprovado — o badge "Aprovado" já confirma
+                         *  a entrega; reenviar o app (se precisar) continua
+                         *  disponível logo abaixo, entre as outras ações. */}
+                        {isPending && (
+                          <div className="p-3">
+                            <a
+                              href={buildDeliveryWhatsappUrl(item)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={() => approveAndDeliver(item)}
+                              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:opacity-95 text-white text-sm font-bold flex items-center justify-center gap-2 shadow-lg transition-all"
+                            >
+                              <MessageCircle className="w-4 h-4" />
+                              <span>Aprovar & Entregar</span>
+                            </a>
+                          </div>
                         )}
                       </div>
+                      </AdminCardSection>
 
-                      <a
-                        href={buildContactWhatsappUrl(item)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-emerald-500/30 text-emerald-300 text-sm font-bold flex items-center justify-center gap-2 transition-all"
+                      <AdminCardSection
+                        label="Links"
+                        subtitle="Link oficial, link do app e preço do vitalício"
+                        icon={Globe}
+                        tone="sky"
+                        isOpen={isSectionOpen(cardKey, 'links', false)}
+                        onToggle={() => toggleSection(cardKey, 'links')}
                       >
-                        <MessageCircle className="w-4 h-4" />
-                        <span>WhatsApp</span>
-                      </a>
-
-                      {/* Some depois de aprovado — o badge "Aprovado" já confirma
-                       *  a entrega; reenviar o app (se precisar) continua
-                       *  disponível logo abaixo, entre as outras ações. */}
-                      {isPending && (
-                        <a
-                          href={buildDeliveryWhatsappUrl(item)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={() => approveAndDeliver(item)}
-                          className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:opacity-95 text-white text-sm font-bold flex items-center justify-center gap-2 shadow-lg transition-all"
-                        >
-                          <MessageCircle className="w-4 h-4" />
-                          <span>Aprovar & Entregar</span>
-                        </a>
-                      )}
-
-                      <div className="text-xs text-slate-400 uppercase font-mono pt-1">
+                      <div className="text-xs text-slate-400 uppercase font-mono">
                         {item.layout_model || 'mosaico'} / {item.theme_variant || 'rose'}
                       </div>
 
@@ -801,26 +909,6 @@ export default function AdminCatalogosPage() {
                           <p className="text-[11px] text-rose-300/60">É esse que ela divulga: bio, WhatsApp, etc.</p>
                         </div>
 
-                        <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1.5">
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs font-bold uppercase tracking-wider text-slate-300">Link Mágico da Cliente</span>
-                            {item.edit_token && (
-                              <button
-                                onClick={() => {
-                                  navigator.clipboard.writeText(buildProfessionalLinks(item).edit);
-                                  showToast('🔗 Link Mágico de Edição copiado!');
-                                }}
-                                className="text-xs text-rose-400 hover:text-rose-300 font-bold underline flex items-center gap-1"
-                              >
-                                Copiar Link
-                              </button>
-                            )}
-                          </div>
-                          <p className="text-xs font-mono text-slate-300 truncate">
-                            {item.slug}.{PRODUCTION_DOMAIN}{item.edit_token ? `?edit=${item.edit_token.substring(0, 8)}...` : ''}
-                          </p>
-                        </div>
-
                         {item.edit_token && (
                           <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1.5">
                             <div className="flex items-center justify-between">
@@ -842,63 +930,6 @@ export default function AdminCatalogosPage() {
                           </div>
                         )}
 
-                        {/* Só faz sentido enquanto ela ainda não assinou nada — depois
-                         *  disso a tela de primeiro contato nem existe mais pro link
-                         *  dela, então o toggle não teria efeito nenhum. */}
-                        {(!item.plan_tier || item.plan_tier === 'catalog') && (
-                          <>
-                            <button
-                              onClick={() => toggleFirstOfferTier(item)}
-                              className={`w-full px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 border transition-all ${
-                                item.first_offer_tier === 'plus'
-                                  ? 'bg-amber-500/20 border-amber-500/60 text-amber-300'
-                                  : 'bg-white/5 border-slate-700 text-slate-400'
-                              }`}
-                            >
-                              <Crown className="w-3.5 h-3.5" />
-                              Oferta inicial: {item.first_offer_tier === 'plus' ? 'Agenda direto' : 'Catálogo (padrão)'}
-                            </button>
-
-                            <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800 space-y-3">
-                              <span className="text-sm font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-                                <Wallet className="w-4 h-4" />
-                                Preço do Plano Catálogo
-                              </span>
-                              <div className="flex flex-col gap-2">
-                                <input
-                                  type="text"
-                                  inputMode="decimal"
-                                  placeholder={`Padrão (${CATALOGO_PRICE_LABEL})`}
-                                  value={getPriceDraft(item)}
-                                  onChange={(e) =>
-                                    setPriceDrafts((prev) => ({ ...prev, [item.id || '']: e.target.value }))
-                                  }
-                                  className="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-3 text-base text-white placeholder-slate-500 focus:border-rose-500 focus:outline-none"
-                                />
-                                <button
-                                  onClick={() => savePriceOverride(item)}
-                                  className="w-full py-3 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 text-sm font-bold"
-                                >
-                                  Salvar
-                                </button>
-                              </div>
-                              <p className="text-xs text-slate-500">Deixe em branco e salve pra voltar ao padrão.</p>
-                            </div>
-
-                            <button
-                              onClick={() => toggleCatalogBillingMode(item)}
-                              className={`w-full px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 border transition-all ${
-                                item.catalog_billing_mode === 'recorrente'
-                                  ? 'bg-sky-500/20 border-sky-500/60 text-sky-300'
-                                  : 'bg-white/5 border-slate-700 text-slate-400'
-                              }`}
-                            >
-                              <RefreshCw className="w-3.5 h-3.5" />
-                              Cobrança do Catálogo: {item.catalog_billing_mode === 'recorrente' ? 'Assinatura mensal' : 'Pagamento único (padrão)'}
-                            </button>
-                          </>
-                        )}
-
                         {/* Fase 28: só faz sentido pra quem JÁ é recorrente —
                          *  é o preço de "parar de pagar mensalidade", oferecido
                          *  pela própria cliente dentro do app dela. Ao contrário
@@ -906,33 +937,44 @@ export default function AdminCatalogosPage() {
                          *  de ela já estar pagando (a admin pode negociar a
                          *  qualquer momento). */}
                         {item.catalog_billing_mode === 'recorrente' && (
-                          <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800 space-y-3">
-                            <span className="text-sm font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-                              <Wallet className="w-4 h-4" />
-                              Preço do Catálogo Vitalício
+                          <div className="p-3 rounded-xl bg-slate-950/40 border border-slate-800/70 flex items-center gap-2">
+                            <span className="text-xs text-slate-400 shrink-0 flex items-center gap-1">
+                              <Wallet className="w-3.5 h-3.5" />
+                              Vitalício:
                             </span>
-                            <div className="flex flex-col gap-2">
+                            <div className="relative flex-1">
+                              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">
+                                R$
+                              </span>
                               <input
                                 type="text"
                                 inputMode="decimal"
-                                placeholder={`Padrão (${CATALOGO_VITALICIO_PRICE_LABEL})`}
+                                placeholder={CATALOGO_VITALICIO_PRICE_LABEL.replace('R$ ', '')}
                                 value={getLifetimePriceDraft(item)}
                                 onChange={(e) =>
                                   setLifetimePriceDrafts((prev) => ({ ...prev, [item.id || '']: e.target.value }))
                                 }
-                                className="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-3 text-base text-white placeholder-slate-500 focus:border-rose-500 focus:outline-none"
+                                className="w-full bg-slate-800 border border-slate-700 rounded-lg pl-7 pr-2 py-2 text-sm text-white placeholder-slate-400 focus:border-rose-500 focus:outline-none"
                               />
-                              <button
-                                onClick={() => saveLifetimePriceOverride(item)}
-                                className="w-full py-3 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 text-sm font-bold"
-                              >
-                                Salvar
-                              </button>
                             </div>
-                            <p className="text-xs text-slate-500">Deixe em branco e salve pra voltar ao padrão.</p>
+                            <button
+                              onClick={() => saveLifetimePriceOverride(item)}
+                              className="px-3 py-2 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold transition-all shrink-0"
+                            >
+                              Salvar
+                            </button>
                           </div>
                         )}
+                      </AdminCardSection>
 
+                      <AdminCardSection
+                        label="Ações raras"
+                        subtitle="Oferta inicial, agendamento e conceder plano manual"
+                        icon={Settings2}
+                        tone="amber"
+                        isOpen={isSectionOpen(cardKey, 'acoes', false)}
+                        onToggle={() => toggleSection(cardKey, 'acoes')}
+                      >
                         {/* Fase 26: caso de borda — cliente pagando fora do sistema (ex:
                          *  uma vez só, via Pix direto), sem assinatura Asaas de verdade. */}
                         {item.manual_plan ? (
@@ -952,54 +994,64 @@ export default function AdminCatalogosPage() {
                             <p className="text-[11px] text-emerald-300/60">Sem cobrança via Asaas — concedido manualmente.</p>
                           </div>
                         ) : (
-                          <div className="flex items-center gap-1.5">
+                          <div className="flex flex-col gap-1.5">
+                            {(!item.plan_tier || item.plan_tier === 'catalog') && (
+                              <button
+                                onClick={() => toggleFirstOfferTier(item)}
+                                className={`w-full px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 border transition-all ${
+                                  item.first_offer_tier === 'plus'
+                                    ? 'bg-amber-500/20 border-amber-500/60 text-amber-300'
+                                    : 'bg-slate-800 border-slate-600 text-slate-200'
+                                }`}
+                              >
+                                <Crown className="w-3.5 h-3.5" />
+                                Oferta inicial: {item.first_offer_tier === 'plus' ? 'Agenda direto' : 'Catálogo (padrão)'}
+                              </button>
+                            )}
+                            <button
+                              onClick={() => toggleBookingEnabled(item)}
+                              className={`w-full px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 border transition-all ${
+                                item.booking_enabled
+                                  ? 'bg-rose-500/20 border-rose-500/60 text-rose-300'
+                                  : 'bg-slate-800 border-slate-600 text-slate-200'
+                              }`}
+                            >
+                              <CalendarClock className="w-3.5 h-3.5" />
+                              Agendamento automático: {item.booking_enabled ? 'Ligado' : 'Desligado'}
+                            </button>
                             <button
                               onClick={() => grantManualPlan(item, 'basico')}
-                              className="flex-1 px-2 py-2 rounded-xl text-xs font-bold bg-white/5 border border-slate-700 text-slate-400 hover:border-emerald-500/60 hover:text-emerald-300 transition-all flex items-center justify-center gap-1"
+                              className="w-full px-2 py-2 rounded-xl text-xs font-bold bg-slate-800 border border-slate-600 text-slate-200 hover:border-emerald-500/60 hover:text-emerald-300 transition-all flex items-center justify-center gap-1"
                             >
                               <Gift className="w-3.5 h-3.5" />
                               Conceder Catálogo (manual)
                             </button>
                             <button
                               onClick={() => grantManualPlan(item, 'plus')}
-                              className="flex-1 px-2 py-2 rounded-xl text-xs font-bold bg-white/5 border border-slate-700 text-slate-400 hover:border-amber-500/60 hover:text-amber-300 transition-all flex items-center justify-center gap-1"
+                              className="w-full px-2 py-2 rounded-xl text-xs font-bold bg-slate-800 border border-slate-600 text-slate-200 hover:border-amber-500/60 hover:text-amber-300 transition-all flex items-center justify-center gap-1"
                             >
                               <Gift className="w-3.5 h-3.5" />
                               Conceder Agenda (manual)
                             </button>
                           </div>
                         )}
+                      </AdminCardSection>
 
-                        {item.edit_token && (
-                          <a
-                            href={buildAppWhatsappUrl(item)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-emerald-500/40 text-emerald-300 text-sm font-bold flex items-center justify-center gap-2 transition-all"
-                          >
-                            <Smartphone className="w-4 h-4" />
-                            <span>Enviar app por WhatsApp</span>
-                          </a>
-                        )}
-
-                        {/* Admin-only (2026-10-01): extrai serviços de um print/PDF que
-                         *  a cliente mandou e SUBSTITUI os serviços atuais do catálogo
-                         *  dela — nunca exposto no self-edit da profissional. */}
-                        <button
-                          onClick={() => openServicesModal(item)}
-                          className="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-rose-500/40 text-rose-300 text-sm font-bold flex items-center justify-center gap-2 transition-all"
-                        >
-                          <Bot className="w-4 h-4" />
-                          <span>Cadastrar Serviços com IA</span>
-                        </button>
-
-                        <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between">
+                      <AdminCardSection
+                        label="Desativação"
+                        subtitle="Pausar ou excluir este catálogo"
+                        icon={AlertTriangle}
+                        tone="red"
+                        isOpen={isSectionOpen(cardKey, 'desativacao', false)}
+                        onToggle={() => toggleSection(cardKey, 'desativacao')}
+                      >
+                        <div className="flex items-center gap-2">
                           <button
                             onClick={() => toggleCatalogDisabled(item)}
-                            className={`p-2 rounded-lg transition-all flex items-center gap-1.5 text-xs font-semibold ${
+                            className={`flex-1 px-3 py-2.5 rounded-xl border transition-all flex items-center justify-center gap-1.5 text-xs font-bold ${
                               item.catalog_disabled
-                                ? 'text-emerald-400 hover:bg-emerald-500/10'
-                                : 'text-amber-400 hover:bg-amber-500/10'
+                                ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/20'
+                                : 'bg-amber-500/10 border-amber-500/40 text-amber-300 hover:bg-amber-500/20'
                             }`}
                             title={item.catalog_disabled ? 'Reativar Catálogo' : 'Desativar Catálogo'}
                           >
@@ -1009,14 +1061,15 @@ export default function AdminCatalogosPage() {
 
                           <button
                             onClick={() => setCatalogToDelete(item)}
-                            className="p-2 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-all flex items-center gap-1.5 text-xs font-semibold"
+                            className="flex-1 px-3 py-2.5 rounded-xl border border-red-500/40 bg-red-500/10 text-red-300 hover:bg-red-500/20 transition-all flex items-center justify-center gap-1.5 text-xs font-bold"
                             title="Excluir Catálogo"
                           >
                             <Trash2 className="w-4 h-4" />
                             <span>Excluir Catálogo</span>
                           </button>
                         </div>
-                      </div>
+                      </AdminCardSection>
+                    </div>
                   )}
                 </div>
               );
