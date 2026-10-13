@@ -7,6 +7,7 @@ import { PRODUCTION_DOMAIN } from '@/lib/public-url';
 import { ServiceWorkerRegister } from '@/components/app-shell/ServiceWorkerRegister';
 import { BottomNav } from '@/components/app-shell/BottomNav';
 import { WelcomeOnboarding } from '@/components/app-shell/WelcomeOnboarding';
+import { AppPostHogTracker } from '@/components/app-shell/AppPostHogTracker';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -88,6 +89,15 @@ export default async function ProfessionalAppLayout({ children, params }: AppLay
   return (
     <div className={`pro-app-shell min-h-screen bg-cream text-ink font-body-pro ${showNav ? 'pb-20' : ''}`}>
       <ServiceWorkerRegister />
+      {order && (
+        <AppPostHogTracker
+          slug={slug}
+          planTier={order.plan_tier}
+          subscriptionStatus={order.subscription_status}
+          clientName={order.client_name}
+          studioName={order.studio_name}
+        />
+      )}
       {/* Só pro Plano Agenda — pedido real, 2026-10-07: quem só tem o Plano
        *  Catálogo não deve ver esse onboarding de boas-vindas (a última tela
        *  menciona "assinatura" no menu, e a intenção é não empurrar nada de
