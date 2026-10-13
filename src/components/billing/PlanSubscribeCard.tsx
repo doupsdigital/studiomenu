@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import posthog from 'posthog-js';
+import { capture } from '@/lib/analytics';
 import { Crown, BookOpen, Gift, Check, CreditCard, QrCode, ExternalLink, Info, type LucideIcon } from 'lucide-react';
 import { PLAN_PRICING, type PayablePlanTier } from '@/lib/pricing';
 import { formatCpfCnpj } from '@/lib/format';
@@ -280,7 +280,7 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
         return;
       }
       setQr({ paymentId: json.paymentId, image: json.pixQrCodeImage, payload: json.pixKey });
-      posthog.capture('billing_pix_generated', { slug, plan });
+      capture('billing_pix_generated', { slug, plan });
       startPolling(json.paymentId);
     } catch {
       setError('Falha na conexão.');

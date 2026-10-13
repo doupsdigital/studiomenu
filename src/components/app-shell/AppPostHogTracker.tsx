@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import posthog from 'posthog-js';
+import { initPostHog, identify } from '@/lib/analytics';
 
 interface AppPostHogTrackerProps {
   slug: string;
@@ -31,24 +31,19 @@ interface AppPostHogTrackerProps {
  *  vídeo, mesmo só a própria dona do negócio assistindo depois. */
 export function AppPostHogTracker({ slug, planTier, subscriptionStatus, clientName, studioName }: AppPostHogTrackerProps) {
   useEffect(() => {
-    const key = process.env.NEXT_PUBLIC_POSTHOG_KEY;
-    if (!key) return;
+    initPostHog({
+      api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com',
+      person_profiles: 'always',
+      autocapture: true,
+      capture_pageview: true,
+      capture_pageleave: true,
+      session_recording: {
+        maskAllInputs: false,
+        maskInputOptions: { password: true, email: true },
+      },
+    });
 
-    if (!posthog.__loaded) {
-      posthog.init(key, {
-        api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com',
-        person_profiles: 'always',
-        autocapture: true,
-        capture_pageview: true,
-        capture_pageleave: true,
-        session_recording: {
-          maskAllInputs: false,
-          maskInputOptions: { password: true, email: true },
-        },
-      });
-    }
-
-    posthog.identify(slug, {
+    identify(slug, {
       plan_tier: planTier,
       subscription_status: subscriptionStatus,
       client_name: clientName,
