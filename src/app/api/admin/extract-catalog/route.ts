@@ -149,8 +149,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: 'A IA não conseguiu extrair os procedimentos desse material.' }, { status: 422 });
     }
 
-    const defaultImage = nichePreset.procedures[0]?.image_url || '';
-
     const procedures = (toolUseBlock.input?.procedures || []).map((p: any, index: number) => ({
       id: `ai-${Date.now()}-${index}`,
       title: p.title || 'Procedimento sem nome',
@@ -159,7 +157,11 @@ export async function POST(request: Request) {
       duration: p.duration || '',
       duration_minutes: typeof p.duration_minutes === 'number' ? p.duration_minutes : null,
       category: p.category || 'Geral',
-      image_url: p.image_url || defaultImage,
+      // Sem correspondência com o catálogo modelo: deixa vazio em vez de cair numa foto
+      // genérica sem relação com o serviço real — o `ProcedureImage` já mostra o
+      // placeholder "STUDIO + nome" + "Imagem em breve..." automaticamente (pedido real,
+      // 2026-10-13).
+      image_url: p.image_url || '',
       badge: '',
       is_highlight: false,
     }));
