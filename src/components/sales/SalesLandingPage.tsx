@@ -1,6 +1,6 @@
 'use client';
 
-import posthog from 'posthog-js';
+import { capture } from '@/lib/analytics';
 import { AGENDA_PRICE } from '@/lib/pricing';
 import { HeroMockup } from './HeroMockup';
 import { FaqSection } from './FaqSection';
@@ -10,7 +10,7 @@ import { LiveShowcaseCta } from './LiveShowcaseCta';
  *  autocapture do PostHog já pega sozinho em qualquer botão/link — nomear
  *  facilita muito montar funil de conversão depois (2026-10-13). */
 function trackCta(plan: 'catalogo' | 'vitalicio' | 'duvida_generica') {
-  posthog.capture('cta_click', { plan });
+  capture('cta_click', { plan });
 }
 
 const WHATSAPP_NUMBER = '5562991083435';
