@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import posthog from 'posthog-js';
+import { initPostHog } from '@/lib/analytics';
 
 /** Analytics da landing page de vendas (`studiomenu.art`) — pedido real,
  *  2026-10-13: reaproveita o mesmo projeto PostHog que já existia (antigo
@@ -16,10 +16,7 @@ import posthog from 'posthog-js';
  *  recording cobre "como a pessoa navegou / onde ela travou". */
 export function PostHogTracker() {
   useEffect(() => {
-    const key = process.env.NEXT_PUBLIC_POSTHOG_KEY;
-    if (!key || posthog.__loaded) return;
-
-    posthog.init(key, {
+    initPostHog({
       api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com',
       person_profiles: 'always',
       autocapture: true,

@@ -2,7 +2,7 @@
 
 import React, { useMemo, useEffect, useState } from 'react';
 import type { Step } from 'react-joyride';
-import posthog from 'posthog-js';
+import { capture } from '@/lib/analytics';
 import { CatalogOrderData, ProcedureItem, ThemeVariant, LayoutModel, CatalogInstructionItem } from '@/types/catalog';
 import { HeaderCover } from './HeaderCover';
 import { ProcedureGrid } from './ProcedureGrid';
@@ -238,10 +238,7 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
       if (res.success) {
         setIsSaved(true);
         setActiveModal('save_success');
-        // Só dispara de verdade onde o PostHog foi inicializado (editor
-        // real em /app/[slug]/catalogo) — no showroom público e nos
-        // catálogos de clientes sem o tracker, é um no-op seguro.
-        posthog.capture('catalog_edit_saved', { slug: catalogState.slug });
+        capture('catalog_edit_saved', { slug: catalogState.slug });
       } else {
         setSaveErrorMessage(res.message || 'Erro ao salvar as alterações no catálogo.');
         setActiveModal('save_error');
