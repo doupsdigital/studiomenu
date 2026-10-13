@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import posthog from 'posthog-js';
 import { Crown, BookOpen, Gift, Check, CreditCard, QrCode, ExternalLink, Info, type LucideIcon } from 'lucide-react';
 import { PLAN_PRICING, type PayablePlanTier } from '@/lib/pricing';
 import { formatCpfCnpj } from '@/lib/format';
@@ -279,6 +280,7 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
         return;
       }
       setQr({ paymentId: json.paymentId, image: json.pixQrCodeImage, payload: json.pixKey });
+      posthog.capture('billing_pix_generated', { slug, plan });
       startPolling(json.paymentId);
     } catch {
       setError('Falha na conexão.');
@@ -440,7 +442,10 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
                   value={cpfCnpj}
                   onChange={(e) => setCpfCnpj(formatCpfCnpj(e.target.value))}
                   maxLength={18}
-                  className="h-12 w-full rounded-xl bg-surface border border-linen pl-3 pr-10 text-base text-ink placeholder:text-ink-faint"
+                  // `ph-mask`: dado sensível (CPF/CNPJ) não aparece na gravação de
+                  // sessão do PostHog, mesmo sem ser do tipo "password"/"email"
+                  // (os únicos tipos mascarados globalmente — 2026-10-13).
+                  className="ph-mask h-12 w-full rounded-xl bg-surface border border-linen pl-3 pr-10 text-base text-ink placeholder:text-ink-faint"
                 />
                 <button
                   type="button"
