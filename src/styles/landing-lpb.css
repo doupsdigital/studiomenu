@@ -451,6 +451,57 @@
   background: #f2cad5;
 }
 
+/* Modo "vitrine estática" (pedido real, 2026-10-14) — iframe some do fluxo
+ *  de toque/scroll (só decorativo, mostra a capa ao vivo), quem recebe o
+ *  toque é `.lp-testdrive-tap-overlay` logo abaixo, que abre o modal
+ *  fullscreen em vez de deixar rolar inline (causa do bug de gesto visto
+ *  em gravações do PostHog). */
+.lp-testdrive-screen--static,
+.lp-testdrive-screen--static * {
+  pointer-events: none;
+}
+
+.lp-testdrive-tap-overlay {
+  position: absolute;
+  top: var(--lp-bezel, 6px);
+  left: var(--lp-bezel, 6px);
+  width: var(--lp-screen-w);
+  height: var(--lp-screen-h);
+  border-radius: 29px;
+  border: none;
+  background: rgba(20, 8, 14, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 50;
+  padding: 0;
+  transition: background 0.2s ease;
+}
+
+.lp-testdrive-tap-overlay:hover {
+  background: rgba(20, 8, 14, 0.3);
+}
+
+.lp-testdrive-tap-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  color: var(--lp-accent-dark);
+  font-size: 0.85rem;
+  font-weight: 800;
+  padding: 10px 18px;
+  border-radius: 100px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.3);
+  animation: lp-tag-soft-pulse 2.4s infinite ease-in-out;
+}
+
+.lp-testdrive-tap-badge svg {
+  color: var(--lp-accent);
+  flex-shrink: 0;
+}
+
 @media (min-width: 600px) {
   .lp-testdrive-phone { --lp-phone-w: 310px; --lp-phone-h: 671px; --lp-bezel: 7px; }
 }
@@ -1453,6 +1504,110 @@
   color: #9e7f8a;
   margin-top: 6px;
   letter-spacing: 0.02em;
+}
+
+/* ==========================================================================
+   MODAL FULLSCREEN DE TESTE DO CATÁLOGO
+   ========================================================================== */
+/* Sempre montado no DOM (o React nunca desmonta, só troca `.is-open`) —
+ *  ver comentário em `MockupModal.tsx` pro porquê (carregar instantâneo). */
+.lp-mockup-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 8, 14, 0.82);
+  backdrop-filter: blur(3px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 18px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.22s ease, visibility 0.22s;
+}
+
+.lp-mockup-modal-overlay.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* Moldura de celular de verdade (mesma linguagem visual do mockup da Hero,
+ *  `.lp-testdrive-phone`) — pedido real, 2026-10-14: sem isso parecia uma
+ *  página nova em vez de um teste "por cima" da landing. A margem do
+ *  overlay ao redor (padding acima) deixa o fundo escurecido da própria
+ *  landing visível nos cantos, reforçando que é uma camada por cima. */
+.lp-mockup-modal-phone {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+  height: 100%;
+  max-height: 760px;
+  border-radius: 42px;
+  background: linear-gradient(155deg, #2e2729 0%, #110e10 55%);
+  padding: 12px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+}
+
+.lp-mockup-modal-notch {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70px;
+  height: 11px;
+  background: #000000;
+  border-radius: 6px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.lp-mockup-modal-screen {
+  width: 100%;
+  height: 100%;
+  border-radius: 32px;
+  overflow: hidden;
+  background: #f2cad5;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4) inset;
+}
+
+.lp-mockup-modal-screen iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+/* Botão de fechar bem evidente (pedido real, 2026-10-14 — o anterior era
+ *  discreto demais) — círculo branco sólido, encostado no canto da moldura. */
+.lp-mockup-modal-close {
+  position: absolute;
+  top: -14px;
+  right: -10px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #2a1a20;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.4);
+  z-index: 10;
+  transition: transform 0.15s ease;
+}
+
+.lp-mockup-modal-close:hover {
+  transform: scale(1.08);
+}
+
+@media (max-width: 600px) {
+  .lp-mockup-modal-overlay { padding: 34px 26px; }
+  .lp-mockup-modal-phone { max-width: 100%; max-height: 100%; border-radius: 36px; padding: 10px; }
+  .lp-mockup-modal-screen { border-radius: 28px; }
 }
 
 /* ==========================================================================
