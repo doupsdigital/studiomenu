@@ -13,7 +13,13 @@ import { useEffect, useState } from 'react';
  *  visível muda; aqui a gente escuta e troca o que cada lado mostra. */
 type MockupScreen = 'cover' | 'catalog' | 'other';
 
-export function HeroMockup() {
+interface HeroMockupProps {
+  /** Slug de `/c/showcase/{slug}` — qual catálogo embutir no mockup. Padrão
+   *  `landingpage` (preset genérico) pra quem não passar nada. */
+  showcaseSlug?: string;
+}
+
+export function HeroMockup({ showcaseSlug = 'landingpage' }: HeroMockupProps) {
   const [screen, setScreen] = useState<MockupScreen>('cover');
 
   useEffect(() => {
@@ -40,7 +46,7 @@ export function HeroMockup() {
           <div className="lp-testdrive-notch" />
           <div className="lp-testdrive-screen">
             <div className="lp-testdrive-screen-scaler">
-              <iframe src="/c/showcase/landingpage" title="Prévia ao vivo do catálogo StudioMenu" />
+              <iframe src={`/c/showcase/${showcaseSlug}`} title="Prévia ao vivo do catálogo StudioMenu" />
             </div>
           </div>
         </div>
