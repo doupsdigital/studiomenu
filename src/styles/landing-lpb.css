@@ -1564,6 +1564,7 @@
 }
 
 .lp-mockup-modal-screen {
+  position: relative;
   width: 100%;
   height: 100%;
   border-radius: 32px;
@@ -1572,11 +1573,29 @@
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4) inset;
 }
 
-.lp-mockup-modal-screen iframe {
-  width: 100%;
-  height: 100%;
-  border: 0;
+/* Iframe SEMPRE no tamanho de design (390×844, um celular de verdade) —
+ *  só a aparência é encolhida pelo `scale()` calculado via JS (ver
+ *  `MockupModal.tsx`), igual o mockup da Hero faz com CSS puro. Sem isso o
+ *  site dentro do iframe renderiza pensando que está numa tela menor que
+ *  um celular (achado real testando no celular, 2026-10-14). */
+.lp-mockup-modal-scaler {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 390px;
+  height: 844px;
+  transform-origin: 0 0;
+  background: #f2cad5;
+}
+
+.lp-mockup-modal-scaler iframe {
+  width: 390px !important;
+  height: 844px !important;
+  border: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
   display: block;
+  background: #f2cad5;
 }
 
 /* Botão de fechar bem evidente (pedido real, 2026-10-14 — o anterior era
