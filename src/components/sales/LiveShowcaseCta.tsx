@@ -2,7 +2,13 @@
 
 import Link from 'next/link';
 
-export function LiveShowcaseCta() {
+interface LiveShowcaseCtaProps {
+  /** Slug de `/c/showcase/{slug}` pro botão — pedido real, 2026-10-14: antes
+   *  era sempre o Studio genérico, mesmo numa página nichada de Lash. */
+  showcaseSlug?: string;
+}
+
+export function LiveShowcaseCta({ showcaseSlug = 'studiodesigner' }: LiveShowcaseCtaProps) {
   return (
     <section className="lp-live-cta-section">
       <div className="lp-container">
@@ -18,7 +24,7 @@ export function LiveShowcaseCta() {
 
           <div className="lp-live-cta-actions">
             <Link
-              href="/c/showcase/studiodesigner"
+              href={`/c/showcase/${showcaseSlug}`}
               target="_blank"
               rel="noopener noreferrer"
               className="lp-live-cta-btn"

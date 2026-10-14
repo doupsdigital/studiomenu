@@ -7,11 +7,12 @@ interface FaqItem {
   answer: string;
 }
 
-const FAQ_ITEMS: FaqItem[] = [
-  {
-    question: '1. Serve para o meu tipo de Studio / procedimento?',
-    answer: 'Com certeza! O StudioMenu foi feito sob medida para Lash Designers, Nail Designers, Esteticistas, Micropigmentadoras, Cabeleireiras e Studios de Beleza em geral.',
-  },
+const DEFAULT_FIRST_ITEM: FaqItem = {
+  question: '1. Serve para o meu tipo de Studio / procedimento?',
+  answer: 'Com certeza! O StudioMenu foi feito sob medida para Lash Designers, Nail Designers, Esteticistas, Micropigmentadoras, Cabeleireiras e Studios de Beleza em geral.',
+};
+
+const REST_OF_FAQ_ITEMS: FaqItem[] = [
   {
     question: '2. Consigo editar meu catálogo depois de pronto?',
     answer: 'Sim, é 100% editável! Pelo próprio celular você pode trocar a foto da capa, atualizar preços, adicionar novos procedimentos, alterar o tema e cores a qualquer momento. É super rápido e simples.',
@@ -34,8 +35,15 @@ const FAQ_ITEMS: FaqItem[] = [
   },
 ];
 
-export function FaqSection() {
+interface FaqSectionProps {
+  /** Substitui a 1ª pergunta por uma versão nichada — é a única que falava
+   *  de "todos os nichos" (ver `src/data/landing-niche-content.tsx`). */
+  firstItem?: FaqItem;
+}
+
+export function FaqSection({ firstItem }: FaqSectionProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(0); // Primeiro item aberto por padrão
+  const FAQ_ITEMS: FaqItem[] = [firstItem ?? DEFAULT_FIRST_ITEM, ...REST_OF_FAQ_ITEMS];
 
   const toggleItem = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);
