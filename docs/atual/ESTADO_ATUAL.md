@@ -203,6 +203,19 @@ ficam separados de commits de documentação (`docs:`) por hábito.
 5. Ao abrir CNPJ: converter a conta Asaas, testar com valor baixo, só então reavaliar Pix Automático.
 6. Construir o banco de dados de desenvolvimento no Supabase (planejado, ainda não feito).
 
+**Do lado técnico:**
+5. Contador de urgência da tela de primeiro contato (`UrgencyTimerBanner.tsx`, cronômetro de 2h
+   pro Plano Catálogo) foi **removido de `FirstContactScreen.tsx` em 2026-10-14** depois de uma
+   gravação do PostHog mostrar o card "Modo Admin" (com botão de debug) em vez do cronômetro.
+   Causa: o cookie de sessão do admin (`sm_admin_session`) é host-only pra `studiomenu.art`, e
+   `/app/{slug}/inicio` roda nesse MESMO host (não é subdomínio) — qualquer navegador já logado
+   no `/admin` (cookie válido por 30 dias) vê o card de admin ao abrir o link de QUALQUER
+   cliente, mesmo sem relação com aquele slug. O componente (`src/components/app-shell/
+   UrgencyTimerBanner.tsx`) continua no repo, só não é mais importado/renderizado — antes de
+   reativar, precisa de um isolamento de verdade entre sessão de admin e visita de cliente (ex:
+   nunca chamar `posthog.identify`/mostrar UI de admin numa página de cliente, ou escopar o
+   cookie de admin de outra forma).
+
 **Testado com dinheiro real:** Pix Básico, upgrade pro Plus, webhook, cancelamento pelo painel
 Asaas → agenda bloqueada.
 **Em produção mas ainda não provado com dinheiro real:** pagamento por cartão, renovação mensal
