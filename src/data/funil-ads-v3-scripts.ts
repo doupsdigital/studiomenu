@@ -2,7 +2,7 @@
 // em vez de vender pelo X1, o anúncio manda direto pra Landing Page de vendas (`SalesLandingPage.tsx`)
 // e a lead já chega no WhatsApp dizendo qual plano quer — o botão de cada card da LP manda uma
 // mensagem pronta (ver `whatsappLink(...)` em `SalesLandingPage.tsx`):
-//   • "Olá! Vi a página do StudioMenu e quero o Plano Catálogo por R$24,90/mês"
+//   • "Olá! Vi a página do StudioMenu e quero o Plano Catálogo por R$22,90/mês"
 //   • "Olá! Vi a página do StudioMenu e quero o Plano Vitalício por R$197,00, pagamento único"
 //
 // Diferença chave pros outros 2 funis (`funil-ads-scripts.ts`, `funil-ads-v2-scripts.ts`): a lead
@@ -15,7 +15,7 @@
 // (fechou Vitalício R$197 em 2026-10-08) — o resto varia a abordagem comercial em cima dessa
 // mesma espinha dorsal, pra testar qual converte melhor.
 //
-// Preços centralizados em `src/lib/pricing.ts`; os valores de Catálogo usados aqui (R$24,90/mês)
+// Preços centralizados em `src/lib/pricing.ts`; os valores de Catálogo usados aqui (R$22,90/mês)
 // são os de teste do X1 atual (`TEST_CATALOGO_PRICE` em `SalesLandingPage.tsx`), não o preço
 // "oficial" de catálogo avulso (`CATALOGO_PRICE`, R$89,90) — se o teste mudar de preço, estas
 // mensagens devem ser atualizadas junto, porque citam o valor literal que a lead acabou de ver.
@@ -45,7 +45,7 @@ function buildOpeningSteps(): FunilV3Step[] {
     {
       title: '1️⃣ Boas-vindas',
       badge: 'Recepção',
-      tip: 'A mensagem dela já chega pronta, variando só o plano escolhido: "Olá! Vi a página do StudioMenu e quero o Plano Catálogo por R$24,90/mês" ou "...Plano Vitalício por R$197,00, pagamento único". Não precisa confirmar de novo qual plano — ela já escolheu.',
+      tip: 'A mensagem dela já chega pronta, variando só o plano escolhido: "Olá! Vi a página do StudioMenu e quero o Plano Catálogo por R$22,90/mês" ou "...Plano Vitalício por R$197,00, pagamento único". Não precisa confirmar de novo qual plano — ela já escolheu.',
       content: `Olá, seja bem-vinda! 😊`,
     },
   ];
@@ -363,7 +363,7 @@ Dá uma olhada com calma — é só clicar e navegar como se fosse uma cliente s
         badge: 'Preço & Valor',
         content: `Fico feliz que gostou! 😊 Você pode ter esse Catálogo de duas formas:
 
-*Plano Catálogo* — R$24,90/mês, sem fidelidade, cancela quando quiser.
+*Plano Catálogo* — R$22,90/mês, sem fidelidade, cancela quando quiser.
 *Plano Vitalício* — R$197,00, pagamento único, sem mensalidade nenhuma.
 
 Qual faz mais sentido pra você?`,

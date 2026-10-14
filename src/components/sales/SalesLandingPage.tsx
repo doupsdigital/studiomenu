@@ -64,7 +64,7 @@ function priceParts(price: number): { whole: string; cents: string } {
 // direto pra landing em vez do script de WhatsApp — por isso os preços aqui
 // são valores de teste à parte, não os de verdade (`CATALOGO_PRICE`) usados
 // no checkout/admin.
-const TEST_CATALOGO_PRICE = 24.9;
+const TEST_CATALOGO_PRICE = 22.9;
 const TEST_VITALICIO_PRICE = 197;
 
 interface SalesLandingPageProps {
@@ -169,7 +169,7 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
 
             <div className="lp-pricing-tier-grid">
               {/* Catálogo (assinatura) — teste de X1, 2026-10-08: preço de
-               *  teste 24,90/mês, "/mês" ao lado do valor (não embaixo). */}
+               *  teste 22,90/mês, "/mês" ao lado do valor (não embaixo). */}
               <div className="lp-pricing-tier-card">
                 <div className="lp-tier-badge lp-tier-badge--basic">🔁 ASSINATURA MENSAL</div>
                 <h3 className="lp-tier-title">StudioMenu Catálogo</h3>
@@ -192,7 +192,7 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
                 </ul>
 
                 <a
-                  href={whatsappLink('Olá! Vi a página do StudioMenu e quero o Plano Catálogo por R$24,90/mês')}
+                  href={whatsappLink('Olá! Vi a página do StudioMenu e quero o Plano Catálogo por R$22,90/mês')}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="lp-btn lp-btn--whatsapp"

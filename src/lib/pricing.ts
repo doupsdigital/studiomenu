@@ -13,13 +13,15 @@
 export const CATALOGO_PRICE = 89.9;
 export const CATALOGO_PRICE_LABEL = 'R$ 89,90';
 
-/** Preço/modo padrão pra catálogo NOVO criado pelo admin (2026-10-13) —
- *  passa a nascer como assinatura mensal (`catalog_billing_mode:
- *  'recorrente'`) em vez de pagamento único avulso, usando esse valor como
- *  `billing_price_override` inicial. Catálogos já existentes não são
- *  afetados (isso só entra no INSERT de um catálogo novo); o admin
- *  continua podendo trocar modo/preço por cliente em `/admin/catalogos`. */
-export const CATALOGO_RECORRENTE_DEFAULT_PRICE = 24.9;
+/** Preço/modo padrão pra catálogo NOVO criado pelo admin (2026-10-13,
+ *  atualizado pra R$22,90 em 2026-10-14) — passa a nascer como assinatura
+ *  mensal (`catalog_billing_mode: 'recorrente'`) em vez de pagamento único
+ *  avulso, usando esse valor como `billing_price_override` inicial.
+ *  Catálogos já existentes NÃO são afetados por mudar esse valor (o preço
+ *  de cada cliente já está gravado na própria linha em
+ *  `orders.billing_price_override` desde a criação) — o admin continua
+ *  podendo trocar modo/preço por cliente em `/admin/catalogos`. */
+export const CATALOGO_RECORRENTE_DEFAULT_PRICE = 22.9;
 
 export const AGENDA_PRICE = 34.9;
 export const AGENDA_PRICE_LABEL = 'R$ 34,90/mês';
