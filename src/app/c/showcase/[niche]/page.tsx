@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { NicheType, CatalogOrderData } from '@/types/catalog';
 import { ShowcaseClient } from './ShowcaseClient';
 import { landingMockupPreset } from '@/data/niche-presets/landing-mockup';
+import { lashLandingMockupPreset } from '@/data/niche-presets/lash-landing-mockup';
 
 interface ShowcasePageProps {
   params: Promise<{ niche: string }>;
@@ -40,6 +41,11 @@ const SHOWCASE_SLUGS: Record<string, { niche: NicheType; forceBasico: boolean; c
   // showrooms, aqui a foto NÃO deve trocar ao alternar Mosaico/Clássico —
   // sempre a mesma mulher morena, independente do modelo escolhido.
   landingpage: { niche: 'studio', forceBasico: true, coverOverride: '/modelos/mosaico/assets/img/Hero.webp', presetOverride: landingMockupPreset },
+  // Preset próprio, só pro modal de teste da landing nichada de Lash
+  // (pedido real, 2026-10-14) — só 4 procedimentos (os mesmos do criativo
+  // de anúncio), editável à vontade sem afetar o showroom real do nicho
+  // Lash (`lash`/`lashdesigner` acima continuam intactos).
+  lashlanding: { niche: 'lash', forceBasico: true, coverOverride: '/modelos/mosaico/assets/img/Hero.webp', presetOverride: lashLandingMockupPreset },
 };
 
 function resolveShowcaseSlug(slug: string): { niche: NicheType; forceBasico: boolean; coverOverride?: string; presetOverride?: CatalogOrderData } {

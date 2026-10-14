@@ -1,11 +1,12 @@
 'use client';
 
+import { useState } from 'react';
 import { capture } from '@/lib/analytics';
 import { AGENDA_PRICE } from '@/lib/pricing';
 import { HeroMockup } from './HeroMockup';
+import { MockupModal } from './MockupModal';
 import { HowItWorksSection } from './HowItWorksSection';
 import { FaqSection } from './FaqSection';
-import { LiveShowcaseCta } from './LiveShowcaseCta';
 import type { LandingNicheContent } from '@/data/landing-niche-content';
 
 /** Evento nomeado pros 3 CTAs de maior valor, além do clique "cru" que o
@@ -75,6 +76,7 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
   const catalogoParts = priceParts(TEST_CATALOGO_PRICE);
   const vitalicioParts = priceParts(TEST_VITALICIO_PRICE);
   const agendaParts = priceParts(AGENDA_PRICE);
+  const [mockupOpen, setMockupOpen] = useState(false);
 
   return (
     <div className="lp-lashmenu">
@@ -132,11 +134,18 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
                 </div>
                 */}
 
-                <p className="lp-hero-swipe-hint lp-hero-swipe-hint--emphasis">👇 Teste o Catálogo navegando pelo celular abaixo:</p>
+                <p className="lp-hero-swipe-hint lp-hero-swipe-hint--emphasis">👉 Toque no celular abaixo pra testar o Catálogo:</p>
               </div>
 
-              {/* Mockup: catálogo real embutido */}
-              <HeroMockup showcaseSlug={content.showcaseSlug} />
+              {/* Mockup: vitrine estática, abre o modal fullscreen de teste
+               *  ao tocar (2026-10-14) — ver comentário em `MockupModal.tsx`. */}
+              <HeroMockup
+                showcaseSlug={content.showcaseSlug}
+                onTap={() => {
+                  capture('hero_mockup_tap');
+                  setMockupOpen(true);
+                }}
+              />
             </div>
           </div>
         </section>
@@ -173,7 +182,6 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
               <div className="lp-pricing-tier-card">
                 <div className="lp-tier-badge lp-tier-badge--basic">🔁 ASSINATURA MENSAL</div>
                 <h3 className="lp-tier-title">StudioMenu Catálogo</h3>
-                <p className="lp-tier-desc">Catálogo digital com seu nome, fotos e preços, sempre no ar — edite pelo celular quando quiser.</p>
 
                 <div className="lp-tier-price-box">
                   <div className="lp-tier-price-main">
@@ -210,7 +218,6 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
               <div className="lp-pricing-tier-card lp-pricing-tier-card--vip">
                 <div className="lp-tier-badge lp-tier-badge--vip">⭐ RECOMENDADO</div>
                 <h3 className="lp-tier-title">StudioMenu Vitalício</h3>
-                <p className="lp-tier-desc">Tudo do Catálogo, pagando uma vez só — sem mensalidade.</p>
 
                 <div className="lp-tier-price-box">
                   <div className="lp-tier-price-main">
@@ -305,9 +312,6 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
 
         {/* 6. DÚVIDAS FREQUENTES */}
         <FaqSection firstItem={content.faqFirstItem} />
-
-        {/* 7. SEÇÃO MATADORA (CTA SHOWCASE AO VIVO) */}
-        <LiveShowcaseCta showcaseSlug={content.liveShowcaseSlug} />
       </main>
 
       <footer className="lp-site-footer">
@@ -342,6 +346,8 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
           TIRAR DÚVIDAS NO WHATSAPP
         </a>
       </div>
+
+      <MockupModal showcaseSlug={content.showcaseSlug} isOpen={mockupOpen} onClose={() => setMockupOpen(false)} />
     </div>
   );
 }
