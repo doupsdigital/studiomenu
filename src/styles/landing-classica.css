@@ -1,0 +1,1311 @@
+/* ==========================================================================
+   LANDING PAGE — PORTADA QUASE 1:1 DE legacy/vendas/lpb/css/style.css
+   ==========================================================================
+   Todo seletor aqui tem prefixo `lp-` (e vive dentro de `.lpc-lashmenu`) de
+   propósito — os nomes originais (`.container`, `.btn`, `.badge`...) são
+   genéricos demais pra ficar soltos num app Tailwind, colidiriam com a
+   utility `container` do Tailwind (ambas fariam `.container`, a que vier
+   depois no CSS compilado ganharia, quebrando um dos dois lados sem
+   avisar). Os VALORES (cor, rem, clamp, animação) são copiados exatamente
+   do arquivo legado — pedido explícito da usuária pra bater igual,
+   2026-09-23, depois de uma primeira tentativa em Tailwind solto que saiu
+   com tamanhos/fonte diferentes do original. */
+
+.lpc-lashmenu {
+  --lp-bg: #faf8f5;
+  --lp-bg-subtle: #f4f0ea;
+  --lp-card: #ffffff;
+  --lp-border: #ede9e3;
+  --lp-accent: #c84b72;
+  --lp-accent-light: #fbedf2;
+  --lp-accent-dark: #a33a5c;
+  --lp-text: #1a1220;
+  --lp-muted: #7a6b78;
+  --lp-radius-md: 16px;
+  --lp-radius-lg: 22px;
+  --lp-radius-pill: 999px;
+
+  background: var(--lp-bg);
+  color: var(--lp-text);
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+.lpc-lashmenu *,
+.lpc-lashmenu *::before,
+.lpc-lashmenu *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.lpc-lashmenu h1,
+.lpc-lashmenu h2,
+.lpc-lashmenu h3,
+.lpc-lashmenu h4 {
+  color: var(--lp-text);
+  font-weight: 800;
+  line-height: 1.18;
+  letter-spacing: -0.03em;
+  word-break: break-word;
+}
+
+.lpc-container {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.lpc-text-gradient {
+  color: var(--lp-accent);
+}
+
+.lpc-text-wine {
+  color: #6d1430;
+}
+
+.lpc-hero-title-line2 {
+  display: block;
+  margin-top: 8px;
+}
+
+/* Botões */
+.lpc-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 24px;
+  border-radius: var(--lp-radius-md);
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  text-align: center;
+}
+
+.lpc-btn--primary {
+  background: var(--lp-accent);
+  color: #ffffff;
+  box-shadow: 0 10px 32px rgba(200, 75, 114, 0.32);
+  position: relative;
+  overflow: hidden;
+  animation: lpc-slow-cta-pulse 3s infinite ease-in-out;
+}
+
+.lpc-btn--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 40px rgba(200, 75, 114, 0.45);
+}
+
+.lpc-btn--whatsapp {
+  background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 26px rgba(37, 211, 102, 0.35);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  font-size: 0.95rem;
+  padding: 16px 20px;
+}
+
+.lpc-btn--whatsapp:hover {
+  background: linear-gradient(135deg, #20bd5a 0%, #0e7368 100%);
+  box-shadow: 0 12px 32px rgba(37, 211, 102, 0.48);
+  transform: translateY(-2px);
+}
+
+@keyframes lpc-slow-cta-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 8px 24px rgba(200, 75, 114, 0.35); }
+  50% { transform: scale(1.025); box-shadow: 0 12px 34px rgba(200, 75, 114, 0.55), 0 0 15px rgba(200, 75, 114, 0.3); }
+}
+
+/* ==========================================================================
+   BARRA DE ANÚNCIO NO TOPO
+   ========================================================================== */
+.lpc-top-bar {
+  background: var(--lp-accent);
+  color: #ffffff;
+  padding: 8px 0;
+  box-shadow: 0 3px 14px rgba(192, 75, 107, 0.22);
+}
+
+.lpc-announcement-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.lpc-topbar-avatars {
+  display: inline-flex;
+  align-items: center;
+}
+
+.lpc-topbar-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid #ffffff;
+  margin-left: -7px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.lpc-topbar-avatar:first-child {
+  margin-left: 0;
+}
+
+.lpc-topbar-stars {
+  color: #fcd34d;
+  font-size: 0.76rem;
+  letter-spacing: 1px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.lpc-announcement-text {
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.lpc-announcement-text strong {
+  font-weight: 800;
+  color: #ffffff;
+}
+
+@media (max-width: 600px) {
+  .lpc-top-bar { padding: 7px 0; }
+  .lpc-announcement-content { gap: 6px; }
+  .lpc-topbar-avatar { width: 20px; height: 20px; }
+  .lpc-topbar-stars { font-size: 0.7rem; }
+  .lpc-announcement-text { font-size: 0.72rem; }
+}
+
+/* ==========================================================================
+   HERO
+   ========================================================================== */
+.lpc-hero-section {
+  padding: clamp(26px, 3.8vw, 44px) 0 38px;
+  display: flex;
+  align-items: center;
+}
+
+.lpc-hero-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 36px;
+  align-items: center;
+  width: 100%;
+}
+
+.lpc-hero-content {
+  text-align: left;
+}
+
+.lpc-hero-brand-block {
+  margin-bottom: 20px;
+}
+
+.lpc-hero-brand-h1 {
+  font-size: clamp(2.6rem, 5.8vw, 3.8rem);
+  font-weight: 800;
+  color: #34222c;
+  letter-spacing: -0.035em;
+  line-height: 1;
+  margin: 0 0 6px;
+  display: inline-flex;
+  align-items: baseline;
+}
+
+.lpc-hero-brand-h1 em {
+  font-style: italic;
+  font-weight: 800;
+  color: var(--lp-accent);
+  margin-left: 1px;
+}
+
+.lpc-hero-brand-tagline {
+  font-size: clamp(0.74rem, 1.4vw, 0.85rem);
+  font-weight: 700;
+  color: var(--lp-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0;
+}
+
+.lpc-hero-title {
+  font-size: clamp(1.6rem, 3.6vw, 2.5rem);
+  font-weight: 900;
+  line-height: 1.16;
+  letter-spacing: -0.03em;
+  margin-bottom: 18px;
+}
+
+.lpc-hero-subtitle {
+  font-size: 0.98rem;
+  color: var(--lp-muted);
+  line-height: 1.65;
+  margin-bottom: 24px;
+  max-width: 520px;
+}
+
+.lpc-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.lpc-hero-swipe-hint {
+  font-size: 0.83rem;
+  font-weight: 700;
+  color: var(--lp-accent);
+  margin-top: 14px;
+}
+
+/* Mais destaque (teste de X1, 2026-10-08) — virou o único CTA textual da
+   seção depois de remover o botão "Criar Meu Catálogo Agora". Mesmo
+   contraste do botão removido: fundo rosa, texto branco. */
+.lpc-hero-swipe-hint--emphasis {
+  display: block;
+  text-align: left;
+  font-size: 0.98rem;
+  color: #ffffff;
+  background: var(--lp-accent);
+  padding: 13px 22px;
+  border-radius: var(--lp-radius-md);
+  box-shadow: 0 10px 32px rgba(200, 75, 114, 0.32);
+  margin-top: 20px;
+}
+
+@media (max-width: 900px) {
+  .lpc-hero-grid { grid-template-columns: 1fr; gap: 32px; }
+}
+
+@media (max-width: 600px) {
+  .lpc-hero-section { padding-top: 50px; padding-bottom: 24px; }
+  .lpc-hero-actions .lpc-btn { width: 100%; }
+}
+
+/* ── Mockup do celular ── */
+.lpc-hero-phone-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 0;
+  width: 100%;
+}
+
+.lpc-phone-interactive-container {
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+}
+
+/* Moldura de verdade de iPhone: a tela recua `--lp-bezel` de cada lado (o
+ *  cálculo original do LashMenu preenchia o retângulo do celular 100% até
+ *  a borda, sem sobra nenhuma pra mostrar a cor de fundo do aparelho — só
+ *  dava pra ver um fiapo da moldura nos 4 cantos arredondados; reportado
+ *  como "sem bordas de iPhone, parece, ou está muito fina", 2026-09-23).
+ *  Escala em X e Y calculada separadamente (mesmo truque do
+ *  `.showroom-phone` mais abaixo no arquivo original) pra preencher a
+ *  área da tela exatamente, mesmo com a proporção não batendo 100% com a
+ *  do iframe 390×844. */
+.lpc-testdrive-phone {
+  --lp-phone-w: 245px;
+  --lp-phone-h: 530px;
+  --lp-bezel: 6px;
+  --lp-screen-w: calc(var(--lp-phone-w) - var(--lp-bezel) * 2);
+  --lp-screen-h: calc(var(--lp-phone-h) - var(--lp-bezel) * 2);
+  --lp-base-w: 390px;
+  --lp-base-h: 844px;
+
+  position: relative;
+  width: var(--lp-phone-w);
+  max-width: 65vw;
+  height: var(--lp-phone-h);
+  background: linear-gradient(155deg, #2e2729 0%, #110e10 55%);
+  border-radius: 34px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  margin: 0 auto;
+}
+
+.lpc-testdrive-notch {
+  position: absolute;
+  top: var(--lp-bezel, 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 62px;
+  height: 10px;
+  background: #000000;
+  border-radius: 6px;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.lpc-testdrive-screen {
+  position: absolute;
+  top: var(--lp-bezel, 6px);
+  left: var(--lp-bezel, 6px);
+  width: var(--lp-screen-w);
+  height: var(--lp-screen-h);
+  border-radius: 29px;
+  overflow: hidden;
+  background: #f2cad5;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4) inset;
+}
+
+.lpc-testdrive-screen-scaler {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--lp-base-w);
+  height: var(--lp-base-h);
+  transform-origin: 0 0;
+  transform: scale(calc(var(--lp-screen-w) / var(--lp-base-w)), calc(var(--lp-screen-h) / var(--lp-base-h)));
+  background: #f2cad5;
+}
+
+.lpc-testdrive-screen-scaler iframe {
+  width: 390px !important;
+  height: 844px !important;
+  border: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block;
+  background: #f2cad5;
+}
+
+@media (min-width: 600px) {
+  .lpc-testdrive-phone { --lp-phone-w: 310px; --lp-phone-h: 671px; --lp-bezel: 7px; }
+}
+
+.lpc-phone-scroll-indicator,
+.lpc-phone-left-indicator {
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lpc-phone-scroll-indicator.is-hidden,
+.lpc-phone-left-indicator.is-hidden {
+  opacity: 0;
+  transform: translateY(-50%) scale(0.85);
+  pointer-events: none;
+}
+
+.lpc-phone-scroll-indicator {
+  position: absolute;
+  top: 32%;
+  right: -94px;
+  transform: translateY(-50%);
+  z-index: 120;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.lpc-phone-left-indicator {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 120;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Mesmo valor (espelhado) de quando o Deslize ainda era o único indicador,
+ *  fixo do lado direito (`right: -52px`) — mantém o visual original de
+ *  "pendurado na borda" do celular, só migrado pro lado esquerdo. */
+.lpc-phone-left-indicator--deslize {
+  left: -52px;
+}
+
+/* Clique nos cards sempre foi do lado esquerdo — valor inalterado. */
+.lpc-phone-left-indicator--clique {
+  left: -94px;
+}
+
+.lpc-left-cue-tag {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #c84b72;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  padding: 3.5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(200, 75, 114, 0.35);
+  box-shadow: 0 4px 14px rgba(200, 75, 114, 0.2);
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  animation: lpc-tag-soft-pulse 2.4s infinite ease-in-out;
+}
+
+.lpc-left-tap-icon {
+  filter: drop-shadow(0 4px 12px rgba(200, 75, 114, 0.38));
+  animation: lpc-tap-pulse 1.4s infinite ease-in-out;
+}
+
+@keyframes lpc-tap-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(0.86); }
+}
+
+.lpc-photo-cursor-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: lpc-pointer-point-left 1.8s infinite ease-in-out;
+}
+
+.lpc-photo-point-icon {
+  filter: drop-shadow(0 2px 8px rgba(200, 75, 114, 0.35));
+}
+
+@keyframes lpc-pointer-point-left {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-7px); }
+}
+
+.lpc-scroll-cue-tag {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: #c84b72;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(200, 75, 114, 0.35);
+  box-shadow: 0 4px 12px rgba(200, 75, 114, 0.18);
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  animation: lpc-tag-soft-pulse 2.4s infinite ease-in-out;
+}
+
+.lpc-scroll-cursor-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  animation: lpc-pointer-swipe-down 2.4s infinite cubic-bezier(0.45, 0, 0.25, 1);
+}
+
+.lpc-touch-pointer-hand-svg {
+  filter: drop-shadow(0 4px 10px rgba(200, 75, 114, 0.35));
+}
+
+.lpc-scroll-cue-arrow-svg {
+  filter: drop-shadow(0 2px 6px rgba(200, 75, 114, 0.3));
+  animation: lpc-arrow-bounce 1.2s infinite ease-in-out;
+}
+
+@keyframes lpc-pointer-swipe-down {
+  0% { transform: translateY(-12px); opacity: 0.2; }
+  20% { opacity: 1; }
+  75% { transform: translateY(18px); opacity: 1; }
+  100% { transform: translateY(24px); opacity: 0.15; }
+}
+
+@keyframes lpc-arrow-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(3px); }
+}
+
+@keyframes lpc-tag-soft-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 4px 12px rgba(200, 75, 114, 0.18); }
+  50% { transform: scale(1.04); box-shadow: 0 6px 16px rgba(200, 75, 114, 0.3); }
+}
+
+@media (max-width: 480px) {
+  .lpc-phone-scroll-indicator { right: -72px; }
+  .lpc-scroll-cue-tag { font-size: 0.60rem; padding: 2.5px 6.5px; }
+  .lpc-phone-left-indicator--deslize { left: -44px; }
+  .lpc-phone-left-indicator--clique { left: -72px; }
+  .lpc-left-cue-tag { font-size: 0.58rem; padding: 2.5px 7px; }
+  .lpc-left-tap-icon { width: 24px; height: 24px; }
+}
+
+/* ==========================================================================
+   MARQUEE DE DEPOIMENTOS
+   ========================================================================== */
+.lpc-marquee-ribbon-section {
+  background: var(--lp-accent);
+  color: #ffffff;
+  padding: clamp(34px, 4.8vw, 50px) 0;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 8px 30px rgba(192, 75, 107, 0.28);
+}
+
+.lpc-marquee-ribbon-wrap {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  mask-image: linear-gradient(to right, transparent, black 3%, black 97%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 3%, black 97%, transparent);
+}
+
+.lpc-marquee-ribbon-track {
+  display: flex;
+  align-items: stretch;
+  gap: 22px;
+  width: max-content;
+  animation: lpc-ribbon-marquee 34s linear infinite;
+  will-change: transform;
+  padding: 8px 0;
+}
+
+.lpc-marquee-ribbon-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes lpc-ribbon-marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.lpc-marquee-review-card {
+  width: 290px;
+  flex-shrink: 0;
+  background: #ffffff;
+  border: 1.5px solid rgba(230, 80, 115, 0.18);
+  border-radius: 20px;
+  padding: 16px 18px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lpc-mrc-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lpc-mrc-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--lp-accent);
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(230, 80, 115, 0.25);
+}
+
+.lpc-mrc-user {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.lpc-mrc-name {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #1f1417;
+  line-height: 1.1;
+}
+
+.lpc-mrc-stars {
+  color: #ffb800;
+  font-size: 0.82rem;
+  letter-spacing: 1px;
+}
+
+.lpc-mrc-quote {
+  font-size: 0.83rem;
+  line-height: 1.45;
+  color: #4a3e44;
+  margin: 0;
+  font-style: italic;
+  font-weight: 500;
+}
+
+@media (max-width: 600px) {
+  .lpc-marquee-ribbon-section { padding: 26px 0; }
+  .lpc-marquee-ribbon-track { gap: 14px; animation-duration: 25s; }
+  .lpc-marquee-review-card { width: 250px; padding: 14px 15px; border-radius: 16px; }
+  .lpc-mrc-avatar { width: 34px; height: 34px; }
+  .lpc-mrc-name { font-size: 0.82rem; }
+  .lpc-mrc-quote { font-size: 0.78rem; }
+}
+
+/* ==========================================================================
+   SEÇÃO ANTES x DEPOIS
+   ========================================================================== */
+.lpc-comparison-section {
+  padding: 60px 0;
+  background: #ffffff;
+}
+
+.lpc-section-header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.lpc-section-kicker {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--lp-accent);
+  margin-bottom: 10px;
+}
+
+.lpc-section-title {
+  font-size: clamp(1.4rem, 4.2vw, 2.5rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  margin-bottom: 12px;
+  line-height: 1.2;
+}
+
+@media (max-width: 600px) {
+  .lpc-section-title { font-size: 1.48rem; line-height: 1.25; }
+}
+
+.lpc-vs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  margin-top: 36px;
+}
+
+@media (max-width: 768px) {
+  .lpc-vs-grid { grid-template-columns: 1fr; }
+}
+
+.lpc-vs-box {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--lp-radius-lg);
+  padding: 28px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.03);
+}
+
+.lpc-vs-box--bad { background: #fef2f2; border: 1.5px solid #fecaca; }
+.lpc-vs-box--good { background: #f0fdf4; border: 1.5px solid #bbf7d0; }
+
+.lpc-vs-box-head { margin-top: 10px; margin-bottom: 20px; }
+
+.lpc-vs-box--bad .lpc-vs-box-head h3 { color: #dc2626; font-size: 1.2rem; font-weight: 800; margin: 0 0 0 28px; }
+.lpc-vs-box--good .lpc-vs-box-head h3 { color: #16a34a; font-size: 1.2rem; font-weight: 800; margin: 0 0 0 28px; }
+
+/* Badge diagonal "Antes/Depois" no canto, tipo etiqueta de oferta. */
+.lpc-vs-ribbon {
+  position: absolute;
+  top: 16px;
+  left: -34px;
+  width: 135px;
+  transform: rotate(-45deg);
+  text-align: center;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 0;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  z-index: 2;
+}
+
+.lpc-vs-ribbon--bad { background: #dc2626; }
+.lpc-vs-ribbon--good { background: #16a34a; }
+
+.lpc-vs-bullet-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+}
+
+.lpc-vs-bullet-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--lp-text);
+}
+
+.lpc-vs-svg-bad { color: #dc2626; flex-shrink: 0; margin-top: 2px; }
+.lpc-vs-svg-good { color: #16a34a; flex-shrink: 0; margin-top: 2px; }
+
+/* ==========================================================================
+   OFERTA / PLANOS
+   ========================================================================== */
+.lpc-pricing-section {
+  background: linear-gradient(145deg, #c84b72 0%, #b03a60 100%);
+  padding: clamp(50px, 7vw, 80px) 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.lpc-pricing-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 600px;
+  height: 250px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.20) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.lpc-pricing-header-title {
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.lpc-pricing-header-title .lpc-section-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.15;
+  margin-bottom: 6px;
+}
+
+.lpc-pricing-header-title .lpc-section-subtitle {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.95rem;
+  font-weight: 400;
+}
+
+.lpc-pricing-tier-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: stretch;
+}
+
+/* Teste de X1 com um card só (Plano Agenda comentado, 2026-10-08) — centraliza
+   e limita a largura em vez de deixar o card sozinho esticado/desalinhado
+   num grid pensado pra 2 colunas. */
+.lpc-pricing-tier-grid--single {
+  grid-template-columns: 1fr;
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .lpc-pricing-tier-grid { grid-template-columns: 1fr; gap: 22px; }
+}
+
+.lpc-pricing-tier-card {
+  background: #ffffff;
+  border: 1px solid rgba(200, 75, 114, 0.2);
+  border-radius: 24px;
+  padding: 32px 26px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.12);
+  color: #1a1412;
+}
+
+.lpc-pricing-tier-card--vip {
+  border: 2.5px solid #c84b72;
+  box-shadow: 0 16px 50px rgba(200, 75, 114, 0.28);
+}
+
+.lpc-tier-badge {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 5px 14px;
+  border-radius: 100px;
+  margin-bottom: 14px;
+  text-transform: uppercase;
+}
+
+.lpc-tier-badge--basic {
+  background: #fdf2f5;
+  color: #c84b72;
+  border: 1px solid rgba(200, 75, 114, 0.25);
+}
+
+.lpc-tier-badge--vip {
+  background: linear-gradient(135deg, #c84b72 0%, #a82b54 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(200, 75, 114, 0.3);
+}
+
+.lpc-tier-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.85rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: #1a1412;
+}
+
+.lpc-tier-desc {
+  font-size: 0.88rem;
+  color: #665a5e;
+  line-height: 1.48;
+  margin-bottom: 20px;
+  min-height: 48px;
+}
+
+.lpc-tier-price-box {
+  background: linear-gradient(135deg, #fff0f3 0%, #fce4eb 100%);
+  border-radius: 18px;
+  padding: 18px 16px;
+  text-align: center;
+  margin-bottom: 22px;
+  border: 1.5px solid rgba(200, 75, 114, 0.35);
+  box-shadow: 0 4px 16px rgba(200, 75, 114, 0.08);
+  color: #1a1412;
+}
+
+.lpc-pricing-tier-card--vip .lpc-tier-price-box {
+  background: linear-gradient(135deg, #c84b72 0%, #b03a60 100%);
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 8px 24px rgba(200, 75, 114, 0.35);
+}
+
+.lpc-tier-price-main {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 2px;
+  color: #c84b72;
+  line-height: 1;
+}
+
+.lpc-pricing-tier-card--vip .lpc-tier-price-main { color: #ffffff; }
+
+.lpc-tier-currency { font-size: 1.2rem; font-weight: 800; }
+.lpc-tier-val { font-size: 3rem; font-weight: 900; }
+.lpc-tier-cents { font-size: 1.2rem; font-weight: 700; }
+/* "/mês" ao lado do preço, não embaixo (pedido real, teste de X1, 2026-10-08). */
+.lpc-tier-period { font-size: 1rem; font-weight: 700; margin-left: 4px; opacity: 0.85; }
+
+.lpc-tier-price-sub {
+  font-size: 0.78rem;
+  color: #6e4652;
+  margin-top: 6px;
+  font-weight: 600;
+}
+
+.lpc-pricing-tier-card--vip .lpc-tier-price-sub { color: rgba(255, 255, 255, 0.9); }
+
+.lpc-tier-bullets {
+  list-style: none;
+  margin: 0 0 26px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex-grow: 1;
+}
+
+.lpc-tier-bullets li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.88rem;
+  color: #383033;
+  line-height: 1.35;
+}
+
+.lpc-tier-bullets li svg { color: #c84b72; flex-shrink: 0; }
+
+.lpc-tier-guarantee {
+  margin: 12px 0 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #7a6a70;
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* ==========================================================================
+   BADGE DE ENTREGA NO HERO
+   ========================================================================== */
+.lpc-hero-delivery-badge-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.lpc-hero-delivery-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--lp-accent-light);
+  border: 1px solid rgba(200, 75, 114, 0.3);
+  padding: 10px 20px;
+  border-radius: var(--lp-radius-pill);
+  font-size: 0.92rem;
+  color: var(--lp-accent-dark);
+  box-shadow: 0 4px 14px rgba(200, 75, 114, 0.1);
+  text-align: center;
+}
+
+.lpc-hero-delivery-badge strong {
+  color: var(--lp-accent);
+}
+
+/* ==========================================================================
+   FAIXA DE DESTAQUE: ENTREGA 24H
+   ========================================================================== */
+.lpc-delivery-banner-section {
+  padding: 24px 0;
+  background: #fbf0f3;
+  border-top: 1px solid rgba(200, 75, 114, 0.15);
+  border-bottom: 1px solid rgba(200, 75, 114, 0.15);
+}
+
+.lpc-delivery-banner-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: #ffffff;
+  border: 1.5px solid rgba(200, 75, 114, 0.25);
+  border-radius: var(--lp-radius-md);
+  padding: 16px 24px;
+  box-shadow: 0 6px 20px rgba(200, 75, 114, 0.08);
+  text-align: center;
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+.lpc-db-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.lpc-db-text {
+  font-size: 0.98rem;
+  color: var(--lp-text);
+  line-height: 1.45;
+  font-weight: 500;
+}
+
+.lpc-db-text strong {
+  color: var(--lp-accent);
+  font-weight: 800;
+}
+
+@media (max-width: 600px) {
+  .lpc-hero-delivery-badge { font-size: 0.82rem; padding: 7px 12px; }
+  .lpc-delivery-banner-box { gap: 8px; padding: 14px 16px; }
+  .lpc-db-text { font-size: 0.88rem; }
+}
+
+/* ==========================================================================
+   DÚVIDAS FREQUENTES (FAQ)
+   ========================================================================== */
+.lpc-faq-section {
+  padding: 64px 0 80px;
+  background: var(--lp-bg);
+}
+
+.lpc-faq-list {
+  max-width: 780px;
+  margin: 32px auto 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.lpc-faq-item {
+  background: #ffffff;
+  border: 1.5px solid var(--lp-border);
+  border-radius: var(--lp-radius-md);
+  overflow: hidden;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+}
+
+.lpc-faq-item:hover {
+  border-color: rgba(200, 75, 114, 0.35);
+  box-shadow: 0 6px 20px rgba(200, 75, 114, 0.06);
+}
+
+.lpc-faq-item.is-open {
+  border-color: var(--lp-accent);
+  box-shadow: 0 8px 25px rgba(200, 75, 114, 0.12);
+  background: #ffffff;
+}
+
+.lpc-faq-question {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--lp-text);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.lpc-faq-item.is-open .lpc-faq-question {
+  color: var(--lp-accent);
+}
+
+.lpc-faq-question-text {
+  line-height: 1.35;
+}
+
+.lpc-faq-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--lp-bg-subtle);
+  color: var(--lp-accent);
+  flex-shrink: 0;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease, color 0.2s ease;
+}
+
+.lpc-faq-item.is-open .lpc-faq-icon {
+  transform: rotate(180deg);
+  background: var(--lp-accent);
+  color: #ffffff;
+}
+
+.lpc-faq-answer {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lpc-faq-item.is-open .lpc-faq-answer {
+  grid-template-rows: 1fr;
+}
+
+.lpc-faq-answer-inner {
+  overflow: hidden;
+}
+
+.lpc-faq-answer-inner p {
+  padding: 0 24px 22px;
+  font-size: 0.93rem;
+  line-height: 1.6;
+  color: #554852;
+  margin: 0;
+  font-weight: 500;
+}
+
+@media (max-width: 600px) {
+  .lpc-faq-section { padding: 44px 0 60px; }
+  .lpc-faq-question { padding: 16px 18px; font-size: 0.92rem; }
+  .lpc-faq-answer-inner p { padding: 0 18px 18px; font-size: 0.88rem; }
+  .lpc-faq-icon { width: 28px; height: 28px; }
+}
+
+/* ==========================================================================
+   SEÇÃO MATADORA (CTA SHOWCASE AO VIVO)
+   ========================================================================== */
+.lpc-live-cta-section {
+  padding: 0 0 80px;
+  background: var(--lp-bg);
+}
+
+.lpc-live-cta-box {
+  background: linear-gradient(135deg, var(--lp-accent) 0%, var(--lp-accent-dark) 100%);
+  border-radius: 28px;
+  padding: clamp(32px, 4.5vw, 48px) clamp(20px, 4vw, 40px);
+  text-align: center;
+  color: #ffffff;
+  box-shadow: 0 16px 40px rgba(200, 75, 114, 0.28);
+  position: relative;
+  overflow: hidden;
+  max-width: 920px;
+  margin: 0 auto;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.lpc-live-cta-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  padding: 6px 16px;
+  border-radius: 100px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: #ffffff;
+  margin-bottom: 18px;
+  text-transform: uppercase;
+}
+
+.lpc-live-cta-title {
+  font-size: clamp(1.2rem, 3.2vw, 1.8rem);
+  font-weight: 600;
+  color: #ffffff !important;
+  line-height: 1.35;
+  margin-bottom: 22px;
+  letter-spacing: -0.01em;
+}
+
+.lpc-live-cta-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.lpc-live-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #ffffff;
+  color: var(--lp-accent-dark) !important;
+  font-size: 1rem;
+  font-weight: 800;
+  padding: 16px 36px;
+  border-radius: var(--lp-radius-md);
+  text-decoration: none;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.18);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  letter-spacing: 0.02em;
+}
+
+.lpc-live-cta-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  background: #ffffff;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.28);
+  color: var(--lp-accent) !important;
+}
+
+@media (max-width: 600px) {
+  .lpc-live-cta-section { padding-bottom: 50px; }
+  .lpc-live-cta-box { border-radius: 20px; padding: 26px 18px; }
+  .lpc-live-cta-btn { width: 100%; font-size: 0.92rem; padding: 15px 20px; }
+}
+
+/* ==========================================================================
+   RODAPÉ
+   ========================================================================== */
+.lpc-site-footer {
+  background: #fbf0f3;
+  border-top: 1px solid rgba(200, 75, 114, 0.15);
+  padding: 24px 20px 28px;
+  margin: 0;
+  color: #553d46;
+  text-align: center;
+}
+
+.lpc-footer-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.lpc-footer-logo {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #24141a;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.lpc-footer-logo em {
+  font-style: italic;
+  color: var(--lp-accent);
+}
+
+.lpc-footer-tagline {
+  font-size: 0.80rem;
+  color: #7a5c67;
+  letter-spacing: 0.02em;
+  font-weight: 500;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.lpc-footer-copy {
+  font-size: 0.72rem;
+  color: #9e7f8a;
+  margin-top: 6px;
+  letter-spacing: 0.02em;
+}
+
+/* ==========================================================================
+   BOTÃO FLUTUANTE DE WHATSAPP
+   ========================================================================== */
+.lpc-sticky-wa-bar {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+  width: calc(100% - 32px);
+  max-width: 440px;
+}
+
+.lpc-sticky-wa-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+  color: #ffffff !important;
+  font-weight: 800;
+  font-size: 0.9rem;
+  padding: 14px 20px;
+  border-radius: 100px;
+  box-shadow: 0 10px 30px rgba(37, 211, 102, 0.45);
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  animation: lpc-pulse-button 3s ease-in-out infinite;
+}
+
+@keyframes lpc-pulse-button {
+  0%, 100% { box-shadow: 0 6px 24px rgba(200, 75, 114, 0.35); }
+  50% { box-shadow: 0 10px 34px rgba(200, 75, 114, 0.6); }
+}

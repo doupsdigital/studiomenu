@@ -204,6 +204,52 @@
   padding: clamp(26px, 3.8vw, 44px) 0 38px;
   display: flex;
   align-items: center;
+  position: relative;
+}
+
+/* Faixa diagonal de nicho, canto superior direito da Hero (pedido real,
+ *  2026-10-14 — trocou um selo circular por essa faixa, mesmo estilo visual
+ *  do `.lp-vs-ribbon` usado nos cards Antes/Depois, mas espelhada pro canto
+ *  direito e com tipografia serifada em itálico, pra ficar "estilizada" em
+ *  vez do bold uppercase genérico). Vive dentro de `.lp-container` (já tem
+ *  `position: relative`); o wrap com `overflow: hidden` clipa a faixa certinho
+ *  no canto, do jeito clássico de ribbon de oferta. */
+/* Proporção escalada (×1.4) da versão que funcionava certinho (sem cortar)
+ *  — manter a MESMA razão entre caixa de recorte e tamanho da faixa é o que
+ *  evita o corte; só aumentar a faixa sem aumentar a caixa junto corta ela
+ *  (bug da tentativa anterior, 2026-10-14). */
+.lp-hero-niche-ribbon-wrap {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 155px;
+  height: 155px;
+  overflow: hidden;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.lp-hero-niche-ribbon {
+  position: absolute;
+  top: 28px;
+  right: -48px;
+  width: 203px;
+  transform: rotate(45deg);
+  text-align: center;
+  padding: 8px 0;
+  background: linear-gradient(135deg, var(--lp-accent) 0%, var(--lp-accent-dark) 100%);
+  color: #ffffff;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 1.6rem;
+  letter-spacing: 0.03em;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+@media (max-width: 900px) {
+  .lp-hero-niche-ribbon-wrap { width: 130px; height: 130px; }
+  .lp-hero-niche-ribbon { top: 21px; right: -45px; width: 175px; font-size: 1.4rem; padding: 7px 0; }
 }
 
 .lp-hero-grid {
@@ -249,6 +295,15 @@
   margin: 0;
 }
 
+/* Trecho em destaque dentro do eyebrow (ex: "Lash Designer" dentro de "O
+ *  catálogo digital da Lash Designer") — pedido real, 2026-10-14: fonte
+ *  maior e cor de marca, pra chamar mais atenção que o resto da frase. */
+.lp-eyebrow-highlight {
+  font-size: 1.3em;
+  color: var(--lp-accent);
+  font-weight: 900;
+}
+
 .lp-hero-title {
   font-size: clamp(1.6rem, 3.6vw, 2.5rem);
   font-weight: 900;
@@ -258,7 +313,8 @@
 }
 
 .lp-hero-subtitle {
-  font-size: 0.98rem;
+  font-size: 1.1rem;
+  font-weight: 500;
   color: var(--lp-muted);
   line-height: 1.65;
   margin-bottom: 24px;
@@ -285,7 +341,7 @@
 .lp-hero-swipe-hint--emphasis {
   display: block;
   text-align: left;
-  font-size: 0.98rem;
+  font-size: 1.15rem;
   color: #ffffff;
   background: var(--lp-accent);
   padding: 13px 22px;
@@ -660,6 +716,98 @@
 }
 
 /* ==========================================================================
+   COMO FUNCIONA (LINHA DO TEMPO VERTICAL)
+   ========================================================================== */
+.lp-steps-section {
+  padding: 56px 0 60px;
+  background: #ffffff;
+}
+
+.lp-steps-list {
+  list-style: none;
+  margin: 40px 0 0;
+  padding: 0;
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.lp-step-item {
+  display: flex;
+  gap: 22px;
+  align-items: stretch;
+}
+
+.lp-step-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 56px;
+}
+
+.lp-step-number {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--lp-accent) 0%, var(--lp-accent-dark) 100%);
+  color: #ffffff;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.9rem;
+  font-weight: 700;
+  box-shadow: 0 8px 20px rgba(200, 75, 114, 0.35);
+  border: 3px solid #ffffff;
+  outline: 1.5px solid rgba(200, 75, 114, 0.25);
+}
+
+.lp-step-connector {
+  width: 3px;
+  flex-grow: 1;
+  margin: 6px 0;
+  background: linear-gradient(to bottom, rgba(200, 75, 114, 0.45), rgba(200, 75, 114, 0.12));
+  border-radius: 2px;
+  min-height: 28px;
+}
+
+.lp-step-content {
+  padding-bottom: 36px;
+  padding-top: 8px;
+}
+
+.lp-step-item:last-child .lp-step-content {
+  padding-bottom: 0;
+}
+
+.lp-step-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--lp-text);
+  letter-spacing: -0.01em;
+  margin-bottom: 8px;
+}
+
+.lp-step-desc {
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: var(--lp-muted);
+  max-width: 480px;
+}
+
+@media (max-width: 600px) {
+  .lp-steps-section { padding: 44px 0 46px; }
+  .lp-step-number { width: 46px; height: 46px; font-size: 1.55rem; }
+  .lp-step-marker { width: 46px; }
+  .lp-step-item { gap: 16px; }
+  .lp-step-content { padding-bottom: 28px; }
+  .lp-step-title { font-size: 1.2rem; }
+  .lp-step-desc { font-size: 1rem; }
+}
+
+/* ==========================================================================
    SEÇÃO ANTES x DEPOIS
    ========================================================================== */
 .lp-comparison-section {
@@ -957,30 +1105,59 @@
 }
 
 /* ==========================================================================
-   BADGE DE ENTREGA NO HERO
+   ENTREGA EXPRESSA (FAIXA ROSA FORTE)
    ========================================================================== */
-.lp-hero-delivery-badge-wrap {
-  display: flex;
-  justify-content: center;
-  margin-top: 24px;
-}
-
-.lp-hero-delivery-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--lp-accent-light);
-  border: 1px solid rgba(200, 75, 114, 0.3);
-  padding: 10px 20px;
-  border-radius: var(--lp-radius-pill);
-  font-size: 0.92rem;
-  color: var(--lp-accent-dark);
-  box-shadow: 0 4px 14px rgba(200, 75, 114, 0.1);
+/* Virou seção própria (pedido real, 2026-10-14) — era só um badge pequeno
+ *  dentro da Hero, agora cria a alternância branco/rosa logo cedo na
+ *  página, mesmo gradiente forte da seção de Oferta. */
+.lp-delivery-highlight-section {
+  padding: 44px 0;
+  background: linear-gradient(145deg, #c84b72 0%, #b03a60 100%);
   text-align: center;
 }
 
-.lp-hero-delivery-badge strong {
-  color: var(--lp-accent);
+.lp-delivery-highlight-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.lp-delivery-highlight-icon {
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #ffffff;
+  font-size: 1.3rem;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.22);
+}
+
+/* `.lp-lashmenu h2` (mais acima no arquivo) força cor escura — precisa de 2
+ *  classes aqui (maior especificidade) pra ganhar dessa regra. */
+.lp-delivery-highlight-section .lp-delivery-highlight-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0;
+}
+
+.lp-delivery-highlight-text {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.92);
+  max-width: 480px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+.lp-delivery-highlight-text strong {
+  color: #ffffff;
+  font-weight: 800;
 }
 
 /* ==========================================================================
@@ -1027,7 +1204,10 @@
 }
 
 @media (max-width: 600px) {
-  .lp-hero-delivery-badge { font-size: 0.82rem; padding: 7px 12px; }
+  .lp-delivery-highlight-section { padding: 36px 0; }
+  .lp-delivery-highlight-icon { width: 40px; height: 40px; font-size: 1.15rem; }
+  .lp-delivery-highlight-title { font-size: 1.6rem; }
+  .lp-delivery-highlight-text { font-size: 1.05rem; }
   .lp-delivery-banner-box { gap: 8px; padding: 14px 16px; }
   .lp-db-text { font-size: 0.88rem; }
 }
