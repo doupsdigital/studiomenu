@@ -13,7 +13,7 @@ const STEPS: Step[] = [
     description: 'Escolha o plano ideal abaixo e fale com a gente no WhatsApp — te atendemos com todo cuidado.',
   },
   {
-    title: 'Manda seu Instagram',
+    title: 'Envie seu Instagram',
     description: 'Pedimos o @ do Instagram do seu Studio pra criar um Catálogo com a sua cara.',
   },
   {

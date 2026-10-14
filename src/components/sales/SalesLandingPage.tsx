@@ -7,7 +7,6 @@ import { HeroMockup } from './HeroMockup';
 import { MockupModal } from './MockupModal';
 import { HowItWorksSection } from './HowItWorksSection';
 import { FaqSection } from './FaqSection';
-import { LiveShowcaseCta } from './LiveShowcaseCta';
 import type { LandingNicheContent } from '@/data/landing-niche-content';
 
 /** Evento nomeado pros 3 CTAs de maior valor, além do clique "cru" que o
@@ -183,7 +182,6 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
               <div className="lp-pricing-tier-card">
                 <div className="lp-tier-badge lp-tier-badge--basic">🔁 ASSINATURA MENSAL</div>
                 <h3 className="lp-tier-title">StudioMenu Catálogo</h3>
-                <p className="lp-tier-desc">Catálogo digital com seu nome, fotos e preços, sempre no ar — edite pelo celular quando quiser.</p>
 
                 <div className="lp-tier-price-box">
                   <div className="lp-tier-price-main">
@@ -220,7 +218,6 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
               <div className="lp-pricing-tier-card lp-pricing-tier-card--vip">
                 <div className="lp-tier-badge lp-tier-badge--vip">⭐ RECOMENDADO</div>
                 <h3 className="lp-tier-title">StudioMenu Vitalício</h3>
-                <p className="lp-tier-desc">Tudo do Catálogo, pagando uma vez só — sem mensalidade.</p>
 
                 <div className="lp-tier-price-box">
                   <div className="lp-tier-price-main">
@@ -315,9 +312,6 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
 
         {/* 6. DÚVIDAS FREQUENTES */}
         <FaqSection firstItem={content.faqFirstItem} />
-
-        {/* 7. SEÇÃO MATADORA (CTA SHOWCASE AO VIVO) */}
-        <LiveShowcaseCta showcaseSlug={content.liveShowcaseSlug} />
       </main>
 
       <footer className="lp-site-footer">
