@@ -54,7 +54,7 @@ function priceParts(price: number): { whole: string; cents: string } {
   return { whole, cents };
 }
 
-const TEST_CATALOGO_PRICE = 24.9;
+const TEST_CATALOGO_PRICE = 22.9;
 const TEST_VITALICIO_PRICE = 197;
 
 export function SalesLandingPageClassica() {
@@ -248,7 +248,7 @@ export function SalesLandingPageClassica() {
                 </ul>
 
                 <a
-                  href={whatsappLink('Olá! Vi a página do StudioMenu e quero o Plano Catálogo por R$24,90/mês')}
+                  href={whatsappLink('Olá! Vi a página do StudioMenu e quero o Plano Catálogo por R$22,90/mês')}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="lpc-btn lpc-btn--whatsapp"
