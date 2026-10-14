@@ -1067,10 +1067,11 @@
 
 .lp-tier-title {
   font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 1.85rem;
+  font-size: 2.13rem;
   font-weight: 700;
-  margin-bottom: 6px;
+  margin-bottom: 20px;
   color: #1a1412;
+  text-align: center;
 }
 
 .lp-tier-desc {

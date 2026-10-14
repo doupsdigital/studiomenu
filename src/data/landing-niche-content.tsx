@@ -29,10 +29,6 @@ export interface LandingNicheContent {
    *  já é genérico o bastante pra servir qualquer nicho, sem soar fora de
    *  contexto numa página 100% dedicada a um nicho só). */
   faqFirstItem: { question: string; answer: string };
-  /** Slug de `/c/showcase/{slug}` pro botão "Ver modelo na prática" da seção
-   *  final — versão "designer" (Básico/WhatsApp), igual ao link que já é
-   *  usado nos anúncios desse nicho. */
-  liveShowcaseSlug: string;
   /** Faixa diagonal decorativa no canto superior direito da Hero (pedido
    *  real, 2026-10-14 — 1ª versão era um selo circular com ícone de cílios,
    *  trocada por uma faixa tipo "oferta" com o nome do nicho) — opcional:
@@ -62,7 +58,6 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
       question: '1. Serve para o meu tipo de Studio / procedimento?',
       answer: 'Com certeza! O StudioMenu foi feito sob medida para Lash Designers, Nail Designers, Esteticistas, Micropigmentadoras, Cabeleireiras e Studios de Beleza em geral.',
     },
-    liveShowcaseSlug: 'studiodesigner',
   },
   lash: {
     eyebrow: (
@@ -76,13 +71,12 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
         <strong>Fotos e preços</strong> dos seus procedimentos em um <strong>Link interativo</strong> que valoriza seu trabalho — a cliente escolhe e já te chama pra agendar no <strong>WhatsApp</strong>.
       </>
     ),
-    showcaseSlug: 'lash',
+    showcaseSlug: 'lashlanding',
     socialProofHighlight: '350+ Lash Designers',
     faqFirstItem: {
       question: '1. Só serve pra extensão de cílios ou dá pra colocar outros serviços também?',
       answer: 'Dá pra colocar qualquer serviço que você oferecer no seu studio! Fio a Fio, Volume Russo, Híbrido, Egípcio, Design de Sobrancelha, Henna — você monta o catálogo do jeitinho que atende de verdade, sem limite de categoria.',
     },
-    liveShowcaseSlug: 'lashdesigner',
     cornerBadge: (
       <div className="lp-hero-niche-ribbon-wrap" aria-hidden="true">
         <span className="lp-hero-niche-ribbon">Lash</span>
@@ -107,7 +101,6 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
       question: '1. Só serve pra unha ou dá pra colocar outros serviços também?',
       answer: 'Dá pra colocar qualquer serviço que você oferecer no seu studio! Alongamento em Gel, Fibra de Vidro, Esmaltação em Gel, Nail Art, Spa dos Pés — você monta o catálogo do jeitinho que atende de verdade, sem limite de categoria.',
     },
-    liveShowcaseSlug: 'naildesigner',
     cornerBadge: (
       <div className="lp-hero-niche-ribbon-wrap" aria-hidden="true">
         <span className="lp-hero-niche-ribbon">Nail</span>
