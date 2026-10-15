@@ -30,13 +30,14 @@ interface SubscriptionSectionProps {
    *  `PLAN_PRICING.basico` é só o padrão de tabela, mostraria valor errado
    *  pra quem paga um preço diferente (achado real, 2026-10-07). */
   billingPriceOverride?: number | null;
-  /** Se o Catálogo dessa cliente nasceu recorrente (Fase 27) — nunca é
-   *  apagado na troca de tier, então continua valendo mesmo depois dela
-   *  evoluir pro Agenda. É o que diferencia, no cancelamento do Agenda,
-   *  quem tem um Catálogo recorrente pra "voltar" (oferece as 2 opções) de
-   *  quem veio do Catálogo avulso de sempre (só "cancelar", sem nada a
-   *  recuperar — o avulso já é dela pra sempre, pagamento único). */
-  catalogBillingMode?: 'avulso' | 'recorrente';
+  /** Se o Catálogo dessa cliente nasceu recorrente — mensal (Fase 27) ou
+   *  anual (2026-10-15) — nunca é apagado na troca de tier, então continua
+   *  valendo mesmo depois dela evoluir pro Agenda. É o que diferencia, no
+   *  cancelamento do Agenda, quem tem um Catálogo recorrente pra "voltar"
+   *  (oferece as 2 opções) de quem veio do Catálogo avulso de sempre (só
+   *  "cancelar", sem nada a recuperar — o avulso já é dela pra sempre,
+   *  pagamento único). */
+  catalogBillingMode?: 'avulso' | 'recorrente' | 'anual';
   /** Preço customizado da conversão de Catálogo recorrente pra vitalício
    *  (Fase 28) — admin negocia por cliente. */
   lifetimePriceOverride?: number | null;
@@ -55,7 +56,7 @@ const ActivePlanCard: React.FC<{
   manualPlan?: boolean;
   hasRealSubscription?: boolean;
   billingPriceOverride?: number | null;
-  catalogBillingMode?: 'avulso' | 'recorrente';
+  catalogBillingMode?: 'avulso' | 'recorrente' | 'anual';
   onCancel: () => void;
   onDowngradeToCatalogo?: () => void;
   loading: boolean;
@@ -76,14 +77,21 @@ const ActivePlanCard: React.FC<{
   const isOneTime = tier === 'basico' && !hasRealSubscription;
   // Catálogo recorrente usa o preço customizado por admin (mesmo campo do
   // avulso), nunca o padrão de tabela — ver nota acima do componente.
+  // Sufixo "/mês" ou "/ano" conforme o modo (2026-10-15) — `catalogBillingMode`
+  // só vem 'anual' quando `tier === 'basico'`, nunca pro Agenda.
   const catalogPrice = resolveCatalogPrice(billingPriceOverride);
-  const pricing = tier === 'basico' ? { price: catalogPrice.price, label: `${catalogPrice.label}/mês` } : PLAN_PRICING.plus;
-  // Ela upgradeou pro Agenda a partir de um Catálogo recorrente (mesma
-  // assinatura reaproveitada, nunca duas em paralelo) — cancelar "tudo" de
-  // uma vez perderia também o Catálogo que ela paga à parte. Oferece as 2
-  // opções só nesse caso; quem veio do avulso não tem nada a recuperar (o
-  // avulso já é dela pra sempre, então só existe "cancelar").
-  const showDowngradeOption = tier === 'plus' && catalogBillingMode === 'recorrente' && !manualPlan && Boolean(onDowngradeToCatalogo);
+  const pricing =
+    tier === 'basico'
+      ? { price: catalogPrice.price, label: `${catalogPrice.label}${catalogBillingMode === 'anual' ? '/ano' : '/mês'}` }
+      : PLAN_PRICING.plus;
+  // Ela upgradeou pro Agenda a partir de um Catálogo recorrente — mensal ou
+  // anual (mesma assinatura reaproveitada, nunca duas em paralelo) —
+  // cancelar "tudo" de uma vez perderia também o Catálogo que ela paga à
+  // parte. Oferece as 2 opções só nesse caso; quem veio do avulso não tem
+  // nada a recuperar (o avulso já é dela pra sempre, então só existe
+  // "cancelar").
+  const showDowngradeOption =
+    tier === 'plus' && catalogBillingMode !== undefined && catalogBillingMode !== 'avulso' && !manualPlan && Boolean(onDowngradeToCatalogo);
 
   const subtitle = manualPlan
     ? 'Ativado manualmente pela equipe StudioMenu'
@@ -137,7 +145,9 @@ const ActivePlanCard: React.FC<{
                   disabled={loading}
                   className="w-full h-11 rounded-xl bg-rose-50 border-2 border-rose-600 text-rose-700 text-[15px] font-bold shadow-sm disabled:opacity-50 hover:bg-rose-100 transition-colors"
                 >
-                  {loading ? 'Processando...' : `Voltar pro Plano Catálogo (${catalogPrice.label}/mês)`}
+                  {loading
+                    ? 'Processando...'
+                    : `Voltar pro Plano Catálogo (${catalogPrice.label}${catalogBillingMode === 'anual' ? '/ano' : '/mês'})`}
                 </button>
               )}
               <div className="flex gap-2">
@@ -300,10 +310,11 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
             showMethodChoice={!hasRealSubscription}
           />
         </div>
-        {/* Autoatendimento (Fase 28): só faz sentido pra quem tem mesmo uma
-         *  mensalidade real do Catálogo rodando — avulso já é dela pra
-         *  sempre, não tem o que "converter". */}
-        {hasRealSubscription && catalogBillingMode === 'recorrente' && (
+        {/* Autoatendimento (Fase 28, + anual em 2026-10-15): só faz sentido
+         *  pra quem tem mesmo uma cobrança recorrente real do Catálogo
+         *  rodando (mensal ou anual) — avulso já é dela pra sempre, não tem
+         *  o que "converter". */}
+        {hasRealSubscription && catalogBillingMode !== undefined && catalogBillingMode !== 'avulso' && (
           <div id="upgrade-lifetime">
             <p className="flex items-center gap-1.5 text-[15px] font-bold text-ink mb-2">
               <Gift className="w-4 h-4 text-rose-600" /> Quer parar de pagar mensalidade?
@@ -327,15 +338,16 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
   // assinou nada ou só teve Básico entra pelo Básico.
   const reofferTier: PayablePlanTier = planTier === 'plus' ? 'plus' : 'basico';
   // Reofertar o Catálogo precisa repassar o MESMO preço customizado e modo
-  // (avulso/recorrente) de antes — `billing_price_override`/`catalog_billing_mode`
-  // nunca são apagados pelo cancelamento, só o `PlanSubscribeCard` não
-  // recebia nenhum dos dois aqui (achado real, 2026-10-07: reofertava
-  // sempre o padrão de tabela em pagamento único, mesmo pra quem era
-  // recorrente com preço próprio).
+  // (avulso/recorrente/anual) de antes — `billing_price_override`/
+  // `catalog_billing_mode` nunca são apagados pelo cancelamento, só o
+  // `PlanSubscribeCard` não recebia nenhum dos dois aqui (achado real,
+  // 2026-10-07: reofertava sempre o padrão de tabela em pagamento único,
+  // mesmo pra quem era recorrente com preço próprio).
   const reofferCatalogPrice = resolveCatalogPrice(billingPriceOverride);
+  const reofferSuffix = catalogBillingMode === 'anual' ? '/ano' : catalogBillingMode === 'recorrente' ? '/mês' : '';
   const reofferPriceOverride =
     reofferTier === 'basico'
-      ? { price: reofferCatalogPrice.price, label: catalogBillingMode === 'recorrente' ? `${reofferCatalogPrice.label}/mês` : reofferCatalogPrice.label }
+      ? { price: reofferCatalogPrice.price, label: `${reofferCatalogPrice.label}${reofferSuffix}` }
       : undefined;
 
   return (

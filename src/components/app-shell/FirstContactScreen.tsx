@@ -36,13 +36,15 @@ interface FirstContactScreenProps {
  *  muda conforme o plano ofertado (Fase 22). */
 export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order }) => {
   const isAgendaOffer = order.first_offer_tier === 'plus';
-  const isCatalogoRecorrente = order.catalog_billing_mode === 'recorrente';
   const catalogPrice = resolveCatalogPrice(order.billing_price_override);
   // Mesmo preço/campo de sempre (`billing_price_override`) — só o rótulo
-  // ganha "/mês" quando o admin marcou esse catálogo como recorrente (Fase
-  // 27), pra bater com o que o checkout de fato vai cobrar.
-  const catalogDisplayPrice = isCatalogoRecorrente
-    ? { price: catalogPrice.price, label: `${catalogPrice.label}/mês` }
+  // ganha "/mês" ou "/ano" quando o admin marcou esse catálogo como
+  // recorrente/anual (Fase 27, + 2026-10-15), pra bater com o que o
+  // checkout de fato vai cobrar.
+  const catalogBillingSuffix =
+    order.catalog_billing_mode === 'anual' ? '/ano' : order.catalog_billing_mode === 'recorrente' ? '/mês' : '';
+  const catalogDisplayPrice = catalogBillingSuffix
+    ? { price: catalogPrice.price, label: `${catalogPrice.label}${catalogBillingSuffix}` }
     : catalogPrice;
   const [highlightView, setHighlightView] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
