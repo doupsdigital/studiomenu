@@ -2,9 +2,33 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from './supabase-admin';
 import { sendTelegramMessage } from './telegram';
 import { sendMetaCapiEvent } from './meta-capi';
-import { AsaasApiError, cancelSubscription, getPixQrCode, type AsaasPayment } from './asaas';
+import {
+  AsaasApiError,
+  cancelSubscription,
+  createSubscription,
+  getPixQrCode,
+  getSubscription,
+  type AsaasBillingType,
+  type AsaasCycle,
+  type AsaasPayment,
+} from './asaas';
 
 type PaymentMethod = 'pix' | 'card';
+
+/** Meio-dia fixo evita variar com fuso horário do servidor (Vercel roda em
+ *  UTC) — mesmo padrão já usado em `formatShortDate`
+ *  (`PlanSubscribeCard.tsx`) pra datas no formato YYYY-MM-DD do Asaas. */
+function daysBetween(fromISO: string, toISO: string): number {
+  const from = new Date(`${fromISO}T12:00:00`).getTime();
+  const to = new Date(`${toISO}T12:00:00`).getTime();
+  return Math.round((to - from) / 86400000);
+}
+
+function addDays(fromISO: string, days: number): string {
+  const d = new Date(`${fromISO}T12:00:00`);
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 10);
+}
 
 /** Resposta do checkout conforme o método — Pix devolve o QR na hora; cartão
  *  devolve o link da página de pagamento do Asaas (onde ela digita o cartão,
@@ -156,6 +180,113 @@ export async function activateSubscription(orderId: string, confirmedPaymentId?:
         contentName: 'Plano Vitalício StudioMenu',
       }).catch((err) => console.error('[Meta CAPI Async Error]:', err));
     }
+  }
+}
+
+/** Troca de CICLO de cobrança (MONTHLY↔YEARLY) entre Catálogo e Agenda
+ *  (2026-10-15) — a troca de tier comum (`updateSubscription`, PUT) só
+ *  atualiza valor/descrição, nunca o `cycle`; quando o ciclo muda de
+ *  verdade (ex: Catálogo ANUAL → Agenda mensal), precisa de uma assinatura
+ *  Asaas NOVA. Cria a nova ANTES de cancelar a antiga — se criar falhar,
+ *  nada foi perdido (ela continua na antiga); se cancelar a antiga falhar
+ *  depois, o pior caso é 2 assinaturas simultâneas por um tempo
+ *  (recuperável, só avisa no Telegram), bem menos grave que ficar sem
+ *  nenhuma.
+ *
+ *  Crédito do que ainda não foi "gasto" na assinatura antiga é proporcional
+ *  por VALOR, não por tempo corrido — empurra a 1ª cobrança da assinatura
+ *  nova proporcionalmente ao que ela já pagou, nunca pelos mesmos dias que
+ *  sobravam (senão uma cliente que acabou de pagar o Catálogo anual e
+ *  evoluísse pro Agenda ganharia quase 1 ano de Agenda de graça — um valor
+ *  bem maior do que o que ela pagou). Funciona igual pra regressão
+ *  (downgrade): mesma fórmula, sem caso especial.
+ *
+ *  Só calcula crédito se a assinatura antiga está `ativo` (em dia) — se
+ *  estiver suspensa/atrasada, crédito zero e a nova começa cobrando hoje
+ *  (evita depender do comportamento do Asaas pra `nextDueDate` numa
+ *  assinatura atrasada, que não foi confirmado em sandbox). */
+export async function switchSubscriptionCycle(input: {
+  orderId: string;
+  customerId: string;
+  oldSubscriptionId: string;
+  oldSubscriptionStatus: 'none' | 'ativo' | 'suspenso' | 'cancelado';
+  oldCycle: AsaasCycle;
+  newCycle: AsaasCycle;
+  newValue: number;
+  newDescription: string;
+  newBillingType: AsaasBillingType;
+  newPendingPlanTier: 'basico' | 'plus';
+}): Promise<{ nextDueDate: string | null }> {
+  // Trava de idempotência — evita duplo-clique/retry criando 2 assinaturas
+  // novas órfãs antes de qualquer uma virar a oficial na order. Uma trava
+  // com mais de 2 minutos é tratada como travada por engano (ex: um request
+  // anterior caiu no meio) e libera sozinha.
+  const lockThreshold = new Date(Date.now() - 2 * 60 * 1000).toISOString();
+  const { data: locked } = await supabaseAdmin
+    .from('orders')
+    .update({ plan_switch_lock_at: new Date().toISOString() })
+    .eq('id', input.orderId)
+    .or(`plan_switch_lock_at.is.null,plan_switch_lock_at.lt.${lockThreshold}`)
+    .select('id')
+    .maybeSingle();
+  if (!locked) {
+    throw new Error('Troca de plano já em andamento. Tente novamente em instantes.');
+  }
+
+  try {
+    let creditDays = 0;
+    if (input.oldSubscriptionStatus === 'ativo') {
+      const old = await getSubscription(input.oldSubscriptionId);
+      if (old?.nextDueDate && typeof old.value === 'number') {
+        const todayISO = new Date().toISOString().slice(0, 10);
+        const remainingDays = Math.max(0, daysBetween(todayISO, old.nextDueDate));
+        const oldCycleDays = input.oldCycle === 'YEARLY' ? 365 : 30;
+        const unusedValue = old.value * (remainingDays / oldCycleDays);
+        const newCycleDays = input.newCycle === 'YEARLY' ? 365 : 30;
+        const newDailyRate = input.newValue / newCycleDays;
+        creditDays = newDailyRate > 0 ? Math.round(unusedValue / newDailyRate) : 0;
+      }
+    }
+    const nextDueDateOverride = addDays(new Date().toISOString().slice(0, 10), creditDays);
+
+    const newSubscription = await createSubscription({
+      customerId: input.customerId,
+      value: input.newValue,
+      description: input.newDescription,
+      billingType: input.newBillingType,
+      cycle: input.newCycle,
+      nextDueDateOverride,
+    });
+
+    await supabaseAdmin
+      .from('orders')
+      .update({
+        asaas_subscription_id: newSubscription.id,
+        pending_plan_tier: input.newPendingPlanTier,
+        pending_lifetime_payment_id: null,
+      })
+      .eq('id', input.orderId);
+
+    try {
+      await cancelSubscription(input.oldSubscriptionId);
+    } catch (cancelError) {
+      // 404 = já cancelada/removida (ex: dupla tentativa) — não é um erro
+      // de verdade. Qualquer outro erro aqui NÃO interrompe o fluxo (ela já
+      // está no plano novo), mas precisa de atenção manual — a profissional
+      // continuaria pagando as duas assinaturas se ninguém perceber.
+      if (!(cancelError instanceof AsaasApiError && cancelError.status === 404)) {
+        console.error('[switchSubscriptionCycle] Falha ao cancelar assinatura antiga:', cancelError);
+        await sendTelegramMessage(
+          `⚠️ Troca de ciclo de cobrança: assinatura ANTIGA não foi cancelada, verificar manualmente no Asaas!\n\nOrder: ${input.orderId}\nAssinatura antiga: ${input.oldSubscriptionId}\nAssinatura nova (já ativa): ${newSubscription.id}`
+        ).catch((err) => console.error('[Telegram Async Error]:', err));
+      }
+    }
+
+    await activateSubscription(input.orderId);
+
+    return { nextDueDate: newSubscription.nextDueDate ?? null };
+  } finally {
+    await supabaseAdmin.from('orders').update({ plan_switch_lock_at: null }).eq('id', input.orderId);
   }
 }
 

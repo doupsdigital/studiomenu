@@ -41,6 +41,9 @@ type AdminCatalog = CatalogOrderData & {
    *  assinatura mensal (Fase 27) ou anual (2026-10-15) — só tem efeito antes
    *  de ela pagar. */
   catalog_billing_mode?: 'avulso' | 'recorrente' | 'anual';
+  /** Se o Plano Agenda dessa cliente é vendido mensal (padrão) ou anual
+   *  (2026-10-15) — só tem efeito antes de ela pagar o Agenda. */
+  agenda_billing_mode?: 'recorrente' | 'anual';
   /** Preço customizado da conversão de Catálogo recorrente pra vitalício
    *  (Fase 28) — `null`/ausente usa o padrão (`CATALOGO_VITALICIO_PRICE`,
    *  src/lib/pricing.ts). */
@@ -442,6 +445,30 @@ export default function AdminCatalogosPage() {
     } catch (e) {
       console.error('Erro ao atualizar catalog_billing_mode:', e);
       showToast('❌ Erro ao atualizar a cobrança do Catálogo.');
+    }
+  };
+
+  /** Mesma ideia do toggle do Catálogo acima, só que pro Plano Agenda
+   *  (2026-10-15) — sem 'avulso' (Agenda nunca foi pagamento único). */
+  const toggleAgendaBillingMode = async (item: AdminCatalog, next: 'recorrente' | 'anual') => {
+    if (!item.id || item.agenda_billing_mode === next) return;
+    try {
+      const res = await fetch('/api/admin/catalog-actions', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ id: item.id, agenda_billing_mode: next }),
+      });
+      const result = await res.json();
+      if (!result.success) {
+        showToast('❌ Erro ao atualizar a cobrança do Agenda.');
+        return;
+      }
+      showToast(next === 'anual' ? '🗓️ Agenda vai virar assinatura anual.' : '🔁 Agenda volta a ser assinatura mensal.');
+      fetchCatalogs();
+    } catch (e) {
+      console.error('Erro ao atualizar agenda_billing_mode:', e);
+      showToast('❌ Erro ao atualizar a cobrança do Agenda.');
     }
   };
 
@@ -869,6 +896,45 @@ export default function AdminCatalogosPage() {
                                   Salvar
                                 </button>
                               </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Cobrança do Agenda (2026-10-15) — trava quando o
+                         *  Agenda fica ativo, não quando o Catálogo fica (por
+                         *  isso o gate é `!== 'plus'`, diferente do bloco do
+                         *  Catálogo acima, que é `=== 'catalog'`): a
+                         *  profissional pode evoluir pro Agenda bem depois de
+                         *  já ser assinante do Catálogo, então o admin
+                         *  precisa poder configurar o modo do Agenda mesmo
+                         *  nesse meio-tempo. */}
+                        {item.plan_tier !== 'plus' && (
+                          <div className="p-4 space-y-3 bg-slate-950/40 border-t border-slate-800/70">
+                            <span className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                              <RefreshCw className="w-3.5 h-3.5" />
+                              Cobrança do Agenda
+                            </span>
+                            <div className="grid grid-cols-2 gap-1 p-1 rounded-xl bg-slate-900 border border-slate-800">
+                              <button
+                                onClick={() => toggleAgendaBillingMode(item, 'recorrente')}
+                                className={`py-2.5 rounded-lg text-xs font-bold transition-all ${
+                                  (item.agenda_billing_mode || 'recorrente') === 'recorrente'
+                                    ? 'bg-sky-500 text-white shadow-sm'
+                                    : 'text-slate-400 hover:text-slate-200'
+                                }`}
+                              >
+                                Mensal
+                              </button>
+                              <button
+                                onClick={() => toggleAgendaBillingMode(item, 'anual')}
+                                className={`py-2.5 rounded-lg text-xs font-bold transition-all ${
+                                  item.agenda_billing_mode === 'anual'
+                                    ? 'bg-emerald-500 text-white shadow-sm'
+                                    : 'text-slate-400 hover:text-slate-200'
+                                }`}
+                              >
+                                Anual
+                              </button>
                             </div>
                           </div>
                         )}
