@@ -59,7 +59,7 @@ export function HeroMockup({ showcaseSlug = 'landingpage', onTap }: HeroMockupPr
           <div className="lp-testdrive-notch" />
           <div className={`lp-testdrive-screen${onTap ? ' lp-testdrive-screen--static' : ''}`}>
             <div className="lp-testdrive-screen-scaler">
-              <iframe src={`/c/showcase/${showcaseSlug}`} title="Prévia ao vivo do catálogo StudioMenu" tabIndex={-1} />
+              <iframe src={`/c/showcase/${showcaseSlug}`} title="Prévia ao vivo do Menu Digital StudioMenu" tabIndex={-1} />
             </div>
           </div>
 
