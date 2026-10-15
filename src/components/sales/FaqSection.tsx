@@ -7,6 +7,17 @@ interface FaqItem {
   answer: string;
 }
 
+/** Quebra-objeção da assinatura (pedido real, 2026-10-15) — sempre a 1ª
+ *  pergunta, em TODOS os nichos (não é nichada como `firstItem`), com
+ *  destaque visual próprio (`lp-faq-item--highlight`) e sempre aberta de
+ *  cara (`openIndex` inicial = 0, índice onde ela sempre cai). Sem número
+ *  no texto de propósito — ela não faz parte da sequência 1-6, é a exceção
+ *  que chama atenção primeiro. */
+const SUBSCRIPTION_FAQ_ITEM: FaqItem = {
+  question: 'Por que é uma assinatura, e não um pagamento único?',
+  answer: 'Diferente de um catálogo em PDF ou imagem, seu Menu Digital é um Site de verdade — precisa ficar hospedado, no ar, seguro e rápido 365 dias por ano. A assinatura garante exatamente isso: que ele nunca saia do ar, nunca fique lento e que suas clientes consigam acessar sempre através do seu link.',
+};
+
 const DEFAULT_FIRST_ITEM: FaqItem = {
   question: '1. Serve para o meu tipo de Studio / procedimento?',
   answer: 'Com certeza! O StudioMenu foi desenvolvido sob medida para Lash Designers, Nail Designers, Esteticistas, Micropigmentadoras, Cabeleireiras e Studios de Beleza em geral.',
@@ -42,7 +53,7 @@ interface FaqSectionProps {
 
 export function FaqSection({ firstItem }: FaqSectionProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
-  const FAQ_ITEMS: FaqItem[] = [firstItem ?? DEFAULT_FIRST_ITEM, ...REST_OF_FAQ_ITEMS];
+  const FAQ_ITEMS: FaqItem[] = [SUBSCRIPTION_FAQ_ITEM, firstItem ?? DEFAULT_FIRST_ITEM, ...REST_OF_FAQ_ITEMS];
 
   const toggleItem = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);
@@ -59,18 +70,27 @@ export function FaqSection({ firstItem }: FaqSectionProps) {
         <div className="lp-faq-list">
           {FAQ_ITEMS.map((item, index) => {
             const isOpen = openIndex === index;
+            const isHighlight = index === 0;
             return (
               <div
                 key={index}
-                className={`lp-faq-item ${isOpen ? 'is-open' : ''}`}
+                className={`lp-faq-item ${isOpen ? 'is-open' : ''} ${isHighlight ? 'lp-faq-item--highlight' : ''}`}
               >
+                {isHighlight && (
+                  <div className="lp-faq-highlight-badge">
+                    <span aria-hidden="true">💡</span> A dúvida mais comum
+                  </div>
+                )}
                 <button
                   type="button"
                   className="lp-faq-question"
                   onClick={() => toggleItem(index)}
                   aria-expanded={isOpen}
                 >
-                  <span className="lp-faq-question-text">{item.question}</span>
+                  <span className="lp-faq-question-text">
+                    {isHighlight && <span className="lp-faq-highlight-icon" aria-hidden="true">🌐</span>}
+                    {item.question}
+                  </span>
                   <span className="lp-faq-icon">
                     <svg
                       width="20"
