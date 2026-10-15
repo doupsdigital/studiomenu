@@ -7,7 +7,7 @@ import { compressImageFiles } from '@/lib/image-compress-client';
 import Link from 'next/link';
 import { ArrowLeft, Sparkles, ExternalLink, Search, RefreshCw, Plus, Trash2, MessageCircle, Phone, Smartphone, CalendarClock, Globe, Crown, ChevronDown, PauseCircle, PlayCircle, Gift, Bot, Upload, FileText, X, Wallet, Settings2, AlertTriangle, type LucideIcon } from 'lucide-react';
 import { usesSubdomainRouting, PRODUCTION_DOMAIN } from '@/lib/public-url';
-import { CATALOGO_PRICE_LABEL, CATALOGO_VITALICIO_PRICE_LABEL } from '@/lib/pricing';
+import { AGENDA_PRICE_LABEL, CATALOGO_PRICE_LABEL, CATALOGO_VITALICIO_PRICE_LABEL } from '@/lib/pricing';
 
 /** `res.json()` direto quebra quando o corpo não é JSON de verdade (ex: erro
  *  413 da Vercel antes mesmo da rota rodar) — mesmo utilitário já usado em
@@ -44,6 +44,9 @@ type AdminCatalog = CatalogOrderData & {
   /** Se o Plano Agenda dessa cliente é vendido mensal (padrão) ou anual
    *  (2026-10-15) — só tem efeito antes de ela pagar o Agenda. */
   agenda_billing_mode?: 'recorrente' | 'anual';
+  /** Preço customizado do Plano Agenda — campo PRÓPRIO, separado do
+   *  `billing_price_override` do Catálogo (2026-10-15). */
+  agenda_price_override?: number | null;
   /** Preço customizado da conversão de Catálogo recorrente pra vitalício
    *  (Fase 28) — `null`/ausente usa o padrão (`CATALOGO_VITALICIO_PRICE`,
    *  src/lib/pricing.ts). */
@@ -517,6 +520,50 @@ export default function AdminCatalogosPage() {
     }
   };
 
+  // Preço customizado do Plano Agenda — campo PRÓPRIO, separado do do
+  // Catálogo acima (2026-10-15, achado real: compartilhar o mesmo campo
+  // vazava o preço de um plano pro outro). Mesmo padrão de rascunho por id.
+  const [agendaPriceDrafts, setAgendaPriceDrafts] = useState<Record<string, string>>({});
+
+  const getAgendaPriceDraft = (item: AdminCatalog) => {
+    const id = item.id || '';
+    if (agendaPriceDrafts[id] !== undefined) return agendaPriceDrafts[id];
+    return item.agenda_price_override != null ? item.agenda_price_override.toFixed(2).replace('.', ',') : '';
+  };
+
+  const saveAgendaPriceOverride = async (item: AdminCatalog) => {
+    if (!item.id) return;
+    const raw = (agendaPriceDrafts[item.id] ?? '').trim();
+    const value = raw === '' ? null : Number(raw.replace(',', '.'));
+    if (value !== null && (!Number.isFinite(value) || value < 5)) {
+      showToast('❌ Preço inválido (mínimo R$5).');
+      return;
+    }
+    try {
+      const res = await fetch('/api/admin/catalog-actions', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ id: item.id, agenda_price_override: value }),
+      });
+      const result = await res.json();
+      if (!result.success) {
+        showToast('❌ Erro ao salvar o preço.');
+        return;
+      }
+      showToast(value === null ? '🔄 Preço do Agenda voltou ao padrão.' : '💰 Preço do Agenda atualizado!');
+      setAgendaPriceDrafts((prev) => {
+        const next = { ...prev };
+        delete next[item.id!];
+        return next;
+      });
+      fetchCatalogs();
+    } catch (e) {
+      console.error('Erro ao salvar agenda_price_override:', e);
+      showToast('❌ Erro ao salvar o preço.');
+    }
+  };
+
   // Preço customizado da conversão de Catálogo recorrente pra vitalício
   // (Fase 28) — mesmo padrão do preço do Catálogo acima, campo PRÓPRIO
   // (`lifetime_price_override`), já que é uma oferta diferente.
@@ -935,6 +982,36 @@ export default function AdminCatalogosPage() {
                               >
                                 Anual
                               </button>
+                            </div>
+
+                            <div>
+                              <span className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5 mb-2">
+                                <Wallet className="w-3.5 h-3.5" />
+                                Preço do Agenda
+                              </span>
+                              <div className="flex gap-2">
+                                <div className="relative flex-1">
+                                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-300 font-bold text-base pointer-events-none">
+                                    R$
+                                  </span>
+                                  <input
+                                    type="text"
+                                    inputMode="decimal"
+                                    placeholder={AGENDA_PRICE_LABEL.replace('R$ ', '').replace('/mês', '')}
+                                    value={getAgendaPriceDraft(item)}
+                                    onChange={(e) =>
+                                      setAgendaPriceDrafts((prev) => ({ ...prev, [item.id || '']: e.target.value }))
+                                    }
+                                    className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-10 pr-3 py-3 text-base font-semibold text-white placeholder-slate-400 focus:border-rose-500 focus:outline-none"
+                                  />
+                                </div>
+                                <button
+                                  onClick={() => saveAgendaPriceOverride(item)}
+                                  className="px-5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-sm font-bold transition-all"
+                                >
+                                  Salvar
+                                </button>
+                              </div>
                             </div>
                           </div>
                         )}

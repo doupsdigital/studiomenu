@@ -48,6 +48,11 @@ export interface ProfessionalOrderSummary {
    *  (2026-10-15) — mesma ideia de `catalog_billing_mode`, só decide o
    *  CHECKOUT antes de ela pagar o Agenda. */
   agenda_billing_mode: 'recorrente' | 'anual';
+  /** Preço customizado do Plano Agenda pra essa cliente específica — campo
+   *  PRÓPRIO, separado de `billing_price_override` (2026-10-15, achado real:
+   *  compartilhar o mesmo campo vazava o preço do Catálogo pro Agenda). `null`
+   *  usa o padrão (`AGENDA_PRICE`/`AGENDA_ANUAL_PRICE`, via `resolveAgendaPrice`). */
+  agenda_price_override: number | null;
   /** Existe uma assinatura Asaas de verdade por trás (Plano Agenda, ou Plano
    *  Catálogo vendido como recorrente) — `null` pra quem nunca assinou (ou só
    *  tem o Catálogo avulso/manual). Usado só pra saber SE existe, nunca lido
@@ -71,7 +76,7 @@ export async function getOrderForProfessionalApp(slug: string): Promise<Professi
   const { data, error } = await supabaseAdmin
     .from('orders')
     .select(
-      'id, slug, edit_token, client_name, studio_name, whatsapp_number, plan_tier, subscription_status, billing_email, billing_cpf_cnpj, payment_method, booking_enabled, auth_user_id, first_offer_tier, agenda_paused, manual_plan, billing_price_override, catalog_billing_mode, agenda_billing_mode, asaas_subscription_id, lifetime_price_override, created_at'
+      'id, slug, edit_token, client_name, studio_name, whatsapp_number, plan_tier, subscription_status, billing_email, billing_cpf_cnpj, payment_method, booking_enabled, auth_user_id, first_offer_tier, agenda_paused, manual_plan, billing_price_override, catalog_billing_mode, agenda_billing_mode, agenda_price_override, asaas_subscription_id, lifetime_price_override, created_at'
     )
     .eq('slug', normalizedSlug)
     .single();
@@ -101,6 +106,7 @@ export async function getOrderForProfessionalApp(slug: string): Promise<Professi
     catalog_billing_mode:
       data.catalog_billing_mode === 'recorrente' || data.catalog_billing_mode === 'anual' ? data.catalog_billing_mode : 'avulso',
     agenda_billing_mode: data.agenda_billing_mode === 'anual' ? 'anual' : 'recorrente',
+    agenda_price_override: data.agenda_price_override === null || data.agenda_price_override === undefined ? null : Number(data.agenda_price_override),
     has_real_subscription: Boolean(data.asaas_subscription_id),
     lifetime_price_override: data.lifetime_price_override === null || data.lifetime_price_override === undefined ? null : Number(data.lifetime_price_override),
     created_at: data.created_at || undefined,

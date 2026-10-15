@@ -46,10 +46,10 @@ export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order })
   const catalogDisplayPrice = catalogBillingSuffix
     ? { price: catalogPrice.price, label: `${catalogPrice.label}${catalogBillingSuffix}` }
     : catalogPrice;
-  // Mesmo campo compartilhado (`billing_price_override`) reinterpretado pro
-  // Agenda, igual já acontece no checkout (2026-10-15) — rótulo já sai com
-  // "/mês" ou "/ano" certo, via `resolveAgendaPrice`.
-  const agendaDisplayPrice = resolveAgendaPrice(order.agenda_billing_mode, order.billing_price_override);
+  // Campo PRÓPRIO do Agenda (`agenda_price_override`, 2026-10-15) — não o
+  // `billing_price_override` do Catálogo, senão vaza o preço de um plano pro
+  // outro (achado real testando). Rótulo já sai com "/mês" ou "/ano" certo.
+  const agendaDisplayPrice = resolveAgendaPrice(order.agenda_billing_mode, order.agenda_price_override);
   const [highlightView, setHighlightView] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
 
