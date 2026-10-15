@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 
 interface FaqItem {
   question: string;
@@ -62,7 +62,7 @@ export function FaqSection({ firstItem }: FaqSectionProps) {
   return (
     <section className="lp-faq-section" id="faq">
       <div className="lp-container">
-        <div className="lp-section-header">
+        <div className="lp-section-header" data-reveal>
           <p className="lp-section-kicker">Tire Suas Dúvidas</p>
           <h2 className="lp-section-title">Perguntas Frequentes</h2>
         </div>
@@ -75,6 +75,8 @@ export function FaqSection({ firstItem }: FaqSectionProps) {
               <div
                 key={index}
                 className={`lp-faq-item ${isOpen ? 'is-open' : ''} ${isHighlight ? 'lp-faq-item--highlight' : ''}`}
+                data-reveal
+                style={{ '--reveal-delay': `${index * 0.08}s` } as CSSProperties}
               >
                 {isHighlight && (
                   <div className="lp-faq-highlight-badge">
