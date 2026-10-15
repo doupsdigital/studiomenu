@@ -19,6 +19,10 @@ export interface LandingNicheContent {
   socialProofHighlight: ReactNode;
   /** 1ª pergunta do FAQ nichada. */
   faqFirstItem: { question: string; answer: string };
+  /** Âncora de valor nichada (pedido real, 2026-10-15) — substitui a 2ª
+   *  bullet do card "StudioMenu Anual" (`SalesLandingPage.tsx`), comparando
+   *  o preço anual ao custo de 1 atendimento típico do nicho. */
+  anualValueAnchor: string;
   /** Faixa decorativa no canto superior direito da Hero. */
   cornerBadge?: ReactNode;
 }
@@ -43,6 +47,7 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
       question: '1. Serve para o meu tipo de Studio / procedimento?',
       answer: 'Com certeza! O StudioMenu foi desenvolvido sob medida para Lash Designers, Nail Designers, Esteticistas, Micropigmentadoras, Cabeleireiras e Studios de Beleza em geral.',
     },
+    anualValueAnchor: 'Sai por menos que 1 atendimento do seu studio',
   },
   lash: {
     eyebrow: (
@@ -67,6 +72,7 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
       question: '1. Só serve pra extensão de cílios ou dá pra colocar outros serviços também?',
       answer: 'Dá pra colocar qualquer serviço que você oferecer no seu studio! Fio a Fio, Volume Russo, Híbrido, Egípcio, Design de Sobrancelha, Henna — você organiza o seu Menu Digital do jeitinho que atende de verdade, sem limite de categoria.',
     },
+    anualValueAnchor: 'Sai por menos que 1 aplicação de Volume Brasileiro',
     cornerBadge: (
       <div className="lp-hero-niche-ribbon-wrap" aria-hidden="true">
         <span className="lp-hero-niche-ribbon">Lash</span>
@@ -100,6 +106,7 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
       question: '1. Só serve pra unha ou dá pra colocar outros serviços também?',
       answer: 'Dá pra colocar qualquer serviço que você oferecer no seu studio! Alongamento em Gel, Fibra de Vidro, Esmaltação em Gel, Nail Art, Spa dos Pés, Cuticulagem — você organiza o seu Menu Digital do jeitinho que atende de verdade, sem limite de categoria.',
     },
+    anualValueAnchor: 'Sai por menos que 1 alongamento em Gel',
     cornerBadge: (
       <div className="lp-hero-niche-ribbon-wrap" aria-hidden="true">
         <span className="lp-hero-niche-ribbon">Nail</span>

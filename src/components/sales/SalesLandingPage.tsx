@@ -293,8 +293,17 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
                 </div>
 
                 <ul className="lp-tier-bullets">
+                  {/* Âncora de valor nichada (pedido real, 2026-10-15) — 1ª
+                   *  bullet do card (pedido real, 2026-10-15: é o gancho mais
+                   *  forte, deve ser a primeira coisa lida). Troca o ✓ rosa
+                   *  padrão por um 🏷️ dourado e texto em negrito, pra
+                   *  destacar da comparação de preço das outras bullets
+                   *  (puramente informativas). */}
+                  <li className="lp-tier-bullet--value-anchor">
+                    <span className="lp-tier-bullet-icon" aria-hidden="true">🏷️</span>
+                    <span><strong>{content.anualValueAnchor}</strong></span>
+                  </li>
                   <li>{CHECK_ICON}<span><strong>Pague uma vez e use o ano todo</strong></span></li>
-                  <li>{CHECK_ICON}<span>Seu Menu Digital online como um site, sempre no ar</span></li>
                   <li>{CHECK_ICON}<span>Link profissional para colocar na Bio do Instagram e WhatsApp</span></li>
                   <li>{CHECK_ICON}<span>Edite serviços, fotos e preços quando quiser direto pelo celular</span></li>
                   <li>{CHECK_ICON}<span>Cliente escolhe o procedimento e agenda direto no seu WhatsApp</span></li>
@@ -353,9 +362,11 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
           </div>
         </section>
 
-        {/* 5. MARQUEE DE PROVA SOCIAL — depois dos planos de propósito
-         *  (pedido real, 2026-10-14): reforça a decisão bem na hora que ela
-         *  está olhando o preço, em vez de só reter atenção lá no início. */}
+        {/* 5. DÚVIDAS FREQUENTES — antes do carrossel de prova social (pedido
+         *  real, 2026-10-15; antes vinha depois). */}
+        <FaqSection firstItem={content.faqFirstItem} />
+
+        {/* 6. MARQUEE DE PROVA SOCIAL */}
         <section className="lp-marquee-ribbon-section">
           <div className="lp-marquee-ribbon-wrap">
             <div className="lp-marquee-ribbon-track">
@@ -374,9 +385,6 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
             </div>
           </div>
         </section>
-
-        {/* 6. DÚVIDAS FREQUENTES */}
-        <FaqSection firstItem={content.faqFirstItem} />
       </main>
 
       <footer className="lp-site-footer">

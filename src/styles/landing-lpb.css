@@ -1207,6 +1207,28 @@
 
 .lp-tier-bullets li svg { color: #c84b72; flex-shrink: 0; }
 
+/* Âncora de valor nichada (pedido real, 2026-10-15; realinhada depois de
+ *  feedback real — a 1ª versão (font-size maior + ícone maior) quebrava o
+ *  alinhamento com as outras bullets quando o texto virava 2 linhas, porque
+ *  herdava `align-items: center` (centraliza o ícone no MEIO do bloco de 2
+ *  linhas, em vez de no topo da 1ª linha como as outras bullets parecem
+ *  ter). Agora só a cor/negrito do texto destaca — tamanho de fonte e
+ *  ícone praticamente iguais aos das outras linhas, e `align-items:
+ *  flex-start` prende o ícone no topo, igual o ritmo visual das demais. */
+.lp-tier-bullets li.lp-tier-bullet--value-anchor {
+  align-items: flex-start;
+}
+
+.lp-tier-bullet--value-anchor strong {
+  color: #b45309;
+}
+
+.lp-tier-bullet-icon {
+  font-size: 1em;
+  line-height: 1.35;
+  flex-shrink: 0;
+}
+
 .lp-tier-guarantee {
   margin: 12px 0 0;
   font-size: 0.78rem;
