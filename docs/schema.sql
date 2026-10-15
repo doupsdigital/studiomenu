@@ -76,7 +76,10 @@ CREATE TABLE IF NOT EXISTS public.orders (
     -- assinatura). Depois que ela paga, a tela "Plano" não usa mais essa
     -- coluna pra decidir o que mostrar — usa `asaas_subscription_id` (ver
     -- `SubscriptionSection.tsx`).
-    catalog_billing_mode TEXT NOT NULL DEFAULT 'avulso' CHECK (catalog_billing_mode IN ('avulso', 'recorrente')),
+    -- 'anual' (2026-10-15, docs/migrations/2026-10-15_catalogo_anual.sql):
+    -- mesma ideia de 'recorrente', só que a assinatura Asaas nasce com
+    -- cycle=YEARLY em vez de MONTHLY (ver createSubscription, src/lib/asaas.ts).
+    catalog_billing_mode TEXT NOT NULL DEFAULT 'avulso' CHECK (catalog_billing_mode IN ('avulso', 'recorrente', 'anual')),
     -- Autoatendimento pra converter Catálogo recorrente em vitalício (Fase 28,
     -- docs/migrations/2026-10-07_catalogo_vitalicio.sql) — id do pagamento
     -- avulso da Asaas enquanto aguarda confirmação (evita duplicar cobrança

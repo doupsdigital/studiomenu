@@ -23,6 +23,15 @@ export const CATALOGO_PRICE_LABEL = 'R$ 89,90';
  *  podendo trocar modo/preço por cliente em `/admin/catalogos`. */
 export const CATALOGO_RECORRENTE_DEFAULT_PRICE = 22.9;
 
+/** Preço sugerido pro Plano Catálogo vendido como assinatura ANUAL
+ *  (2026-10-15) — só usado como placeholder no input de preço do admin em
+ *  `/admin/catalogos`; o valor de verdade cobrado continua vindo de
+ *  `billing_price_override` por cliente, igual ao modo recorrente mensal.
+ *  Não é seedado automaticamente em nenhum catálogo novo (diferente de
+ *  `CATALOGO_RECORRENTE_DEFAULT_PRICE`) — esse modo só existe quando o admin
+ *  escolhe manualmente pra uma cliente específica. */
+export const CATALOGO_ANUAL_DEFAULT_PRICE = 139.9;
+
 export const AGENDA_PRICE = 34.9;
 export const AGENDA_PRICE_LABEL = 'R$ 34,90/mês';
 

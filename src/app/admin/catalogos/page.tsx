@@ -37,9 +37,10 @@ type AdminCatalog = CatalogOrderData & {
   /** Preço customizado do Plano Catálogo pra essa cliente — `null`/ausente
    *  usa o padrão (`CATALOGO_PRICE`, src/lib/pricing.ts). */
   billing_price_override?: number | null;
-  /** Se o Plano Catálogo dessa cliente é vendido avulso (padrão) ou como
-   *  assinatura mensal (Fase 27) — só tem efeito antes de ela pagar. */
-  catalog_billing_mode?: 'avulso' | 'recorrente';
+  /** Se o Plano Catálogo dessa cliente é vendido avulso (padrão), como
+   *  assinatura mensal (Fase 27) ou anual (2026-10-15) — só tem efeito antes
+   *  de ela pagar. */
+  catalog_billing_mode?: 'avulso' | 'recorrente' | 'anual';
   /** Preço customizado da conversão de Catálogo recorrente pra vitalício
    *  (Fase 28) — `null`/ausente usa o padrão (`CATALOGO_VITALICIO_PRICE`,
    *  src/lib/pricing.ts). */
@@ -412,10 +413,11 @@ export default function AdminCatalogosPage() {
     }
   };
 
-  /** Fase 27: pagamento único (padrão) ou assinatura mensal pro Plano
-   *  Catálogo dessa cliente — só muda o que o checkout oferece antes de ela
-   *  pagar (igual ao toggle de oferta inicial, acima). */
-  const toggleCatalogBillingMode = async (item: AdminCatalog, next: 'avulso' | 'recorrente') => {
+  /** Fase 27 (+ anual em 2026-10-15): pagamento único (padrão), assinatura
+   *  mensal ou anual pro Plano Catálogo dessa cliente — só muda o que o
+   *  checkout oferece antes de ela pagar (igual ao toggle de oferta inicial,
+   *  acima). */
+  const toggleCatalogBillingMode = async (item: AdminCatalog, next: 'avulso' | 'recorrente' | 'anual') => {
     if (!item.id || item.catalog_billing_mode === next) return;
     try {
       const res = await fetch('/api/admin/catalog-actions', {
@@ -429,7 +431,13 @@ export default function AdminCatalogosPage() {
         showToast('❌ Erro ao atualizar a cobrança do Catálogo.');
         return;
       }
-      showToast(next === 'recorrente' ? '🔁 Catálogo vai virar assinatura mensal.' : '💳 Catálogo volta a ser pagamento único.');
+      showToast(
+        next === 'recorrente'
+          ? '🔁 Catálogo vai virar assinatura mensal.'
+          : next === 'anual'
+            ? '🗓️ Catálogo vai virar assinatura anual.'
+            : '💳 Catálogo volta a ser pagamento único.'
+      );
       fetchCatalogs();
     } catch (e) {
       console.error('Erro ao atualizar catalog_billing_mode:', e);
@@ -799,16 +807,16 @@ export default function AdminCatalogosPage() {
                                 <RefreshCw className="w-3.5 h-3.5" />
                                 Cobrança do Catálogo
                               </span>
-                              <div className="grid grid-cols-2 gap-1 p-1 rounded-xl bg-slate-900 border border-slate-800">
+                              <div className="grid grid-cols-3 gap-1 p-1 rounded-xl bg-slate-900 border border-slate-800">
                                 <button
                                   onClick={() => toggleCatalogBillingMode(item, 'avulso')}
                                   className={`py-2.5 rounded-lg text-xs font-bold transition-all ${
-                                    item.catalog_billing_mode !== 'recorrente'
+                                    (item.catalog_billing_mode || 'avulso') === 'avulso'
                                       ? 'bg-rose-500 text-white shadow-sm'
                                       : 'text-slate-400 hover:text-slate-200'
                                   }`}
                                 >
-                                  Pagamento único
+                                  Único
                                 </button>
                                 <button
                                   onClick={() => toggleCatalogBillingMode(item, 'recorrente')}
@@ -818,7 +826,17 @@ export default function AdminCatalogosPage() {
                                       : 'text-slate-400 hover:text-slate-200'
                                   }`}
                                 >
-                                  Assinatura
+                                  Mensal
+                                </button>
+                                <button
+                                  onClick={() => toggleCatalogBillingMode(item, 'anual')}
+                                  className={`py-2.5 rounded-lg text-xs font-bold transition-all ${
+                                    item.catalog_billing_mode === 'anual'
+                                      ? 'bg-emerald-500 text-white shadow-sm'
+                                      : 'text-slate-400 hover:text-slate-200'
+                                  }`}
+                                >
+                                  Anual
                                 </button>
                               </div>
                             </div>
@@ -930,13 +948,14 @@ export default function AdminCatalogosPage() {
                           </div>
                         )}
 
-                        {/* Fase 28: só faz sentido pra quem JÁ é recorrente —
-                         *  é o preço de "parar de pagar mensalidade", oferecido
-                         *  pela própria cliente dentro do app dela. Ao contrário
-                         *  do preço do Catálogo acima, continua editável depois
+                        {/* Fase 28 (+ anual em 2026-10-15): só faz sentido pra
+                         *  quem JÁ é recorrente (mensal ou anual) — é o preço
+                         *  de "parar de pagar mensalidade", oferecido pela
+                         *  própria cliente dentro do app dela. Ao contrário do
+                         *  preço do Catálogo acima, continua editável depois
                          *  de ela já estar pagando (a admin pode negociar a
                          *  qualquer momento). */}
-                        {item.catalog_billing_mode === 'recorrente' && (
+                        {(item.catalog_billing_mode === 'recorrente' || item.catalog_billing_mode === 'anual') && (
                           <div className="p-3 rounded-xl bg-slate-950/40 border border-slate-800/70 flex items-center gap-2">
                             <span className="text-xs text-slate-400 shrink-0 flex items-center gap-1">
                               <Wallet className="w-3.5 h-3.5" />

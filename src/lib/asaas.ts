@@ -89,6 +89,11 @@ export interface AsaasPayment {
 
 export type AsaasBillingType = 'PIX' | 'CREDIT_CARD';
 
+/** Ciclo de cobrança de uma assinatura — a API do Asaas aceita mais valores
+ *  (WEEKLY, QUARTERLY, SEMIANNUALLY...), só expomos os 2 que o produto usa
+ *  hoje (2026-10-15: Catálogo recorrente mensal e, agora, anual). */
+export type AsaasCycle = 'MONTHLY' | 'YEARLY';
+
 export interface AsaasPixQrCode {
   encodedImage: string;
   payload: string;
@@ -121,6 +126,9 @@ export async function createSubscription(input: {
   value: number;
   description: string;
   billingType?: AsaasBillingType;
+  /** Padrão MONTHLY (Plano Agenda, Catálogo recorrente mensal) — YEARLY pro
+   *  Catálogo vendido como assinatura anual (2026-10-15). */
+  cycle?: AsaasCycle;
 }): Promise<AsaasSubscription> {
   const nextDueDate = new Date().toISOString().slice(0, 10);
   return asaasRequest<AsaasSubscription>('POST', '/subscriptions', {
@@ -128,7 +136,7 @@ export async function createSubscription(input: {
     billingType: input.billingType ?? 'PIX',
     value: input.value,
     nextDueDate,
-    cycle: 'MONTHLY',
+    cycle: input.cycle ?? 'MONTHLY',
     description: input.description,
   });
 }
