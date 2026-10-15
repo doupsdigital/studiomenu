@@ -1126,6 +1126,66 @@
 
 .lp-pricing-tier-card--vip .lp-tier-price-sub { color: rgba(255, 255, 255, 0.9); }
 
+/* Selo de desconto do Plano Anual (2026-10-15) — "burst" de 16 pontas no
+ *  canto superior direito do card, igual referência enviada pela usuária.
+ *  `.lp-pricing-tier-card` já é `position: relative`, então isto ancora
+ *  nela; levemente rotacionado pra parecer um selo colado, não um ícone
+ *  reto. */
+.lp-tier-discount-seal {
+  position: absolute;
+  top: 16px;
+  right: 12px;
+  width: 88px;
+  height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #e0393f 0%, #b3161c 100%);
+  clip-path: polygon(50.00% 0.00%, 58.00% 9.79%, 69.13% 3.81%, 72.78% 15.91%, 85.36% 14.64%, 84.09% 27.22%, 96.19% 30.87%, 90.21% 42.00%, 100.00% 50.00%, 90.21% 58.00%, 96.19% 69.13%, 84.09% 72.78%, 85.36% 85.36%, 72.78% 84.09%, 69.13% 96.19%, 58.00% 90.21%, 50.00% 100.00%, 42.00% 90.21%, 30.87% 96.19%, 27.22% 84.09%, 14.64% 85.36%, 15.91% 72.78%, 3.81% 69.13%, 9.79% 58.00%, 0.00% 50.00%, 9.79% 42.00%, 3.81% 30.87%, 15.91% 27.22%, 14.64% 14.64%, 27.22% 15.91%, 30.87% 3.81%, 42.00% 9.79%);
+  /* Rotação aplicada no selo INTEIRO (forma + texto juntos, sem
+   *  contra-rotacionar o <span>) — a estrela de 16 pontas tem simetria
+   *  quase igual a cada ~22.5°, então rotacionar só a forma (com o texto
+   *  sempre reto por cima) ficava visualmente imperceptível. Girando os
+   *  dois juntos, o "OFF" inclinado é o que deixa a rotação visível. */
+  transform: rotate(14deg);
+  box-shadow: 0 6px 16px rgba(179, 22, 28, 0.45);
+  z-index: 2;
+}
+
+.lp-tier-discount-seal span {
+  color: #ffffff;
+  font-size: 0.6rem;
+  font-weight: 800;
+  line-height: 1;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/* Especificidade maior de propósito (`.lp-tier-discount-seal
+ *  .lp-tier-discount-seal-percent`, não só `.lp-tier-discount-seal-percent`
+ *  sozinha) — sem isso, `.lp-tier-discount-seal span` (que estiliza o
+ *  "OFF") vence por ter mais especificidade e trava o font-size do "49%"
+ *  sempre em 0.72rem, não importa o valor aqui. */
+.lp-tier-discount-seal .lp-tier-discount-seal-percent {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: -4px;
+}
+
+@media (max-width: 768px) {
+  .lp-tier-discount-seal {
+    width: 70px;
+    height: 70px;
+    top: 12px;
+    right: 8px;
+  }
+
+  .lp-tier-discount-seal span { font-size: 0.52rem; }
+  .lp-tier-discount-seal .lp-tier-discount-seal-percent { font-size: 1.2rem; }
+}
+
 .lp-tier-bullets {
   list-style: none;
   margin: 0 0 26px;

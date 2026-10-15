@@ -12,7 +12,7 @@ import type { LandingNicheContent } from '@/data/landing-niche-content';
 /** Evento nomeado pros 3 CTAs de maior valor, além do clique "cru" que o
  *  autocapture do PostHog já pega sozinho em qualquer botão/link — nomear
  *  facilita muito montar funil de conversão depois (2026-10-13). */
-function trackCta(plan: 'catalogo' | 'vitalicio' | 'duvida_generica') {
+function trackCta(plan: 'catalogo' | 'vitalicio' | 'anual' | 'duvida_generica') {
   capture('cta_click', { plan });
 }
 
@@ -68,6 +68,17 @@ function priceParts(price: number): { whole: string; cents: string } {
 const TEST_CATALOGO_PRICE = 22.9;
 const TEST_VITALICIO_PRICE = 197;
 
+/** Plano Anual — substitui o Vitalício na oferta a partir de 2026-10-15
+ *  (pedido real: mudança de estratégia de vendas, Vitalício fica comentado
+ *  mais abaixo em vez de apagado, pra reverter rápido se quiser voltar).
+ *  O desconto real contra 12x o Mensal (`TEST_CATALOGO_PRICE`) dá ~49,09% —
+ *  fixado em 50 de propósito pro badge (decisão 2026-10-15: número redondo
+ *  converte mais que "49%", que soa um cálculo estranho). Não é mais uma
+ *  fórmula reativa — se qualquer um dos 2 preços mudar, decidir manualmente
+ *  se o 50% continua representativo o suficiente. */
+const TEST_ANUAL_PRICE = 139.9;
+const ANUAL_DISCOUNT_PERCENT = 50;
+
 interface SalesLandingPageProps {
   content: LandingNicheContent;
 }
@@ -75,6 +86,7 @@ interface SalesLandingPageProps {
 export function SalesLandingPage({ content }: SalesLandingPageProps) {
   const catalogoParts = priceParts(TEST_CATALOGO_PRICE);
   const vitalicioParts = priceParts(TEST_VITALICIO_PRICE);
+  const anualParts = priceParts(TEST_ANUAL_PRICE);
   const agendaParts = priceParts(AGENDA_PRICE);
   const [mockupOpen, setMockupOpen] = useState(false);
 
@@ -211,10 +223,9 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
                 </a>
               </div>
 
-              {/* Vitalício — teste de X1, 2026-10-08: card próprio, separado
-               *  do Catálogo recorrente de propósito — o CTA manda uma
-               *  mensagem de WhatsApp que já menciona "vitalício", pra ela
-               *  saber na hora qual oferta o lead quer sem precisar perguntar. */}
+              {/* Vitalício — DESATIVADO (mudança de estratégia, 2026-10-15):
+               *  deixado comentado, não apagado, pra reativar rápido no
+               *  lugar do card Anual abaixo se quiser voltar a oferecer.
               <div className="lp-pricing-tier-card lp-pricing-tier-card--vip">
                 <div className="lp-tier-badge lp-tier-badge--vip">⭐ RECOMENDADO</div>
                 <h3 className="lp-tier-title">StudioMenu Vitalício</h3>
@@ -245,6 +256,59 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
                 >
                   {WHATSAPP_ICON}
                   QUERO O MENU VITALÍCIO
+                </a>
+
+                <p className="lp-tier-guarantee">🔒 Garantia de 7 dias — não gostou, devolvemos 100% do seu dinheiro.</p>
+              </div>
+              */}
+
+              {/* Anual — no lugar do Vitalício (mudança de estratégia,
+               *  2026-10-15): mesmo card --vip (borda/badge de destaque),
+               *  badge virou "MAIS POPULAR" em vez de "RECOMENDADO". Selo de
+               *  desconto (`lp-tier-discount-seal`) é um "burst" de 16 pontas
+               *  via clip-path, posicionado no canto superior direito do
+               *  card (pedido real, com print de referência) — texto usa
+               *  `ANUAL_DISCOUNT_PERCENT` (calculado acima a partir do
+               *  Mensal x12) pra nunca ficar com um número errado se o
+               *  preço do Mensal mudar sem atualizar aqui. */}
+              <div className="lp-pricing-tier-card lp-pricing-tier-card--vip">
+                <div className="lp-tier-discount-seal" aria-hidden="true">
+                  <span>
+                    <span className="lp-tier-discount-seal-percent">{ANUAL_DISCOUNT_PERCENT}%</span>
+                    <br />
+                    OFF
+                  </span>
+                </div>
+
+                <div className="lp-tier-badge lp-tier-badge--vip">⭐ MAIS POPULAR</div>
+                <h3 className="lp-tier-title">StudioMenu Anual</h3>
+
+                <div className="lp-tier-price-box">
+                  <div className="lp-tier-price-main">
+                    <span className="lp-tier-currency">R$</span>
+                    <span className="lp-tier-val">{anualParts.whole}</span>
+                    <span className="lp-tier-cents">,{anualParts.cents}</span>
+                    <span className="lp-tier-period">/ano</span>
+                  </div>
+                </div>
+
+                <ul className="lp-tier-bullets">
+                  <li>{CHECK_ICON}<span><strong>Pague uma vez e use o ano todo</strong></span></li>
+                  <li>{CHECK_ICON}<span>Seu Menu Digital online como um site, sempre no ar</span></li>
+                  <li>{CHECK_ICON}<span>Link profissional para colocar na Bio do Instagram e WhatsApp</span></li>
+                  <li>{CHECK_ICON}<span>Edite serviços, fotos e preços quando quiser direto pelo celular</span></li>
+                  <li>{CHECK_ICON}<span>Cliente escolhe o procedimento e agenda direto no seu WhatsApp</span></li>
+                </ul>
+
+                <a
+                  href={whatsappLink('Olá! Vi a página do StudioMenu e quero o Menu Digital Plano Anual por R$139,90, pagamento único')}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="lp-btn lp-btn--whatsapp"
+                  onClick={() => trackCta('anual')}
+                >
+                  {WHATSAPP_ICON}
+                  QUERO O PLANO ANUAL
                 </a>
 
                 <p className="lp-tier-guarantee">🔒 Garantia de 7 dias — não gostou, devolvemos 100% do seu dinheiro.</p>
