@@ -1599,15 +1599,14 @@
  *  página nova em vez de um teste "por cima" da landing. A margem do
  *  overlay ao redor (padding acima) deixa o fundo escurecido da própria
  *  landing visível nos cantos, reforçando que é uma camada por cima. */
+/* Largura/altura/padding vêm de `style` inline (`MockupModal.tsx`) — a
+ *  moldura inteira (bezel + tela) escala como um bloco rígido só, sempre na
+ *  proporção do design (390x844 + bezel), pra nunca sobrar faixa de fundo
+ *  rosa num dos lados (bug real em produção, 2026-10-15). */
 .lp-mockup-modal-phone {
   position: relative;
-  width: 100%;
-  max-width: 360px;
-  height: 100%;
-  max-height: 760px;
   border-radius: 42px;
   background: linear-gradient(155deg, #2e2729 0%, #110e10 55%);
-  padding: 12px;
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
 }
 
@@ -1688,7 +1687,7 @@
 
 @media (max-width: 600px) {
   .lp-mockup-modal-overlay { padding: 34px 26px; }
-  .lp-mockup-modal-phone { max-width: 100%; max-height: 100%; border-radius: 36px; padding: 10px; }
+  .lp-mockup-modal-phone { border-radius: 36px; }
   .lp-mockup-modal-screen { border-radius: 28px; }
 }
 
