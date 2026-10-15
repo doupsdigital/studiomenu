@@ -6,6 +6,7 @@ import {
   AsaasApiError,
   cancelSubscription,
   createSubscription,
+  getFirstSubscriptionPayment,
   getPixQrCode,
   getSubscription,
   type AsaasBillingType,
@@ -284,7 +285,17 @@ export async function switchSubscriptionCycle(input: {
 
     await activateSubscription(input.orderId);
 
-    return { nextDueDate: newSubscription.nextDueDate ?? null };
+    // NÃO usa `newSubscription.nextDueDate` aqui — achado real testando
+    // (2026-10-15): a própria Asaas devolve esse campo já adiantado 1 ciclo
+    // em relação à data que a gente pediu (confirmado isolado contra o
+    // sandbox: pedimos nextDueDate=12/02, a assinatura volta com
+    // nextDueDate=12/03, mas o PAGAMENTO gerado é mesmo pro dia 12/02).
+    // Usar o campo da assinatura prometeria pra profissional uma data um
+    // ciclo inteiro depois da cobrança real. O pagamento de verdade
+    // (`getFirstSubscriptionPayment`, já usado no fluxo de assinatura nova)
+    // é a fonte certa.
+    const firstPayment = await getFirstSubscriptionPayment(newSubscription.id);
+    return { nextDueDate: firstPayment?.dueDate ?? newSubscription.nextDueDate ?? null };
   } finally {
     await supabaseAdmin.from('orders').update({ plan_switch_lock_at: null }).eq('id', input.orderId);
   }
