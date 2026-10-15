@@ -18,6 +18,21 @@ interface MockupModalProps {
 const DESIGN_W = 390;
 const DESIGN_H = 844;
 
+/** Espessura da moldura (bezel) — mesmo valor do `padding` de
+ *  `.lp-mockup-modal-phone` em `landing-lpb.css`. A moldura INTEIRA
+ *  (bezel + tela) precisa ser escalada como um bloco rígido só, incluindo
+ *  o bezel — se a moldura esticar livre em 100%/100% do espaço disponível
+ *  (como era antes) ela assume a proporção da TELA do aparelho, que quase
+ *  nunca bate exatamente com a proporção do design (390x844), sobrando uma
+ *  faixa onde o fundo rosa de `.lp-mockup-modal-screen` aparece atrás do
+ *  conteúdo escalado (bug real visto em produção, 2026-10-15). */
+const BEZEL = 12;
+const FRAME_W = DESIGN_W + BEZEL * 2;
+const FRAME_H = DESIGN_H + BEZEL * 2;
+/** Teto de tamanho em telas grandes — equivalente ao antigo `max-width:
+ *  360px` da moldura. */
+const MAX_SCALE = 360 / FRAME_W;
+
 /** Modal de teste do catálogo, formato celular (pedido real, 2026-10-14) —
  *  substitui o mockup inline rolável na Hero. Dentro do modal o iframe é a
  *  ÚNICA superfície rolável visível, elimina o conflito de gesto entre
@@ -35,18 +50,20 @@ const DESIGN_H = 844;
  *  como o mockup da Hero) porque a moldura aqui é fluida — se ajusta
  *  continuamente ao espaço disponível, não só em 2-3 tamanhos fixos. */
 export function MockupModal({ showcaseSlug, isOpen, onClose }: MockupModalProps) {
-  const screenRef = useRef<HTMLDivElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
 
   useEffect(() => {
-    const el = screenRef.current;
+    const el = overlayRef.current;
     if (!el) return;
 
     function updateScale() {
       if (!el) return;
-      const { width, height } = el.getBoundingClientRect();
-      if (width === 0 || height === 0) return;
-      setScale(Math.min(width / DESIGN_W, height / DESIGN_H));
+      const style = getComputedStyle(el);
+      const availW = el.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+      const availH = el.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom);
+      if (availW <= 0 || availH <= 0) return;
+      setScale(Math.min(availW / FRAME_W, availH / FRAME_H, MAX_SCALE));
     }
 
     updateScale();
@@ -78,8 +95,13 @@ export function MockupModal({ showcaseSlug, isOpen, onClose }: MockupModalProps)
       className={`lp-mockup-modal-overlay${isOpen ? ' is-open' : ''}`}
       onClick={onClose}
       aria-hidden={!isOpen}
+      ref={overlayRef}
     >
-      <div className="lp-mockup-modal-phone" onClick={(event) => event.stopPropagation()}>
+      <div
+        className="lp-mockup-modal-phone"
+        style={{ width: FRAME_W * scale, height: FRAME_H * scale, padding: BEZEL * scale }}
+        onClick={(event) => event.stopPropagation()}
+      >
         <button type="button" className="lp-mockup-modal-close" onClick={onClose} aria-label="Fechar">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
             <line x1="18" y1="6" x2="6" y2="18" />
@@ -87,7 +109,7 @@ export function MockupModal({ showcaseSlug, isOpen, onClose }: MockupModalProps)
           </svg>
         </button>
         <div className="lp-mockup-modal-notch" />
-        <div className="lp-mockup-modal-screen" ref={screenRef}>
+        <div className="lp-mockup-modal-screen">
           <div className="lp-mockup-modal-scaler" style={{ transform: `scale(${scale})` }}>
             <iframe src={`/c/showcase/${showcaseSlug}`} title="Teste o Menu Digital StudioMenu" />
           </div>
