@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'react';
+
 interface Step {
   title: string;
   description: string;
@@ -28,14 +30,19 @@ export function HowItWorksSection() {
   return (
     <section className="lp-steps-section">
       <div className="lp-container">
-        <div className="lp-section-header">
+        <div className="lp-section-header" data-reveal>
           <p className="lp-section-kicker">Processo Simples e Sem Burocracia</p>
           <h2 className="lp-section-title">Como funciona para ter o seu Menu Digital</h2>
         </div>
 
         <ol className="lp-steps-list">
           {STEPS.map((step, i) => (
-            <li key={i} className="lp-step-item">
+            <li
+              key={i}
+              className="lp-step-item"
+              data-reveal
+              style={{ '--reveal-delay': `${i * 0.1}s` } as CSSProperties}
+            >
               <div className="lp-step-marker">
                 <span className="lp-step-number">{i + 1}</span>
                 {i < STEPS.length - 1 && <span className="lp-step-connector" aria-hidden="true" />}
