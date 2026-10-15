@@ -1435,6 +1435,68 @@
   .lp-faq-icon { width: 28px; height: 28px; }
 }
 
+/* Quebra-objeção da assinatura — sempre a 1ª pergunta do FAQ, com destaque
+ *  visual próprio (pedido real, 2026-10-15): fundo rosa claro sempre ligado
+ *  (não só quando aberta), borda e selo de cor acesos o tempo todo, e um
+ *  pulso suave tipo "ping" ao redor do card pra chamar o olho sem ser
+ *  irritante (`animation-iteration-count: infinite`, mas sutil e lento). */
+.lp-faq-item--highlight {
+  background: var(--lp-accent-light);
+  border-color: var(--lp-accent);
+  animation: lp-faq-highlight-ping 2.6s ease-in-out infinite;
+}
+
+.lp-faq-item--highlight:hover,
+.lp-faq-item--highlight.is-open {
+  background: var(--lp-accent-light);
+  border-color: var(--lp-accent-dark);
+}
+
+.lp-faq-item--highlight .lp-faq-icon {
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--lp-accent-dark);
+}
+
+.lp-faq-item--highlight.is-open .lp-faq-icon {
+  background: var(--lp-accent-dark);
+  color: #ffffff;
+}
+
+.lp-faq-highlight-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 16px 0 0 24px;
+  padding: 5px 14px;
+  background: linear-gradient(135deg, var(--lp-accent) 0%, var(--lp-accent-dark) 100%);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-radius: 100px;
+}
+
+.lp-faq-item--highlight .lp-faq-question {
+  padding-top: 14px;
+}
+
+.lp-faq-highlight-icon {
+  display: inline-flex;
+  margin-right: 8px;
+  font-size: 1.05em;
+}
+
+@keyframes lp-faq-highlight-ping {
+  0%, 100% { box-shadow: 0 8px 25px rgba(200, 75, 114, 0.18), 0 0 0 0 rgba(200, 75, 114, 0.3); }
+  50% { box-shadow: 0 8px 25px rgba(200, 75, 114, 0.18), 0 0 0 9px rgba(200, 75, 114, 0); }
+}
+
+@media (max-width: 600px) {
+  .lp-faq-highlight-badge { margin: 14px 0 0 18px; font-size: 0.68rem; padding: 4px 12px; }
+  .lp-faq-item--highlight .lp-faq-question { padding-top: 10px; }
+}
+
 /* ==========================================================================
    SEÇÃO MATADORA (CTA SHOWCASE AO VIVO)
    ========================================================================== */
