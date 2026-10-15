@@ -28,11 +28,11 @@ const WHATSAPP_NUMBER = '5562991083435';
 const AVATARS = ['/landing/avatar-lash-1.webp', '/landing/avatar-lash-2.webp', '/landing/avatar-lash-3.webp'];
 
 const TESTIMONIALS = [
-  { name: 'Mariana A.', avatar: AVATARS[0], quote: 'Parei de mandar PDF no Canva. Minhas clientes amaram o link na bio!' },
-  { name: 'Camila R.', avatar: AVATARS[1], quote: 'Ninguém mais pede desconto. Valorizou muito o meu studio!' },
-  { name: 'Juliana S.', avatar: AVATARS[2], quote: 'Entregaram tudo pronto no meu WhatsApp em menos de 24 horas!' },
-  { name: 'Fernanda M.', avatar: AVATARS[0], quote: 'Parei de mandar tabela de preço no WhatsApp. Agora é só o link e pronto!' },
-  { name: 'Beatriz K.', avatar: AVATARS[1], quote: 'Melhor investimento do ano pro meu studio. Pagou-se no 1º dia!' },
+  { name: 'Mariana A.', avatar: AVATARS[0], quote: 'Coloquei o link do Menu Digital na bio do Instagram e minhas clientes amaram! Muito mais sofisticado.' },
+  { name: 'Camila R.', avatar: AVATARS[1], quote: 'Ninguém mais pede desconto. O Menu Digital valorizou muito o meu studio!' },
+  { name: 'Juliana S.', avatar: AVATARS[2], quote: 'Entregaram meu Menu Digital pronto no meu WhatsApp em menos de 24 horas!' },
+  { name: 'Fernanda M.', avatar: AVATARS[0], quote: 'As clientes entram no link, veem as fotos e já chegam no WhatsApp sabendo exatamente o que querem agendar!' },
+  { name: 'Beatriz K.', avatar: AVATARS[1], quote: 'Melhor investimento do ano pro meu studio. O Menu Digital pagou-se logo nos primeiros agendamentos!' },
 ];
 
 const CHECK_ICON = (
@@ -134,7 +134,7 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
                 </div>
                 */}
 
-                <p className="lp-hero-swipe-hint lp-hero-swipe-hint--emphasis">👉 Toque no celular abaixo pra testar o Catálogo:</p>
+                <p className="lp-hero-swipe-hint lp-hero-swipe-hint--emphasis">👉 Toque no celular abaixo pra testar o Menu Digital ao vivo:</p>
               </div>
 
               {/* Mockup: vitrine estática, abre o modal fullscreen de teste
@@ -158,10 +158,10 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
           <div className="lp-container">
             <div className="lp-delivery-highlight-header">
               <div className="lp-delivery-highlight-icon" aria-hidden="true">⚡</div>
-              <h2 className="lp-delivery-highlight-title">Entrega Rápida</h2>
+              <h2 className="lp-delivery-highlight-title">Entrega Expressa</h2>
             </div>
             <p className="lp-delivery-highlight-text">
-              Montamos o seu catálogo em até <strong>24 horas</strong> — ou bem antes 😉
+              Deixamos o seu Menu Digital pronto em até <strong>24 horas</strong> — ou bem antes 😉
             </p>
           </div>
         </section>
@@ -181,7 +181,7 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
                *  teste 22,90/mês, "/mês" ao lado do valor (não embaixo). */}
               <div className="lp-pricing-tier-card">
                 <div className="lp-tier-badge lp-tier-badge--basic">🔁 ASSINATURA MENSAL</div>
-                <h3 className="lp-tier-title">StudioMenu Catálogo</h3>
+                <h3 className="lp-tier-title">StudioMenu Mensal</h3>
 
                 <div className="lp-tier-price-box">
                   <div className="lp-tier-price-main">
@@ -193,21 +193,21 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
                 </div>
 
                 <ul className="lp-tier-bullets">
-                  <li>{CHECK_ICON}<span>Catálogo online sempre no ar</span></li>
-                  <li>{CHECK_ICON}<span>Link profissional pra bio do Instagram/WhatsApp</span></li>
-                  <li>{CHECK_ICON}<span>Edite fotos, preços e serviços quando quiser</span></li>
-                  <li>{CHECK_ICON}<span>Cliente agenda direto pelo seu WhatsApp</span></li>
+                  <li>{CHECK_ICON}<span>Seu Menu Digital online como um site, sempre no ar</span></li>
+                  <li>{CHECK_ICON}<span>Link profissional para colocar na Bio do Instagram e WhatsApp</span></li>
+                  <li>{CHECK_ICON}<span>Edite serviços, fotos e preços quando quiser direto pelo celular</span></li>
+                  <li>{CHECK_ICON}<span>Cliente escolhe o procedimento e agenda direto no seu WhatsApp</span></li>
                 </ul>
 
                 <a
-                  href={whatsappLink('Olá! Vi a página do StudioMenu e quero o Plano Catálogo por R$22,90/mês')}
+                  href={whatsappLink('Olá! Vi a página do StudioMenu e quero o Menu Digital por R$22,90/mês')}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="lp-btn lp-btn--whatsapp"
                   onClick={() => trackCta('catalogo')}
                 >
                   {WHATSAPP_ICON}
-                  QUERO MEU CATÁLOGO
+                  QUERO MEU MENU DIGITAL
                 </a>
               </div>
 
@@ -229,21 +229,22 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
                 </div>
 
                 <ul className="lp-tier-bullets">
-                  <li>{CHECK_ICON}<span><strong>Pague uma vez só, sem mensalidade</strong></span></li>
-                  <li>{CHECK_ICON}<span>Catálogo online sempre no ar</span></li>
-                  <li>{CHECK_ICON}<span>Edite fotos, preços e serviços quando quiser</span></li>
-                  <li>{CHECK_ICON}<span>Link profissional pra bio do Instagram/WhatsApp</span></li>
+                  <li>{CHECK_ICON}<span><strong>Pague uma vez só, sem nenhuma mensalidade</strong></span></li>
+                  <li>{CHECK_ICON}<span>Seu Menu Digital online como um site, sempre no ar</span></li>
+                  <li>{CHECK_ICON}<span>Link profissional para colocar na Bio do Instagram e WhatsApp</span></li>
+                  <li>{CHECK_ICON}<span>Edite serviços, fotos e preços quando quiser direto pelo celular</span></li>
+                  <li>{CHECK_ICON}<span>Cliente escolhe o procedimento e agenda direto no seu WhatsApp</span></li>
                 </ul>
 
                 <a
-                  href={whatsappLink('Olá! Vi a página do StudioMenu e quero o Plano Vitalício por R$197,00, pagamento único')}
+                  href={whatsappLink('Olá! Vi a página do StudioMenu e quero o Menu Digital Vitalício por R$197,00, pagamento único')}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="lp-btn lp-btn--whatsapp"
                   onClick={() => trackCta('vitalicio')}
                 >
                   {WHATSAPP_ICON}
-                  QUERO O VITALÍCIO
+                  QUERO O MENU VITALÍCIO
                 </a>
 
                 <p className="lp-tier-guarantee">🔒 Garantia de 7 dias — não gostou, devolvemos 100% do seu dinheiro.</p>
@@ -320,7 +321,7 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
             <span className="lp-footer-logo">
               Studio<em>Menu</em>
             </span>
-            <span className="lp-footer-tagline">Catálogo Digital Interativo para Studios de Beleza</span>
+            <span className="lp-footer-tagline">Menu Digital Interativo para Studios de Beleza</span>
             <span className="lp-footer-copy">© 2026 · Todos os direitos reservados</span>
           </div>
         </div>
@@ -334,7 +335,7 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
        *  WhatsApp dela em vez do formulário self-service, 2026-09-24). */}
       <div className="lp-sticky-wa-bar">
         <a
-          href={whatsappLink('Olá! Vi a página do StudioMenu e fiquei com uma dúvida antes de assinar')}
+          href={whatsappLink('Olá! Vi a página do StudioMenu e fiquei com uma dúvida sobre o Menu Digital')}
           target="_blank"
           rel="noopener noreferrer"
           className="lp-sticky-wa-btn"
