@@ -87,9 +87,14 @@ const ActivePlanCard: React.FC<{
   // mesmo campo (`billing_price_override`) reinterpretado via
   // `resolveAgendaPrice` (2026-10-15) — já sai com "/mês" ou "/ano" certo.
   const catalogPrice = resolveCatalogPrice(billingPriceOverride);
+  // Modo de cobrança desse tier específico — decide tanto o sufixo do preço
+  // quanto o rótulo "Mensalidade"/"Anuidade" logo abaixo (achado real,
+  // 2026-10-15: card mostrava "Mensalidade"/"R$139,90/mês" fixo mesmo pra
+  // quem tinha pago o Catálogo ANUAL).
+  const billingCycleMode = tier === 'basico' ? catalogBillingMode : agendaBillingMode;
   const pricing =
     tier === 'basico'
-      ? { price: catalogPrice.price, label: `${catalogPrice.label}${catalogBillingMode === 'anual' ? '/ano' : '/mês'}` }
+      ? { price: catalogPrice.price, label: `${catalogPrice.label}${billingCycleMode === 'anual' ? '/ano' : '/mês'}` }
       : resolveAgendaPrice(agendaBillingMode || 'recorrente', billingPriceOverride);
   // Ela upgradeou pro Agenda a partir de um Catálogo recorrente — mensal ou
   // anual (mesma assinatura reaproveitada, nunca duas em paralelo) —
@@ -120,7 +125,7 @@ const ActivePlanCard: React.FC<{
 
       <div className="bg-surface rounded-xl px-4 py-3 mb-4 border border-rose-200/60">
         <p className="text-[13px] font-bold uppercase tracking-wider text-rose-700/70 mb-0.5">
-          {isOneTime ? 'Status' : 'Mensalidade'}
+          {isOneTime ? 'Status' : billingCycleMode === 'anual' ? 'Anuidade' : 'Mensalidade'}
         </p>
         <p className="font-serif-pro font-bold text-lg text-rose-800 whitespace-nowrap">
           {manualPlan ? 'Sem cobrança' : isOneTime ? 'Ativo ✓ - Sem mensalidade' : pricing.label}
@@ -299,6 +304,7 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
           manualPlan={manualPlan}
           hasRealSubscription={hasRealSubscription}
           billingPriceOverride={billingPriceOverride}
+          catalogBillingMode={catalogBillingMode}
           onCancel={handleCancel}
           loading={loading}
           error={error}
