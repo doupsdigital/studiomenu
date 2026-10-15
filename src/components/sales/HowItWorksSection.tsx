@@ -3,26 +3,24 @@ interface Step {
   description: string;
 }
 
-/** Processo de aquisição, igual pra qualquer nicho (não entra em
- *  `landing-niche-content.tsx` de propósito) — reduz a fricção de "como
- *  funciona pra ter o meu catálogo" antes da seção de planos, pedido real
- *  2026-10-14. */
+/** Processo de aquisição do Menu Digital —
+ *  simples, rápido e sem burocracia para qualquer nicho. */
 const STEPS: Step[] = [
   {
     title: 'Escolha seu plano',
-    description: 'Escolha o plano ideal abaixo e fale com a gente no WhatsApp — te atendemos com todo cuidado.',
+    description: 'Escolha o plano ideal abaixo e fale com a gente no WhatsApp — te atendemos de forma personalizada.',
   },
   {
     title: 'Envie seu Instagram',
-    description: 'Pedimos o @ do Instagram do seu Studio pra criar um Catálogo com a sua cara.',
+    description: 'Você nos passa o @ do seu Studio e nós preparamos o seu Menu Digital com a identidade da sua marca.',
   },
   {
     title: 'Teste sem compromisso',
-    description: 'Mandamos o link da prévia, sem pagar nada. Edite à vontade e veja como vai ficar.',
+    description: 'Enviamos o link da prévia exclusiva no seu celular. Veja como fica lindo antes de qualquer decisão.',
   },
   {
-    title: 'O catálogo é seu!',
-    description: 'Gostou? Finalize o pagamento na plataforma e o catálogo é definitivamente seu.',
+    title: 'Seu Menu no ar!',
+    description: 'Gostou do resultado? Seu link definitivo fica pronto para você colocar na Bio do Instagram e no WhatsApp.',
   },
 ];
 
@@ -31,8 +29,8 @@ export function HowItWorksSection() {
     <section className="lp-steps-section">
       <div className="lp-container">
         <div className="lp-section-header">
-          <p className="lp-section-kicker">Processo Simples e Sem Compromisso</p>
-          <h2 className="lp-section-title">Como funciona pra ter o seu catálogo</h2>
+          <p className="lp-section-kicker">Processo Simples e Sem Burocracia</p>
+          <h2 className="lp-section-title">Como funciona para ter o seu Menu Digital</h2>
         </div>
 
         <ol className="lp-steps-list">

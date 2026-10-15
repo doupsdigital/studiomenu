@@ -89,7 +89,7 @@ export function MockupModal({ showcaseSlug, isOpen, onClose }: MockupModalProps)
         <div className="lp-mockup-modal-notch" />
         <div className="lp-mockup-modal-screen" ref={screenRef}>
           <div className="lp-mockup-modal-scaler" style={{ transform: `scale(${scale})` }}>
-            <iframe src={`/c/showcase/${showcaseSlug}`} title="Teste o catálogo StudioMenu" />
+            <iframe src={`/c/showcase/${showcaseSlug}`} title="Teste o Menu Digital StudioMenu" />
           </div>
         </div>
       </div>

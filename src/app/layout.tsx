@@ -36,8 +36,8 @@ const APPLE_SPLASH_DEVICES = [
 ];
 
 export const metadata: Metadata = {
-  title: "StudioMenu — Catálogos Digitais de Alta Conversão",
-  description: "Plataforma de catálogos digitais e interativos para Lash Designers, Nail Designers, Clínicas de Estética e Studios de Beleza.",
+  title: "StudioMenu — Menu Digital para Studios de Beleza",
+  description: "O Menu Digital que valoriza o seu Studio. Perfeito para Lash Designers, Nail Designers e Studios de Beleza.",
   appleWebApp: {
     capable: true,
     title: 'StudioMenu',

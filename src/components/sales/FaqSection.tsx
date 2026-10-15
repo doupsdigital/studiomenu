@@ -9,40 +9,39 @@ interface FaqItem {
 
 const DEFAULT_FIRST_ITEM: FaqItem = {
   question: '1. Serve para o meu tipo de Studio / procedimento?',
-  answer: 'Com certeza! O StudioMenu foi feito sob medida para Lash Designers, Nail Designers, Esteticistas, Micropigmentadoras, Cabeleireiras e Studios de Beleza em geral.',
+  answer: 'Com certeza! O StudioMenu foi desenvolvido sob medida para Lash Designers, Nail Designers, Esteticistas, Micropigmentadoras, Cabeleireiras e Studios de Beleza em geral.',
 };
 
 const REST_OF_FAQ_ITEMS: FaqItem[] = [
   {
-    question: '2. Consigo editar meu catálogo depois de pronto?',
-    answer: 'Sim, é 100% editável! Pelo próprio celular você pode trocar a foto da capa, atualizar preços, adicionar novos procedimentos, alterar o tema e cores a qualquer momento. É super rápido e simples.',
+    question: '2. Consigo editar meu Menu Digital depois de pronto?',
+    answer: 'Sim, é 100% editável! Pelo próprio celular você pode trocar fotos, atualizar preços, adicionar novos procedimentos, alterar o tema e cores a qualquer momento. É super rápido e simples.',
   },
   {
     question: '3. Tem fidelidade ou contrato de permanência?',
-    answer: 'Nenhuma! Você não fica presa a nenhum contrato ou multa. No plano mensal você só continua se estiver usando e gostando. Se escolher o plano Vitalício, você paga uma única vez e o catálogo é seu, livre de mensalidades.',
+    answer: 'Nenhuma! Você não fica presa a nenhum contrato ou multa. No plano mensal você só continua se estiver usando e gostando. Se escolher o plano Vitalício, você paga uma única vez e o Menu Digital é seu para sempre, livre de mensalidades.',
   },
   {
-    question: '4. Vocês cobram para montar o meu catálogo inicial?',
-    answer: 'Não! Nós preparamos a estrutura inicial do seu catálogo com serviços de exemplo. Você recebe o catálogo pronto para visualizar e pode personalizar com suas fotos, preços e dados no seu próprio ritmo.',
+    question: '4. Vocês cobram para montar o meu Menu Digital inicial?',
+    answer: 'Não! Nós preparamos a estrutura inicial do seu Menu Digital com procedimentos do seu nicho. Você recebe o link pronto para visualizar e pode personalizar fotos, preços e dados com facilidade.',
   },
   {
-    question: '5. Como funciona o link do meu catálogo?',
-    answer: 'O seu catálogo ganha um link exclusivo com o seu nome (ex: seunome.studiomenu.art). Ele abre instantaneamente em qualquer celular, como um site profissional, perfeito para colocar na Bio do Instagram e enviar no WhatsApp.',
+    question: '5. Como funciona o link do meu Menu Digital?',
+    answer: 'O seu studio ganha um link exclusivo com o seu nome (ex: seunome.studiomenu.art). Ele abre instantaneamente em qualquer celular como um site moderno, perfeito para colocar na Bio do Instagram e enviar no WhatsApp.',
   },
   {
-    question: '6. Minha cliente precisa baixar algum aplicativo para ver o catálogo?',
-    answer: 'Não! O catálogo abre direto no navegador do celular da sua cliente (no Safari ou Chrome) em menos de 1 segundo, sem precisar baixar nada nem criar conta.',
+    question: '6. Minha cliente precisa baixar algum aplicativo para ver o Menu Digital?',
+    answer: 'Não! O Menu Digital abre direto no navegador do celular da sua cliente (Safari, Chrome ou direto no Instagram) em menos de 1 segundo, sem precisar baixar nada nem criar conta.',
   },
 ];
 
 interface FaqSectionProps {
-  /** Substitui a 1ª pergunta por uma versão nichada — é a única que falava
-   *  de "todos os nichos" (ver `src/data/landing-niche-content.tsx`). */
+  /** Substitui a 1ª pergunta por uma versão nichada — ver `src/data/landing-niche-content.tsx`. */
   firstItem?: FaqItem;
 }
 
 export function FaqSection({ firstItem }: FaqSectionProps) {
-  const [openIndex, setOpenIndex] = useState<number | null>(0); // Primeiro item aberto por padrão
+  const [openIndex, setOpenIndex] = useState<number | null>(0);
   const FAQ_ITEMS: FaqItem[] = [firstItem ?? DEFAULT_FIRST_ITEM, ...REST_OF_FAQ_ITEMS];
 
   const toggleItem = (index: number) => {
