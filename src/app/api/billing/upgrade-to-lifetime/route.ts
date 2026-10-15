@@ -53,10 +53,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: 'Catálogo não encontrado.' }, { status: 404 });
     }
 
-    // Só faz sentido pra quem tem mesmo uma mensalidade real do Catálogo
-    // rodando — sem isso não existe o que cancelar (ex: quem já é avulso,
-    // ou nunca assinou nada).
-    if (order.plan_tier !== 'basico' || order.catalog_billing_mode !== 'recorrente' || !order.asaas_subscription_id || !order.asaas_customer_id) {
+    // Só faz sentido pra quem tem mesmo uma cobrança recorrente real do
+    // Catálogo rodando (mensal OU anual, 2026-10-15) — sem isso não existe o
+    // que cancelar (ex: quem já é avulso, ou nunca assinou nada).
+    if (
+      order.plan_tier !== 'basico' ||
+      order.catalog_billing_mode === 'avulso' ||
+      !order.asaas_subscription_id ||
+      !order.asaas_customer_id
+    ) {
       return NextResponse.json(
         { success: false, message: 'Isso só está disponível pra quem já tem o Catálogo recorrente.' },
         { status: 400 }

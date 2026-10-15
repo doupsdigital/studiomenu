@@ -38,12 +38,12 @@ export interface ProfessionalOrderSummary {
    *  definido pelo admin — `null` usa o padrão (`CATALOGO_PRICE`,
    *  `src/lib/pricing.ts`, via `resolveCatalogPrice`). */
   billing_price_override: number | null;
-  /** Se o Plano Catálogo dessa cliente é vendido avulso (padrão) ou como
-   *  assinatura mensal (Fase 27) — só decide o CHECKOUT, antes de ela pagar
-   *  (`FirstContactScreen`). Depois de paga, quem decide o que a tela "Plano"
-   *  mostra é `asaas_subscription_id`, não esse campo (ver `hasRealSubscription`
-   *  em `ConfigAccordion`/`SubscriptionSection`). */
-  catalog_billing_mode: 'avulso' | 'recorrente';
+  /** Se o Plano Catálogo dessa cliente é vendido avulso (padrão), assinatura
+   *  mensal (Fase 27) ou anual (2026-10-15) — só decide o CHECKOUT, antes de
+   *  ela pagar (`FirstContactScreen`). Depois de paga, quem decide o que a
+   *  tela "Plano" mostra é `asaas_subscription_id`, não esse campo (ver
+   *  `hasRealSubscription` em `ConfigAccordion`/`SubscriptionSection`). */
+  catalog_billing_mode: 'avulso' | 'recorrente' | 'anual';
   /** Existe uma assinatura Asaas de verdade por trás (Plano Agenda, ou Plano
    *  Catálogo vendido como recorrente) — `null` pra quem nunca assinou (ou só
    *  tem o Catálogo avulso/manual). Usado só pra saber SE existe, nunca lido
@@ -92,7 +92,8 @@ export async function getOrderForProfessionalApp(slug: string): Promise<Professi
     agenda_paused: Boolean(data.agenda_paused),
     manual_plan: Boolean(data.manual_plan),
     billing_price_override: data.billing_price_override === null || data.billing_price_override === undefined ? null : Number(data.billing_price_override),
-    catalog_billing_mode: data.catalog_billing_mode === 'recorrente' ? 'recorrente' : 'avulso',
+    catalog_billing_mode:
+      data.catalog_billing_mode === 'recorrente' || data.catalog_billing_mode === 'anual' ? data.catalog_billing_mode : 'avulso',
     has_real_subscription: Boolean(data.asaas_subscription_id),
     lifetime_price_override: data.lifetime_price_override === null || data.lifetime_price_override === undefined ? null : Number(data.lifetime_price_override),
     created_at: data.created_at || undefined,

@@ -33,9 +33,10 @@ export async function PATCH(request: Request) {
       /** Preço customizado do Plano Catálogo pra essa cliente específica —
        *  `null` volta ao padrão (`CATALOGO_PRICE`, src/lib/pricing.ts). */
       billing_price_override?: number | null;
-      /** Se o Plano Catálogo dessa cliente é vendido avulso ou como
-       *  assinatura mensal (Fase 27) — só tem efeito ANTES de ela pagar. */
-      catalog_billing_mode?: 'avulso' | 'recorrente';
+      /** Se o Plano Catálogo dessa cliente é vendido avulso, como assinatura
+       *  mensal (Fase 27) ou anual (2026-10-15) — só tem efeito ANTES de ela
+       *  pagar. */
+      catalog_billing_mode?: 'avulso' | 'recorrente' | 'anual';
       /** Preço customizado da conversão de Catálogo recorrente pra vitalício
        *  (Fase 28) — `null` volta ao padrão (`CATALOGO_VITALICIO_PRICE`,
        *  src/lib/pricing.ts). */
@@ -80,7 +81,7 @@ export async function PATCH(request: Request) {
       subscription_status?: 'none' | 'ativo' | 'suspenso' | 'cancelado';
       manual_plan?: boolean;
       billing_price_override?: number | null;
-      catalog_billing_mode?: 'avulso' | 'recorrente';
+      catalog_billing_mode?: 'avulso' | 'recorrente' | 'anual';
       lifetime_price_override?: number | null;
       /** Só escrito internamente aqui (nunca vem do request) — limpa a
        *  assinatura real cancelada ao conceder plano manual, ver abaixo. */

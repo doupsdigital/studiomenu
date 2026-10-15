@@ -19,11 +19,12 @@ interface PlanSubscribeCardProps {
   /** Preço customizado do Plano Catálogo pra essa cliente (admin), em vez do
    *  padrão de `PLAN_PRICING.basico`. Só usado quando `plan === 'basico'`. */
   priceOverride?: { price: number; label: string };
-  /** Só relevante quando `plan === 'basico'` (Fase 27): se o admin marcou
-   *  esse catálogo pra vender o Plano Catálogo como assinatura mensal em vez
-   *  de pagamento único (padrão 'avulso'). Decide só o texto do botão aqui —
-   *  quem monta o preço com "/mês" é quem chama (`priceOverride.label`). */
-  billingMode?: 'avulso' | 'recorrente';
+  /** Só relevante quando `plan === 'basico'` (Fase 27, + 'anual' em
+   *  2026-10-15): se o admin marcou esse catálogo pra vender o Plano
+   *  Catálogo como assinatura (mensal ou anual) em vez de pagamento único
+   *  (padrão 'avulso'). Decide só o texto do botão aqui — quem monta o
+   *  preço com "/mês" ou "/ano" é quem chama (`priceOverride.label`). */
+  billingMode?: 'avulso' | 'recorrente' | 'anual';
   /** Autoatendimento pra converter Catálogo recorrente em vitalício (Fase
    *  28) — submete pro endpoint dedicado em vez do checkout genérico, sem
    *  pedir CPF/e-mail de novo (ela já é cliente paga confirmada) e com copy
@@ -144,8 +145,9 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
   const isUpgrade = !showMethodChoice;
   /** Catálogo é pagamento único por padrão — "assinar"/"mensalidade" não
    *  fazem sentido aqui, a não ser que o admin tenha marcado esse catálogo
-   *  como recorrente (Fase 27). Pro Agenda sempre é recorrente. */
-  const isOneTime = plan === 'basico' && billingMode !== 'recorrente';
+   *  como recorrente, mensal ou anual (Fase 27 / 2026-10-15). Pro Agenda
+   *  sempre é recorrente. */
+  const isOneTime = plan === 'basico' && billingMode === 'avulso';
 
   const [email, setEmail] = useState(billingEmail || '');
   const [cpfCnpj, setCpfCnpj] = useState(formatCpfCnpj(billingCpfCnpj || ''));

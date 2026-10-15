@@ -44,9 +44,10 @@ interface ConfigAccordionProps {
   /** Preço customizado da conversão de Catálogo recorrente pra vitalício
    *  (Fase 28) — repassado direto pra `SubscriptionSection`. */
   lifetimePriceOverride: number | null;
-  /** Se o Catálogo dessa cliente nasceu recorrente (Fase 27) — repassado
-   *  direto pra `SubscriptionSection` decidir as opções de cancelamento. */
-  catalogBillingMode: 'avulso' | 'recorrente';
+  /** Se o Catálogo dessa cliente nasceu recorrente — mensal (Fase 27) ou
+   *  anual (2026-10-15) — repassado direto pra `SubscriptionSection` decidir
+   *  as opções de cancelamento. */
+  catalogBillingMode: 'avulso' | 'recorrente' | 'anual';
 }
 
 type SectionKey = 'horarios' | 'bloqueios' | 'pausar' | 'assinatura' | 'conta' | 'notificacoes' | 'suporte';

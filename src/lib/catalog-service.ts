@@ -111,7 +111,7 @@ export async function getCatalogBySlug(slug: string): Promise<CatalogOrderData |
       // nada) fica de fora de propósito — já cai no fallback de
       // procedimentos de exemplo, não faz sentido também "desativar".
       catalog_payment_lapsed:
-        orderData.catalog_billing_mode === 'recorrente' &&
+        orderData.catalog_billing_mode !== 'avulso' &&
         orderData.plan_tier !== 'catalog' &&
         !orderData.manual_plan &&
         orderData.subscription_status !== 'ativo',

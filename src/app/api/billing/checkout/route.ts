@@ -111,6 +111,14 @@ export async function POST(request: Request) {
     // esperar o webhook de sempre; como ela já é assinante paga validada
     // (não uma desconhecida tentando ganhar acesso de graça), ativa o novo
     // tier direto aqui.
+    //
+    // LIMITAÇÃO CONHECIDA (2026-10-15, achado implementando o Catálogo
+    // anual): este PUT só troca valor/descrição, nunca o `cycle` — uma
+    // cliente que evoluir de Catálogo ANUAL pro Plano Agenda continua sendo
+    // cobrada 1x/ano, só que no valor do Agenda (R$34,90), em vez de
+    // mensalmente. Fora do escopo pedido agora; se for oferecer esse
+    // upgrade pra assinantes anuais, revisitar aqui (provavelmente cancelar
+    // a assinatura anual e criar uma nova mensal, em vez de reaproveitar).
     if (order.asaas_subscription_id && order.plan_tier !== plan && order.plan_tier !== 'catalog') {
       const updated = await updateSubscription({ subscriptionId: order.asaas_subscription_id, value: price, description: pricing.description });
       // `pending_lifetime_payment_id` limpo junto (achado em auditoria, Fase
@@ -183,7 +191,7 @@ export async function POST(request: Request) {
     // assinatura nova em vez de atualizar uma existente). Se o admin marcou
     // esse catálogo como 'recorrente' (Fase 27), cai direto no branch de
     // `createSubscription` abaixo — mesmo caminho que já existe pro Agenda.
-    if (plan === 'basico' && order.catalog_billing_mode !== 'recorrente') {
+    if (plan === 'basico' && order.catalog_billing_mode === 'avulso') {
       await supabaseAdmin
         .from('orders')
         .update({ pending_plan_tier: plan, payment_method: method, manual_plan: false })
@@ -199,11 +207,15 @@ export async function POST(request: Request) {
       return buildPaymentResponse(payment, method);
     }
 
+    // Só o Plano Catálogo pode nascer anual (escolha do admin, por cliente,
+    // 2026-10-15) — o Plano Agenda (`plus`) sempre é mensal.
+    const cycle = plan === 'basico' && order.catalog_billing_mode === 'anual' ? 'YEARLY' : 'MONTHLY';
     const subscription = await createSubscription({
       customerId: customer.id,
       value: price,
       description: pricing.description,
       billingType: BILLING_TYPE[method],
+      cycle,
     });
 
     // `manual_plan: false` fecha uma inconsistência latente: um perfil com
