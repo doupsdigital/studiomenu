@@ -90,7 +90,11 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
         Suas técnicas de alongamento, gel e nail art apresentadas como um <strong>site profissional</strong>. Um <strong>Link exclusivo</strong> para a sua bio, onde a cliente vê seu trabalho com sofisticação e agenda direto no seu <strong>WhatsApp</strong>.
       </>
     ),
-    showcaseSlug: 'nail',
+    // 'naildesigner', não 'nail' — o slug 'nail' cai no agendamento automático
+    // (Plus), mas a copy acima promete "agenda direto no WhatsApp" (igual
+    // lash); 'naildesigner' é a versão Básico (WhatsApp) do mesmo nicho
+    // (bug real em produção, 2026-10-15).
+    showcaseSlug: 'naildesigner',
     socialProofHighlight: '350+ Nail Designers',
     faqFirstItem: {
       question: '1. Só serve pra unha ou dá pra colocar outros serviços também?',
