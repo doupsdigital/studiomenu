@@ -55,10 +55,15 @@
 }
 
 /* Scroll reveal (fade + sobe de baixo) — pedido real, 2026-10-15, efeito
- *  comum em landing pages premium. A classe `is-visible` é ligada pelo
+ *  comum em landing pages premium. O atributo `data-visible` é ligado pelo
  *  `IntersectionObserver` em `useScrollReveal` (`src/hooks/`); aqui só a
- *  transição em si. `--reveal-delay` (opcional, via inline style) cria o
- *  efeito "cascata" em grupos de cards/itens que aparecem juntos.
+ *  transição em si. É um atributo, não uma classe, de propósito (ver
+ *  comentário em `useScrollReveal.ts`) — uma classe `is-visible` quebrava o
+ *  FAQ (card sumia ao fechar outra pergunta) porque o React reescreve
+ *  `className` inteiro a cada re-render da lista, apagando o que o
+ *  observer tinha ligado por fora do React; um atributo separado sobrevive
+ *  a isso. `--reveal-delay` (opcional, via inline style) cria o efeito
+ *  "cascata" em grupos de cards/itens que aparecem juntos.
  *  `prefers-reduced-motion` desliga o movimento (acessibilidade) sem nunca
  *  travar conteúdo em opacity:0. */
 .lp-lashmenu [data-reveal] {
@@ -68,7 +73,7 @@
   transition-delay: var(--reveal-delay, 0s);
 }
 
-.lp-lashmenu [data-reveal].is-visible {
+.lp-lashmenu [data-reveal][data-visible] {
   opacity: 1;
   transform: translateY(0);
 }
