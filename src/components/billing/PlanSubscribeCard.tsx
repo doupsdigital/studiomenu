@@ -18,7 +18,7 @@ interface PlanSubscribeCardProps {
   showMethodChoice?: boolean;
   /** Preço customizado pra essa cliente (admin), em vez do padrão de
    *  `PLAN_PRICING[plan]` — Catálogo (`billing_price_override`) ou Agenda
-   *  (mesmo campo, reinterpretado por `resolveAgendaPrice`, 2026-10-15). */
+   *  (campo próprio `agenda_price_override`, 2026-10-15). */
   priceOverride?: { price: number; label: string };
   /** Pro Catálogo (Fase 27, + 'anual' em 2026-10-15): se o admin marcou
    *  pagamento único (padrão 'avulso') ou assinatura (mensal/anual). Pro
@@ -493,7 +493,11 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
           )}
           {isUpgrade && (
             <p className="text-sm text-ink-soft text-center leading-snug">
-              Ao assinar, seu plano evolui automaticamente. O novo valor só vale a partir da próxima mensalidade.
+              {/* "próxima cobrança" em vez de "próxima mensalidade" (achado em
+               *  auditoria, 2026-10-15) — numa troca de ciclo (ex: Catálogo
+               *  anual → Agenda mensal) o crédito pode empurrar a próxima
+               *  cobrança por meses, "mensalidade" prometeria um prazo errado. */}
+              Ao assinar, seu plano evolui automaticamente. O novo valor só vale a partir da próxima cobrança.
             </p>
           )}
           {showMethodChoice && (
