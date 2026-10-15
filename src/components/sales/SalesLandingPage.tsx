@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import { capture } from '@/lib/analytics';
 import { AGENDA_PRICE } from '@/lib/pricing';
 import { HeroMockup } from './HeroMockup';
 import { MockupModal } from './MockupModal';
 import { HowItWorksSection } from './HowItWorksSection';
 import { FaqSection } from './FaqSection';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 import type { LandingNicheContent } from '@/data/landing-niche-content';
 
 /** Evento nomeado pros 3 CTAs de maior valor, além do clique "cru" que o
@@ -89,6 +90,7 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
   const anualParts = priceParts(TEST_ANUAL_PRICE);
   const agendaParts = priceParts(AGENDA_PRICE);
   const [mockupOpen, setMockupOpen] = useState(false);
+  useScrollReveal();
 
   return (
     <div className="lp-lashmenu">
@@ -116,7 +118,13 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
 
           <div className="lp-container">
             <div className="lp-hero-grid">
-              <div className="lp-hero-content">
+              {/* Hero já está visível na carga da página (ninguém rola até
+               *  ela) — o `data-reveal` aqui não é "scroll reveal", é
+               *  animação de entrada no load: o IntersectionObserver de
+               *  `useScrollReveal` dispara assim que monta, pra qualquer
+               *  coisa que já esteja na viewport (pedido real, 2026-10-15:
+               *  landing pages premium animam a Hero no load, em cascata). */}
+              <div className="lp-hero-content" data-reveal>
                 <div className="lp-hero-brand-block">
                   <h1 className="lp-hero-brand-h1">
                     Studio<em>Menu</em>
@@ -167,7 +175,7 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
          *  da Hero. Cria a alternância branco/rosa que ela gosta logo cedo
          *  na página. */}
         <section className="lp-delivery-highlight-section">
-          <div className="lp-container">
+          <div className="lp-container" data-reveal>
             <div className="lp-delivery-highlight-header">
               <div className="lp-delivery-highlight-icon" aria-hidden="true">⚡</div>
               <h2 className="lp-delivery-highlight-title">Entrega Expressa</h2>
@@ -184,14 +192,14 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
         {/* 4. OFERTA */}
         <section id="oferta" className="lp-pricing-section">
           <div className="lp-container">
-            <div className="lp-pricing-header-title">
+            <div className="lp-pricing-header-title" data-reveal>
               <h2 className="lp-section-title">Escolha o Plano Ideal para o Seu Studio</h2>
             </div>
 
             <div className="lp-pricing-tier-grid">
               {/* Catálogo (assinatura) — teste de X1, 2026-10-08: preço de
                *  teste 22,90/mês, "/mês" ao lado do valor (não embaixo). */}
-              <div className="lp-pricing-tier-card">
+              <div className="lp-pricing-tier-card" data-reveal>
                 <div className="lp-tier-badge lp-tier-badge--basic">🔁 ASSINATURA MENSAL</div>
                 <h3 className="lp-tier-title">StudioMenu Mensal</h3>
 
@@ -271,7 +279,11 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
                *  `ANUAL_DISCOUNT_PERCENT` (calculado acima a partir do
                *  Mensal x12) pra nunca ficar com um número errado se o
                *  preço do Mensal mudar sem atualizar aqui. */}
-              <div className="lp-pricing-tier-card lp-pricing-tier-card--vip">
+              <div
+                className="lp-pricing-tier-card lp-pricing-tier-card--vip"
+                data-reveal
+                style={{ '--reveal-delay': '0.15s' } as CSSProperties}
+              >
                 <div className="lp-tier-discount-seal" aria-hidden="true">
                   <span>
                     <span className="lp-tier-discount-seal-percent">{ANUAL_DISCOUNT_PERCENT}%</span>
@@ -368,7 +380,7 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
 
         {/* 6. MARQUEE DE PROVA SOCIAL */}
         <section className="lp-marquee-ribbon-section">
-          <div className="lp-marquee-ribbon-wrap">
+          <div className="lp-marquee-ribbon-wrap" data-reveal>
             <div className="lp-marquee-ribbon-track">
               {[...TESTIMONIALS, ...TESTIMONIALS].map((t, i) => (
                 <div key={i} className="lp-marquee-review-card">
