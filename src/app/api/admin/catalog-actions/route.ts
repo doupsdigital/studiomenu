@@ -21,6 +21,7 @@ export async function PATCH(request: Request) {
       billing_price_override,
       catalog_billing_mode,
       agenda_billing_mode,
+      agenda_price_override,
       lifetime_price_override,
     } = (await request.json()) as {
       id: string;
@@ -41,6 +42,10 @@ export async function PATCH(request: Request) {
       /** Se o Plano Agenda dessa cliente é vendido mensal ou anual
        *  (2026-10-15) — só tem efeito ANTES de ela pagar o Agenda. */
       agenda_billing_mode?: 'recorrente' | 'anual';
+      /** Preço customizado do Plano Agenda — campo PRÓPRIO, separado de
+       *  `billing_price_override` (2026-10-15). `null` volta ao padrão
+       *  (`AGENDA_PRICE`/`AGENDA_ANUAL_PRICE`, src/lib/pricing.ts). */
+      agenda_price_override?: number | null;
       /** Preço customizado da conversão de Catálogo recorrente pra vitalício
        *  (Fase 28) — `null` volta ao padrão (`CATALOGO_VITALICIO_PRICE`,
        *  src/lib/pricing.ts). */
@@ -58,6 +63,7 @@ export async function PATCH(request: Request) {
         billing_price_override === undefined &&
         catalog_billing_mode === undefined &&
         agenda_billing_mode === undefined &&
+        agenda_price_override === undefined &&
         lifetime_price_override === undefined)
     ) {
       return NextResponse.json(
@@ -68,6 +74,11 @@ export async function PATCH(request: Request) {
 
     if (billing_price_override !== undefined && billing_price_override !== null) {
       if (!Number.isFinite(billing_price_override) || billing_price_override < 5) {
+        return NextResponse.json({ success: false, message: 'Preço inválido (mínimo R$5).' }, { status: 400 });
+      }
+    }
+    if (agenda_price_override !== undefined && agenda_price_override !== null) {
+      if (!Number.isFinite(agenda_price_override) || agenda_price_override < 5) {
         return NextResponse.json({ success: false, message: 'Preço inválido (mínimo R$5).' }, { status: 400 });
       }
     }
@@ -88,6 +99,7 @@ export async function PATCH(request: Request) {
       billing_price_override?: number | null;
       catalog_billing_mode?: 'avulso' | 'recorrente' | 'anual';
       agenda_billing_mode?: 'recorrente' | 'anual';
+      agenda_price_override?: number | null;
       lifetime_price_override?: number | null;
       /** Só escrito internamente aqui (nunca vem do request) — limpa a
        *  assinatura real cancelada ao conceder plano manual, ver abaixo. */
@@ -105,6 +117,7 @@ export async function PATCH(request: Request) {
     if (billing_price_override !== undefined) updates.billing_price_override = billing_price_override;
     if (catalog_billing_mode !== undefined) updates.catalog_billing_mode = catalog_billing_mode;
     if (agenda_billing_mode !== undefined) updates.agenda_billing_mode = agenda_billing_mode;
+    if (agenda_price_override !== undefined) updates.agenda_price_override = agenda_price_override;
     if (lifetime_price_override !== undefined) updates.lifetime_price_override = lifetime_price_override;
 
     // Conceder plano manual (Fase 26) numa cliente que JÁ tem uma assinatura

@@ -66,7 +66,7 @@ export async function POST(request: Request) {
     const { data: order, error: orderErr } = await supabaseAdmin
       .from('orders')
       .select(
-        'id, client_name, plan_tier, subscription_status, asaas_customer_id, asaas_subscription_id, payment_method, billing_price_override, catalog_billing_mode, agenda_billing_mode'
+        'id, client_name, plan_tier, subscription_status, asaas_customer_id, asaas_subscription_id, payment_method, billing_price_override, catalog_billing_mode, agenda_billing_mode, agenda_price_override'
       )
       .eq('slug', normalizedSlug)
       .single();
@@ -94,12 +94,14 @@ export async function POST(request: Request) {
     // Plano Catálogo (pagamento único/recorrente/anual): preço customizável
     // livremente pelo admin por cliente, sem teto (resolveCatalogPrice,
     // src/lib/pricing.ts). Plano Agenda (sempre assinatura, mensal ou anual
-    // desde 2026-10-15): `billing_price_override` continua sendo só um
-    // desconto, nunca acima do preço base do modo (resolveAgendaPrice).
+    // desde 2026-10-15): `agenda_price_override` (campo PRÓPRIO, separado do
+    // `billing_price_override` do Catálogo desde 2026-10-15 — achado real
+    // testando, os dois campos compartilhados vazavam preço de um plano pro
+    // outro) continua sendo só um desconto, nunca acima do preço base do modo.
     const price =
       plan === 'basico'
         ? resolveCatalogPrice(order.billing_price_override).price
-        : resolveAgendaPrice(order.agenda_billing_mode === 'anual' ? 'anual' : 'recorrente', order.billing_price_override).price;
+        : resolveAgendaPrice(order.agenda_billing_mode === 'anual' ? 'anual' : 'recorrente', order.agenda_price_override).price;
 
     // Já tem assinatura Asaas e é um tier DIFERENTE do atual → troca de
     // plano (ex: Básico → Plus, ou o contrário). Se o CICLO não muda

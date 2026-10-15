@@ -86,16 +86,19 @@ export function resolveLifetimePrice(lifetimePriceOverride: number | null | unde
 
 /** Preço do Plano Agenda conforme o modo de cobrança (2026-10-15) — preço
  *  base muda (mensal `AGENDA_PRICE` ou anual `AGENDA_ANUAL_PRICE`), e
- *  `billing_price_override` continua funcionando só como DESCONTO (teto no
- *  preço base, nunca acima — comportamento de sempre pro Agenda, centralizado
- *  aqui em vez de inline no checkout). Rótulo ganha "/mês" ou "/ano"
- *  conforme o modo. */
+ *  `agenda_price_override` funciona só como DESCONTO (teto no preço base,
+ *  nunca acima). Rótulo ganha "/mês" ou "/ano" conforme o modo.
+ *
+ *  Campo PRÓPRIO, separado de `billing_price_override` (o do Catálogo) desde
+ *  2026-10-15 — achado real testando: compartilhar o mesmo campo cobrava o
+ *  valor customizado do Catálogo no Agenda por engano (ex: Catálogo mensal
+ *  R$22,90 vazava pro Agenda, que deveria cobrar R$34,90). */
 export function resolveAgendaPrice(
   mode: AgendaBillingMode,
-  billingPriceOverride: number | null | undefined
+  agendaPriceOverride: number | null | undefined
 ): { price: number; label: string } {
   const basePrice = mode === 'anual' ? AGENDA_ANUAL_PRICE : AGENDA_PRICE;
-  const override = billingPriceOverride === null || billingPriceOverride === undefined ? null : Number(billingPriceOverride);
+  const override = agendaPriceOverride === null || agendaPriceOverride === undefined ? null : Number(agendaPriceOverride);
   const price = override !== null && Number.isFinite(override) && override >= 5 && override <= basePrice ? override : basePrice;
   const suffix = mode === 'anual' ? '/ano' : '/mês';
   return { price, label: `R$ ${price.toFixed(2).replace('.', ',')}${suffix}` };

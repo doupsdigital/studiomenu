@@ -41,6 +41,11 @@ interface SubscriptionSectionProps {
   /** Se o Plano Agenda dessa cliente é vendido mensal (padrão) ou anual
    *  (2026-10-15) — mesma ideia de `catalogBillingMode`. */
   agendaBillingMode?: 'recorrente' | 'anual';
+  /** Preço customizado do Plano Agenda — campo PRÓPRIO, separado de
+   *  `billingPriceOverride` (2026-10-15, achado real: compartilhar o mesmo
+   *  campo cobrava/mostrava o valor customizado do Catálogo no Agenda por
+   *  engano). */
+  agendaPriceOverride?: number | null;
   /** Preço customizado da conversão de Catálogo recorrente pra vitalício
    *  (Fase 28) — admin negocia por cliente. */
   lifetimePriceOverride?: number | null;
@@ -61,6 +66,7 @@ const ActivePlanCard: React.FC<{
   billingPriceOverride?: number | null;
   catalogBillingMode?: 'avulso' | 'recorrente' | 'anual';
   agendaBillingMode?: 'recorrente' | 'anual';
+  agendaPriceOverride?: number | null;
   onCancel: () => void;
   onDowngradeToCatalogo?: () => void;
   loading: boolean;
@@ -73,6 +79,7 @@ const ActivePlanCard: React.FC<{
   billingPriceOverride,
   catalogBillingMode,
   agendaBillingMode,
+  agendaPriceOverride,
   onCancel,
   onDowngradeToCatalogo,
   loading,
@@ -84,8 +91,9 @@ const ActivePlanCard: React.FC<{
   // avulso), nunca o padrão de tabela — ver nota acima do componente.
   // Sufixo "/mês" ou "/ano" conforme o modo (2026-10-15) — `catalogBillingMode`
   // só vem 'anual' quando `tier === 'basico'`, nunca pro Agenda. Pro Agenda,
-  // mesmo campo (`billing_price_override`) reinterpretado via
-  // `resolveAgendaPrice` (2026-10-15) — já sai com "/mês" ou "/ano" certo.
+  // campo PRÓPRIO `agendaPriceOverride` (2026-10-15, separado do Catálogo —
+  // achado real: compartilhar o mesmo campo vazava preço de um plano pro
+  // outro) via `resolveAgendaPrice` — já sai com "/mês" ou "/ano" certo.
   const catalogPrice = resolveCatalogPrice(billingPriceOverride);
   // Modo de cobrança desse tier específico — decide tanto o sufixo do preço
   // quanto o rótulo "Mensalidade"/"Anuidade" logo abaixo (achado real,
@@ -95,7 +103,7 @@ const ActivePlanCard: React.FC<{
   const pricing =
     tier === 'basico'
       ? { price: catalogPrice.price, label: `${catalogPrice.label}${billingCycleMode === 'anual' ? '/ano' : '/mês'}` }
-      : resolveAgendaPrice(agendaBillingMode || 'recorrente', billingPriceOverride);
+      : resolveAgendaPrice(agendaBillingMode || 'recorrente', agendaPriceOverride);
   // Ela upgradeou pro Agenda a partir de um Catálogo recorrente — mensal ou
   // anual (mesma assinatura reaproveitada, nunca duas em paralelo) —
   // cancelar "tudo" de uma vez perderia também o Catálogo que ela paga à
@@ -218,6 +226,7 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
   billingPriceOverride,
   catalogBillingMode,
   agendaBillingMode,
+  agendaPriceOverride,
   lifetimePriceOverride,
 }) => {
   const router = useRouter();
@@ -287,6 +296,7 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
         billingPriceOverride={billingPriceOverride}
         catalogBillingMode={catalogBillingMode}
         agendaBillingMode={agendaBillingMode}
+        agendaPriceOverride={agendaPriceOverride}
         onCancel={handleCancel}
         onDowngradeToCatalogo={handleDowngradeToCatalogo}
         loading={loading}
@@ -326,7 +336,7 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
             billingEmail={billingEmail}
             billingCpfCnpj={billingCpfCnpj}
             showMethodChoice={!hasRealSubscription}
-            priceOverride={resolveAgendaPrice(agendaBillingMode || 'recorrente', billingPriceOverride)}
+            priceOverride={resolveAgendaPrice(agendaBillingMode || 'recorrente', agendaPriceOverride)}
             billingMode={agendaBillingMode}
           />
         </div>
@@ -368,7 +378,7 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
   const reofferPriceOverride =
     reofferTier === 'basico'
       ? { price: reofferCatalogPrice.price, label: `${reofferCatalogPrice.label}${reofferSuffix}` }
-      : resolveAgendaPrice(agendaBillingMode || 'recorrente', billingPriceOverride);
+      : resolveAgendaPrice(agendaBillingMode || 'recorrente', agendaPriceOverride);
 
   return (
     <div className="flex flex-col gap-3">
