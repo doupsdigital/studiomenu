@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { timingSafeEqual } from 'crypto';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 import { activateSubscription, setSubscriptionStatus, findOrderIdByAsaasIds } from '@/lib/billing-service';
 
 const ACTIVATE_EVENTS = new Set(['PAYMENT_CONFIRMED', 'PAYMENT_RECEIVED']);
@@ -63,6 +64,23 @@ export async function POST(request: Request) {
     if (!orderId) {
       console.warn('[API Billing Webhook] Nenhum pedido encontrado pra', subscriptionId || customerId);
       return NextResponse.json({ success: true }); // 200 mesmo assim — evita a Asaas insistir num evento que não é nosso
+    }
+
+    // Evento sobre uma assinatura que já não é mais a atual dessa order (ex:
+    // 2026-10-15, troca de ciclo de cobrança — cancela a assinatura ANTIGA
+    // depois de já criar e ativar a nova). O `SUBSCRIPTION_DELETED` da
+    // antiga cai aqui, não acha a order pelo `subscriptionId` (já foi
+    // trocado), mas o fallback por `customerId` acha a MESMA order mesmo
+    // assim (só existe 1 customer por profissional) — sem este check, esse
+    // evento tardio derrubava a assinatura nova que acabou de ser ativada.
+    // Só compara quando o payload TRAZ um `subscriptionId` — eventos sem
+    // esse campo continuam resolvendo só por `customerId`, comportamento de
+    // sempre (Fase 21).
+    if (subscriptionId) {
+      const { data: current } = await supabaseAdmin.from('orders').select('asaas_subscription_id').eq('id', orderId).single();
+      if (current?.asaas_subscription_id && current.asaas_subscription_id !== subscriptionId) {
+        return NextResponse.json({ success: true });
+      }
     }
 
     // "Recebido em dinheiro" (baixa manual no painel do Asaas, ex: cliente

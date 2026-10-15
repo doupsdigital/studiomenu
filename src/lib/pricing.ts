@@ -1,3 +1,5 @@
+import type { AsaasCycle } from './asaas';
+
 /** Preços dos planos pagos — fonte única de verdade, não hardcoded em
  *  vários arquivos (decisão registrada em docs/historico/PLANO_AGENDAMENTO_STUDIOMENU_PLUS.md,
  *  ampliada na Fase 19 pro tier Básico).
@@ -35,7 +37,15 @@ export const CATALOGO_ANUAL_DEFAULT_PRICE = 139.9;
 export const AGENDA_PRICE = 34.9;
 export const AGENDA_PRICE_LABEL = 'R$ 34,90/mês';
 
+/** Preço do Plano Agenda vendido como assinatura ANUAL (2026-10-15) — mesma
+ *  ideia do Catálogo anual, produto próprio, admin escolhe por cliente em
+ *  `/admin/catalogos` (`orders.agenda_billing_mode`). */
+export const AGENDA_ANUAL_PRICE = 249.9;
+export const AGENDA_ANUAL_PRICE_LABEL = 'R$ 249,90/ano';
+
 export type PayablePlanTier = 'basico' | 'plus';
+export type AgendaBillingMode = 'recorrente' | 'anual';
+export type CatalogBillingMode = 'avulso' | 'recorrente' | 'anual';
 
 /** Preço + descrição (texto que vai pro Asaas e aparece no extrato da
  *  profissional) de cada tier pago — usado pelo checkout genérico.
@@ -72,4 +82,37 @@ export function resolveLifetimePrice(lifetimePriceOverride: number | null | unde
   const override = lifetimePriceOverride === null || lifetimePriceOverride === undefined ? null : Number(lifetimePriceOverride);
   const price = override !== null && Number.isFinite(override) && override >= 5 ? override : CATALOGO_VITALICIO_PRICE;
   return { price, label: `R$ ${price.toFixed(2).replace('.', ',')}` };
+}
+
+/** Preço do Plano Agenda conforme o modo de cobrança (2026-10-15) — preço
+ *  base muda (mensal `AGENDA_PRICE` ou anual `AGENDA_ANUAL_PRICE`), e
+ *  `billing_price_override` continua funcionando só como DESCONTO (teto no
+ *  preço base, nunca acima — comportamento de sempre pro Agenda, centralizado
+ *  aqui em vez de inline no checkout). Rótulo ganha "/mês" ou "/ano"
+ *  conforme o modo. */
+export function resolveAgendaPrice(
+  mode: AgendaBillingMode,
+  billingPriceOverride: number | null | undefined
+): { price: number; label: string } {
+  const basePrice = mode === 'anual' ? AGENDA_ANUAL_PRICE : AGENDA_PRICE;
+  const override = billingPriceOverride === null || billingPriceOverride === undefined ? null : Number(billingPriceOverride);
+  const price = override !== null && Number.isFinite(override) && override >= 5 && override <= basePrice ? override : basePrice;
+  const suffix = mode === 'anual' ? '/ano' : '/mês';
+  return { price, label: `R$ ${price.toFixed(2).replace('.', ',')}${suffix}` };
+}
+
+/** Única fonte de verdade pra "qual ciclo Asaas (MONTHLY/YEARLY) esse tier
+ *  resolve hoje" (2026-10-15) — usada tanto pela cobrança real
+ *  (`checkout/route.ts`, decide se precisa trocar de ciclo numa troca de
+ *  tier) quanto pela exibição de preço ANTES de pagar
+ *  (`FirstContactScreen.tsx`/`SubscriptionSection.tsx`), pra nunca mostrar
+ *  um rótulo "/mês" ou "/ano" diferente do que de fato vai ser cobrado. */
+export function resolveBillingCycle(
+  plan: PayablePlanTier,
+  order: { catalog_billing_mode?: string | null; agenda_billing_mode?: string | null }
+): AsaasCycle {
+  if (plan === 'basico') {
+    return order.catalog_billing_mode === 'anual' ? 'YEARLY' : 'MONTHLY';
+  }
+  return order.agenda_billing_mode === 'anual' ? 'YEARLY' : 'MONTHLY';
 }

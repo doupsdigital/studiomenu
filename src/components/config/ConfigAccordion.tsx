@@ -48,6 +48,9 @@ interface ConfigAccordionProps {
    *  anual (2026-10-15) — repassado direto pra `SubscriptionSection` decidir
    *  as opções de cancelamento. */
   catalogBillingMode: 'avulso' | 'recorrente' | 'anual';
+  /** Se o Plano Agenda dessa cliente é vendido mensal (padrão) ou anual
+   *  (2026-10-15) — repassado direto pra `SubscriptionSection`. */
+  agendaBillingMode: 'recorrente' | 'anual';
 }
 
 type SectionKey = 'horarios' | 'bloqueios' | 'pausar' | 'assinatura' | 'conta' | 'notificacoes' | 'suporte';
@@ -75,6 +78,7 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
   hasRealSubscription,
   billingPriceOverride,
   catalogBillingMode,
+  agendaBillingMode,
   lifetimePriceOverride,
 }) => {
   const [open, setOpen] = useState<Record<SectionKey, boolean>>({
@@ -277,6 +281,7 @@ export const ConfigAccordion: React.FC<ConfigAccordionProps> = ({
             hasRealSubscription={hasRealSubscription}
             billingPriceOverride={billingPriceOverride}
             catalogBillingMode={catalogBillingMode}
+            agendaBillingMode={agendaBillingMode}
             lifetimePriceOverride={lifetimePriceOverride}
           />
         </SectionCard>

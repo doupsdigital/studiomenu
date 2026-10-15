@@ -20,6 +20,7 @@ export async function PATCH(request: Request) {
       manual_plan,
       billing_price_override,
       catalog_billing_mode,
+      agenda_billing_mode,
       lifetime_price_override,
     } = (await request.json()) as {
       id: string;
@@ -37,6 +38,9 @@ export async function PATCH(request: Request) {
        *  mensal (Fase 27) ou anual (2026-10-15) — só tem efeito ANTES de ela
        *  pagar. */
       catalog_billing_mode?: 'avulso' | 'recorrente' | 'anual';
+      /** Se o Plano Agenda dessa cliente é vendido mensal ou anual
+       *  (2026-10-15) — só tem efeito ANTES de ela pagar o Agenda. */
+      agenda_billing_mode?: 'recorrente' | 'anual';
       /** Preço customizado da conversão de Catálogo recorrente pra vitalício
        *  (Fase 28) — `null` volta ao padrão (`CATALOGO_VITALICIO_PRICE`,
        *  src/lib/pricing.ts). */
@@ -53,6 +57,7 @@ export async function PATCH(request: Request) {
         manual_plan === undefined &&
         billing_price_override === undefined &&
         catalog_billing_mode === undefined &&
+        agenda_billing_mode === undefined &&
         lifetime_price_override === undefined)
     ) {
       return NextResponse.json(
@@ -82,6 +87,7 @@ export async function PATCH(request: Request) {
       manual_plan?: boolean;
       billing_price_override?: number | null;
       catalog_billing_mode?: 'avulso' | 'recorrente' | 'anual';
+      agenda_billing_mode?: 'recorrente' | 'anual';
       lifetime_price_override?: number | null;
       /** Só escrito internamente aqui (nunca vem do request) — limpa a
        *  assinatura real cancelada ao conceder plano manual, ver abaixo. */
@@ -98,6 +104,7 @@ export async function PATCH(request: Request) {
     if (manual_plan !== undefined) updates.manual_plan = manual_plan;
     if (billing_price_override !== undefined) updates.billing_price_override = billing_price_override;
     if (catalog_billing_mode !== undefined) updates.catalog_billing_mode = catalog_billing_mode;
+    if (agenda_billing_mode !== undefined) updates.agenda_billing_mode = agenda_billing_mode;
     if (lifetime_price_override !== undefined) updates.lifetime_price_override = lifetime_price_override;
 
     // Conceder plano manual (Fase 26) numa cliente que JÁ tem uma assinatura
