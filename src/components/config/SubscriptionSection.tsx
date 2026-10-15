@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { CheckCircle2, AlertTriangle, Sparkles, Gift } from 'lucide-react';
-import { PLAN_PRICING, resolveCatalogPrice, resolveLifetimePrice, type PayablePlanTier } from '@/lib/pricing';
+import { resolveAgendaPrice, resolveCatalogPrice, resolveLifetimePrice, type PayablePlanTier } from '@/lib/pricing';
 import { PlanSubscribeCard } from '@/components/billing/PlanSubscribeCard';
 
 interface SubscriptionSectionProps {
@@ -38,6 +38,14 @@ interface SubscriptionSectionProps {
    *  "cancelar", sem nada a recuperar — o avulso já é dela pra sempre,
    *  pagamento único). */
   catalogBillingMode?: 'avulso' | 'recorrente' | 'anual';
+  /** Se o Plano Agenda dessa cliente é vendido mensal (padrão) ou anual
+   *  (2026-10-15) — mesma ideia de `catalogBillingMode`. */
+  agendaBillingMode?: 'recorrente' | 'anual';
+  /** Preço customizado do Plano Agenda — campo PRÓPRIO, separado de
+   *  `billingPriceOverride` (2026-10-15, achado real: compartilhar o mesmo
+   *  campo cobrava/mostrava o valor customizado do Catálogo no Agenda por
+   *  engano). */
+  agendaPriceOverride?: number | null;
   /** Preço customizado da conversão de Catálogo recorrente pra vitalício
    *  (Fase 28) — admin negocia por cliente. */
   lifetimePriceOverride?: number | null;
@@ -57,6 +65,8 @@ const ActivePlanCard: React.FC<{
   hasRealSubscription?: boolean;
   billingPriceOverride?: number | null;
   catalogBillingMode?: 'avulso' | 'recorrente' | 'anual';
+  agendaBillingMode?: 'recorrente' | 'anual';
+  agendaPriceOverride?: number | null;
   onCancel: () => void;
   onDowngradeToCatalogo?: () => void;
   loading: boolean;
@@ -68,6 +78,8 @@ const ActivePlanCard: React.FC<{
   hasRealSubscription,
   billingPriceOverride,
   catalogBillingMode,
+  agendaBillingMode,
+  agendaPriceOverride,
   onCancel,
   onDowngradeToCatalogo,
   loading,
@@ -78,12 +90,20 @@ const ActivePlanCard: React.FC<{
   // Catálogo recorrente usa o preço customizado por admin (mesmo campo do
   // avulso), nunca o padrão de tabela — ver nota acima do componente.
   // Sufixo "/mês" ou "/ano" conforme o modo (2026-10-15) — `catalogBillingMode`
-  // só vem 'anual' quando `tier === 'basico'`, nunca pro Agenda.
+  // só vem 'anual' quando `tier === 'basico'`, nunca pro Agenda. Pro Agenda,
+  // campo PRÓPRIO `agendaPriceOverride` (2026-10-15, separado do Catálogo —
+  // achado real: compartilhar o mesmo campo vazava preço de um plano pro
+  // outro) via `resolveAgendaPrice` — já sai com "/mês" ou "/ano" certo.
   const catalogPrice = resolveCatalogPrice(billingPriceOverride);
+  // Modo de cobrança desse tier específico — decide tanto o sufixo do preço
+  // quanto o rótulo "Mensalidade"/"Anuidade" logo abaixo (achado real,
+  // 2026-10-15: card mostrava "Mensalidade"/"R$139,90/mês" fixo mesmo pra
+  // quem tinha pago o Catálogo ANUAL).
+  const billingCycleMode = tier === 'basico' ? catalogBillingMode : agendaBillingMode;
   const pricing =
     tier === 'basico'
-      ? { price: catalogPrice.price, label: `${catalogPrice.label}${catalogBillingMode === 'anual' ? '/ano' : '/mês'}` }
-      : PLAN_PRICING.plus;
+      ? { price: catalogPrice.price, label: `${catalogPrice.label}${billingCycleMode === 'anual' ? '/ano' : '/mês'}` }
+      : resolveAgendaPrice(agendaBillingMode || 'recorrente', agendaPriceOverride);
   // Ela upgradeou pro Agenda a partir de um Catálogo recorrente — mensal ou
   // anual (mesma assinatura reaproveitada, nunca duas em paralelo) —
   // cancelar "tudo" de uma vez perderia também o Catálogo que ela paga à
@@ -113,7 +133,7 @@ const ActivePlanCard: React.FC<{
 
       <div className="bg-surface rounded-xl px-4 py-3 mb-4 border border-rose-200/60">
         <p className="text-[13px] font-bold uppercase tracking-wider text-rose-700/70 mb-0.5">
-          {isOneTime ? 'Status' : 'Mensalidade'}
+          {isOneTime ? 'Status' : billingCycleMode === 'anual' ? 'Anuidade' : 'Mensalidade'}
         </p>
         <p className="font-serif-pro font-bold text-lg text-rose-800 whitespace-nowrap">
           {manualPlan ? 'Sem cobrança' : isOneTime ? 'Ativo ✓ - Sem mensalidade' : pricing.label}
@@ -205,6 +225,8 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
   hasRealSubscription,
   billingPriceOverride,
   catalogBillingMode,
+  agendaBillingMode,
+  agendaPriceOverride,
   lifetimePriceOverride,
 }) => {
   const router = useRouter();
@@ -273,6 +295,8 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
         hasRealSubscription={hasRealSubscription}
         billingPriceOverride={billingPriceOverride}
         catalogBillingMode={catalogBillingMode}
+        agendaBillingMode={agendaBillingMode}
+        agendaPriceOverride={agendaPriceOverride}
         onCancel={handleCancel}
         onDowngradeToCatalogo={handleDowngradeToCatalogo}
         loading={loading}
@@ -290,6 +314,7 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
           manualPlan={manualPlan}
           hasRealSubscription={hasRealSubscription}
           billingPriceOverride={billingPriceOverride}
+          catalogBillingMode={catalogBillingMode}
           onCancel={handleCancel}
           loading={loading}
           error={error}
@@ -301,13 +326,18 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
           {/* Quem já tem uma assinatura real por trás do Catálogo (recorrente,
            *  Fase 27) troca de tier na MESMA assinatura — upgrade instantâneo,
            *  sem cobrança nova hoje (`isUpgrade` em PlanSubscribeCard). Quem
-           *  é avulso precisa mesmo de uma assinatura nova pro Agenda. */}
+           *  é avulso precisa mesmo de uma assinatura nova pro Agenda. Preço
+           *  mostrado ANTES de pagar (mensal ou anual, 2026-10-15) — sem
+           *  isso sempre mostrava R$34,90/mês fixo, mesmo pra quem o admin
+           *  marcou Agenda anual. */}
           <PlanSubscribeCard
             slug={slug}
             plan="plus"
             billingEmail={billingEmail}
             billingCpfCnpj={billingCpfCnpj}
             showMethodChoice={!hasRealSubscription}
+            priceOverride={resolveAgendaPrice(agendaBillingMode || 'recorrente', agendaPriceOverride)}
+            billingMode={agendaBillingMode}
           />
         </div>
         {/* Autoatendimento (Fase 28, + anual em 2026-10-15): só faz sentido
@@ -348,7 +378,7 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
   const reofferPriceOverride =
     reofferTier === 'basico'
       ? { price: reofferCatalogPrice.price, label: `${reofferCatalogPrice.label}${reofferSuffix}` }
-      : undefined;
+      : resolveAgendaPrice(agendaBillingMode || 'recorrente', agendaPriceOverride);
 
   return (
     <div className="flex flex-col gap-3">
@@ -369,7 +399,7 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
         billingEmail={billingEmail}
         billingCpfCnpj={billingCpfCnpj}
         priceOverride={reofferPriceOverride}
-        billingMode={reofferTier === 'basico' ? catalogBillingMode : undefined}
+        billingMode={reofferTier === 'basico' ? catalogBillingMode : agendaBillingMode}
       />
     </div>
   );

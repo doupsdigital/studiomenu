@@ -16,13 +16,14 @@ interface PlanSubscribeCardProps {
    *  assinante ativa (Básico → Plus): ali não tem cobrança nova, o método
    *  atual continua valendo. */
   showMethodChoice?: boolean;
-  /** Preço customizado do Plano Catálogo pra essa cliente (admin), em vez do
-   *  padrão de `PLAN_PRICING.basico`. Só usado quando `plan === 'basico'`. */
+  /** Preço customizado pra essa cliente (admin), em vez do padrão de
+   *  `PLAN_PRICING[plan]` — Catálogo (`billing_price_override`) ou Agenda
+   *  (campo próprio `agenda_price_override`, 2026-10-15). */
   priceOverride?: { price: number; label: string };
-  /** Só relevante quando `plan === 'basico'` (Fase 27, + 'anual' em
-   *  2026-10-15): se o admin marcou esse catálogo pra vender o Plano
-   *  Catálogo como assinatura (mensal ou anual) em vez de pagamento único
-   *  (padrão 'avulso'). Decide só o texto do botão aqui — quem monta o
+  /** Pro Catálogo (Fase 27, + 'anual' em 2026-10-15): se o admin marcou
+   *  pagamento único (padrão 'avulso') ou assinatura (mensal/anual). Pro
+   *  Agenda (2026-10-15, sempre assinatura): só 'recorrente'/'anual', nunca
+   *  'avulso'. Decide só o texto do botão aqui (`isOneTime`) — quem monta o
    *  preço com "/mês" ou "/ano" é quem chama (`priceOverride.label`). */
   billingMode?: 'avulso' | 'recorrente' | 'anual';
   /** Autoatendimento pra converter Catálogo recorrente em vitalício (Fase
@@ -323,8 +324,11 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
           </ul>
           {isUpgrade && (
             <p className="text-sm text-white/80 leading-snug mb-5">
-              A partir da próxima mensalidade
-              {upgradeNextDue ? ` (${formatShortDate(upgradeNextDue)})` : ''}, o valor passa a ser {pricing.label}.
+              {/* "A partir de {data}" em vez de "próxima mensalidade"
+               *  (2026-10-15) — numa troca de ciclo de cobrança (ex: Catálogo
+               *  anual → Agenda mensal) essa data pode ficar meses à frente,
+               *  "mensalidade" soaria estranho. */}
+              A partir {upgradeNextDue ? `de ${formatShortDate(upgradeNextDue)}` : 'da próxima cobrança'}, o valor passa a ser {pricing.label}.
             </p>
           )}
           <button
@@ -489,7 +493,11 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
           )}
           {isUpgrade && (
             <p className="text-sm text-ink-soft text-center leading-snug">
-              Ao assinar, seu plano evolui automaticamente. O novo valor só vale a partir da próxima mensalidade.
+              {/* "próxima cobrança" em vez de "próxima mensalidade" (achado em
+               *  auditoria, 2026-10-15) — numa troca de ciclo (ex: Catálogo
+               *  anual → Agenda mensal) o crédito pode empurrar a próxima
+               *  cobrança por meses, "mensalidade" prometeria um prazo errado. */}
+              Ao assinar, seu plano evolui automaticamente. O novo valor só vale a partir da próxima cobrança.
             </p>
           )}
           {showMethodChoice && (

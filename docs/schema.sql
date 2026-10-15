@@ -80,6 +80,23 @@ CREATE TABLE IF NOT EXISTS public.orders (
     -- mesma ideia de 'recorrente', só que a assinatura Asaas nasce com
     -- cycle=YEARLY em vez de MONTHLY (ver createSubscription, src/lib/asaas.ts).
     catalog_billing_mode TEXT NOT NULL DEFAULT 'avulso' CHECK (catalog_billing_mode IN ('avulso', 'recorrente', 'anual')),
+    -- Mesma ideia da coluna acima, só que pro Plano Agenda (2026-10-15,
+    -- docs/migrations/2026-10-15_agenda_anual_e_troca_ciclo.sql) — sem 'avulso'
+    -- (Agenda nunca foi pagamento único). Ver `resolveBillingCycle` em
+    -- src/lib/pricing.ts.
+    agenda_billing_mode TEXT NOT NULL DEFAULT 'recorrente' CHECK (agenda_billing_mode IN ('recorrente', 'anual')),
+    -- Preço customizado do Plano Agenda — campo PRÓPRIO, separado de
+    -- `billing_price_override` (2026-10-15, docs/migrations/2026-10-15_agenda_price_override.sql).
+    -- Achado real testando: compartilhar o mesmo campo do Catálogo cobrava o
+    -- valor customizado do Catálogo no Agenda por engano, sempre que fosse
+    -- menor que o preço de tabela do Agenda. Ver `resolveAgendaPrice` em
+    -- src/lib/pricing.ts.
+    agenda_price_override NUMERIC(10,2) CHECK (agenda_price_override IS NULL OR agenda_price_override >= 5),
+    -- Trava de idempotência pra troca de ciclo de cobrança
+    -- (`switchSubscriptionCycle`, src/lib/billing-service.ts) — evita
+    -- duplo-clique/retry criando 2 assinaturas novas órfãs. Liberada (volta
+    -- a NULL) no fim da operação, com ou sem erro.
+    plan_switch_lock_at TIMESTAMPTZ DEFAULT NULL,
     -- Autoatendimento pra converter Catálogo recorrente em vitalício (Fase 28,
     -- docs/migrations/2026-10-07_catalogo_vitalicio.sql) — id do pagamento
     -- avulso da Asaas enquanto aguarda confirmação (evita duplicar cobrança

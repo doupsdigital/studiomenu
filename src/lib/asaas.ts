@@ -72,6 +72,9 @@ export interface AsaasSubscription {
   status: string;
   /** Data (YYYY-MM-DD) da próxima cobrança da assinatura. */
   nextDueDate?: string;
+  /** Valor atual cobrado por ciclo — fonte de verdade (não o nosso banco)
+   *  pro cálculo de crédito na troca de ciclo de cobrança (2026-10-15). */
+  value?: number;
 }
 
 export interface AsaasPayment {
@@ -127,10 +130,16 @@ export async function createSubscription(input: {
   description: string;
   billingType?: AsaasBillingType;
   /** Padrão MONTHLY (Plano Agenda, Catálogo recorrente mensal) — YEARLY pro
-   *  Catálogo vendido como assinatura anual (2026-10-15). */
+   *  Catálogo/Agenda vendidos como assinatura anual (2026-10-15). */
   cycle?: AsaasCycle;
+  /** Data (YYYY-MM-DD) da 1ª cobrança — padrão hoje. Usado na troca de
+   *  ciclo de cobrança (2026-10-15, `switchSubscriptionCycle` em
+   *  `billing-service.ts`) pra adiar a 1ª cobrança da assinatura nova
+   *  proporcionalmente ao que ainda não foi "gasto" na assinatura antiga,
+   *  em vez de cobrar de novo algo que ela já pagou. */
+  nextDueDateOverride?: string;
 }): Promise<AsaasSubscription> {
-  const nextDueDate = new Date().toISOString().slice(0, 10);
+  const nextDueDate = input.nextDueDateOverride ?? new Date().toISOString().slice(0, 10);
   return asaasRequest<AsaasSubscription>('POST', '/subscriptions', {
     customer: input.customerId,
     billingType: input.billingType ?? 'PIX',

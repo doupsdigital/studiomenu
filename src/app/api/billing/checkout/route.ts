@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { isProfessionalRequestAuthorized } from '@/lib/professional-session';
-import { PLAN_PRICING, resolveCatalogPrice, type PayablePlanTier } from '@/lib/pricing';
-import { activateSubscription, buildPaymentResponse } from '@/lib/billing-service';
+import { PLAN_PRICING, resolveAgendaPrice, resolveBillingCycle, resolveCatalogPrice, type PayablePlanTier } from '@/lib/pricing';
+import { activateSubscription, buildPaymentResponse, switchSubscriptionCycle } from '@/lib/billing-service';
 import {
   AsaasConfigError,
   AsaasApiError,
@@ -65,7 +65,9 @@ export async function POST(request: Request) {
 
     const { data: order, error: orderErr } = await supabaseAdmin
       .from('orders')
-      .select('id, client_name, plan_tier, subscription_status, asaas_customer_id, asaas_subscription_id, payment_method, billing_price_override, catalog_billing_mode')
+      .select(
+        'id, client_name, plan_tier, subscription_status, asaas_customer_id, asaas_subscription_id, payment_method, billing_price_override, catalog_billing_mode, agenda_billing_mode, agenda_price_override'
+      )
       .eq('slug', normalizedSlug)
       .single();
 
@@ -89,48 +91,64 @@ export async function POST(request: Request) {
 
     const pricing = PLAN_PRICING[plan];
 
-    // Plano Catálogo (pagamento único): preço customizável livremente pelo
-    // admin por cliente, sem teto (resolveCatalogPrice, src/lib/pricing.ts).
-    // Plano Agenda (assinatura): `billing_price_override` continua sendo só
-    // um desconto de teste, nunca acima do preço de tabela — comportamento
-    // de sempre, intocado.
-    let price: number;
-    if (plan === 'basico') {
-      price = resolveCatalogPrice(order.billing_price_override).price;
-    } else {
-      const override = order.billing_price_override === null ? null : Number(order.billing_price_override);
-      price = override !== null && Number.isFinite(override) && override >= 5 && override <= pricing.price ? override : pricing.price;
-    }
+    // Plano Catálogo (pagamento único/recorrente/anual): preço customizável
+    // livremente pelo admin por cliente, sem teto (resolveCatalogPrice,
+    // src/lib/pricing.ts). Plano Agenda (sempre assinatura, mensal ou anual
+    // desde 2026-10-15): `agenda_price_override` (campo PRÓPRIO, separado do
+    // `billing_price_override` do Catálogo desde 2026-10-15 — achado real
+    // testando, os dois campos compartilhados vazavam preço de um plano pro
+    // outro) continua sendo só um desconto, nunca acima do preço base do modo.
+    const price =
+      plan === 'basico'
+        ? resolveCatalogPrice(order.billing_price_override).price
+        : resolveAgendaPrice(order.agenda_billing_mode === 'anual' ? 'anual' : 'recorrente', order.agenda_price_override).price;
 
     // Já tem assinatura Asaas e é um tier DIFERENTE do atual → troca de
-    // plano (ex: Básico → Plus): atualiza valor/descrição em vez de criar
-    // uma assinatura nova, evitando cobrança duplicada. Confirmado contra o
-    // sandbox real (Fase 19): um PUT /subscriptions NÃO gera cobrança nova
-    // nem afeta a do ciclo atual (já paga) — o novo valor só vale a partir
-    // do próximo vencimento. Sem pagamento novo pra confirmar, não dá pra
-    // esperar o webhook de sempre; como ela já é assinante paga validada
-    // (não uma desconhecida tentando ganhar acesso de graça), ativa o novo
-    // tier direto aqui.
+    // plano (ex: Básico → Plus, ou o contrário). Se o CICLO não muda
+    // (mensal→mensal ou anual→anual), atualiza valor/descrição na mesma
+    // assinatura em vez de criar uma nova, evitando cobrança duplicada.
+    // Confirmado contra o sandbox real (Fase 19): um PUT /subscriptions NÃO
+    // gera cobrança nova nem afeta a do ciclo atual (já paga) — o novo valor
+    // só vale a partir do próximo vencimento. Sem pagamento novo pra
+    // confirmar, não dá pra esperar o webhook de sempre; como ela já é
+    // assinante paga validada (não uma desconhecida tentando ganhar acesso
+    // de graça), ativa o novo tier direto aqui.
     //
-    // LIMITAÇÃO CONHECIDA (2026-10-15, achado implementando o Catálogo
-    // anual): este PUT só troca valor/descrição, nunca o `cycle` — uma
-    // cliente que evoluir de Catálogo ANUAL pro Plano Agenda continua sendo
-    // cobrada 1x/ano, só que no valor do Agenda (R$34,90), em vez de
-    // mensalmente. Fora do escopo pedido agora; se for oferecer esse
-    // upgrade pra assinantes anuais, revisitar aqui (provavelmente cancelar
-    // a assinatura anual e criar uma nova mensal, em vez de reaproveitar).
+    // Se o ciclo MUDA (ex: Catálogo anual → Agenda mensal, ou o contrário,
+    // 2026-10-15): o PUT não dá conta (nunca troca `cycle`) — cria uma
+    // assinatura nova com crédito proporcional ao que não foi "gasto" na
+    // antiga (`switchSubscriptionCycle`, src/lib/billing-service.ts).
     if (order.asaas_subscription_id && order.plan_tier !== plan && order.plan_tier !== 'catalog') {
-      const updated = await updateSubscription({ subscriptionId: order.asaas_subscription_id, value: price, description: pricing.description });
-      // `pending_lifetime_payment_id` limpo junto (achado em auditoria, Fase
-      // 28): trocar de tier invalida qualquer conversão pra vitalício que
-      // tivesse ficado pendente (Pix gerado, não pago) — sem isso, pagar
-      // aquele Pix velho mais tarde cancelaria essa assinatura nova sem
-      // nenhum motivo, via `activateSubscription`.
-      await supabaseAdmin.from('orders').update({ pending_plan_tier: plan, pending_lifetime_payment_id: null }).eq('id', order.id);
-      await activateSubscription(order.id);
-      // `nextDueDate` só alimenta o aviso "a partir de dd/mm o valor passa a
-      // ser X" no modal de sucesso — se o Asaas não devolver, o aviso sai sem data.
-      return NextResponse.json({ success: true, upgraded: true, nextDueDate: updated.nextDueDate ?? null });
+      const oldCycle = resolveBillingCycle(order.plan_tier, order);
+      const newCycle = resolveBillingCycle(plan, order);
+
+      if (oldCycle === newCycle) {
+        const updated = await updateSubscription({ subscriptionId: order.asaas_subscription_id, value: price, description: pricing.description });
+        // `pending_lifetime_payment_id` limpo junto (achado em auditoria, Fase
+        // 28): trocar de tier invalida qualquer conversão pra vitalício que
+        // tivesse ficado pendente (Pix gerado, não pago) — sem isso, pagar
+        // aquele Pix velho mais tarde cancelaria essa assinatura nova sem
+        // nenhum motivo, via `activateSubscription`.
+        await supabaseAdmin.from('orders').update({ pending_plan_tier: plan, pending_lifetime_payment_id: null }).eq('id', order.id);
+        await activateSubscription(order.id);
+        // `nextDueDate` só alimenta o aviso "a partir de dd/mm o valor passa a
+        // ser X" no modal de sucesso — se o Asaas não devolver, o aviso sai sem data.
+        return NextResponse.json({ success: true, upgraded: true, nextDueDate: updated.nextDueDate ?? null });
+      }
+
+      const switched = await switchSubscriptionCycle({
+        orderId: order.id,
+        customerId: order.asaas_customer_id,
+        oldSubscriptionId: order.asaas_subscription_id,
+        oldSubscriptionStatus: order.subscription_status,
+        oldCycle,
+        newCycle,
+        newValue: price,
+        newDescription: pricing.description,
+        newBillingType: BILLING_TYPE[method],
+        newPendingPlanTier: plan,
+      });
+      return NextResponse.json({ success: true, upgraded: true, nextDueDate: switched.nextDueDate });
     }
 
     // Reaproveita uma assinatura já criada e ainda não paga (ex: a
@@ -207,9 +225,11 @@ export async function POST(request: Request) {
       return buildPaymentResponse(payment, method);
     }
 
-    // Só o Plano Catálogo pode nascer anual (escolha do admin, por cliente,
-    // 2026-10-15) — o Plano Agenda (`plus`) sempre é mensal.
-    const cycle = plan === 'basico' && order.catalog_billing_mode === 'anual' ? 'YEARLY' : 'MONTHLY';
+    // Catálogo e Agenda podem nascer mensal ou anual (escolha do admin, por
+    // cliente, 2026-10-15) — `resolveBillingCycle` é a mesma função usada
+    // pra decidir cobrança de verdade e pra exibir preço antes de pagar,
+    // nunca diverge uma da outra.
+    const cycle = resolveBillingCycle(plan, order);
     const subscription = await createSubscription({
       customerId: customer.id,
       value: price,

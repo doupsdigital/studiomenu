@@ -8,7 +8,7 @@ import { CatalogReadyPreview } from './CatalogReadyPreview';
 import { ConfettiBurst } from './ConfettiBurst';
 import { PlanSubscribeCard } from '@/components/billing/PlanSubscribeCard';
 import { ProductTour } from '@/components/tour/ProductTour';
-import { PLAN_PRICING, resolveCatalogPrice } from '@/lib/pricing';
+import { resolveAgendaPrice, resolveCatalogPrice } from '@/lib/pricing';
 import type { ProfessionalOrderSummary } from '@/lib/professional-app-service';
 
 interface FirstContactScreenProps {
@@ -46,6 +46,10 @@ export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order })
   const catalogDisplayPrice = catalogBillingSuffix
     ? { price: catalogPrice.price, label: `${catalogPrice.label}${catalogBillingSuffix}` }
     : catalogPrice;
+  // Campo PRÓPRIO do Agenda (`agenda_price_override`, 2026-10-15) — não o
+  // `billing_price_override` do Catálogo, senão vaza o preço de um plano pro
+  // outro (achado real testando). Rótulo já sai com "/mês" ou "/ano" certo.
+  const agendaDisplayPrice = resolveAgendaPrice(order.agenda_billing_mode, order.agenda_price_override);
   const [highlightView, setHighlightView] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
 
@@ -70,7 +74,7 @@ export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order })
         ? {
             target: '[data-tour="fc-subscribe"]',
             title: 'Assine pra liberar o agendamento',
-            content: `${PLAN_PRICING.plus.label}, sem compromisso — cancele quando quiser. Suas clientes escolhem o horário sozinhas, sem trocar mensagem.`,
+            content: `${agendaDisplayPrice.label}, sem compromisso — cancele quando quiser. Suas clientes escolhem o horário sozinhas, sem trocar mensagem.`,
           }
         : {
             target: '[data-tour="fc-subscribe"]',
@@ -78,7 +82,7 @@ export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order })
             content: `${catalogDisplayPrice.label} — é só preencher e pagar por Pix ou cartão de crédito.`,
           },
     ],
-    [isAgendaOffer, catalogDisplayPrice.label]
+    [isAgendaOffer, catalogDisplayPrice.label, agendaDisplayPrice.label]
   );
 
   return (
@@ -109,7 +113,14 @@ export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order })
         )}
 
         {isAgendaOffer ? (
-          <PlanSubscribeCard slug={order.slug} plan="plus" billingEmail={order.billing_email} billingCpfCnpj={order.billing_cpf_cnpj} />
+          <PlanSubscribeCard
+            slug={order.slug}
+            plan="plus"
+            billingEmail={order.billing_email}
+            billingCpfCnpj={order.billing_cpf_cnpj}
+            priceOverride={agendaDisplayPrice}
+            billingMode={order.agenda_billing_mode}
+          />
         ) : (
           <PlanSubscribeCard
             slug={order.slug}
