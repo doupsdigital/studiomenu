@@ -1776,6 +1776,56 @@
   background: #f2cad5;
 }
 
+/* Dicas de interação (re-port do `HeroMockup.tsx`, pedido real,
+ *  2026-10-16) — aqui o iframe é a superfície REAL de teste (não uma
+ *  vitrine estática), então essas dicas só reforçam que dá pra
+ *  rolar/tocar. `pointer-events: none` garante que nunca bloqueiam o
+ *  toque/scroll de verdade no iframe.
+ *
+ *  Vivem em `.lp-mockup-modal-phone` (a MOLDURA), não em
+ *  `.lp-mockup-modal-scaler` (reforçado depois de feedback real,
+ *  2026-10-16 — a 1ª tentativa ficava dentro da tela, por cima da
+ *  foto/texto, confundindo com o conteúdo). `left`/`right` negativos
+ *  penduram elas um pouco pra fora da tela, coladas na borda/bezel, igual
+ *  era no mockup antigo da Hero (`.lp-phone-left-indicator`/
+ *  `.lp-phone-scroll-indicator`). O deslocamento é propositalmente
+ *  pequeno (16px, não os ~50-94px da Hora) — a margem escura ao redor do
+ *  celular aqui é bem mais apertada (padding do overlay, que cai pra só
+ *  26px no mobile em `.lp-mockup-modal-overlay`), então um valor maior
+ *  cortaria a dica pra fora da tela em aparelhos pequenos. */
+.lp-mockup-hint {
+  position: absolute;
+  z-index: 40;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.lp-mockup-hint--swipe {
+  left: -16px;
+  top: 50%;
+  transform: translateY(-50%);
+  animation: lp-mockup-hint-in-swipe 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.lp-mockup-hint--photo {
+  right: -16px;
+  top: 32%;
+  animation: lp-mockup-hint-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes lp-mockup-hint-in {
+  from { opacity: 0; transform: scale(0.85); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes lp-mockup-hint-in-swipe {
+  from { opacity: 0; transform: translateY(-50%) scale(0.85); }
+  to { opacity: 1; transform: translateY(-50%) scale(1); }
+}
+
 /* Botão de fechar bem evidente (pedido real, 2026-10-14 — o anterior era
  *  discreto demais) — círculo branco sólido, encostado no canto da moldura. */
 .lp-mockup-modal-close {
