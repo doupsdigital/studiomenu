@@ -62,6 +62,7 @@ export function MockupModal({ showcaseSlug, isOpen, onClose }: MockupModalProps)
   const [scale, setScale] = useState(1);
   const [screen, setScreen] = useState<MockupScreen>('cover');
   const [detailModalOpen, setDetailModalOpen] = useState(false);
+  const [overlayModalOpen, setOverlayModalOpen] = useState(false);
   const [hintsReady, setHintsReady] = useState(false);
 
   useEffect(() => {
@@ -71,6 +72,14 @@ export function MockupModal({ showcaseSlug, isOpen, onClose }: MockupModalProps)
         // enquanto ele está por cima do card, reaparece ao fechar (ver
         // `ProcedureGrid.tsx`).
         setDetailModalOpen(Boolean(event.data.open));
+        return;
+      }
+      if (event.data?.type === 'VITRINE_OVERLAY_MODAL') {
+        // Modal de agendamento/WhatsApp simulado por cima do detalhe
+        // (pedido real, 2026-10-16) — mensagem própria, independente da
+        // acima, pra não reaparecer por um instante entre o detalhe fechar
+        // e esse abrir (ver `CatalogLayout.tsx`).
+        setOverlayModalOpen(Boolean(event.data.open));
         return;
       }
       if (event.data?.type !== 'VITRINE_SCREEN_CHANGE') return;
@@ -173,7 +182,7 @@ export function MockupModal({ showcaseSlug, isOpen, onClose }: MockupModalProps)
          *  de `.lp-mockup-modal-phone` — `left`/`right` negativos penduram
          *  elas um pouco pra fora da tela, em cima do bezel/fundo escuro,
          *  igual era no mockup antigo da Hero. */}
-        {hintsReady && screen !== 'other' && !detailModalOpen && (
+        {hintsReady && screen !== 'other' && !detailModalOpen && !overlayModalOpen && (
           <div className="lp-mockup-hint lp-mockup-hint--swipe" aria-hidden="true">
             {screen === 'catalog' ? (
               <>

@@ -110,6 +110,20 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
   // Par do agendaDemo pro modo "Básico" do showroom — ver FakeWhatsappScreen.
   const [fakeWhatsappItem, setFakeWhatsappItem] = useState<ProcedureItem | null>(null);
 
+  // Avisa o pai (mockup/modal de teste da landing page) se algum desses 2
+  // modais de agendamento está aberto — pedido real, 2026-10-16: fechar o
+  // modal de detalhe do procedimento (`ProcedureGrid.tsx`, que já avisa o
+  // seu próprio estado) já reaparecia a dica "Clique nos cards" ANTES de um
+  // desses abrir por cima dele (ex: tocar "Agendar" fecha o detalhe e abre
+  // a simulação de WhatsApp). Mensagem própria (não a mesma do detalhe) —
+  // o pai combina as duas, evita depender da ordem de render entre
+  // componentes diferentes pra não reaparecer achando de vista por um
+  // instante.
+  useEffect(() => {
+    if (window.parent === window) return;
+    window.parent.postMessage({ type: 'VITRINE_OVERLAY_MODAL', open: Boolean(bookingItem || fakeWhatsappItem) }, '*');
+  }, [bookingItem, fakeWhatsappItem]);
+
   // Toast discreto pra cada edição local (feedback imediato antes de "Salvar")
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const showToast = (text: string) => {
