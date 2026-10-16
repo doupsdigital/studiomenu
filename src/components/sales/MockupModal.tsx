@@ -61,10 +61,18 @@ export function MockupModal({ showcaseSlug, isOpen, onClose }: MockupModalProps)
   const overlayRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
   const [screen, setScreen] = useState<MockupScreen>('cover');
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [hintsReady, setHintsReady] = useState(false);
 
   useEffect(() => {
     function handleMessage(event: MessageEvent) {
+      if (event.data?.type === 'VITRINE_DETAIL_MODAL') {
+        // Modal de detalhe do procedimento (pedido real, 2026-10-16) — some
+        // enquanto ele está por cima do card, reaparece ao fechar (ver
+        // `ProcedureGrid.tsx`).
+        setDetailModalOpen(Boolean(event.data.open));
+        return;
+      }
       if (event.data?.type !== 'VITRINE_SCREEN_CHANGE') return;
       const label = String(event.data.label || '').toLowerCase();
       if (label.includes('capa') || label.includes('hero')) {
@@ -165,7 +173,7 @@ export function MockupModal({ showcaseSlug, isOpen, onClose }: MockupModalProps)
          *  de `.lp-mockup-modal-phone` — `left`/`right` negativos penduram
          *  elas um pouco pra fora da tela, em cima do bezel/fundo escuro,
          *  igual era no mockup antigo da Hero. */}
-        {hintsReady && screen !== 'other' && (
+        {hintsReady && screen !== 'other' && !detailModalOpen && (
           <div className="lp-mockup-hint lp-mockup-hint--swipe" aria-hidden="true">
             {screen === 'catalog' ? (
               <>
