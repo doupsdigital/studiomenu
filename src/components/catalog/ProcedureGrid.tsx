@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, GripVertical } from 'lucide-react';
 import {
   DndContext,
@@ -148,6 +148,17 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
   layoutSwitcher,
 }) => {
   const [selectedProcedure, setSelectedProcedure] = useState<ProcedureItem | null>(null);
+
+  // Avisa o pai (mockup/modal de teste da landing page) se o modal de
+  // detalhe do procedimento está aberto ou não — pedido real, 2026-10-16:
+  // a dica "Clique nos cards" (`MockupModal.tsx`) precisa sumir enquanto
+  // esse modal está por cima, e reaparecer ao fechar. Mesmo padrão de
+  // `window.parent.postMessage` já usado em `ShowcaseClient.tsx` pro
+  // indicador de deslize/toque.
+  useEffect(() => {
+    if (window.parent === window) return;
+    window.parent.postMessage({ type: 'VITRINE_DETAIL_MODAL', open: Boolean(selectedProcedure) }, '*');
+  }, [selectedProcedure]);
 
   // Extrair categorias únicas existentes (incluindo categorias vazias recém-criadas)
   const categories = useMemo(() => {
