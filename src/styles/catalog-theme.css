@@ -1389,13 +1389,25 @@ button {
   gap: 14px;
 }
 
-.secao-contato__titulo {
+/* Repete STUDIO/Nome da Capa (pedido real, 2026-10-19) — reaproveita as
+ *  classes de `HeaderCover.tsx` (ver `CTASection.tsx`), mas aqui dentro
+ *  `.hero__titulo` perde a margem grande que tem na Capa (calibrada pra
+ *  ficar embaixo do selo "Seja Bem Vinda" lá) — nessa tela o espaçamento já
+ *  vem do `gap` de `.secao-contato__corpo` acima, então a margem extra só
+ *  afastava "STUDIO" do nome sem motivo. */
+.secao-contato__studio-repeat .hero__titulo {
+  gap: 2px;
   margin: 0;
+}
+
+.secao-contato__titulo {
+  margin: 10px 0 0;
   font-family: 'Fraunces', Georgia, serif;
   font-size: 38px;
   line-height: 1.08;
   font-weight: 400;
   color: var(--contact-title-color);
+  text-align: center;
 }
 
 .secao-contato__titulo em {
@@ -1410,6 +1422,7 @@ button {
   max-width: 320px;
   line-height: 1.45;
 }
+
 
 .secao-contato__acoes {
   display: flex;
