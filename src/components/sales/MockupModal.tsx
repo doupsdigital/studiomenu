@@ -14,7 +14,7 @@ interface MockupModalProps {
  *  esse aviso — o iframe é a superfície real de teste (não uma vitrine
  *  estática), mas nada sinalizava que dava pra rolar/tocar nela, então as
  *  dicas ajudam o primeiro toque. */
-type MockupScreen = 'cover' | 'catalog' | 'instructions' | 'other';
+type MockupScreen = 'cover' | 'catalog' | 'instructions' | 'contact' | 'other';
 
 /** Tamanho de "design" do catálogo — mesmo valor usado pelo mockup da Hero
  *  (`.lp-testdrive-screen-scaler`). O iframe SEMPRE renderiza nesse
@@ -92,6 +92,10 @@ export function MockupModal({ showcaseSlug, isOpen, onClose }: MockupModalProps)
         // Orientações (pedido real, 2026-10-16) — mostra "DESLIZE" de novo
         // (igual a capa), mas sem "Sua foto aqui" (só faz sentido na capa).
         setScreen('instructions');
+      } else if (label.includes('contato')) {
+        // Última tela (pedido real, 2026-10-19) — "ponte pós-demonstração":
+        // mostra o CTA pra ver os planos (ver JSX mais abaixo).
+        setScreen('contact');
       } else {
         setScreen('other');
       }
@@ -150,6 +154,20 @@ export function MockupModal({ showcaseSlug, isOpen, onClose }: MockupModalProps)
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
+  /* "Ponte pós-demonstração" (pedido real, 2026-10-19) — fecha o modal e
+   *  rola a página (não o iframe) até a seção de planos. `#oferta` e o
+   *  modal vivem no mesmo documento (só o catálogo em si está no iframe),
+   *  então `getElementById` funciona direto, sem precisar de `postMessage`.
+   *  Atraso pequeno antes de rolar — dá tempo da transição de fechar
+   *  (`0.22s` em `.lp-mockup-modal-overlay`) acontecer primeiro, senão a
+   *  página pula embaixo do modal ainda visível. */
+  function handleViewPlans() {
+    onClose();
+    setTimeout(() => {
+      document.getElementById('oferta')?.scrollIntoView({ behavior: 'smooth' });
+    }, 300);
+  }
+
   return (
     <div
       className={`lp-mockup-modal-overlay${isOpen ? ' is-open' : ''}`}
@@ -172,6 +190,22 @@ export function MockupModal({ showcaseSlug, isOpen, onClose }: MockupModalProps)
         <div className="lp-mockup-modal-screen">
           <div className="lp-mockup-modal-scaler" style={{ transform: `scale(${scale})` }}>
             <iframe src={`/c/showcase/${showcaseSlug}`} title="Teste o Menu Digital StudioMenu" />
+
+            {/* Ponte pós-demonstração (pedido real, 2026-10-19) — na última
+             *  tela (Contato), em vez de deixar o fluxo morrer aí, oferece
+             *  ir direto pros planos. Diferente das dicas acima (só
+             *  decorativas, `pointer-events: none`), este é um botão de
+             *  verdade — fica dentro do scaler de propósito, pra ter
+             *  exatamente o tamanho certo em qualquer celular. */}
+            {screen === 'contact' && !detailModalOpen && !overlayModalOpen && (
+              <button
+                type="button"
+                className="lp-btn lp-btn--whatsapp lp-mockup-cta-plans"
+                onClick={handleViewPlans}
+              >
+                👉 Gostou da demonstração? Ver planos e valores
+              </button>
+            )}
           </div>
         </div>
 
@@ -182,7 +216,7 @@ export function MockupModal({ showcaseSlug, isOpen, onClose }: MockupModalProps)
          *  de `.lp-mockup-modal-phone` — `left`/`right` negativos penduram
          *  elas um pouco pra fora da tela, em cima do bezel/fundo escuro,
          *  igual era no mockup antigo da Hero. */}
-        {hintsReady && screen !== 'other' && !detailModalOpen && !overlayModalOpen && (
+        {hintsReady && screen !== 'other' && screen !== 'contact' && !detailModalOpen && !overlayModalOpen && (
           <div className="lp-mockup-hint lp-mockup-hint--swipe" aria-hidden="true">
             {screen === 'catalog' ? (
               <>
