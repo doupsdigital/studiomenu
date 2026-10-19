@@ -68,7 +68,7 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     ),
     heroTitle: (
       <>
-        Você construiu um <span className="lp-text-gradient">Studio Incrível</span>. Mas ainda
+        Você já tem um <span className="lp-text-gradient">Studio Incrível</span>. Mas ainda
         manda Tabela de <span className="lp-text-wine">preços e fotos do seu trabalho</span>{' '}
         soltas no WhatsApp?
       </>
@@ -104,7 +104,7 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     ),
     heroTitle: (
       <>
-        Você construiu um <span className="lp-text-gradient">Studio Incrível</span>. Mas ainda
+        Você já tem um <span className="lp-text-gradient">Studio Incrível</span>. Mas ainda
         manda Tabela de <span className="lp-text-wine">preços e fotos do seu trabalho</span>{' '}
         soltas no WhatsApp?
       </>
@@ -147,7 +147,7 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     ),
     heroTitle: (
       <>
-        Você construiu um <span className="lp-text-gradient">Studio Incrível</span>. Mas ainda
+        Você já tem um <span className="lp-text-gradient">Studio Incrível</span>. Mas ainda
         manda Tabela de <span className="lp-text-wine">preços e fotos do seu trabalho</span>{' '}
         soltas no WhatsApp?
       </>
@@ -180,7 +180,7 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     ),
     heroTitle: (
       <>
-        Você construiu um <span className="lp-text-gradient">Studio Incrível</span>. Mas ainda
+        Você já tem um <span className="lp-text-gradient">Studio Incrível</span>. Mas ainda
         manda Tabela de <span className="lp-text-wine">preços e fotos do seu trabalho</span>{' '}
         soltas no WhatsApp?
       </>
