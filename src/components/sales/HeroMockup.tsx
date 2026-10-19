@@ -59,9 +59,41 @@ export function HeroMockup({ showcaseSlug = 'landingpage', onTap }: HeroMockupPr
           <div className="lp-testdrive-notch" />
           <div className={`lp-testdrive-screen${onTap ? ' lp-testdrive-screen--static' : ''}`}>
             <div className="lp-testdrive-screen-scaler">
-              <iframe src={`/c/showcase/${showcaseSlug}`} title="Prévia ao vivo do Menu Digital StudioMenu" tabIndex={-1} />
+              {/* `#catalogo` só na vitrine estática (pedido real, 2026-10-19)
+               *  — mostra direto a tela de serviços/cards, igual o
+               *  criativo do anúncio, pra continuidade visual (sem isso a
+               *  pessoa via a capa aqui e podia achar que clicou errado,
+               *  já que não sabia ainda que o menu tem uma capa). O modal
+               *  de teste completo (ao tocar) continua abrindo do zero
+               *  pela capa — usa outra URL, sem essa âncora. */}
+              <iframe
+                src={`/c/showcase/${showcaseSlug}${onTap ? '#catalogo' : ''}`}
+                title="Prévia ao vivo do Menu Digital StudioMenu"
+                tabIndex={-1}
+              />
             </div>
           </div>
+
+          {/* "Toque aqui" nos 2 lados DO CELULAR (pedido real, 2026-10-19;
+           *  2ª tentativa depois de feedback real — a versão com anel+mão
+           *  não agradou visualmente. Agora setas apontando pro mockup,
+           *  mesmo estilo/linguagem visual do indicador "Sua foto aqui"
+           *  mais abaixo (`lp-photo-point-icon`) — maiores e mais afastadas
+           *  do celular (fora de vez, não só pendurada na borda). */}
+          {onTap && (
+            <span className="lp-testdrive-tap-arrow lp-testdrive-tap-arrow--left" aria-hidden="true">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#c84b72" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 12h14m-7-7 7 7-7 7" />
+              </svg>
+            </span>
+          )}
+          {onTap && (
+            <span className="lp-testdrive-tap-arrow lp-testdrive-tap-arrow--right" aria-hidden="true">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#c84b72" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+              </svg>
+            </span>
+          )}
 
           {onTap && (
             <button type="button" className="lp-testdrive-tap-overlay" onClick={onTap}>

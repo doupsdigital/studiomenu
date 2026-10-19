@@ -534,6 +534,47 @@
   flex-shrink: 0;
 }
 
+/* "Toque aqui" nos 2 lados do mockup — setas apontando pro celular
+ *  (pedido real, 2026-10-19; 2ª tentativa depois de feedback real: a
+ *  versão com anel+mão não agradou visualmente). Mesma linguagem do
+ *  indicador "Sua foto aqui" mais abaixo (`lp-photo-point-icon`), só
+ *  maior e mais afastada — fora do celular de vez, não pendurada na
+ *  borda. `.lp-testdrive-phone` é `position: relative`, então ancora
+ *  nela. */
+.lp-testdrive-tap-arrow {
+  position: absolute;
+  top: 50%;
+  pointer-events: none;
+  z-index: 110;
+  filter: drop-shadow(0 3px 10px rgba(200, 75, 114, 0.4));
+}
+
+.lp-testdrive-tap-arrow--left {
+  left: -62px;
+  animation: lp-tap-arrow-bounce-right 1.4s infinite ease-in-out;
+}
+
+.lp-testdrive-tap-arrow--right {
+  right: -62px;
+  animation: lp-tap-arrow-bounce-left 1.4s infinite ease-in-out;
+}
+
+@keyframes lp-tap-arrow-bounce-right {
+  0%, 100% { transform: translateY(-50%) translateX(0); }
+  50% { transform: translateY(-50%) translateX(8px); }
+}
+
+@keyframes lp-tap-arrow-bounce-left {
+  0%, 100% { transform: translateY(-50%) translateX(0); }
+  50% { transform: translateY(-50%) translateX(-8px); }
+}
+
+@media (max-width: 480px) {
+  .lp-testdrive-tap-arrow svg { width: 26px; height: 26px; }
+  .lp-testdrive-tap-arrow--left { left: -36px; }
+  .lp-testdrive-tap-arrow--right { right: -36px; }
+}
+
 @media (min-width: 600px) {
   .lp-testdrive-phone { --lp-phone-w: 310px; --lp-phone-h: 671px; --lp-bezel: 7px; }
 }
