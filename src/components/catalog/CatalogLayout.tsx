@@ -39,6 +39,18 @@ interface CatalogLayoutProps {
   /** Repassado direto pro `ProcedureGrid` — ver o comentário lá. Só o
    *  showroom usa (pedido real, 2026-10-08). */
   layoutSwitcher?: { value: LayoutModel; onChange: (layout: LayoutModel) => void };
+  /** Não renderiza a seção de Capa — só a vitrine ESTÁTICA do mockup da
+   *  Hero usa isso (`HeroMockup.tsx`, pedido real, 2026-10-19), pra mostrar
+   *  direto a tela de serviços/cards, igual o criativo do anúncio.
+   *  Decisão de propósito: NÃO é feito rolando até a seção (3 tentativas
+   *  diferentes de "rolar até o catálogo" — âncora de URL, `scrollIntoView`
+   *  no load do iframe pelo pai, e `scrollIntoView` interno no próprio
+   *  documento — causaram o MESMO bug real em produção, 2026-10-19: a
+   *  página PAI (fora do iframe) rolava sozinha ao carregar. Não renderizar
+   *  a Capa elimina a necessidade de rolar — a tela de serviços já nasce
+   *  no topo, sem nenhuma chamada de scroll envolvida. Não muda nada em
+   *  catálogos reais nem no showroom normal — default `false`. */
+  hideCoverSection?: boolean;
 }
 
 export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
@@ -50,6 +62,7 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
   demoBookingOnly = false,
   themeSwitcher,
   layoutSwitcher,
+  hideCoverSection = false,
 }) => {
   const [showWelcomeOverlay, setShowWelcomeOverlay] = useState(isNewCatalog);
   const [catalogState, setCatalogState] = useState<CatalogOrderData>(data);
@@ -594,16 +607,20 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
 
       {/* 3. APP MOBILE CONTAINER COM SUPORTE A EDIÇÃO IN-PLACE */}
       <div className={`mosaico-app is-visible ${isLuxury ? 'is-luxury' : ''}`}>
-        {/* Hero Section (Foto da Capa, Nome da Profissional, Frase Hero) */}
-        <HeaderCover
-          data={catalogState}
-          categories={categories}
-          isEditMode={isEditMode}
-          onOpenCoverModal={() => setActiveModal('cover')}
-          onUpdateClientName={handleUpdateClientName}
-          onUpdateHeroPhrase={handleUpdateHeroPhrase}
-          themeSwitcher={themeSwitcher}
-        />
+        {/* Hero Section (Foto da Capa, Nome da Profissional, Frase Hero) —
+         *  não renderiza quando `hideCoverSection` (ver comentário na prop
+         *  acima). */}
+        {!hideCoverSection && (
+          <HeaderCover
+            data={catalogState}
+            categories={categories}
+            isEditMode={isEditMode}
+            onOpenCoverModal={() => setActiveModal('cover')}
+            onUpdateClientName={handleUpdateClientName}
+            onUpdateHeroPhrase={handleUpdateHeroPhrase}
+            themeSwitcher={themeSwitcher}
+          />
+        )}
 
         {/* Seção Mosaico/Clássico de Procedimentos */}
         <ProcedureGrid

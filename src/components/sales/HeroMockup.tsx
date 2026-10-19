@@ -59,7 +59,27 @@ export function HeroMockup({ showcaseSlug = 'landingpage', onTap }: HeroMockupPr
           <div className="lp-testdrive-notch" />
           <div className={`lp-testdrive-screen${onTap ? ' lp-testdrive-screen--static' : ''}`}>
             <div className="lp-testdrive-screen-scaler">
-              <iframe src={`/c/showcase/${showcaseSlug}`} title="Prévia ao vivo do Menu Digital StudioMenu" tabIndex={-1} />
+              {/* `?tela=catalogo` só na vitrine estática (pedido real,
+               *  2026-10-19) — mostra direto a tela de serviços/cards,
+               *  igual o criativo do anúncio. O modal de teste completo (ao
+               *  tocar) continua abrindo do zero pela capa, com navegação
+               *  normal — usa outra URL, sem esse parâmetro.
+               *
+               *  3ª tentativa depois de bug real em produção, 2026-10-19 —
+               *  as 2 anteriores (âncora `#catalogo` na URL; depois
+               *  `scrollIntoView` chamado de dentro do próprio catálogo via
+               *  `?query=`) sempre rolavam a página PAI (fora do iframe)
+               *  sozinha, não importa o mecanismo usado pra rolar o iframe.
+               *  Essa versão não rola NADA — `ShowcaseClient.tsx` só deixa
+               *  de renderizar a seção de Capa quando esse parâmetro está
+               *  presente, então a tela de serviços já nasce no topo. Sem
+               *  nenhuma chamada de scroll envolvida, o bug deixa de ser
+               *  possível estruturalmente. */}
+              <iframe
+                src={`/c/showcase/${showcaseSlug}${onTap ? '?tela=catalogo' : ''}`}
+                title="Prévia ao vivo do Menu Digital StudioMenu"
+                tabIndex={-1}
+              />
             </div>
           </div>
 
