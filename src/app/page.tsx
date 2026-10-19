@@ -14,7 +14,7 @@ interface StudioMenuLandingPageProps {
  *  seja um nicho implementado cai em `geral` (a landing de sempre). */
 export default async function StudioMenuLandingPage({ searchParams }: StudioMenuLandingPageProps) {
   const { nicho } = await searchParams;
-  const resolvedNiche: LandingNiche = nicho === 'lash' || nicho === 'nail' ? nicho : 'geral';
+  const resolvedNiche: LandingNiche = nicho && nicho in LANDING_NICHE_CONTENT ? (nicho as LandingNiche) : 'geral';
   const content = LANDING_NICHE_CONTENT[resolvedNiche];
 
   return (
