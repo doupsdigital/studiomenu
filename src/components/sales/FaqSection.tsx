@@ -9,10 +9,10 @@ interface FaqItem {
 
 /** Quebra-objeção da assinatura (pedido real, 2026-10-15) — sempre a 1ª
  *  pergunta, em TODOS os nichos (não é nichada como `firstItem`), com
- *  destaque visual próprio (`lp-faq-item--highlight`) e sempre aberta de
- *  cara (`openIndex` inicial = 0, índice onde ela sempre cai). Sem número
- *  no texto de propósito — ela não faz parte da sequência 1-6, é a exceção
- *  que chama atenção primeiro. */
+ *  destaque visual próprio (`lp-faq-item--highlight`). Retraída por padrão
+ *  igual as outras (pedido real, 2026-10-19 — reverte a decisão anterior
+ *  de abrir sozinha). Sem número no texto de propósito — ela não faz
+ *  parte da sequência 1-6, é a exceção que chama atenção primeiro. */
 const SUBSCRIPTION_FAQ_ITEM: FaqItem = {
   question: 'Por que é uma assinatura, e não um pagamento único?',
   answer: 'Diferente de um catálogo em PDF ou imagem, seu Menu Digital é um Site de verdade — precisa ficar hospedado, no ar, seguro e rápido 365 dias por ano. A assinatura garante exatamente isso: que ele nunca saia do ar, nunca fique lento e que suas clientes consigam acessar sempre através do seu link.',
@@ -57,7 +57,7 @@ interface FaqSectionProps {
 }
 
 export function FaqSection({ firstItem, subscriptionItemOverride }: FaqSectionProps) {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
   const FAQ_ITEMS: FaqItem[] = [
     subscriptionItemOverride ?? SUBSCRIPTION_FAQ_ITEM,
     firstItem ?? DEFAULT_FIRST_ITEM,
