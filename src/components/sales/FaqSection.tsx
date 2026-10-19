@@ -49,11 +49,20 @@ const REST_OF_FAQ_ITEMS: FaqItem[] = [
 interface FaqSectionProps {
   /** Substitui a 1ª pergunta por uma versão nichada — ver `src/data/landing-niche-content.tsx`. */
   firstItem?: FaqItem;
+  /** Substitui a pergunta destacada (`SUBSCRIPTION_FAQ_ITEM` acima) — pedido
+   *  real, 2026-10-19, pro teste de plano único anual: sem um 2º plano
+   *  mensal pra comparar, não cabe mais falar em "assinatura" (ver
+   *  `content.subscriptionFaqOverride` em `landing-niche-content.tsx`). */
+  subscriptionItemOverride?: FaqItem;
 }
 
-export function FaqSection({ firstItem }: FaqSectionProps) {
+export function FaqSection({ firstItem, subscriptionItemOverride }: FaqSectionProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
-  const FAQ_ITEMS: FaqItem[] = [SUBSCRIPTION_FAQ_ITEM, firstItem ?? DEFAULT_FIRST_ITEM, ...REST_OF_FAQ_ITEMS];
+  const FAQ_ITEMS: FaqItem[] = [
+    subscriptionItemOverride ?? SUBSCRIPTION_FAQ_ITEM,
+    firstItem ?? DEFAULT_FIRST_ITEM,
+    ...REST_OF_FAQ_ITEMS,
+  ];
 
   const toggleItem = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);

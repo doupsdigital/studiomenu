@@ -1158,6 +1158,24 @@
 
 .lp-pricing-tier-card--vip .lp-tier-price-sub { color: rgba(255, 255, 255, 0.9); }
 
+/* Âncora "De R$X por" (teste de plano único, pedido real, 2026-10-19) —
+ *  só aparece quando `content.singleAnnualPlanTest` existe (ver
+ *  `SalesLandingPage.tsx`); substitui o papel que o card Mensal fazia
+ *  antes (dar uma referência de comparação pro preço do Anual). */
+.lp-tier-price-anchor {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+  margin-bottom: 4px;
+}
+
+.lp-tier-price-anchor-value {
+  text-decoration: line-through;
+  text-decoration-thickness: 1.5px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.95);
+}
+
 /* Selo de desconto do Plano Anual (2026-10-15) — "burst" de 16 pontas no
  *  canto superior direito do card, igual referência enviada pela usuária.
  *  `.lp-pricing-tier-card` já é `position: relative`, então isto ancora

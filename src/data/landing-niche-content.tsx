@@ -32,6 +32,34 @@ export interface LandingNicheContent {
   anualValueAnchor: string;
   /** Faixa decorativa no canto superior direito da Hero. */
   cornerBadge?: ReactNode;
+  /** Teste de plano único anual (pedido real, 2026-10-19) — quando
+   *  presente, `SalesLandingPage.tsx` esconde o card Mensal e mostra só o
+   *  Anual (sem badge "MAIS POPULAR", sem comparação), com preço/âncora/
+   *  CTA próprios. Hipótese: a escolha entre 2 planos bem na hora do
+   *  preço pode estar derrubando gente que já tinha testado o mockup e
+   *  gostado (visto nas gravações de sessão). Só `lash`/`nail` por
+   *  enquanto — `lashdesigner`/`naildesigner` ficam sem isso de propósito
+   *  (referência/backup da página de 2 planos). Pra reativar o Mensal
+   *  depois, é só remover este campo do nicho. */
+  singleAnnualPlanTest?: {
+    price: number;
+    anchorPrice: number;
+    ctaLabel: string;
+    /** Nome do nicho em texto puro (ex: "Lash Designer"), usado na
+     *  mensagem pré-pronta do WhatsApp (pedido real, 2026-10-19) — pra ela
+     *  saber de qual página a lead veio sem precisar perguntar, e sem
+     *  soar como texto de robô ("Plano Anual, pagamento único" fazia
+     *  gente desistir de mandar, segundo gravações de sessão). Não dá pra
+     *  reaproveitar `eyebrow`/`cornerBadge` aqui porque são ReactNode, não
+     *  string simples (não dá pra colocar JSX dentro de um link de
+     *  WhatsApp). */
+    nicheLabel: string;
+  };
+  /** Override da 1ª pergunta destacada do FAQ (`SUBSCRIPTION_FAQ_ITEM` em
+   *  `FaqSection.tsx`) — só faz sentido junto com `singleAnnualPlanTest`:
+   *  sem um 2º plano mensal pra comparar, não cabe mais falar em
+   *  "assinatura". */
+  subscriptionFaqOverride?: { question: string; answer: string };
 }
 
 export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = {
@@ -92,6 +120,18 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
         <span className="lp-hero-niche-ribbon">Lash</span>
       </div>
     ),
+    // Teste de plano único anual (pedido real, 2026-10-19) — ver
+    // comentário de `singleAnnualPlanTest` na interface acima.
+    singleAnnualPlanTest: {
+      price: 129.9,
+      anchorPrice: 199.9,
+      ctaLabel: 'QUERO MEU MENU DIGITAL',
+      nicheLabel: 'Lash Designer',
+    },
+    subscriptionFaqOverride: {
+      question: 'Por que o pagamento é anual?',
+      answer: 'Diferente de um catálogo em PDF ou imagem, seu Menu Digital é um Site de verdade — precisa ficar hospedado, no ar, seguro e rápido 365 dias por ano. Esse valor garante exatamente isso: que ele nunca saia do ar, nunca fique lento e que suas clientes consigam acessar sempre através do seu link.',
+    },
   },
   nail: {
     // Copy do Hero atualizada pra bater com a nova campanha de criativos
@@ -126,12 +166,28 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
       question: '1. Só serve pra unha ou dá pra colocar outros serviços também?',
       answer: 'Dá pra colocar qualquer serviço que você oferecer no seu studio! Alongamento em Gel, Fibra de Vidro, Esmaltação em Gel, Nail Art, Spa dos Pés, Cuticulagem — você organiza o seu Menu Digital do jeitinho que atende de verdade, sem limite de categoria.',
     },
-    anualValueAnchor: 'Sai por menos que 1 alongamento em Gel',
+    // Trocado de "1 alongamento em Gel" pra "1 esmaltação em Gel" (pedido
+    // real, 2026-10-19) — serviço mais popular/universal entre as opções
+    // sugeridas, só pro teste de plano único (naildesigner mantém o texto
+    // antigo, de propósito, como referência/backup).
+    anualValueAnchor: 'Sai por menos que 1 Esmaltação em Gel',
     cornerBadge: (
       <div className="lp-hero-niche-ribbon-wrap" aria-hidden="true">
         <span className="lp-hero-niche-ribbon">Nail</span>
       </div>
     ),
+    // Teste de plano único anual (pedido real, 2026-10-19) — ver
+    // comentário de `singleAnnualPlanTest` na interface acima.
+    singleAnnualPlanTest: {
+      price: 129.9,
+      anchorPrice: 199.9,
+      ctaLabel: 'QUERO MEU MENU DIGITAL',
+      nicheLabel: 'Nail Designer',
+    },
+    subscriptionFaqOverride: {
+      question: 'Por que o pagamento é anual?',
+      answer: 'Diferente de um catálogo em PDF ou imagem, seu Menu Digital é um Site de verdade — precisa ficar hospedado, no ar, seguro e rápido 365 dias por ano. Esse valor garante exatamente isso: que ele nunca saia do ar, nunca fique lento e que suas clientes consigam acessar sempre através do seu link.',
+    },
   },
   // lashdesigner/naildesigner (2026-10-19) — ver comentário de
   // `LandingNiche` acima. Hero com copy de dor/objeção, mesma frase nos 2
