@@ -63,6 +63,29 @@ export function HeroMockup({ showcaseSlug = 'landingpage', onTap }: HeroMockupPr
             </div>
           </div>
 
+          {/* "Toque aqui" nos 2 lados DO CELULAR (pedido real, 2026-10-19;
+           *  re-adicionado isoladamente, sem a âncora `#catalogo`, depois de
+           *  reverter os 2 juntos por causa do bug de scroll automático —
+           *  testando um de cada vez pra achar qual dos dois era a causa
+           *  real). Setas apontando pro mockup, mesmo estilo/linguagem
+           *  visual do indicador "Sua foto aqui" mais abaixo
+           *  (`lp-photo-point-icon`) — maiores e mais afastadas do celular
+           *  (fora de vez, não só pendurada na borda). */}
+          {onTap && (
+            <span className="lp-testdrive-tap-arrow lp-testdrive-tap-arrow--left" aria-hidden="true">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#c84b72" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 12h14m-7-7 7 7-7 7" />
+              </svg>
+            </span>
+          )}
+          {onTap && (
+            <span className="lp-testdrive-tap-arrow lp-testdrive-tap-arrow--right" aria-hidden="true">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#c84b72" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+              </svg>
+            </span>
+          )}
+
           {onTap && (
             <button type="button" className="lp-testdrive-tap-overlay" onClick={onTap}>
               <span className="lp-testdrive-tap-badge">
