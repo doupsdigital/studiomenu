@@ -26,7 +26,26 @@ const STEPS: Step[] = [
   },
 ];
 
-export function HowItWorksSection() {
+interface HowItWorksSectionProps {
+  /** Teste de plano único anual (pedido real, 2026-10-19) — quando true,
+   *  troca o passo 1 (hoje "Escolha seu plano... escolha o plano ideal
+   *  abaixo", que não faz mais sentido sem um plano pra escolher) por uma
+   *  versão sem menção a "plano". Ver `content.singleAnnualPlanTest` em
+   *  `landing-niche-content.tsx`/`SalesLandingPage.tsx`. */
+  singlePlan?: boolean;
+}
+
+export function HowItWorksSection({ singlePlan }: HowItWorksSectionProps) {
+  const steps = singlePlan
+    ? [
+        {
+          title: 'Fale com a gente',
+          description: 'Toque no botão abaixo e fale com a gente no WhatsApp — te atendemos de forma personalizada.',
+        },
+        ...STEPS.slice(1),
+      ]
+    : STEPS;
+
   return (
     <section className="lp-steps-section">
       <div className="lp-container">
@@ -36,7 +55,7 @@ export function HowItWorksSection() {
         </div>
 
         <ol className="lp-steps-list">
-          {STEPS.map((step, i) => (
+          {steps.map((step, i) => (
             <li
               key={i}
               className="lp-step-item"
@@ -45,7 +64,7 @@ export function HowItWorksSection() {
             >
               <div className="lp-step-marker">
                 <span className="lp-step-number">{i + 1}</span>
-                {i < STEPS.length - 1 && <span className="lp-step-connector" aria-hidden="true" />}
+                {i < steps.length - 1 && <span className="lp-step-connector" aria-hidden="true" />}
               </div>
               <div className="lp-step-content">
                 <h3 className="lp-step-title">{step.title}</h3>

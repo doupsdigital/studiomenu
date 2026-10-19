@@ -210,7 +210,7 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
         </section>
 
         {/* 3. COMO FUNCIONA */}
-        <HowItWorksSection />
+        <HowItWorksSection singlePlan={Boolean(singlePlanTest)} />
 
         {/* 4. OFERTA */}
         <section id="oferta" className="lp-pricing-section">
@@ -219,7 +219,7 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
               {/* Teste de plano único (pedido real, 2026-10-19) — "Escolha"
                *  não faz mais sentido sem um 2º plano pra escolher entre. */}
               <h2 className="lp-section-title">
-                {singlePlanTest ? 'O Seu Novo Menu Digital Está Aqui' : 'Escolha o Plano Ideal para o Seu Studio'}
+                {singlePlanTest ? 'Hora de Deixar Seu Studio Mais Profissional' : 'Escolha o Plano Ideal para o Seu Studio'}
               </h2>
             </div>
 
