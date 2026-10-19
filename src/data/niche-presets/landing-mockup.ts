@@ -82,6 +82,11 @@ export const landingMockupPreset: CatalogOrderData = {
       ],
     },
   ],
+  // `items` zerado de propósito (pedido real, 2026-10-19) — esconde a tela
+  // de Orientações nesse mockup (fica "muita informação" pro lead frio ler
+  // nesse primeiro contato). A tela já esconde sozinha pra visitante quando
+  // não tem nenhum item — ver comentário equivalente em
+  // `nail-landing-mockup.ts`/`lash-landing-mockup.ts`.
   instructions: {
     pre_care: [
       'Chegue com 5 a 10 minutos de antecedência.',
@@ -91,11 +96,6 @@ export const landingMockupPreset: CatalogOrderData = {
       'Seguir os guias de cuidados pós fornecidos por cada profissional.',
     ],
     tolerances: 'Tolerância de 15 minutos de atraso.',
-    items: [
-      { id: 'confirmacao', title: 'Confirmação', description: 'Até um dia antes do seu horário marcado.' },
-      { id: 'pontualidade', title: 'Pontualidade', description: 'Tolerância de 15 minutos de atraso.' },
-      { id: 'preparacao', title: 'Preparação', description: 'Chegue com 5 a 10 minutos de antecedência.' },
-      { id: 'pagamento', title: 'Pagamento', description: 'Dinheiro, Pix, cartão de débito ou crédito.' },
-    ],
+    items: [],
   },
 };

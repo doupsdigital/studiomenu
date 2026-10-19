@@ -499,6 +499,17 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
       // Passo "cat-add-proc" (Adicionar novos serviços) removido — o botão
       // fica logo depois da lista de procedimentos, e o balão nunca ficou
       // bem posicionado ali antes de descobrirmos o `skipScroll` (2026-09-24).
+      //
+      // "cat-orientacoes" (pedido real, 2026-10-19) — essa tela, diferente
+      // das outras, só aparece pra visitante real se tiver pelo menos 1
+      // item (`InstructionsSection.tsx`), mas sempre aparece aqui no editor
+      // — sem esse passo do tour, ninguém saberia por que ela "some" pro
+      // lead/cliente final se deixar tudo vazio.
+      {
+        target: '[data-tour="cat-orientacoes"]',
+        title: 'Informações importantes',
+        content: 'Essa tela é opcional: se você deixar todos os campos vazios, ela não aparece pra sua cliente.',
+      },
       { target: '[data-tour="cat-theme"]', title: 'Personalize tema e layout', content: 'Esses botões trocam a paleta de cores e o modelo da grade (Mosaico/Clássico).', skipScroll: true },
       { target: '[data-tour="cat-save"]', title: 'Não esqueça de salvar', content: 'As mudanças só valem pra cliente final depois de tocar aqui.', skipScroll: true }
     );
