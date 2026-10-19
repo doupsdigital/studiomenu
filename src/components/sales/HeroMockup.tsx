@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, type CSSProperties } from 'react';
+import { useEffect, useState } from 'react';
 
 /** Indicadores do mockup da home (pedido real, 2026-10-08). Dois lados:
  *  - Esquerda: mão de "DESLIZE" na capa, troca pra "Clique nos cards"
@@ -53,23 +53,42 @@ export function HeroMockup({ showcaseSlug = 'landingpage', onTap }: HeroMockupPr
   }, [interactive]);
 
   return (
-    <div className="lp-hero-phone-wrap" data-reveal style={{ '--reveal-delay': '0.15s' } as CSSProperties}>
+    <div className="lp-hero-phone-wrap">
       <div className="lp-phone-interactive-container">
         <div className="lp-testdrive-phone">
           <div className="lp-testdrive-notch" />
           <div className={`lp-testdrive-screen${onTap ? ' lp-testdrive-screen--static' : ''}`}>
             <div className="lp-testdrive-screen-scaler">
-              {/* `#catalogo` só na vitrine estática (pedido real, 2026-10-19)
-               *  — mostra direto a tela de serviços/cards, igual o
-               *  criativo do anúncio, pra continuidade visual (sem isso a
-               *  pessoa via a capa aqui e podia achar que clicou errado,
-               *  já que não sabia ainda que o menu tem uma capa). O modal
-               *  de teste completo (ao tocar) continua abrindo do zero
-               *  pela capa — usa outra URL, sem essa âncora. */}
+              {/* Pula direto pra tela de serviços/cards na vitrine estática
+               *  (pedido real, 2026-10-19) — mesma continuidade visual do
+               *  criativo do anúncio (sem isso a pessoa via a capa aqui e
+               *  podia achar que clicou errado, já que não sabia ainda que
+               *  o menu tem uma capa). O modal de teste completo (ao tocar)
+               *  continua abrindo do zero pela capa.
+               *
+               *  NÃO usa `#catalogo` na URL do `src` (bug real, 2026-10-19
+               *  — corrigido depois de 2 tentativas na pista errada,
+               *  animação e scroll-anchoring): navegar o iframe com uma
+               *  âncora de URL aciona o "scroll to the fragment" nativo do
+               *  navegador, que pode rolar containers ANCESTRAIS (inclusive
+               *  a página pai, fora do iframe) pra garantir que o elemento
+               *  fique visível — causava a página inteira rolar sozinha
+               *  pra baixo ao carregar. Em vez disso, rola só o DOCUMENTO
+               *  DO PRÓPRIO IFRAME via JS no `onLoad` (`scrollIntoView` não
+               *  cruza a fronteira do iframe, só a navegação por âncora
+               *  faz isso). */}
               <iframe
-                src={`/c/showcase/${showcaseSlug}${onTap ? '#catalogo' : ''}`}
+                src={`/c/showcase/${showcaseSlug}`}
                 title="Prévia ao vivo do Menu Digital StudioMenu"
                 tabIndex={-1}
+                onLoad={(event) => {
+                  if (!onTap) return;
+                  try {
+                    event.currentTarget.contentWindow?.document.getElementById('catalogo')?.scrollIntoView();
+                  } catch {
+                    // Falha rara (ex: timing) — fallback seguro, só mostra a capa.
+                  }
+                }}
               />
             </div>
           </div>
