@@ -120,10 +120,11 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
         <span className="lp-hero-niche-ribbon">Lash</span>
       </div>
     ),
-    // Teste de plano único anual (pedido real, 2026-10-19) — ver
-    // comentário de `singleAnnualPlanTest` na interface acima.
+    // Teste de plano único anual (pedido real, 2026-10-19) — preço
+    // igualado ao de nail (R$89,90), que já estava rodando como teste à
+    // parte (ver comentário de `singleAnnualPlanTest` na interface acima).
     singleAnnualPlanTest: {
-      price: 129.9,
+      price: 89.9,
       anchorPrice: 199.9,
       ctaLabel: 'QUERO MEU MENU DIGITAL',
       nicheLabel: 'Lash Designer',
