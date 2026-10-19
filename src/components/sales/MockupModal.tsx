@@ -203,7 +203,7 @@ export function MockupModal({ showcaseSlug, isOpen, onClose }: MockupModalProps)
                 className="lp-btn lp-btn--whatsapp lp-mockup-cta-plans"
                 onClick={handleViewPlans}
               >
-                👉 Gostou da demonstração? Ver planos e valores
+                👉 Gostou da demonstração? Ver valores e garantir o seu
               </button>
             )}
           </div>

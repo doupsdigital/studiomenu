@@ -87,7 +87,30 @@ interface SalesLandingPageProps {
 export function SalesLandingPage({ content }: SalesLandingPageProps) {
   const catalogoParts = priceParts(TEST_CATALOGO_PRICE);
   const vitalicioParts = priceParts(TEST_VITALICIO_PRICE);
-  const anualParts = priceParts(TEST_ANUAL_PRICE);
+  // Teste de plano único anual (pedido real, 2026-10-19) — quando o nicho
+  // tem `singleAnnualPlanTest`, preço/âncora/CTA vêm dele; senão, os
+  // valores padrão de sempre (2 planos, desconto fixo). O desconto agora é
+  // sempre CALCULADO (preço vs âncora) em vez de fixo — só dá 50 "redondo"
+  // por coincidência no caso padrão (139,90 vs 12x o Mensal já decidido
+  // antes); no teste de plano único (199,90 → 129,90) dá 35%, de verdade.
+  const singlePlanTest = content.singleAnnualPlanTest;
+  const anualPrice = singlePlanTest?.price ?? TEST_ANUAL_PRICE;
+  const anualParts = priceParts(anualPrice);
+  const anualAnchorParts = singlePlanTest ? priceParts(singlePlanTest.anchorPrice) : null;
+  const anualDiscountPercent = singlePlanTest
+    ? Math.round((1 - singlePlanTest.price / singlePlanTest.anchorPrice) * 100)
+    : ANUAL_DISCOUNT_PERCENT;
+  const anualCtaLabel = singlePlanTest?.ctaLabel ?? 'QUERO O PLANO ANUAL';
+  /* Mensagem do WhatsApp (pedido real, 2026-10-19) — a antiga ("Plano
+   *  Anual... pagamento único") soava robótica e fazia gente desistir de
+   *  mandar (visto em gravações de sessão), além de não dizer de qual
+   *  nicho a lead veio. A nova é mais parecida com algo que uma pessoa
+   *  escreveria de verdade, e cita o nicho (`nicheLabel`) em vez de
+   *  "Plano Anual". Preço sempre vem de `anualParts` (nunca duplicado como
+   *  texto fixo), pra nunca ficar desatualizado se o preço mudar. */
+  const anualWhatsappMessage = singlePlanTest
+    ? `Oi! Vi a página do StudioMenu pra ${singlePlanTest.nicheLabel} e quero o meu Menu Digital por R$${anualParts.whole},${anualParts.cents}/ano 😊`
+    : `Olá! Vi a página do StudioMenu e quero o Menu Digital Plano Anual por R$${anualParts.whole},${anualParts.cents}, pagamento único`;
   const agendaParts = priceParts(AGENDA_PRICE);
   const [mockupOpen, setMockupOpen] = useState(false);
   useScrollReveal();
@@ -187,49 +210,60 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
         </section>
 
         {/* 3. COMO FUNCIONA */}
-        <HowItWorksSection />
+        <HowItWorksSection singlePlan={Boolean(singlePlanTest)} />
 
         {/* 4. OFERTA */}
         <section id="oferta" className="lp-pricing-section">
           <div className="lp-container">
             <div className="lp-pricing-header-title" data-reveal>
-              <h2 className="lp-section-title">Escolha o Plano Ideal para o Seu Studio</h2>
+              {/* Teste de plano único (pedido real, 2026-10-19) — "Escolha"
+               *  não faz mais sentido sem um 2º plano pra escolher entre. */}
+              <h2 className="lp-section-title">
+                {singlePlanTest ? 'Hora de Deixar Seu Studio Mais Profissional' : 'Escolha o Plano Ideal para o Seu Studio'}
+              </h2>
             </div>
 
-            <div className="lp-pricing-tier-grid">
+            <div className={`lp-pricing-tier-grid${singlePlanTest ? ' lp-pricing-tier-grid--single' : ''}`}>
               {/* Catálogo (assinatura) — teste de X1, 2026-10-08: preço de
-               *  teste 22,90/mês, "/mês" ao lado do valor (não embaixo). */}
-              <div className="lp-pricing-tier-card" data-reveal>
-                <div className="lp-tier-badge lp-tier-badge--basic">🔁 ASSINATURA MENSAL</div>
-                <h3 className="lp-tier-title">StudioMenu Mensal</h3>
+               *  teste 22,90/mês, "/mês" ao lado do valor (não embaixo).
+               *  Escondido quando `singlePlanTest` está ativo (teste de
+               *  plano único anual, pedido real, 2026-10-19 — ver
+               *  `content.singleAnnualPlanTest`). Pra reativar, é só tirar
+               *  esse campo do nicho em `landing-niche-content.tsx` —
+               *  este card volta sozinho, sem mexer em mais nada aqui. */}
+              {!singlePlanTest && (
+                <div className="lp-pricing-tier-card" data-reveal>
+                  <div className="lp-tier-badge lp-tier-badge--basic">🔁 ASSINATURA MENSAL</div>
+                  <h3 className="lp-tier-title">StudioMenu Mensal</h3>
 
-                <div className="lp-tier-price-box">
-                  <div className="lp-tier-price-main">
-                    <span className="lp-tier-currency">R$</span>
-                    <span className="lp-tier-val">{catalogoParts.whole}</span>
-                    <span className="lp-tier-cents">,{catalogoParts.cents}</span>
-                    <span className="lp-tier-period">/mês</span>
+                  <div className="lp-tier-price-box">
+                    <div className="lp-tier-price-main">
+                      <span className="lp-tier-currency">R$</span>
+                      <span className="lp-tier-val">{catalogoParts.whole}</span>
+                      <span className="lp-tier-cents">,{catalogoParts.cents}</span>
+                      <span className="lp-tier-period">/mês</span>
+                    </div>
                   </div>
+
+                  <ul className="lp-tier-bullets">
+                    <li>{CHECK_ICON}<span>Seu Menu Digital online como um site, sempre no ar</span></li>
+                    <li>{CHECK_ICON}<span>Link profissional para colocar na Bio do Instagram e WhatsApp</span></li>
+                    <li>{CHECK_ICON}<span>Edite serviços, fotos e preços quando quiser direto pelo celular</span></li>
+                    <li>{CHECK_ICON}<span>Cliente escolhe o procedimento e agenda direto no seu WhatsApp</span></li>
+                  </ul>
+
+                  <a
+                    href={whatsappLink('Olá! Vi a página do StudioMenu e quero o Menu Digital por R$22,90/mês')}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="lp-btn lp-btn--whatsapp"
+                    onClick={() => trackCta('catalogo')}
+                  >
+                    {WHATSAPP_ICON}
+                    QUERO MEU MENU DIGITAL
+                  </a>
                 </div>
-
-                <ul className="lp-tier-bullets">
-                  <li>{CHECK_ICON}<span>Seu Menu Digital online como um site, sempre no ar</span></li>
-                  <li>{CHECK_ICON}<span>Link profissional para colocar na Bio do Instagram e WhatsApp</span></li>
-                  <li>{CHECK_ICON}<span>Edite serviços, fotos e preços quando quiser direto pelo celular</span></li>
-                  <li>{CHECK_ICON}<span>Cliente escolhe o procedimento e agenda direto no seu WhatsApp</span></li>
-                </ul>
-
-                <a
-                  href={whatsappLink('Olá! Vi a página do StudioMenu e quero o Menu Digital por R$22,90/mês')}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="lp-btn lp-btn--whatsapp"
-                  onClick={() => trackCta('catalogo')}
-                >
-                  {WHATSAPP_ICON}
-                  QUERO MEU MENU DIGITAL
-                </a>
-              </div>
+              )}
 
               {/* Vitalício — DESATIVADO (mudança de estratégia, 2026-10-15):
                *  deixado comentado, não apagado, pra reativar rápido no
@@ -272,13 +306,14 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
 
               {/* Anual — no lugar do Vitalício (mudança de estratégia,
                *  2026-10-15): mesmo card --vip (borda/badge de destaque),
-               *  badge virou "MAIS POPULAR" em vez de "RECOMENDADO". Selo de
-               *  desconto (`lp-tier-discount-seal`) é um "burst" de 16 pontas
-               *  via clip-path, posicionado no canto superior direito do
-               *  card (pedido real, com print de referência) — texto usa
-               *  `ANUAL_DISCOUNT_PERCENT` (calculado acima a partir do
-               *  Mensal x12) pra nunca ficar com um número errado se o
-               *  preço do Mensal mudar sem atualizar aqui. */}
+               *  badge virou "MAIS POPULAR" em vez de "RECOMENDADO" — some
+               *  de novo no teste de plano único (`singlePlanTest`, pedido
+               *  real 2026-10-19), que não tem mais um 2º plano pra ela ser
+               *  "mais popular" QUE. Selo de desconto (`lp-tier-discount-seal`)
+               *  é um "burst" de 16 pontas via clip-path, posicionado no
+               *  canto superior direito do card — texto usa
+               *  `anualDiscountPercent` (calculado acima, preço vs âncora)
+               *  pra nunca ficar com um número errado. */}
               <div
                 className="lp-pricing-tier-card lp-pricing-tier-card--vip"
                 data-reveal
@@ -286,16 +321,30 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
               >
                 <div className="lp-tier-discount-seal" aria-hidden="true">
                   <span>
-                    <span className="lp-tier-discount-seal-percent">{ANUAL_DISCOUNT_PERCENT}%</span>
+                    <span className="lp-tier-discount-seal-percent">{anualDiscountPercent}%</span>
                     <br />
                     OFF
                   </span>
                 </div>
 
-                <div className="lp-tier-badge lp-tier-badge--vip">⭐ MAIS POPULAR</div>
-                <h3 className="lp-tier-title">StudioMenu Anual</h3>
+                {!singlePlanTest && <div className="lp-tier-badge lp-tier-badge--vip">⭐ MAIS POPULAR</div>}
+                {/* Sem "Anual" no teste de plano único (pedido real,
+                 *  2026-10-19) — resolve o corte visual do selo de desconto
+                 *  (texto mais curto) e evita reforçar a palavra "anual"
+                 *  logo no título do card; o "/ano" no preço já comunica
+                 *  isso. */}
+                <h3 className="lp-tier-title">{singlePlanTest ? 'StudioMenu' : 'StudioMenu Anual'}</h3>
 
                 <div className="lp-tier-price-box">
+                  {/* Âncora "de/por" (pedido real, 2026-10-19) — só no teste
+                   *  de plano único, onde não existe mais um 2º plano mais
+                   *  barato pra comparar; o preço "cheio" riscado cumpre
+                   *  esse papel. */}
+                  {anualAnchorParts && (
+                    <div className="lp-tier-price-anchor">
+                      De <span className="lp-tier-price-anchor-value">R$ {anualAnchorParts.whole},{anualAnchorParts.cents}</span> por
+                    </div>
+                  )}
                   <div className="lp-tier-price-main">
                     <span className="lp-tier-currency">R$</span>
                     <span className="lp-tier-val">{anualParts.whole}</span>
@@ -322,14 +371,14 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
                 </ul>
 
                 <a
-                  href={whatsappLink('Olá! Vi a página do StudioMenu e quero o Menu Digital Plano Anual por R$139,90, pagamento único')}
+                  href={whatsappLink(anualWhatsappMessage)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="lp-btn lp-btn--whatsapp"
                   onClick={() => trackCta('anual')}
                 >
                   {WHATSAPP_ICON}
-                  QUERO O PLANO ANUAL
+                  {anualCtaLabel}
                 </a>
 
                 <p className="lp-tier-guarantee">🔒 Garantia de 7 dias — não gostou, devolvemos 100% do seu dinheiro.</p>
@@ -376,7 +425,7 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
 
         {/* 5. DÚVIDAS FREQUENTES — antes do carrossel de prova social (pedido
          *  real, 2026-10-15; antes vinha depois). */}
-        <FaqSection firstItem={content.faqFirstItem} />
+        <FaqSection firstItem={content.faqFirstItem} subscriptionItemOverride={content.subscriptionFaqOverride} />
 
         {/* 6. MARQUEE DE PROVA SOCIAL */}
         <section className="lp-marquee-ribbon-section">
