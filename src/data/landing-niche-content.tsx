@@ -57,20 +57,27 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     anualValueAnchor: 'Sai por menos que 1 atendimento do seu studio',
   },
   lash: {
+    // Copy do Hero atualizada pra bater com a nova campanha de criativos
+    // (pedido real, 2026-10-19 — ela testou `lashdesigner` em localhost,
+    // gostou mais e pediu pra aplicar na página oficial também, não só na
+    // nova). Idêntica à de `lashdesigner` abaixo de propósito.
     eyebrow: (
       <>
-        Menu Digital feito para <span className="lp-eyebrow-highlight">Lash Designer</span>
+        Feito para <span className="lp-eyebrow-highlight">Lash Designer</span>
       </>
     ),
     heroTitle: (
       <>
-        O Menu Digital que valoriza o{' '}
-        <span className="lp-text-gradient">seu Studio de Lash</span>.
+        Você construiu um <span className="lp-text-gradient">Studio Incrível</span>. Mas ainda
+        manda Tabela de <span className="lp-text-wine">preços e fotos do seu trabalho</span>{' '}
+        soltas no WhatsApp?
       </>
     ),
     heroSubtitle: (
       <>
-        Seus procedimentos de extensão de cílios apresentados como um <strong>site profissional</strong>. Um <strong>Link exclusivo</strong> para a sua bio, onde a cliente se encanta pelas fotos e já clica para agendar direto no seu <strong>WhatsApp</strong>.
+        Conheça o <strong className="lp-text-gradient">StudioMenu</strong>.{' '}
+        <strong className="lp-text-wine">Não é PDF nem Canva</strong>: é seu
+        próprio <strong className="lp-text-gradient">Site/Menu Digital interativo</strong>.
       </>
     ),
     showcaseSlug: 'lashlanding',
@@ -87,20 +94,26 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     ),
   },
   nail: {
+    // Copy do Hero atualizada pra bater com a nova campanha de criativos
+    // (pedido real, 2026-10-19 — ver comentário equivalente em `lash`
+    // acima). Idêntica à de `naildesigner` abaixo de propósito.
     eyebrow: (
       <>
-        Menu Digital feito para <span className="lp-eyebrow-highlight">Nail Designer</span>
+        Feito para <span className="lp-eyebrow-highlight">Nail Designer</span>
       </>
     ),
     heroTitle: (
       <>
-        O Menu Digital que valoriza o{' '}
-        <span className="lp-text-gradient">seu Studio de Nail</span>.
+        Você construiu um <span className="lp-text-gradient">Studio Incrível</span>. Mas ainda
+        manda Tabela de <span className="lp-text-wine">preços e fotos do seu trabalho</span>{' '}
+        soltas no WhatsApp?
       </>
     ),
     heroSubtitle: (
       <>
-        Suas técnicas de alongamento, gel e nail art apresentadas como um <strong>site profissional</strong>. Um <strong>Link exclusivo</strong> para a sua bio, onde a cliente vê seu trabalho com sofisticação e agenda direto no seu <strong>WhatsApp</strong>.
+        Conheça o <strong className="lp-text-gradient">StudioMenu</strong>.{' '}
+        <strong className="lp-text-wine">Não é PDF nem Canva</strong>: é seu
+        próprio <strong className="lp-text-gradient">Site/Menu Digital interativo</strong>.
       </>
     ),
     // 'naildesigner', não 'nail' — o slug 'nail' cai no agendamento automático
