@@ -1826,6 +1826,39 @@
   to { opacity: 1; transform: translateY(-50%) scale(1); }
 }
 
+/* Ponte pós-demonstração (pedido real, 2026-10-19; reforçado depois de
+ *  feedback real — queria do tamanho/estilo do CTA de verdade da página,
+ *  não um selo pequeno, e centralizado na tela, não grudado embaixo).
+ *  Reaproveita `.lp-btn`/`.lp-btn--whatsapp` (mesmo visual do botão
+ *  "QUERO MEU MENU DIGITAL" da seção de Oferta) — qualquer ajuste de cor
+ *  futuro ali já reflete aqui também, sem duplicar estilo. Botão de
+ *  verdade (diferente das dicas, que são só decorativas), por isso vive
+ *  dentro do `.lp-mockup-modal-scaler` (mesma caixa 390×844 do design, pra
+ *  ter o tamanho certo em qualquer celular) e NÃO tem `pointer-events:
+ *  none`. */
+.lp-mockup-cta-plans {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 45;
+  width: calc(100% - 64px);
+  max-width: 340px;
+  font-size: 1.05rem;
+  line-height: 1.35;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.4), 0 8px 26px rgba(37, 211, 102, 0.4);
+  animation: lp-mockup-cta-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.lp-mockup-cta-plans:active {
+  transform: translate(-50%, -50%) scale(0.97);
+}
+
+@keyframes lp-mockup-cta-in {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
 /* Botão de fechar bem evidente (pedido real, 2026-10-14 — o anterior era
  *  discreto demais) — círculo branco sólido, encostado no canto da moldura. */
 .lp-mockup-modal-close {
