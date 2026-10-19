@@ -62,6 +62,10 @@ export function MockupModal({ showcaseSlug, isOpen, onClose }: MockupModalProps)
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [scale, setScale] = useState(1);
   const [screen, setScreen] = useState<MockupScreen>('cover');
+  // Tema ativo no catálogo embutido (pedido real, 2026-10-19) — usado só
+  // pra decidir em qual botão (Rosé/Luxury) mostrar a dica "Mude as cores
+  // do tema": sempre no OPOSTO do tema atual, nunca no que já está ativo.
+  const [theme, setTheme] = useState<'rose' | 'luxury'>('rose');
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [overlayModalOpen, setOverlayModalOpen] = useState(false);
   const [hintsReady, setHintsReady] = useState(false);
@@ -81,6 +85,10 @@ export function MockupModal({ showcaseSlug, isOpen, onClose }: MockupModalProps)
         // enquanto ele está por cima do card, reaparece ao fechar (ver
         // `ProcedureGrid.tsx`).
         setDetailModalOpen(Boolean(event.data.open));
+        return;
+      }
+      if (event.data?.type === 'VITRINE_THEME_CHANGE') {
+        setTheme(event.data.theme === 'luxury' ? 'luxury' : 'rose');
         return;
       }
       if (event.data?.type === 'VITRINE_OVERLAY_MODAL') {
@@ -259,11 +267,27 @@ export function MockupModal({ showcaseSlug, isOpen, onClose }: MockupModalProps)
         {hintsReady && screen === 'cover' && (
           <div className="lp-mockup-hint lp-mockup-hint--photo" aria-hidden="true">
             <span className="lp-scroll-cue-tag">Capa do seu Studio</span>
-            <div className="lp-photo-cursor-wrap">
-              <svg className="lp-photo-point-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c84b72" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19 12H5M12 19l-7-7 7-7" />
-              </svg>
-            </div>
+          </div>
+        )}
+
+        {/* "Mude as cores do tema" (pedido real, 2026-10-19) — aponta sempre
+         *  pro botão do tema OPOSTO ao que está ativo agora (convite pra
+         *  experimentar o outro), e troca de lado sozinha quando a pessoa
+         *  clica Rosé/Luxury lá dentro do iframe (via `theme`, atualizado
+         *  pelo postMessage `VITRINE_THEME_CHANGE` de `ShowcaseClient.tsx`).
+         *  Mesmo padrão das outras dicas (`.lp-mockup-hint`, penduradas na
+         *  borda da moldura), só com seta apontando pra CIMA em vez de
+         *  pro lado, já que os botões ficam no topo da capa. */}
+        {hintsReady && screen === 'cover' && !detailModalOpen && !overlayModalOpen && (
+          <div
+            className={`lp-mockup-hint ${theme === 'rose' ? 'lp-mockup-hint--theme-luxury' : 'lp-mockup-hint--theme-rose'}`}
+            aria-hidden="true"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c84b72" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
+              <line x1="12" y1="19" x2="12" y2="5" />
+              <polyline points="5 12 12 5 19 12" />
+            </svg>
+            <span className="lp-scroll-cue-tag">Mude as cores do tema</span>
           </div>
         )}
       </div>

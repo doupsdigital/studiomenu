@@ -47,8 +47,10 @@ export function ShowcaseClient({ niche, forceBasico = false, coverOverride, pres
   // tema de abertura (ela mesma troca pelos botões Rosé/Luxury se quiser
   // mostrar o Luxury depois). Chegou a abrir Studio direto em Luxury
   // (2026-10-08), mas testando na prática no celular não ficou legal —
-  // revertido no mesmo dia. Layout (Mosaico/Clássico) continua herdando do
-  // preset normalmente — só o tema foi fixado.
+  // revertido no mesmo dia. Mesma decisão vale pro mockup da landing page de
+  // vendas (testado em Luxury por padrão, 2026-10-19, revertido no mesmo
+  // dia por preferência dela). Layout (Mosaico/Clássico) continua herdando
+  // do preset normalmente — só o tema foi fixado.
   const [themeVariant, setThemeVariant] = useState<ThemeVariant>('rose');
 
   // Avisa o pai (mockup da landing page) qual tela está visível, pro
@@ -75,6 +77,15 @@ export function ShowcaseClient({ niche, forceBasico = false, coverOverride, pres
     sections.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
   }, [niche, layoutModel, themeVariant]);
+
+  // Avisa o pai (modal de teste da landing page) qual tema está ativo agora
+  // — pedido real, 2026-10-19: a dica "Mude as cores do tema" precisa saber
+  // em qual botão (Rosé/Luxury) mostrar a animação, sempre no OPOSTO do
+  // tema atual (convite pra experimentar o outro).
+  useEffect(() => {
+    if (window.parent === window) return;
+    window.parent.postMessage({ type: 'VITRINE_THEME_CHANGE', theme: themeVariant }, '*');
+  }, [themeVariant]);
 
   if (!basePreset) {
     return (
