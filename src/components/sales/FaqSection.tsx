@@ -23,14 +23,24 @@ const DEFAULT_FIRST_ITEM: FaqItem = {
   answer: 'Com certeza! O StudioMenu foi desenvolvido sob medida para Lash Designers, Nail Designers, Esteticistas, Micropigmentadoras, Cabeleireiras e Studios de Beleza em geral.',
 };
 
+/** Item #3 ("Tem fidelidade...") — texto varia conforme tem ou não o 2º
+ *  plano Mensal pra comparar. O texto antigo (fixo) citava "plano
+ *  Vitalício", que nem existe mais desde que o Anual tomou o lugar dele
+ *  (2026-10-15) — bug real encontrado em produção, 2026-10-19, corrigido
+ *  junto com a variante do teste de plano único. */
+function buildFidelityItem(singlePlan: boolean): FaqItem {
+  return {
+    question: '3. Tem fidelidade ou contrato de permanência?',
+    answer: singlePlan
+      ? 'Nenhuma! Você não fica presa a nenhum contrato ou multa. Você paga uma vez e usa o Menu Digital o ano inteiro — sem mensalidade, sem fidelidade e sem multa de cancelamento.'
+      : 'Nenhuma! Você não fica presa a nenhum contrato ou multa. No plano Mensal, você só continua se estiver usando e gostando — cancele quando quiser. Se escolher o Anual, você paga uma vez e usa o Menu Digital o ano inteiro, sem multa nem fidelidade.',
+  };
+}
+
 const REST_OF_FAQ_ITEMS: FaqItem[] = [
   {
     question: '2. Consigo editar meu Menu Digital depois de pronto?',
     answer: 'Sim, é 100% editável! Pelo próprio celular você pode trocar fotos, atualizar preços, adicionar novos procedimentos, alterar o tema e cores a qualquer momento. É super rápido e simples.',
-  },
-  {
-    question: '3. Tem fidelidade ou contrato de permanência?',
-    answer: 'Nenhuma! Você não fica presa a nenhum contrato ou multa. No plano mensal você só continua se estiver usando e gostando. Se escolher o plano Vitalício, você paga uma única vez e o Menu Digital é seu para sempre, livre de mensalidades.',
   },
   {
     question: '4. Vocês cobram para montar o meu Menu Digital inicial?',
@@ -54,14 +64,20 @@ interface FaqSectionProps {
    *  mensal pra comparar, não cabe mais falar em "assinatura" (ver
    *  `content.subscriptionFaqOverride` em `landing-niche-content.tsx`). */
   subscriptionItemOverride?: FaqItem;
+  /** Teste de plano único anual (pedido real, 2026-10-19) — troca a
+   *  resposta do item #3 (ver `buildFidelityItem` acima), que citava
+   *  "plano mensal" e "plano Vitalício". */
+  singlePlan?: boolean;
 }
 
-export function FaqSection({ firstItem, subscriptionItemOverride }: FaqSectionProps) {
+export function FaqSection({ firstItem, subscriptionItemOverride, singlePlan }: FaqSectionProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const FAQ_ITEMS: FaqItem[] = [
     subscriptionItemOverride ?? SUBSCRIPTION_FAQ_ITEM,
     firstItem ?? DEFAULT_FIRST_ITEM,
-    ...REST_OF_FAQ_ITEMS,
+    REST_OF_FAQ_ITEMS[0],
+    buildFidelityItem(Boolean(singlePlan)),
+    ...REST_OF_FAQ_ITEMS.slice(1),
   ];
 
   const toggleItem = (index: number) => {

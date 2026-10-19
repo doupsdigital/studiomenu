@@ -425,7 +425,11 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
 
         {/* 5. DÚVIDAS FREQUENTES — antes do carrossel de prova social (pedido
          *  real, 2026-10-15; antes vinha depois). */}
-        <FaqSection firstItem={content.faqFirstItem} subscriptionItemOverride={content.subscriptionFaqOverride} />
+        <FaqSection
+          firstItem={content.faqFirstItem}
+          subscriptionItemOverride={content.subscriptionFaqOverride}
+          singlePlan={Boolean(singlePlanTest)}
+        />
 
         {/* 6. MARQUEE DE PROVA SOCIAL */}
         <section className="lp-marquee-ribbon-section">
