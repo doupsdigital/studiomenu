@@ -367,7 +367,7 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
                   <li>{CHECK_ICON}<span><strong>Pague uma vez e use o ano todo</strong></span></li>
                   <li>{CHECK_ICON}<span>Link profissional para colocar na Bio do Instagram e WhatsApp</span></li>
                   <li>{CHECK_ICON}<span>Edite serviços, fotos e preços quando quiser direto pelo celular</span></li>
-                  <li>{CHECK_ICON}<span>Cliente escolhe o procedimento e agenda direto no seu WhatsApp</span></li>
+                  <li>{CHECK_ICON}<span><strong>Te mandamos sua prévia e você só paga se gostar.</strong></span></li>
                 </ul>
 
                 <a
