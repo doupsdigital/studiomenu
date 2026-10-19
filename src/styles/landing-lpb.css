@@ -1875,6 +1875,25 @@
   animation: lp-mockup-hint-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+/* "Mude as cores do tema" (pedido real, 2026-10-19) — perto do topo da
+ *  moldura, igual à posição real dos botões Rosé/Luxury na capa (flanqueando
+ *  o selo "Seja Bem Vinda"). Seta pro TOPO (`flex-direction: column` com o
+ *  ícone antes do texto) em vez de pro lado, já que aponta pra um botão
+ *  ACIMA da dica, não ao lado. */
+.lp-mockup-hint--theme-rose,
+.lp-mockup-hint--theme-luxury {
+  top: 10%;
+  animation: lp-mockup-hint-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.lp-mockup-hint--theme-rose {
+  left: -16px;
+}
+
+.lp-mockup-hint--theme-luxury {
+  right: -16px;
+}
+
 @keyframes lp-mockup-hint-in {
   from { opacity: 0; transform: scale(0.85); }
   to { opacity: 1; transform: scale(1); }
