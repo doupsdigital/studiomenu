@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
 
 /** Indicadores do mockup da home (pedido real, 2026-10-08). Dois lados:
  *  - Esquerda: mão de "DESLIZE" na capa, troca pra "Clique nos cards"
@@ -53,66 +53,15 @@ export function HeroMockup({ showcaseSlug = 'landingpage', onTap }: HeroMockupPr
   }, [interactive]);
 
   return (
-    <div className="lp-hero-phone-wrap">
+    <div className="lp-hero-phone-wrap" data-reveal style={{ '--reveal-delay': '0.15s' } as CSSProperties}>
       <div className="lp-phone-interactive-container">
         <div className="lp-testdrive-phone">
           <div className="lp-testdrive-notch" />
           <div className={`lp-testdrive-screen${onTap ? ' lp-testdrive-screen--static' : ''}`}>
             <div className="lp-testdrive-screen-scaler">
-              {/* Pula direto pra tela de serviços/cards na vitrine estática
-               *  (pedido real, 2026-10-19) — mesma continuidade visual do
-               *  criativo do anúncio (sem isso a pessoa via a capa aqui e
-               *  podia achar que clicou errado, já que não sabia ainda que
-               *  o menu tem uma capa). O modal de teste completo (ao tocar)
-               *  continua abrindo do zero pela capa.
-               *
-               *  NÃO usa `#catalogo` na URL do `src` (bug real, 2026-10-19
-               *  — corrigido depois de 2 tentativas na pista errada,
-               *  animação e scroll-anchoring): navegar o iframe com uma
-               *  âncora de URL aciona o "scroll to the fragment" nativo do
-               *  navegador, que pode rolar containers ANCESTRAIS (inclusive
-               *  a página pai, fora do iframe) pra garantir que o elemento
-               *  fique visível — causava a página inteira rolar sozinha
-               *  pra baixo ao carregar. Em vez disso, rola só o DOCUMENTO
-               *  DO PRÓPRIO IFRAME via JS no `onLoad` (`scrollIntoView` não
-               *  cruza a fronteira do iframe, só a navegação por âncora
-               *  faz isso). */}
-              <iframe
-                src={`/c/showcase/${showcaseSlug}`}
-                title="Prévia ao vivo do Menu Digital StudioMenu"
-                tabIndex={-1}
-                onLoad={(event) => {
-                  if (!onTap) return;
-                  try {
-                    event.currentTarget.contentWindow?.document.getElementById('catalogo')?.scrollIntoView();
-                  } catch {
-                    // Falha rara (ex: timing) — fallback seguro, só mostra a capa.
-                  }
-                }}
-              />
+              <iframe src={`/c/showcase/${showcaseSlug}`} title="Prévia ao vivo do Menu Digital StudioMenu" tabIndex={-1} />
             </div>
           </div>
-
-          {/* "Toque aqui" nos 2 lados DO CELULAR (pedido real, 2026-10-19;
-           *  2ª tentativa depois de feedback real — a versão com anel+mão
-           *  não agradou visualmente. Agora setas apontando pro mockup,
-           *  mesmo estilo/linguagem visual do indicador "Sua foto aqui"
-           *  mais abaixo (`lp-photo-point-icon`) — maiores e mais afastadas
-           *  do celular (fora de vez, não só pendurada na borda). */}
-          {onTap && (
-            <span className="lp-testdrive-tap-arrow lp-testdrive-tap-arrow--left" aria-hidden="true">
-              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#c84b72" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 12h14m-7-7 7 7-7 7" />
-              </svg>
-            </span>
-          )}
-          {onTap && (
-            <span className="lp-testdrive-tap-arrow lp-testdrive-tap-arrow--right" aria-hidden="true">
-              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#c84b72" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19 12H5M12 19l-7-7 7-7" />
-              </svg>
-            </span>
-          )}
 
           {onTap && (
             <button type="button" className="lp-testdrive-tap-overlay" onClick={onTap}>
