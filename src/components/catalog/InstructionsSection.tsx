@@ -57,7 +57,7 @@ export const InstructionsSection: React.FC<InstructionsSectionProps> = ({
           <span className="etiqueta anim-fade-up delay-1">Orientações</span>
         </div>
 
-        <div className="secao-orientacoes__corpo">
+        <div className="secao-orientacoes__corpo" data-tour="cat-orientacoes">
           <h2 className="secao-orientacoes__titulo anim-fade-up delay-2">
             Informações <em>importantes</em>
           </h2>
