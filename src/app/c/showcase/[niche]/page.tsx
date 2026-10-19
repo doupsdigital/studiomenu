@@ -45,8 +45,10 @@ const SHOWCASE_SLUGS: Record<string, { niche: NicheType; forceBasico: boolean; c
   // Preset próprio, só pro modal de teste da landing nichada de Lash
   // (pedido real, 2026-10-14) — só 4 procedimentos (os mesmos do criativo
   // de anúncio), editável à vontade sem afetar o showroom real do nicho
-  // Lash (`lash`/`lashdesigner` acima continuam intactos).
-  lashlanding: { niche: 'lash', forceBasico: true, coverOverride: '/modelos/mosaico/assets/img/Hero.webp', presetOverride: lashLandingMockupPreset },
+  // Lash (`lash`/`lashdesigner` acima continuam intactos). `coverOverride`
+  // trocado da foto de modelo (mulher) pra capa padronizada do nicho
+  // (pedido real, 2026-10-19) — mesma imagem usada em `lashs`.
+  lashlanding: { niche: 'lash', forceBasico: true, coverOverride: '/capa_lash.png', presetOverride: lashLandingMockupPreset },
 };
 
 function resolveShowcaseSlug(slug: string): { niche: NicheType; forceBasico: boolean; coverOverride?: string; presetOverride?: CatalogOrderData } {
