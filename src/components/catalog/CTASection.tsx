@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { MapPin } from 'lucide-react';
 import { CatalogOrderData } from '@/types/catalog';
+import { HeroParticles } from './HeroParticles';
 
 type DemoInfoType = 'whatsapp' | 'instagram' | 'maps';
 
@@ -76,27 +77,19 @@ export const CTASection: React.FC<CTASectionProps> = ({
       </div>
       <div className="secao-contato__scrim"></div>
 
+      {/* Mesma animação de bolhas flutuantes da Capa (pedido real,
+       *  2026-10-19) — `HeroParticles` já lê as cores certas por tema
+       *  (`--hero-particle-*`, Rosé/Luxury) via CSS, sem precisar de nada
+       *  específico dessa tela. */}
+      <HeroParticles />
+
       <div className="secao-contato__conteudo">
         <div className="secao-contato__topo">
           <span className="etiqueta anim-fade-up delay-1">Atendimento Exclusivo</span>
         </div>
 
         <div className="secao-contato__corpo">
-          {/* Repete STUDIO / Nome da Capa (pedido real, 2026-10-19) — mesmas
-           *  classes de `HeaderCover.tsx` (`hero__studio-line`/`hero__titulo
-           *  h1`), de propósito: herda fonte/tamanho/cor idênticos sem
-           *  duplicar CSS. Só leitura aqui (sem `contentEditable` — editar o
-           *  nome já é feito na Capa, essa tela só repete o valor). */}
-          <div className="secao-contato__studio-repeat anim-fade-up delay-1">
-            <div className="hero__studio-line">
-              <span className="hero__studio-label">STUDIO</span>
-              <span className="hero__studio-divider"></span>
-            </div>
-            <div className="hero__titulo">
-              <h1>{data.client_name}</h1>
-            </div>
-          </div>
-
+          <span className="etiqueta secao-contato__sublabel anim-fade-up delay-2">Agende seu horário</span>
           <h2 className="secao-contato__titulo anim-fade-up delay-2">
             Meus <em>Links</em>
           </h2>
