@@ -59,6 +59,7 @@ const MAX_SCALE = 360 / FRAME_W;
  *  continuamente ao espaço disponível, não só em 2-3 tamanhos fixos. */
 export function MockupModal({ showcaseSlug, isOpen, onClose }: MockupModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
   const [scale, setScale] = useState(1);
   const [screen, setScreen] = useState<MockupScreen>('cover');
   const [detailModalOpen, setDetailModalOpen] = useState(false);
@@ -67,6 +68,14 @@ export function MockupModal({ showcaseSlug, isOpen, onClose }: MockupModalProps)
 
   useEffect(() => {
     function handleMessage(event: MessageEvent) {
+      // Bug real, 2026-10-16 — a Hero também tem um iframe do mesmo
+      // catálogo rodando em paralelo (vitrine decorativa, sempre montada
+      // em segundo plano) e manda os MESMOS tipos de postMessage. Sem
+      // filtrar por `event.source`, o modal às vezes pegava o aviso de
+      // tela do iframe ERRADO (da Hero) e mostrava a dica errada (ex:
+      // "Clique nos cards" logo na 1ª abertura, antes de rolar). Só
+      // processa mensagem vinda do PRÓPRIO iframe deste modal.
+      if (event.source !== iframeRef.current?.contentWindow) return;
       if (event.data?.type === 'VITRINE_DETAIL_MODAL') {
         // Modal de detalhe do procedimento (pedido real, 2026-10-16) — some
         // enquanto ele está por cima do card, reaparece ao fechar (ver
@@ -189,7 +198,7 @@ export function MockupModal({ showcaseSlug, isOpen, onClose }: MockupModalProps)
         <div className="lp-mockup-modal-notch" />
         <div className="lp-mockup-modal-screen">
           <div className="lp-mockup-modal-scaler" style={{ transform: `scale(${scale})` }}>
-            <iframe src={`/c/showcase/${showcaseSlug}`} title="Teste o Menu Digital StudioMenu" />
+            <iframe ref={iframeRef} src={`/c/showcase/${showcaseSlug}`} title="Teste o Menu Digital StudioMenu" />
 
             {/* Ponte pós-demonstração (pedido real, 2026-10-19) — na última
              *  tela (Contato), em vez de deixar o fluxo morrer aí, oferece

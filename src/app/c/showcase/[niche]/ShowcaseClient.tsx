@@ -23,9 +23,21 @@ interface ShowcaseClientProps {
    *  pra poder editar serviços/textos livremente sem afetar o showroom
    *  real do nicho nem catálogos de clientes. */
   presetOverride?: CatalogOrderData;
+  /** `?tela=catalogo` na URL (pedido real, 2026-10-19) — pula direto pra
+   *  tela de serviços/cards em vez da capa, só usado pela vitrine estática
+   *  do mockup da Hero (`HeroMockup.tsx`), pra bater com o criativo do
+   *  anúncio. NÃO rola até a seção — simplesmente não renderiza a Capa
+   *  (`hideCoverSection` no `CatalogLayout`), então a tela de serviços já
+   *  nasce no topo. 3 tentativas diferentes de "rolar até o catálogo"
+   *  (âncora de URL, `scrollIntoView` no load do iframe pelo pai, e
+   *  `scrollIntoView` interno aqui dentro) causaram o MESMO bug real em
+   *  produção, 2026-10-19 — a página PAI (fora do iframe) rolava sozinha
+   *  ao carregar, não importa o mecanismo usado pra rolar o iframe. Sem
+   *  nenhuma chamada de scroll envolvida, esse bug deixa de ser possível. */
+  hideCoverSection?: boolean;
 }
 
-export function ShowcaseClient({ niche, forceBasico = false, coverOverride, presetOverride }: ShowcaseClientProps) {
+export function ShowcaseClient({ niche, forceBasico = false, coverOverride, presetOverride, hideCoverSection = false }: ShowcaseClientProps) {
   const basePreset = presetOverride || nichePresetsMap[niche];
 
   const [layoutModel, setLayoutModel] = useState<LayoutModel>(basePreset?.layout_model || 'mosaico');
@@ -124,6 +136,7 @@ export function ShowcaseClient({ niche, forceBasico = false, coverOverride, pres
         demoBookingOnly
         themeSwitcher={{ value: themeVariant, onChange: setThemeVariant }}
         layoutSwitcher={{ value: layoutModel, onChange: setLayoutModel }}
+        hideCoverSection={hideCoverSection}
       />
     </div>
   );
