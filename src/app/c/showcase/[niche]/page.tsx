@@ -3,6 +3,7 @@ import { NicheType, CatalogOrderData } from '@/types/catalog';
 import { ShowcaseClient } from './ShowcaseClient';
 import { landingMockupPreset } from '@/data/niche-presets/landing-mockup';
 import { lashLandingMockupPreset } from '@/data/niche-presets/lash-landing-mockup';
+import { nailLandingMockupPreset } from '@/data/niche-presets/nail-landing-mockup';
 
 interface ShowcasePageProps {
   params: Promise<{ niche: string }>;
@@ -49,6 +50,13 @@ const SHOWCASE_SLUGS: Record<string, { niche: NicheType; forceBasico: boolean; c
   // trocado da foto de modelo (mulher) pra capa padronizada do nicho
   // (pedido real, 2026-10-19) — mesma imagem usada em `lashs`.
   lashlanding: { niche: 'lash', forceBasico: true, coverOverride: '/capa_lash.png', presetOverride: lashLandingMockupPreset },
+  // Equivalente pro Nail (pedido real, 2026-10-19) — mesmo preset real do
+  // nicho (sem filtrar procedimentos, diferente do lashlanding acima), só
+  // com a tela de Orientações esvaziada (ver `nail-landing-mockup.ts`).
+  // Substitui `nails` como `showcaseSlug` do conteúdo da landing (`nail` em
+  // `landing-niche-content.tsx`) — `nails` continua intocado, sem o
+  // presetOverride, pra não perder esse exemplo também.
+  naillanding: { niche: 'nail', forceBasico: true, coverOverride: '/capa_nail.png', presetOverride: nailLandingMockupPreset },
 };
 
 function resolveShowcaseSlug(slug: string): { niche: NicheType; forceBasico: boolean; coverOverride?: string; presetOverride?: CatalogOrderData } {

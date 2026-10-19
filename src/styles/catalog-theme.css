@@ -528,10 +528,10 @@ button {
  *  genérico quando inativo. `--is-active` só acrescenta um destaque (anel)
  *  pra indicar qual é o tema atual, sem mudar a paleta de base. */
 .hero__theme-pill {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.02em;
-  padding: 4px 11px;
+  padding: 5px 13px;
   border-radius: 999px;
   border: 1px solid transparent;
   cursor: pointer;
