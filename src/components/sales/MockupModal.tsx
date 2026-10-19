@@ -258,7 +258,7 @@ export function MockupModal({ showcaseSlug, isOpen, onClose }: MockupModalProps)
 
         {hintsReady && screen === 'cover' && (
           <div className="lp-mockup-hint lp-mockup-hint--photo" aria-hidden="true">
-            <span className="lp-scroll-cue-tag">Sua foto aqui</span>
+            <span className="lp-scroll-cue-tag">Capa do seu Studio</span>
             <div className="lp-photo-cursor-wrap">
               <svg className="lp-photo-point-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c84b72" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
                 <path d="M19 12H5M12 19l-7-7 7-7" />

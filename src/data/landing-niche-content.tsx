@@ -157,11 +157,13 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
         próprio <strong className="lp-text-gradient">Site/Menu Digital interativo</strong>.
       </>
     ),
-    // 'naildesigner', não 'nail' — o slug 'nail' cai no agendamento automático
+    // 'nails', não 'nail' — o slug 'nail' cai no agendamento automático
     // (Plus), mas a copy acima promete "agenda direto no WhatsApp" (igual
-    // lash); 'naildesigner' é a versão Básico (WhatsApp) do mesmo nicho
-    // (bug real em produção, 2026-10-15).
-    showcaseSlug: 'naildesigner',
+    // lash); 'nails' é a versão Básico (WhatsApp) com a capa padronizada do
+    // nicho (sem foto de modelo) — trocado de 'naildesigner' pro mockup não
+    // mostrar mais uma pessoa na capa (pedido real, 2026-10-19), igual foi
+    // feito em `lashlanding` acima.
+    showcaseSlug: 'nails',
     socialProofHighlight: '350+ Nail Designers',
     faqFirstItem: {
       question: '1. Só serve pra unha ou dá pra colocar outros serviços também?',
