@@ -157,6 +157,20 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
 
                 <h2 className="lp-hero-title">{content.heroTitle}</h2>
 
+                {/* Imagem "WhatsApp bagunçado" (pedido real, 2026-10-20) —
+                 *  mostra na prática a dor que a Hero descreve em texto
+                 *  (tabela de preços e fotos soltas no WhatsApp, com X
+                 *  vermelho). Só nichos com `whatsappPainImage` (lash/nail
+                 *  por enquanto, ver `landing-niche-content.tsx`). */}
+                {content.whatsappPainImage && (
+                  <img
+                    src={content.whatsappPainImage}
+                    alt="Tabela de preços e fotos soltas no WhatsApp, marcadas com X"
+                    className="lp-hero-pain-image"
+                    fetchPriority="high"
+                  />
+                )}
+
                 <p className="lp-hero-subtitle">{content.heroSubtitle}</p>
 
                 {/* Botão "Criar Meu Catálogo Agora" removido (teste de X1,
