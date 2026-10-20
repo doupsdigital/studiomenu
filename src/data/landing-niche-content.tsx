@@ -174,11 +174,11 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
         <span className="lp-hero-niche-ribbon" />
       </div>
     ),
-    // Teste de plano único anual (pedido real, 2026-10-19) — preço
-    // igualado ao de nail (R$89,90), que já estava rodando como teste à
-    // parte (ver comentário de `singleAnnualPlanTest` na interface acima).
+    // Teste de plano único anual (pedido real, 2026-10-19, preço ajustado
+    // pra R$79,90 em 2026-10-20) — ver comentário de `singleAnnualPlanTest`
+    // na interface acima.
     singleAnnualPlanTest: {
-      price: 89.9,
+      price: 79.9,
       anchorPrice: 199.9,
       ctaLabel: 'QUERO MEU MENU DIGITAL',
       nicheLabel: 'Lash Designer',
@@ -258,12 +258,11 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     // Teste de plano único anual (pedido real, 2026-10-19) — ver
     // comentário de `singleAnnualPlanTest` na interface acima.
     singleAnnualPlanTest: {
-      // Preço de teste pra nail (pedido real, 2026-10-19) — diferente de
-      // lash (R$129,90) de propósito, pra comparar os 2 valores. Âncora
-      // continua R$199,90 — o % do selo de desconto é sempre CALCULADO
-      // (ver `anualDiscountPercent` em SalesLandingPage.tsx), então não
-      // precisa mexer em mais nada além do preço aqui.
-      price: 89.9,
+      // Preço ajustado pra R$79,90 em 2026-10-20. Âncora continua
+      // R$199,90 — o % do selo de desconto é sempre CALCULADO (ver
+      // `anualDiscountPercent` em SalesLandingPage.tsx), então não precisa
+      // mexer em mais nada além do preço aqui.
+      price: 79.9,
       anchorPrice: 199.9,
       ctaLabel: 'QUERO MEU MENU DIGITAL',
       nicheLabel: 'Nail Designer',
