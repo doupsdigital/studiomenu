@@ -141,18 +141,25 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
 
           <div className="lp-container">
             <div className="lp-hero-grid">
-              {/* Hero já está visível na carga da página (ninguém rola até
-               *  ela) — o `data-reveal` aqui não é "scroll reveal", é
-               *  animação de entrada no load: o IntersectionObserver de
-               *  `useScrollReveal` dispara assim que monta, pra qualquer
-               *  coisa que já esteja na viewport (pedido real, 2026-10-15:
-               *  landing pages premium animam a Hero no load, em cascata). */}
-              <div className="lp-hero-content" data-reveal>
-                <div className="lp-hero-brand-block">
+              {/* Sem `data-reveal` de propósito (pedido real, 2026-10-20) —
+               *  a primeira dobra deve aparecer de imediato, sem nenhuma
+               *  animação de entrada; só a partir da 2ª seção em diante
+               *  (ao rolar) que o scroll reveal entra em ação. */}
+              <div className="lp-hero-content">
+                <div className={`lp-hero-brand-block${content.heroBrandName ? ' lp-hero-brand-block--compact' : ''}`}>
                   <h1 className="lp-hero-brand-h1">
-                    Studio<em>Menu</em>
+                    {content.heroBrandName ? (
+                      <>
+                        {content.heroBrandName.prefix}
+                        <em>{content.heroBrandName.highlight}</em>
+                      </>
+                    ) : (
+                      <>
+                        Studio<em>Menu</em>
+                      </>
+                    )}
                   </h1>
-                  <p className="lp-hero-brand-tagline">{content.eyebrow}</p>
+                  {!content.heroBrandName && <p className="lp-hero-brand-tagline">{content.eyebrow}</p>}
                 </div>
 
                 <h2 className="lp-hero-title">{content.heroTitle}</h2>

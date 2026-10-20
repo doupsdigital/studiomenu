@@ -266,22 +266,15 @@
   top: 28px;
   right: -48px;
   width: 203px;
+  height: 42px;
   transform: rotate(45deg);
-  text-align: center;
-  padding: 8px 0;
   background: linear-gradient(135deg, var(--lp-accent) 0%, var(--lp-accent-dark) 100%);
-  color: #ffffff;
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-style: italic;
-  font-weight: 700;
-  font-size: 1.6rem;
-  letter-spacing: 0.03em;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
 }
 
 @media (max-width: 900px) {
   .lp-hero-niche-ribbon-wrap { width: 130px; height: 130px; }
-  .lp-hero-niche-ribbon { top: 21px; right: -45px; width: 175px; font-size: 1.4rem; padding: 7px 0; }
+  .lp-hero-niche-ribbon { top: 21px; right: -45px; width: 175px; height: 36px; }
 }
 
 .lp-hero-grid {
@@ -298,6 +291,17 @@
 
 .lp-hero-brand-block {
   margin-bottom: 20px;
+}
+
+/* Teste "Ei, LashDesigner/NailDesigner" sem a linha de eyebrow embaixo
+ *  (pedido real, 2026-10-20) — reduz o espaçamento pra reequilibrar
+ *  depois que a linha some. */
+.lp-hero-brand-block--compact {
+  margin-bottom: 18px;
+}
+
+.lp-hero-brand-block--compact .lp-hero-brand-h1 {
+  margin-bottom: 0;
 }
 
 .lp-hero-brand-h1 {
