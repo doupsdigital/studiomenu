@@ -1,6 +1,7 @@
 import { SalesLandingPage } from '@/components/sales/SalesLandingPage';
 import { FbclidTracker } from '@/components/sales/FbclidTracker';
 import { PostHogTracker } from '@/components/sales/PostHogTracker';
+import { MetaPixelTracker } from '@/components/sales/MetaPixelTracker';
 import { LANDING_NICHE_CONTENT, type LandingNiche } from '@/data/landing-niche-content';
 
 interface StudioMenuLandingPageProps {
@@ -19,6 +20,7 @@ export default async function StudioMenuLandingPage({ searchParams }: StudioMenu
 
   return (
     <>
+      <MetaPixelTracker />
       <FbclidTracker />
       <PostHogTracker />
       <SalesLandingPage content={content} />
