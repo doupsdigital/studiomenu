@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, type CSSProperties } from 'react';
+import { useEffect, useState } from 'react';
 
 /** Indicadores do mockup da home (pedido real, 2026-10-08). Dois lados:
  *  - Esquerda: mão de "DESLIZE" na capa, troca pra "Clique nos cards"
@@ -52,8 +52,10 @@ export function HeroMockup({ showcaseSlug = 'landingpage', onTap }: HeroMockupPr
     return () => window.removeEventListener('message', handleMessage);
   }, [interactive]);
 
+  // Sem `data-reveal` de propósito (pedido real, 2026-10-20) — faz parte
+  // da primeira dobra, que deve aparecer de imediato, sem animação.
   return (
-    <div className="lp-hero-phone-wrap" data-reveal style={{ '--reveal-delay': '0.15s' } as CSSProperties}>
+    <div className="lp-hero-phone-wrap">
       <div className="lp-phone-interactive-container">
         <div className="lp-testdrive-phone">
           <div className="lp-testdrive-notch" />

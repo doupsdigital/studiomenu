@@ -17,6 +17,12 @@ export type LandingNiche = 'geral' | 'lash' | 'nail' | 'lashdesigner' | 'naildes
 export interface LandingNicheContent {
   /** Linha pequena acima do título na Hero. */
   eyebrow: ReactNode;
+  /** Teste (pedido real, 2026-10-20) — troca o logo "Studio<em>Menu</em>"
+   *  da Hero por uma saudação nichada (ex: "Ei, <em>LashDesigner</em>")
+   *  e esconde a linha de `eyebrow` logo abaixo (vira redundante). Só
+   *  `lash`/`nail` por enquanto — os outros nichos continuam com o logo
+   *  padrão + eyebrow normal. */
+  heroBrandName?: { prefix: string; highlight: string };
   /** Título principal da Hero — alinhado aos criativos. */
   heroTitle: ReactNode;
   heroSubtitle: ReactNode;
@@ -115,6 +121,7 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     // nova). Idêntica à de `lashdesigner` abaixo de propósito, exceto
     // `whatsappPainImage` (pedido real, 2026-10-20) — só nas páginas ao
     // vivo (`lash`/`nail`), não nas de backup/referência.
+    heroBrandName: { prefix: 'Ei, ', highlight: 'LashDesigner' },
     eyebrow: (
       <>
         Feito para <span className="lp-eyebrow-highlight">Lash Designer</span>
@@ -164,7 +171,7 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     anualValueAnchor: 'Sai por menos que 1 aplicação de Volume Brasileiro',
     cornerBadge: (
       <div className="lp-hero-niche-ribbon-wrap" aria-hidden="true">
-        <span className="lp-hero-niche-ribbon">Lash</span>
+        <span className="lp-hero-niche-ribbon" />
       </div>
     ),
     // Teste de plano único anual (pedido real, 2026-10-19) — preço
@@ -185,6 +192,7 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     // Copy do Hero atualizada pra bater com a nova campanha de criativos
     // (pedido real, 2026-10-19 — ver comentário equivalente em `lash`
     // acima). Idêntica à de `naildesigner` abaixo de propósito.
+    heroBrandName: { prefix: 'Ei, ', highlight: 'NailDesigner' },
     eyebrow: (
       <>
         Feito para <span className="lp-eyebrow-highlight">Nail Designer</span>
@@ -244,7 +252,7 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     anualValueAnchor: 'Sai por menos que 1 Esmaltação em Gel',
     cornerBadge: (
       <div className="lp-hero-niche-ribbon-wrap" aria-hidden="true">
-        <span className="lp-hero-niche-ribbon">Nail</span>
+        <span className="lp-hero-niche-ribbon" />
       </div>
     ),
     // Teste de plano único anual (pedido real, 2026-10-19) — ver
@@ -303,7 +311,7 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     anualValueAnchor: 'Sai por menos que 1 aplicação de Volume Brasileiro',
     cornerBadge: (
       <div className="lp-hero-niche-ribbon-wrap" aria-hidden="true">
-        <span className="lp-hero-niche-ribbon">Lash</span>
+        <span className="lp-hero-niche-ribbon" />
       </div>
     ),
   },
@@ -339,7 +347,7 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     anualValueAnchor: 'Sai por menos que 1 alongamento em Gel',
     cornerBadge: (
       <div className="lp-hero-niche-ribbon-wrap" aria-hidden="true">
-        <span className="lp-hero-niche-ribbon">Nail</span>
+        <span className="lp-hero-niche-ribbon" />
       </div>
     ),
   },
