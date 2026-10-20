@@ -30,3 +30,23 @@ export function identify(distinctId: string, properties?: Record<string, unknown
   if (!isProductionHost() || !posthog.__loaded) return;
   posthog.identify(distinctId, properties);
 }
+
+/** Bug real, 2026-10-20: `identify()` grava o `distinct_id` no
+ *  localStorage/cookie do navegador e ele fica lá — sem um `reset()` em
+ *  algum momento, qualquer página seguinte carregada no MESMO navegador
+ *  (inclusive a landing page pública, que nunca chama `identify`) herda
+ *  a identidade de uma cliente que nem é quem está navegando agora. Usado
+ *  em dois lugares: `PostHogTracker.tsx` (landing — sempre começa
+ *  anônima) e `AppPostHogTracker.tsx` (só quando o slug muda, pra não
+ *  gerar reset desnecessário na mesma cliente). */
+export function reset() {
+  if (!isProductionHost() || !posthog.__loaded) return;
+  posthog.reset();
+}
+
+/** Usado só por `AppPostHogTracker.tsx` pra decidir se precisa de
+ *  `reset()` antes do `identify()` (ver comentário acima). */
+export function getDistinctId(): string | null {
+  if (!isProductionHost() || !posthog.__loaded) return null;
+  return posthog.get_distinct_id();
+}

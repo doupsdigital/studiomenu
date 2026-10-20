@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { initPostHog } from '@/lib/analytics';
+import { initPostHog, reset } from '@/lib/analytics';
 
 /** Analytics da landing page de vendas (`studiomenu.art`) — pedido real,
  *  2026-10-13: reaproveita o mesmo projeto PostHog que já existia (antigo
@@ -27,6 +27,12 @@ export function PostHogTracker() {
         maskInputOptions: { password: true },
       },
     });
+
+    // Bug real, 2026-10-20: sem isso, visita à landing page no mesmo
+    // navegador onde já rolou um `identify(slug)` do app (ex: teste de
+    // QA logo após criar um catálogo) herdava o distinct_id da cliente —
+    // a landing é sempre pública/anônima, nunca deve carregar identidade.
+    reset();
   }, []);
 
   return null;

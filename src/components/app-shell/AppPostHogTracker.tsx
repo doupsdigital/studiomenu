@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { initPostHog, identify } from '@/lib/analytics';
+import { initPostHog, identify, reset, getDistinctId } from '@/lib/analytics';
 
 interface AppPostHogTrackerProps {
   slug: string;
@@ -42,6 +42,16 @@ export function AppPostHogTracker({ slug, planTier, subscriptionStatus, clientNa
         maskInputOptions: { password: true, email: true },
       },
     });
+
+    // Bug real, 2026-10-20: testar o link de VÁRIAS clientes diferentes no
+    // mesmo navegador (QA logo após criar cada catálogo) fazia a 2ª
+    // cliente herdar o `distinct_id` (e as gravações) da 1ª, porque o
+    // `identify` anterior nunca era limpo. Só reseta quando o slug
+    // realmente muda — não a cada remount da mesma cliente.
+    const currentDistinctId = getDistinctId();
+    if (currentDistinctId && currentDistinctId !== slug) {
+      reset();
+    }
 
     identify(slug, {
       plan_tier: planTier,
