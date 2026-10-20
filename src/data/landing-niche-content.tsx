@@ -112,9 +112,11 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     ),
     heroSubtitle: (
       <>
-        Conheça o <strong className="lp-text-gradient">StudioMenu</strong>.{' '}
-        <strong className="lp-text-wine">Não é PDF nem Canva</strong>: É seu
-        próprio <strong className="lp-text-gradient">Site/Menu Digital interativo</strong>.
+        Conheça o <strong className="lp-text-gradient lp-hero-subtitle-brand">StudioMenu</strong>.
+        <br />
+        <strong className="lp-text-wine">Não é PDF nem Canva</strong>.
+        <br />
+        É seu próprio <strong className="lp-text-gradient">Site/Menu Digital interativo</strong>.
       </>
     ),
     whatsappPainImage: '/whatsapp_lash.webp',
@@ -162,9 +164,11 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     ),
     heroSubtitle: (
       <>
-        Conheça o <strong className="lp-text-gradient">StudioMenu</strong>.{' '}
-        <strong className="lp-text-wine">Não é PDF nem Canva</strong>: É seu
-        próprio <strong className="lp-text-gradient">Site/Menu Digital interativo</strong>.
+        Conheça o <strong className="lp-text-gradient lp-hero-subtitle-brand">StudioMenu</strong>.
+        <br />
+        <strong className="lp-text-wine">Não é PDF nem Canva</strong>.
+        <br />
+        É seu próprio <strong className="lp-text-gradient">Site/Menu Digital interativo</strong>.
       </>
     ),
     whatsappPainImage: '/whatsapp_nail.webp',
@@ -229,9 +233,11 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     ),
     heroSubtitle: (
       <>
-        Conheça o <strong className="lp-text-gradient">StudioMenu</strong>.{' '}
-        <strong className="lp-text-wine">Não é PDF nem Canva</strong>: É seu
-        próprio <strong className="lp-text-gradient">Site/Menu Digital interativo</strong>.
+        Conheça o <strong className="lp-text-gradient lp-hero-subtitle-brand">StudioMenu</strong>.
+        <br />
+        <strong className="lp-text-wine">Não é PDF nem Canva</strong>.
+        <br />
+        É seu próprio <strong className="lp-text-gradient">Site/Menu Digital interativo</strong>.
       </>
     ),
     showcaseSlug: 'lashlanding',
@@ -262,9 +268,11 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     ),
     heroSubtitle: (
       <>
-        Conheça o <strong className="lp-text-gradient">StudioMenu</strong>.{' '}
-        <strong className="lp-text-wine">Não é PDF nem Canva</strong>: É seu
-        próprio <strong className="lp-text-gradient">Site/Menu Digital interativo</strong>.
+        Conheça o <strong className="lp-text-gradient lp-hero-subtitle-brand">StudioMenu</strong>.
+        <br />
+        <strong className="lp-text-wine">Não é PDF nem Canva</strong>.
+        <br />
+        É seu próprio <strong className="lp-text-gradient">Site/Menu Digital interativo</strong>.
       </>
     ),
     showcaseSlug: 'naildesigner',
