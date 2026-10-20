@@ -1556,7 +1556,7 @@
 .lp-pain-reinforce-image--bad {
   position: relative;
   z-index: 1;
-  max-width: 155px;
+  max-width: 200px;
   transform: rotate(-6deg);
 }
 
@@ -1577,7 +1577,7 @@
   position: relative;
   z-index: 2;
   display: block;
-  max-width: 195px;
+  max-width: 240px;
   margin: 0 auto;
   transform: rotate(6deg);
   mask-image: var(--good-mockup-mask);
