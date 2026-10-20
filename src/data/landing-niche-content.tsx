@@ -38,6 +38,12 @@ export interface LandingNicheContent {
   secondPainHeading?: ReactNode;
   /** Texto menor ABAIXO da imagem. */
   secondPainText?: ReactNode;
+  /** Imagem do catálogo StudioMenu já organizado (pedido real, 2026-10-20)
+   *  — some ao lado da `secondPainImage` (WhatsApp com X), rotacionada pro
+   *  lado OPOSTO, com um selo de check verde saindo por cima da borda de
+   *  baixo (overflow). Contraste direto "ruim vs bom" reforçando a mesma
+   *  dor. Só existe junto com `secondPainImage` (mesmos nichos). */
+  goodMockupImage?: string;
   /** Slug de `/c/showcase/{slug}` embutido no mockup de celular da Hero. */
   showcaseSlug: string;
   /** Trecho em negrito da barra de prova social no topo ("4.9/5 · Mais de {isto} já usam"). */
@@ -147,6 +153,7 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
         Deixe que o StudioMenu cuide do resto.
       </>
     ),
+    goodMockupImage: '/mockup_lash_bom.webp',
     showcaseSlug: 'lashlanding',
     socialProofHighlight: '350+ Lash Designers',
     faqFirstItem: {
@@ -215,6 +222,7 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
         Deixe que o StudioMenu cuide do resto.
       </>
     ),
+    goodMockupImage: '/mockup_nail_bom.webp',
     // 'naillanding', não 'nail' — o slug 'nail' cai no agendamento
     // automático (Plus), mas a copy acima promete "agenda direto no
     // WhatsApp" (igual lash); 'naillanding' é a versão Básico (WhatsApp)

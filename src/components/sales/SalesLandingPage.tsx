@@ -447,13 +447,45 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
             <div className="lp-container">
               <p className="lp-pain-reinforce-heading">{content.secondPainHeading}</p>
               <p className="lp-pain-reinforce-text">{content.secondPainText}</p>
-              <div className="lp-pain-reinforce-image-wrap">
-                <img
-                  src={content.secondPainImage}
-                  alt="Conversa de WhatsApp com tabela de preços e fotos soltas, marcada com X vermelho"
-                  className="lp-pain-reinforce-image"
-                  loading="lazy"
-                />
+              <div className="lp-pain-reinforce-images-row">
+                <div className="lp-pain-reinforce-image-wrap lp-pain-reinforce-image-wrap--bad">
+                  <img
+                    src={content.secondPainImage}
+                    alt="Conversa de WhatsApp com tabela de preços e fotos soltas, marcada com X vermelho"
+                    className="lp-pain-reinforce-image lp-pain-reinforce-image--bad"
+                    loading="lazy"
+                  />
+                </div>
+                {content.goodMockupImage && (
+                  <div className="lp-pain-reinforce-image-wrap lp-pain-reinforce-image-wrap--good">
+                    {/* Brilho prateado deslizando (pedido real, 2026-10-20) —
+                     *  mesmo efeito das cápsulas da capa (`.hero__chip::after`
+                     *  + `@keyframes heroChipShine` em `catalog-theme.css`),
+                     *  só que varrendo a imagem inteira. `mask-image` usa a
+                     *  própria imagem como máscara (via custom property, já
+                     *  que cada nicho tem uma foto diferente) — sem isso, o
+                     *  brilho apareceria como uma faixa reta sobre o fundo
+                     *  TRANSPARENTE ao redor do celular, não só na silhueta
+                     *  dele. Rotação fica nesse wrapper (não na `<img>`), pra
+                     *  a máscara girar junto e continuar alinhada com a foto. */}
+                    <div
+                      className="lp-pain-reinforce-shine-wrap"
+                      style={{ ['--good-mockup-mask' as any]: `url(${content.goodMockupImage})` }}
+                    >
+                      <img
+                        src={content.goodMockupImage}
+                        alt="Catálogo digital StudioMenu organizado, com fotos e preços de cada serviço"
+                        className="lp-pain-reinforce-image lp-pain-reinforce-image--good"
+                        loading="lazy"
+                      />
+                    </div>
+                    <span className="lp-pain-reinforce-check-badge" aria-hidden="true">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           </section>
