@@ -86,12 +86,16 @@ export function FaqSection({ firstItem, subscriptionItemOverride, singlePlan }: 
 
   return (
     <section className="lp-faq-section" id="faq">
-      <div className="lp-container">
-        <div className="lp-section-header" data-reveal>
-          <p className="lp-section-kicker">Tire Suas Dúvidas</p>
-          <h2 className="lp-section-title">Perguntas Frequentes</h2>
+      <div className="lp-faq-header-band">
+        <div className="lp-container">
+          <div className="lp-section-header" data-reveal>
+            <p className="lp-section-kicker">Tire Suas Dúvidas</p>
+            <h2 className="lp-section-title">Perguntas Frequentes</h2>
+          </div>
         </div>
+      </div>
 
+      <div className="lp-container">
         <div className="lp-faq-list">
           {FAQ_ITEMS.map((item, index) => {
             const isOpen = openIndex === index;
