@@ -1,6 +1,7 @@
 import { SalesLandingPageClassica } from '@/components/sales-classica/SalesLandingPageClassica';
 import { FbclidTracker } from '@/components/sales/FbclidTracker';
 import { PostHogTracker } from '@/components/sales/PostHogTracker';
+import { MetaPixelTracker } from '@/components/sales/MetaPixelTracker';
 
 /** Cópia de segurança da landing page original (`src/app/page.tsx`), feita
  *  em 2026-10-14 — ver o comentário no topo de `SalesLandingPageClassica.tsx`
@@ -9,6 +10,7 @@ import { PostHogTracker } from '@/components/sales/PostHogTracker';
 export default function StudioMenuLandingPageClassica() {
   return (
     <>
+      <MetaPixelTracker />
       <FbclidTracker />
       <PostHogTracker />
       <SalesLandingPageClassica />
