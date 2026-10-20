@@ -1501,14 +1501,31 @@
   text-decoration: none;
 }
 
-/* Glow rosa desfocado atrás do celular — `blur()` (não borda nítida) pra
- *  não virar um círculo/quadrado "duro" atrás da imagem (pedido real,
+/* Lado a lado "ruim vs bom" (pedido real, 2026-10-20) — WhatsApp com X à
+ *  esquerda (menor, pra caber as 2) e catálogo StudioMenu à direita, com
+ *  rotação espelhada (sentidos opostos) reforçando o contraste visual. */
+.lp-pain-reinforce-images-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Glow rosa desfocado atrás de cada celular — `blur()` (não borda nítida)
+ *  pra não virar um círculo/quadrado "duro" atrás da imagem (pedido real,
  *  2026-10-20). Formato levemente elíptico/assimétrico (`border-radius`
  *  com 4 valores diferentes), reforçado pelo blur. */
 .lp-pain-reinforce-image-wrap {
   position: relative;
-  display: inline-block;
-  margin-bottom: 0;
+  flex: 0 0 auto;
+}
+
+/* A imagem BOA é maior e "invade" por cima da ruim (pedido real,
+ *  2026-10-20: "como se o bom começasse a entrar no ruim, bem pouquinho")
+ *  — margem negativa aproxima as duas, `z-index` maior garante que ela
+ *  fica por CIMA na sobreposição. */
+.lp-pain-reinforce-image-wrap--good {
+  margin-left: -32px;
+  z-index: 2;
 }
 
 .lp-pain-reinforce-image-wrap::before {
@@ -1524,19 +1541,95 @@
 
 .lp-pain-reinforce-image {
   position: relative;
-  z-index: 1;
   display: block;
   width: 100%;
-  max-width: 280px;
   height: auto;
   margin: 0 auto;
-  transform: rotate(-4deg);
   /* `filter: drop-shadow` (não `box-shadow`) de propósito — a imagem tem
    *  fundo transparente ao redor do celular (confirmado nos pixels do
    *  arquivo); `box-shadow`/`border-radius` sempre seguem o RETÂNGULO do
    *  elemento, ignorando o alfa, e criavam um "cartão" fantasma visível ao
    *  redor do mockup. `drop-shadow` segue só os pixels visíveis. */
   filter: drop-shadow(0 18px 36px rgba(26, 18, 32, 0.3));
+}
+
+.lp-pain-reinforce-image--bad {
+  position: relative;
+  z-index: 1;
+  max-width: 155px;
+  transform: rotate(-6deg);
+}
+
+.lp-pain-reinforce-image--good {
+  position: relative;
+}
+
+/* Rotação da imagem BOA fica aqui (não na `<img>`), pra o brilho mascarado
+ *  abaixo girar junto e continuar alinhado com a foto (pedido real,
+ *  2026-10-20). */
+/* `mask-image` fica no PAI (não no `::after` que desliza) — ele tem o
+ *  tamanho exato da imagem real, então recorta certinho pra silhueta do
+ *  celular. A faixa de brilho (filha) desliza livremente por dentro,
+ *  sempre clipada por essa máscara do pai, sem depender de matemática de
+ *  `background-position`/`background-size` (1ª tentativa deixou um
+ *  resíduo visível parado no canto, achado real 2026-10-20). */
+.lp-pain-reinforce-shine-wrap {
+  position: relative;
+  z-index: 2;
+  display: block;
+  max-width: 195px;
+  margin: 0 auto;
+  transform: rotate(6deg);
+  mask-image: var(--good-mockup-mask);
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-image: var(--good-mockup-mask);
+  -webkit-mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+}
+
+/* Brilho prateado deslizando — mesmo mecanismo de `.hero__chip::after`/
+ *  `heroChipShine` em `catalog-theme.css` (faixa estreita enviesada,
+ *  atravessando de um lado a outro), só que mais devagar aqui (4.5s, pedido
+ *  real — o das cápsulas da capa é 3s). */
+.lp-pain-reinforce-shine-wrap::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.5) 50%, transparent 100%);
+  transform: skewX(-20deg);
+  /* `blur` amacia a silhueta da faixa (pedido real, 2026-10-20: "parece um
+   *  retângulo passando") — sem isso, mesmo com as bordas transparentes
+   *  no gradiente, o paralelogramo enviesado ficava com um contorno reto
+   *  perceptível. */
+  filter: blur(8px);
+  animation: heroChipShine 4.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Selo de check verde saindo por cima da borda de baixo da imagem BOA
+ *  (overflow de propósito, pedido real, 2026-10-20) — sinaliza "essa é a
+ *  certa", espelhando o X vermelho (já desenhado dentro da outra imagem)
+ *  do lado oposto. */
+.lp-pain-reinforce-check-badge {
+  position: absolute;
+  z-index: 2;
+  bottom: -14px;
+  right: 18%;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #22b573;
+  border: 3px solid var(--lp-bg);
+  box-shadow: 0 8px 18px rgba(34, 181, 115, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .lp-pain-reinforce-text {
