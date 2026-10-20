@@ -1466,9 +1466,118 @@
 /* ==========================================================================
    DÚVIDAS FREQUENTES (FAQ)
    ========================================================================== */
-.lp-faq-section {
-  padding: 64px 0 80px;
+/* Reforço da dor entre o preço e o FAQ (pedido real, 2026-10-20) — 3ª
+ *  tentativa: fundo rosa contínuo com a seção de preço "juntava" as 2
+ *  seções (feedback real). Agora usa o MESMO fundo neutro do FAQ logo
+ *  abaixo (`var(--lp-bg)`) e a MESMA fonte dos títulos do FAQ
+ *  (`.lp-section-title` — Plus Jakarta Sans, peso 900, sem serifada). Só a
+ *  IMAGEM ganha destaque em rosa — um glow desfocado e com formato
+ *  orgânico (não círculo/quadrado "duro"), via `filter: blur()` num
+ *  pseudo-elemento em vez de borda nítida. */
+.lp-pain-reinforce-section {
   background: var(--lp-bg);
+  padding: 56px 0 24px;
+  text-align: center;
+}
+
+.lp-pain-reinforce-heading {
+  max-width: 420px;
+  margin: 0 auto 12px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  font-size: clamp(1.45rem, 4.6vw, 1.9rem);
+  line-height: 1.25;
+  color: var(--lp-text);
+}
+
+.lp-pain-reinforce-highlight {
+  color: #6d1430;
+  text-decoration: underline;
+  text-decoration-color: #6d1430;
+  text-underline-offset: 3px;
+}
+
+.lp-pain-reinforce-highlight--plain {
+  text-decoration: none;
+}
+
+/* Glow rosa desfocado atrás do celular — `blur()` (não borda nítida) pra
+ *  não virar um círculo/quadrado "duro" atrás da imagem (pedido real,
+ *  2026-10-20). Formato levemente elíptico/assimétrico (`border-radius`
+ *  com 4 valores diferentes), reforçado pelo blur. */
+.lp-pain-reinforce-image-wrap {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 0;
+}
+
+.lp-pain-reinforce-image-wrap::before {
+  content: '';
+  position: absolute;
+  inset: -10px;
+  background: radial-gradient(ellipse, var(--lp-accent) 0%, var(--lp-accent-light) 55%, transparent 78%);
+  border-radius: 42% 58% 55% 45% / 55% 45% 58% 42%;
+  filter: blur(26px);
+  opacity: 0.75;
+  z-index: 0;
+}
+
+.lp-pain-reinforce-image {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  max-width: 280px;
+  height: auto;
+  margin: 0 auto;
+  transform: rotate(-4deg);
+  /* `filter: drop-shadow` (não `box-shadow`) de propósito — a imagem tem
+   *  fundo transparente ao redor do celular (confirmado nos pixels do
+   *  arquivo); `box-shadow`/`border-radius` sempre seguem o RETÂNGULO do
+   *  elemento, ignorando o alfa, e criavam um "cartão" fantasma visível ao
+   *  redor do mockup. `drop-shadow` segue só os pixels visíveis. */
+  filter: drop-shadow(0 18px 36px rgba(26, 18, 32, 0.3));
+}
+
+.lp-pain-reinforce-text {
+  max-width: 440px;
+  margin: 0 auto 28px;
+  font-size: 1.02rem;
+  font-weight: 500;
+  line-height: 1.6;
+  color: var(--lp-muted);
+}
+
+.lp-pain-reinforce-text strong {
+  display: inline-block;
+  color: var(--lp-accent-dark);
+  background: var(--lp-accent-light);
+  padding: 1px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 1.12em;
+}
+
+.lp-faq-section {
+  padding: 0 0 80px;
+  background: var(--lp-bg);
+}
+
+/* Faixa rosa leve atrás do cabeçalho do FAQ (pedido real, 2026-10-20) —
+ *  contraste com o fundo neutro do resto da seção. Full-bleed de graça:
+ *  vive FORA do `.lp-container` (que tem `max-width`), direto dentro da
+ *  `<section>`, que não tem limite de largura — sem precisar de nenhuma
+ *  técnica de margem negativa. */
+.lp-faq-header-band {
+  background: #f6d2de;
+  padding: 32px 0 8px;
+  margin-bottom: 20px;
+}
+
+/* Só o título do FAQ, não `.lp-section-title` global (reaproveitada em
+ *  outras seções). */
+.lp-faq-header-band .lp-section-title {
+  font-style: italic;
 }
 
 .lp-faq-list {

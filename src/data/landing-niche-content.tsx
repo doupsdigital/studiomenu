@@ -27,6 +27,17 @@ export interface LandingNicheContent {
    *  `lash`/`nail` por pedido dela — os outros nichos não têm essa imagem
    *  ainda, então simplesmente não renderiza nada pra eles. */
   whatsappPainImage?: string;
+  /** 2º reforço da dor (pedido real, 2026-10-20) — depois do card de
+   *  preços, antes do FAQ: texto grande ("Pare de perder tempo...") em
+   *  cima da imagem de conversa de WhatsApp (cliente pedindo preço/fotos,
+   *  com X vermelho, rotacionada), texto menor ("Foque no que você faz de
+   *  melhor...") embaixo. Empurra pra compra logo após ver o preço.
+   *  `lash`/`nail` por enquanto. */
+  secondPainImage?: string;
+  /** Texto grande ACIMA da imagem. */
+  secondPainHeading?: ReactNode;
+  /** Texto menor ABAIXO da imagem. */
+  secondPainText?: ReactNode;
   /** Slug de `/c/showcase/{slug}` embutido no mockup de celular da Hero. */
   showcaseSlug: string;
   /** Trecho em negrito da barra de prova social no topo ("4.9/5 · Mais de {isto} já usam"). */
@@ -120,6 +131,22 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
       </>
     ),
     whatsappPainImage: '/whatsapp_lash.webp',
+    secondPainImage: '/whatsapp_vermelho_lash.webp',
+    secondPainHeading: (
+      <>
+        Pare de <span className="lp-pain-reinforce-highlight">perder tempo</span> copiando
+        tabela de preços no <span className="lp-pain-reinforce-highlight lp-pain-reinforce-highlight--plain">WhatsApp</span>.
+      </>
+    ),
+    secondPainText: (
+      <>
+        Foque no que você faz de melhor:
+        <br />
+        <strong>Seu trabalho como Lash Designer.</strong>
+        <br />
+        Deixe que o StudioMenu cuide do resto.
+      </>
+    ),
     showcaseSlug: 'lashlanding',
     socialProofHighlight: '350+ Lash Designers',
     faqFirstItem: {
@@ -172,6 +199,22 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
       </>
     ),
     whatsappPainImage: '/whatsapp_nail.webp',
+    secondPainImage: '/whatsapp_vermelho_nail.webp',
+    secondPainHeading: (
+      <>
+        Pare de <span className="lp-pain-reinforce-highlight">perder tempo</span> copiando
+        tabela de preços no <span className="lp-pain-reinforce-highlight lp-pain-reinforce-highlight--plain">WhatsApp</span>.
+      </>
+    ),
+    secondPainText: (
+      <>
+        Foque no que você faz de melhor:
+        <br />
+        <strong>Seu trabalho como Nail Designer.</strong>
+        <br />
+        Deixe que o StudioMenu cuide do resto.
+      </>
+    ),
     // 'naillanding', não 'nail' — o slug 'nail' cai no agendamento
     // automático (Plus), mas a copy acima promete "agenda direto no
     // WhatsApp" (igual lash); 'naillanding' é a versão Básico (WhatsApp)
