@@ -113,7 +113,7 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     heroSubtitle: (
       <>
         Conheça o <strong className="lp-text-gradient">StudioMenu</strong>.{' '}
-        <strong className="lp-text-wine">Não é PDF nem Canva</strong>: é seu
+        <strong className="lp-text-wine">Não é PDF nem Canva</strong>: É seu
         próprio <strong className="lp-text-gradient">Site/Menu Digital interativo</strong>.
       </>
     ),
@@ -163,7 +163,7 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     heroSubtitle: (
       <>
         Conheça o <strong className="lp-text-gradient">StudioMenu</strong>.{' '}
-        <strong className="lp-text-wine">Não é PDF nem Canva</strong>: é seu
+        <strong className="lp-text-wine">Não é PDF nem Canva</strong>: É seu
         próprio <strong className="lp-text-gradient">Site/Menu Digital interativo</strong>.
       </>
     ),
@@ -230,7 +230,7 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     heroSubtitle: (
       <>
         Conheça o <strong className="lp-text-gradient">StudioMenu</strong>.{' '}
-        <strong className="lp-text-wine">Não é PDF nem Canva</strong>: é seu
+        <strong className="lp-text-wine">Não é PDF nem Canva</strong>: É seu
         próprio <strong className="lp-text-gradient">Site/Menu Digital interativo</strong>.
       </>
     ),
@@ -263,7 +263,7 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     heroSubtitle: (
       <>
         Conheça o <strong className="lp-text-gradient">StudioMenu</strong>.{' '}
-        <strong className="lp-text-wine">Não é PDF nem Canva</strong>: é seu
+        <strong className="lp-text-wine">Não é PDF nem Canva</strong>: É seu
         próprio <strong className="lp-text-gradient">Site/Menu Digital interativo</strong>.
       </>
     ),
