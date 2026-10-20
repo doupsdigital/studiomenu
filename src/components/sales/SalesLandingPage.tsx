@@ -191,7 +191,13 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
                 </div>
                 */}
 
-                <p className="lp-hero-swipe-hint lp-hero-swipe-hint--emphasis">👉 Toque no celular abaixo pra testar o Menu Digital ao vivo:</p>
+                <p className="lp-hero-swipe-hint lp-hero-swipe-hint--emphasis">
+                  <span>Toque no celular para testar</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <polyline points="19 12 12 19 5 12" />
+                  </svg>
+                </p>
               </div>
 
               {/* Mockup: vitrine estática, abre o modal fullscreen de teste
