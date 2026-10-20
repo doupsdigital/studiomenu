@@ -129,8 +129,9 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     ),
     heroSubtitle: (
       <>
-        Conheça o <strong className="lp-text-gradient lp-hero-subtitle-brand">StudioMenu</strong>.
-        <br />
+        <span className="lp-hero-subtitle-lead">
+          Conheça o <strong className="lp-hero-subtitle-brand">Studio<em className="lp-text-gradient">Menu</em></strong>.
+        </span>
         <strong className="lp-text-wine">Não é PDF nem Canva</strong>.
         <br />
         É seu próprio <strong className="lp-text-gradient">Site/Menu Digital interativo</strong>.
@@ -198,8 +199,9 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     ),
     heroSubtitle: (
       <>
-        Conheça o <strong className="lp-text-gradient lp-hero-subtitle-brand">StudioMenu</strong>.
-        <br />
+        <span className="lp-hero-subtitle-lead">
+          Conheça o <strong className="lp-hero-subtitle-brand">Studio<em className="lp-text-gradient">Menu</em></strong>.
+        </span>
         <strong className="lp-text-wine">Não é PDF nem Canva</strong>.
         <br />
         É seu próprio <strong className="lp-text-gradient">Site/Menu Digital interativo</strong>.
@@ -284,8 +286,9 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     ),
     heroSubtitle: (
       <>
-        Conheça o <strong className="lp-text-gradient lp-hero-subtitle-brand">StudioMenu</strong>.
-        <br />
+        <span className="lp-hero-subtitle-lead">
+          Conheça o <strong className="lp-hero-subtitle-brand">Studio<em className="lp-text-gradient">Menu</em></strong>.
+        </span>
         <strong className="lp-text-wine">Não é PDF nem Canva</strong>.
         <br />
         É seu próprio <strong className="lp-text-gradient">Site/Menu Digital interativo</strong>.
@@ -319,8 +322,9 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     ),
     heroSubtitle: (
       <>
-        Conheça o <strong className="lp-text-gradient lp-hero-subtitle-brand">StudioMenu</strong>.
-        <br />
+        <span className="lp-hero-subtitle-lead">
+          Conheça o <strong className="lp-hero-subtitle-brand">Studio<em className="lp-text-gradient">Menu</em></strong>.
+        </span>
         <strong className="lp-text-wine">Não é PDF nem Canva</strong>.
         <br />
         É seu próprio <strong className="lp-text-gradient">Site/Menu Digital interativo</strong>.
