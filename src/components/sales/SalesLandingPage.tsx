@@ -157,6 +157,20 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
 
                 <h2 className="lp-hero-title">{content.heroTitle}</h2>
 
+                {/* Imagem "WhatsApp bagunçado" (pedido real, 2026-10-20) —
+                 *  mostra na prática a dor que a Hero descreve em texto
+                 *  (tabela de preços e fotos soltas no WhatsApp, com X
+                 *  vermelho). Só nichos com `whatsappPainImage` (lash/nail
+                 *  por enquanto, ver `landing-niche-content.tsx`). */}
+                {content.whatsappPainImage && (
+                  <img
+                    src={content.whatsappPainImage}
+                    alt="Tabela de preços e fotos soltas no WhatsApp, marcadas com X"
+                    className="lp-hero-pain-image"
+                    fetchPriority="high"
+                  />
+                )}
+
                 <p className="lp-hero-subtitle">{content.heroSubtitle}</p>
 
                 {/* Botão "Criar Meu Catálogo Agora" removido (teste de X1,
@@ -247,7 +261,7 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
 
                   <ul className="lp-tier-bullets">
                     <li>{CHECK_ICON}<span>Seu Menu Digital online como um site, sempre no ar</span></li>
-                    <li>{CHECK_ICON}<span>Link profissional para colocar na Bio do Instagram e WhatsApp</span></li>
+                    <li>{CHECK_ICON}<span>Link para colocar na Bio do Instagram e mandar no WhatsApp</span></li>
                     <li>{CHECK_ICON}<span>Edite serviços, fotos e preços quando quiser direto pelo celular</span></li>
                     <li>{CHECK_ICON}<span>Cliente escolhe o procedimento e agenda direto no seu WhatsApp</span></li>
                   </ul>
@@ -284,7 +298,7 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
                 <ul className="lp-tier-bullets">
                   <li>{CHECK_ICON}<span><strong>Pague uma vez só, sem nenhuma mensalidade</strong></span></li>
                   <li>{CHECK_ICON}<span>Seu Menu Digital online como um site, sempre no ar</span></li>
-                  <li>{CHECK_ICON}<span>Link profissional para colocar na Bio do Instagram e WhatsApp</span></li>
+                  <li>{CHECK_ICON}<span>Link para colocar na Bio do Instagram e mandar no WhatsApp</span></li>
                   <li>{CHECK_ICON}<span>Edite serviços, fotos e preços quando quiser direto pelo celular</span></li>
                   <li>{CHECK_ICON}<span>Cliente escolhe o procedimento e agenda direto no seu WhatsApp</span></li>
                 </ul>
@@ -365,7 +379,7 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
                     <span><strong>{content.anualValueAnchor}</strong></span>
                   </li>
                   <li>{CHECK_ICON}<span><strong>Pague uma vez e use o ano todo</strong></span></li>
-                  <li>{CHECK_ICON}<span>Link profissional para colocar na Bio do Instagram e WhatsApp</span></li>
+                  <li>{CHECK_ICON}<span>Link para colocar na Bio do Instagram e mandar no WhatsApp</span></li>
                   <li>{CHECK_ICON}<span>Edite serviços, fotos e preços quando quiser direto pelo celular</span></li>
                   <li>{CHECK_ICON}<span><strong>Te mandamos sua prévia e você só paga se gostar.</strong></span></li>
                 </ul>

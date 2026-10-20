@@ -351,6 +351,32 @@
   line-height: 1.65;
   margin-bottom: 24px;
   max-width: 520px;
+  text-align: center;
+}
+
+/* Destaques só dentro dessa subheadline (pedido real, 2026-10-20) — não
+ *  mexe em `.lp-text-gradient`/`.lp-text-wine` global (usadas também no
+ *  título da Hero e no resto da subheadline), só o "StudioMenu" e o "Não
+ *  é PDF nem Canva" especificamente. */
+.lp-hero-subtitle-brand {
+  font-size: 1.2em;
+}
+
+.lp-hero-subtitle .lp-text-wine {
+  text-decoration: underline;
+}
+
+/* Imagem "WhatsApp bagunçado" (pedido real, 2026-10-20) — representa
+ *  visualmente a dor que a Hero descreve em texto (tabela de preços e
+ *  fotos soltas no WhatsApp). Mesmo `max-width` da subheadline acima, pra
+ *  ocupar a largura do bloco de texto sem estourar pro lado do mockup. */
+.lp-hero-pain-image {
+  display: block;
+  width: 100%;
+  max-width: 480px;
+  height: auto;
+  border-radius: var(--lp-radius-md);
+  margin-bottom: 24px;
 }
 
 .lp-hero-actions {

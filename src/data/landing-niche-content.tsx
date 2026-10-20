@@ -20,6 +20,13 @@ export interface LandingNicheContent {
   /** Título principal da Hero — alinhado aos criativos. */
   heroTitle: ReactNode;
   heroSubtitle: ReactNode;
+  /** Imagem "WhatsApp bagunçado" (pedido real, 2026-10-20) — mostra na
+   *  prática a dor que a Hero descreve em texto (tabela de preços e fotos
+   *  soltas no WhatsApp, com X vermelho). Fica entre a subheadline e o
+   *  card rosa "Toque no celular..." (`SalesLandingPage.tsx`). Só
+   *  `lash`/`nail` por pedido dela — os outros nichos não têm essa imagem
+   *  ainda, então simplesmente não renderiza nada pra eles. */
+  whatsappPainImage?: string;
   /** Slug de `/c/showcase/{slug}` embutido no mockup de celular da Hero. */
   showcaseSlug: string;
   /** Trecho em negrito da barra de prova social no topo ("4.9/5 · Mais de {isto} já usam"). */
@@ -88,7 +95,9 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     // Copy do Hero atualizada pra bater com a nova campanha de criativos
     // (pedido real, 2026-10-19 — ela testou `lashdesigner` em localhost,
     // gostou mais e pediu pra aplicar na página oficial também, não só na
-    // nova). Idêntica à de `lashdesigner` abaixo de propósito.
+    // nova). Idêntica à de `lashdesigner` abaixo de propósito, exceto
+    // `whatsappPainImage` (pedido real, 2026-10-20) — só nas páginas ao
+    // vivo (`lash`/`nail`), não nas de backup/referência.
     eyebrow: (
       <>
         Feito para <span className="lp-eyebrow-highlight">Lash Designer</span>
@@ -103,11 +112,14 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     ),
     heroSubtitle: (
       <>
-        Conheça o <strong className="lp-text-gradient">StudioMenu</strong>.{' '}
-        <strong className="lp-text-wine">Não é PDF nem Canva</strong>: é seu
-        próprio <strong className="lp-text-gradient">Site/Menu Digital interativo</strong>.
+        Conheça o <strong className="lp-text-gradient lp-hero-subtitle-brand">StudioMenu</strong>.
+        <br />
+        <strong className="lp-text-wine">Não é PDF nem Canva</strong>.
+        <br />
+        É seu próprio <strong className="lp-text-gradient">Site/Menu Digital interativo</strong>.
       </>
     ),
+    whatsappPainImage: '/whatsapp_lash.webp',
     showcaseSlug: 'lashlanding',
     socialProofHighlight: '350+ Lash Designers',
     faqFirstItem: {
@@ -152,11 +164,14 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     ),
     heroSubtitle: (
       <>
-        Conheça o <strong className="lp-text-gradient">StudioMenu</strong>.{' '}
-        <strong className="lp-text-wine">Não é PDF nem Canva</strong>: é seu
-        próprio <strong className="lp-text-gradient">Site/Menu Digital interativo</strong>.
+        Conheça o <strong className="lp-text-gradient lp-hero-subtitle-brand">StudioMenu</strong>.
+        <br />
+        <strong className="lp-text-wine">Não é PDF nem Canva</strong>.
+        <br />
+        É seu próprio <strong className="lp-text-gradient">Site/Menu Digital interativo</strong>.
       </>
     ),
+    whatsappPainImage: '/whatsapp_nail.webp',
     // 'naillanding', não 'nail' — o slug 'nail' cai no agendamento
     // automático (Plus), mas a copy acima promete "agenda direto no
     // WhatsApp" (igual lash); 'naillanding' é a versão Básico (WhatsApp)
@@ -218,9 +233,11 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     ),
     heroSubtitle: (
       <>
-        Conheça o <strong className="lp-text-gradient">StudioMenu</strong>.{' '}
-        <strong className="lp-text-wine">Não é PDF nem Canva</strong>: é seu
-        próprio <strong className="lp-text-gradient">Site/Menu Digital interativo</strong>.
+        Conheça o <strong className="lp-text-gradient lp-hero-subtitle-brand">StudioMenu</strong>.
+        <br />
+        <strong className="lp-text-wine">Não é PDF nem Canva</strong>.
+        <br />
+        É seu próprio <strong className="lp-text-gradient">Site/Menu Digital interativo</strong>.
       </>
     ),
     showcaseSlug: 'lashlanding',
@@ -251,9 +268,11 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     ),
     heroSubtitle: (
       <>
-        Conheça o <strong className="lp-text-gradient">StudioMenu</strong>.{' '}
-        <strong className="lp-text-wine">Não é PDF nem Canva</strong>: é seu
-        próprio <strong className="lp-text-gradient">Site/Menu Digital interativo</strong>.
+        Conheça o <strong className="lp-text-gradient lp-hero-subtitle-brand">StudioMenu</strong>.
+        <br />
+        <strong className="lp-text-wine">Não é PDF nem Canva</strong>.
+        <br />
+        É seu próprio <strong className="lp-text-gradient">Site/Menu Digital interativo</strong>.
       </>
     ),
     showcaseSlug: 'naildesigner',
