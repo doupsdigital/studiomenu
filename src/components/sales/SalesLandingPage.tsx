@@ -437,6 +437,28 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
           </div>
         </section>
 
+        {/* 4.5 REFORÇO DA DOR (pedido real, 2026-10-20) — depois do preço,
+         *  antes do FAQ: reforça mais uma vez a dor (conversa de WhatsApp
+         *  com X vermelho) bem no momento em que a pessoa acabou de ver o
+         *  valor, pra empurrar pra decisão. Só nichos com `secondPainImage`
+         *  (lash por enquanto). */}
+        {content.secondPainImage && (
+          <section className="lp-pain-reinforce-section">
+            <div className="lp-container">
+              <p className="lp-pain-reinforce-heading">{content.secondPainHeading}</p>
+              <p className="lp-pain-reinforce-text">{content.secondPainText}</p>
+              <div className="lp-pain-reinforce-image-wrap">
+                <img
+                  src={content.secondPainImage}
+                  alt="Conversa de WhatsApp com tabela de preços e fotos soltas, marcada com X vermelho"
+                  className="lp-pain-reinforce-image"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* 5. DÚVIDAS FREQUENTES — antes do carrossel de prova social (pedido
          *  real, 2026-10-15; antes vinha depois). */}
         <FaqSection
