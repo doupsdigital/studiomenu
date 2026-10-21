@@ -199,7 +199,7 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     ),
     heroTitle: (
       <>
-        Você ainda <span className="lp-text-gradient">perde clientes</span> mandando Tabela de{' '}
+        Você ainda <span className="lp-text-gradient">perde tempo</span> mandando Tabela de{' '}
         <span className="lp-text-wine">preços e fotos do seu trabalho</span> soltas no WhatsApp?
       </>
     ),
@@ -319,7 +319,7 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     ),
     heroTitle: (
       <>
-        Você ainda <span className="lp-text-gradient">perde clientes</span> mandando Tabela de{' '}
+        Você ainda <span className="lp-text-gradient">perde tempo</span> mandando Tabela de{' '}
         <span className="lp-text-wine">preços e fotos do seu trabalho</span> soltas no WhatsApp?
       </>
     ),
