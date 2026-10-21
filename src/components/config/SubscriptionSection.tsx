@@ -6,6 +6,13 @@ import { CheckCircle2, AlertTriangle, Sparkles, Gift } from 'lucide-react';
 import { resolveAgendaPrice, resolveCatalogPrice, resolveLifetimePrice, type PayablePlanTier } from '@/lib/pricing';
 import { PlanSubscribeCard } from '@/components/billing/PlanSubscribeCard';
 
+/** Desliga o autoatendimento "Quer parar de pagar mensalidade?" (conversão
+ *  pra Catálogo Vitalício, Fase 28) — pedido real, 2026-10-21: "não vou
+ *  trabalhar mais com vitalício por enquanto". Flag em vez de apagar o
+ *  bloco/endpoint (`/api/billing/upgrade-to-lifetime`) — é só esconder a
+ *  entrada, pra reativar rápido se decidir voltar com isso depois. */
+const LIFETIME_UPSELL_ENABLED = false;
+
 interface SubscriptionSectionProps {
   slug: string;
   planTier: 'catalog' | 'basico' | 'plus';
@@ -344,7 +351,7 @@ export const SubscriptionSection: React.FC<SubscriptionSectionProps> = ({
          *  pra quem tem mesmo uma cobrança recorrente real do Catálogo
          *  rodando (mensal ou anual) — avulso já é dela pra sempre, não tem
          *  o que "converter". */}
-        {hasRealSubscription && catalogBillingMode !== undefined && catalogBillingMode !== 'avulso' && (
+        {LIFETIME_UPSELL_ENABLED && hasRealSubscription && catalogBillingMode !== undefined && catalogBillingMode !== 'avulso' && (
           <div id="upgrade-lifetime">
             <p className="flex items-center gap-1.5 text-[15px] font-bold text-ink mb-2">
               <Gift className="w-4 h-4 text-rose-600" /> Quer parar de pagar mensalidade?
