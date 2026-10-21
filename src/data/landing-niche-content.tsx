@@ -129,8 +129,8 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     ),
     heroTitle: (
       <>
-        Você ainda <span className="lp-text-gradient">perde Clientes</span> mandando Tabela de{' '}
-        <span className="lp-text-wine">preços e fotos do seu trabalho</span> soltas no WhatsApp?
+        Você ainda manda <span className="lp-text-gradient">Tabela de Preços em PDF</span> ou{' '}
+        <span className="lp-text-wine">fotos soltas no WhatsApp?</span>
       </>
     ),
     heroSubtitle: (
@@ -140,7 +140,7 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
         </span>
         <strong className="lp-text-wine">Não é PDF nem Canva</strong>.
         <br />
-        É seu próprio <strong className="lp-text-gradient">Site/Menu Digital interativo</strong>.
+        Apresente seus procedimentos em um <strong className="lp-text-gradient">Catálogo Digital interativo</strong> direto no celular da cliente.
       </>
     ),
     whatsappPainImage: '/whatsapp_lash.webp',
@@ -199,8 +199,8 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     ),
     heroTitle: (
       <>
-        Você ainda <span className="lp-text-gradient">perde tempo</span> mandando Tabela de{' '}
-        <span className="lp-text-wine">preços e fotos do seu trabalho</span> soltas no WhatsApp?
+        Você ainda manda <span className="lp-text-gradient">Tabela de Preços em PDF</span> ou{' '}
+        <span className="lp-text-wine">fotos soltas no WhatsApp?</span>
       </>
     ),
     heroSubtitle: (
@@ -210,7 +210,7 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
         </span>
         <strong className="lp-text-wine">Não é PDF nem Canva</strong>.
         <br />
-        É seu próprio <strong className="lp-text-gradient">Site/Menu Digital interativo</strong>.
+        Apresente seus procedimentos em um <strong className="lp-text-gradient">Catálogo Digital interativo</strong> direto no celular da cliente.
       </>
     ),
     whatsappPainImage: '/whatsapp_nail.webp',
