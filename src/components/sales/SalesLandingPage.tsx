@@ -101,15 +101,17 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
     ? Math.round((1 - singlePlanTest.price / singlePlanTest.anchorPrice) * 100)
     : ANUAL_DISCOUNT_PERCENT;
   const anualCtaLabel = singlePlanTest?.ctaLabel ?? 'QUERO O PLANO ANUAL';
-  /* Mensagem do WhatsApp (pedido real, 2026-10-19) — a antiga ("Plano
-   *  Anual... pagamento único") soava robótica e fazia gente desistir de
-   *  mandar (visto em gravações de sessão), além de não dizer de qual
-   *  nicho a lead veio. A nova é mais parecida com algo que uma pessoa
-   *  escreveria de verdade, e cita o nicho (`nicheLabel`) em vez de
-   *  "Plano Anual". Preço sempre vem de `anualParts` (nunca duplicado como
-   *  texto fixo), pra nunca ficar desatualizado se o preço mudar. */
+  /* Mensagem do WhatsApp (pedido real, 2026-10-19, texto revisado em
+   *  2026-10-21) — citar o preço criava uma quebra de expectativa com o
+   *  CTA "TESTAR NO MEU STUDIO" (baixo compromisso): a mensagem assumia
+   *  compra fechada ("quero... por R$X/ano"), o que soma fricção em vez
+   *  de reduzir. Preço também não serve mais pra identificar o plano da
+   *  lead (só existe 1 preço no teste de plano único hoje). Nova mensagem
+   *  espelha o verbo do botão ("testar"), sem preço. Continua citando o
+   *  nicho via `nicheLabel` — já vem certo por nicho (Lash/Nail Designer),
+   *  não precisa trocar nada aqui. */
   const anualWhatsappMessage = singlePlanTest
-    ? `Oi! Vi a página do StudioMenu pra ${singlePlanTest.nicheLabel} e quero o meu Menu Digital por R$${anualParts.whole},${anualParts.cents}/ano 😊`
+    ? `Oi! Vi a página do StudioMenu pra ${singlePlanTest.nicheLabel} e quero testar como ficaria o Menu Digital no meu studio 😊`
     : `Olá! Vi a página do StudioMenu e quero o Menu Digital Plano Anual por R$${anualParts.whole},${anualParts.cents}, pagamento único`;
   const agendaParts = priceParts(AGENDA_PRICE);
   const [mockupOpen, setMockupOpen] = useState(false);
