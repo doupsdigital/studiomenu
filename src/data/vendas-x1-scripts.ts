@@ -22,6 +22,7 @@
 //   texto longo derruba conversão).
 
 export type ScriptCategory =
+  | 'previa-pronta'
   | 'anuncio-catalogo'
   | 'anuncio-agendamento'
   | 'abordagem-catalogo'
@@ -50,6 +51,7 @@ export interface ScriptItem {
 
 export const SCRIPT_CATEGORIES: { key: 'all' | ScriptCategory; label: string }[] = [
   { key: 'all', label: '⚡ Todos os Scripts' },
+  { key: 'previa-pronta', label: '✨ Prévia Pronta — Catálogo já Montado (Google/Instagram)' },
   { key: 'anuncio-catalogo', label: '🗂️ Funil Anúncio 01: Catálogo' },
   { key: 'anuncio-agendamento', label: '📅 Funil Anúncio 02: Agendamento Automático' },
   { key: 'abordagem-catalogo', label: '🎯 Funil Abordagem 01: Catálogo' },
@@ -69,6 +71,66 @@ export const SCRIPT_CATEGORIES: { key: 'all' | ScriptCategory; label: string }[]
 ];
 
 export const SCRIPTS_DATA: ScriptItem[] = [
+  // ==========================================================================
+  // PRÉVIA PRONTA — CATÁLOGO JÁ MONTADO (pedido real, 2026-10-21) — fluxo
+  // novo: ela pesquisa Lash/Nail no Google, analisa o perfil (tem catálogo
+  // no WhatsApp? link no Instagram?) e, pras escolhidas, já cria o
+  // catálogo ANTES de mandar a 1ª mensagem (capa com o nome dela, frase
+  // tirada do Instagram, serviços padrão). Por isso o link já vai direto
+  // na 1ª mensagem, sem "tease" prévio tipo "posso te mostrar um
+  // exemplo?" (diferença pro Funil Abordagem 10, que ainda pergunta antes
+  // de mandar o link). Alternar entre os 3 modelos a cada abordagem nova,
+  // mesma lógica das variantes A/B/C dos outros funis.
+  // ==========================================================================
+  {
+    id: 'previa-pronta-1',
+    category: 'previa-pronta',
+    categoryName: 'Prévia Pronta — Catálogo já Montado',
+    title: '✨ Modelo 01',
+    tip: 'Use pra qualquer nicho (não cita Lash/Nail no texto). Troque o link pelo catálogo já montado pra ela.',
+    content: `Oii, [Nome]! Seu perfil é muito bonito, dá pra ver o cuidado que você tem com o trabalho ✨
+
+Trabalhamos com Menu Digital pra Studios de Beleza — um link interativo, igual um site, que substitui aquele PDF ou print de preços, com fotos e tudo organizado pra sua cliente.
+
+Resolvemos montar um exemplo real com seu nome, pra você ver como fica:
+
+👉 [LINK]
+
+Gostaria de saber sua opinião e se faz sentido ter um assim para o seu Studio. 💕`,
+  },
+  {
+    id: 'previa-pronta-2',
+    category: 'previa-pronta',
+    categoryName: 'Prévia Pronta — Catálogo já Montado',
+    title: '✨ Modelo 02',
+    tip: 'Cita "Lash Designers" direto no texto — ajustar pra "Nail Designers" na hora de mandar pra lead de nail.',
+    content: `Oi, [Nome]! Tudo bem? Seu perfil é lindo, dá pra ver o capricho em cada trabalho 💕
+
+Somos do StudioMenu — criamos Menus Digitais para Lash Designers terem um link próprio, com fotos e valores, ao invés de ficar explicando tudo por mensagem.
+
+Fizemos um com sua identidade só pra te mostrar como ficaria:
+
+👉 [LINK]
+
+Gostaria de saber o que achou e se faz sentido ter um assim para o seu Studio. 💕`,
+  },
+  {
+    id: 'previa-pronta-3',
+    category: 'previa-pronta',
+    categoryName: 'Prévia Pronta — Catálogo já Montado',
+    title: '✨ Modelo 03',
+    tip: 'Já cita "Lash/Nail Designers" — serve pros dois nichos sem precisar ajustar.',
+    content: `Oi, [Nome]! Tudo bem? Vi seu estúdio e o cuidado com os detalhes do seu trabalho chamou muita atenção 👏
+
+A gente cria Menu Digital pra Lash/Nail Designers — um link interativo que organiza seus serviços e valores de um jeito muito mais profissional que print ou PDF.
+
+Resolvemos montar um exemplo real com a sua identidade, pra você ver como fica:
+
+👉 [LINK]
+
+Me conta se gostou — acha que faria sentido pro seu Studio? 💕`,
+  },
+
   // ==========================================================================
   // FUNIL ANÚNCIO 01 — CATÁLOGO (ela já chegou interessada, veio de anúncio)
   // ==========================================================================
