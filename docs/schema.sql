@@ -160,6 +160,7 @@ CREATE TABLE IF NOT EXISTS public.order_services (
     badge TEXT,
     is_highlight BOOLEAN DEFAULT false,
     specs JSONB DEFAULT '[]'::jsonb,
+    extra_photos JSONB DEFAULT '[]'::jsonb,
     -- Agendamento (docs/PLANO_AGENDAMENTO_STUDIOMENU_PLUS.md, Fase 0): duração
     -- estruturada em minutos, usada pelo motor de disponibilidade. O campo
     -- `duration` (texto livre, ex. "1h30min") continua existindo só pra exibição.

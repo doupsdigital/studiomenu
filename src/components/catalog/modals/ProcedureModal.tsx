@@ -18,6 +18,8 @@ function roundToNearestQuarter(minutes: number): number {
   return Math.round(minutes / 15) * 15;
 }
 
+const MAX_EXTRA_PHOTOS = 2;
+
 interface ProcedureModalProps {
   procForm: ProcForm;
   setProcForm: React.Dispatch<React.SetStateAction<ProcForm>>;
@@ -27,6 +29,15 @@ interface ProcedureModalProps {
   setProcFormError: (msg: string) => void;
   onOpenAddCatModal?: () => void;
   onFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  /** Fotos extras do procedimento (pedido real, 2026-10-22), opcional — no
+   *  máx. `MAX_EXTRA_PHOTOS`. Mesmo mecanismo de upload da foto principal
+   *  (`onFileUpload`), só que escreve em `procForm.extra_photos[index]` em
+   *  vez de `procForm.image_url` (ver `VisualEditorModals.tsx`). */
+  onFileUploadExtra?: (e: React.ChangeEvent<HTMLInputElement>, index: number) => void;
+  /** Qual quadrado de foto está com upload em andamento agora (pedido real,
+   *  2026-10-22) — 'main' pra foto principal, índice pra foto extra, null
+   *  pra nenhuma. Mostra um spinner centralizado no quadrado certo. */
+  uploadingProcSlot?: 'main' | number | null;
   onSaveProcedure: (proc: ProcedureItem, index: number | null) => void;
   onClose: () => void;
 }
@@ -40,6 +51,8 @@ export const ProcedureModal: React.FC<ProcedureModalProps> = ({
   setProcFormError,
   onOpenAddCatModal,
   onFileUpload,
+  onFileUploadExtra,
+  uploadingProcSlot = null,
   onSaveProcedure,
   onClose,
 }) => {
@@ -47,6 +60,31 @@ export const ProcedureModal: React.FC<ProcedureModalProps> = ({
   const [durationHours, setDurationHours] = useState(() => Math.min(6, Math.floor(initialTotalMinutes / 60)));
   const [durationMinutesPart, setDurationMinutesPart] = useState(() => initialTotalMinutes % 60);
   const { showStuckHint, copied, handleLabelClick, handleChange: handleFileChange, copyPageLink } = useFilePickerFallback(onFileUpload);
+  // Quantas linhas de foto extra já estão reveladas — uma por clique em
+  // "+ Adicionar mais fotos" (pedido real, 2026-10-22: mesmo formato da
+  // linha principal, reveladas uma de cada vez, não todas de uma vez).
+  // Começa já mostrando as linhas de fotos que o procedimento já tem
+  // salvas, pra reabrir pra editar não esconder o que já foi configurado.
+  const [extraRowCount, setExtraRowCount] = useState(() => procForm.extra_photos?.length || 0);
+  const extraSlot0 = useFilePickerFallback((e) => onFileUploadExtra?.(e, 0));
+  const extraSlot1 = useFilePickerFallback((e) => onFileUploadExtra?.(e, 1));
+  const extraSlotPickers = [extraSlot0, extraSlot1];
+
+  // Remove só a foto, mantendo a linha visível (volta pro estado vazio com
+  // o "+") — pedido real, 2026-10-22, "relacionado à foto em si".
+  const removeExtraPhoto = (index: number) => {
+    setProcForm((prev) => ({
+      ...prev,
+      extra_photos: (prev.extra_photos || []).filter((_, i) => i !== index),
+    }));
+  };
+
+  // Recolhe a última linha de foto extra revelada — remove a linha inteira
+  // (não só a foto), e o link "+ Adicionar mais fotos" volta a aparecer.
+  const retractLastExtraRow = (index: number) => {
+    setExtraRowCount((c) => Math.max(0, c - 1));
+    removeExtraPhoto(index);
+  };
 
   const applyDuration = (hours: number, minutesPart: number) => {
     const total = hours * 60 + minutesPart;
@@ -180,16 +218,37 @@ export const ProcedureModal: React.FC<ProcedureModalProps> = ({
           </p>
         )}
         <div className="lm-svc-photo-row">
-          <div className="lm-svc-photo-preview-wrap">
-            <img
-              src={procForm.image_url || 'https://images.unsplash.com/photo-1583001809873-a1284d563391?auto=format&fit=crop&w=400&q=80'}
-              alt="Preview"
-            />
+          {procForm.image_url ? (
+            <div className="lm-svc-photo-preview-wrap">
+              <img src={procForm.image_url} alt="Preview" />
+              {uploadingProcSlot === 'main' && <span className="lm-svc-photo-spinner" aria-label="Enviando foto..." />}
+            </div>
+          ) : (
+            <label className="lm-svc-photo-preview-wrap lm-svc-photo-preview-wrap--empty" onClick={handleLabelClick}>
+              {uploadingProcSlot === 'main' ? (
+                <span className="lm-svc-photo-spinner" aria-label="Enviando foto..." />
+              ) : (
+                <span className="lm-svc-photo-add-badge">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                </span>
+              )}
+              <input type="file" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
+            </label>
+          )}
+          <div className="lm-svc-photo-actions">
+            <label className="lm-svc-photo-upload-btn" onClick={handleLabelClick}>
+              <span>📤 ESCOLHER FOTO</span>
+              <input type="file" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
+            </label>
+            {procForm.image_url && (
+              <button type="button" className="lm-svc-photo-remove-link" onClick={() => setProcForm((prev) => ({ ...prev, image_url: '' }))}>
+                Remover foto
+              </button>
+            )}
           </div>
-          <label className="lm-svc-photo-upload-btn" onClick={handleLabelClick}>
-            <span>📤 ESCOLHER FOTO</span>
-            <input type="file" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
-          </label>
         </div>
         {showStuckHint && (
           <p className="lm-filepicker-stuck-hint">
@@ -198,6 +257,73 @@ export const ProcedureModal: React.FC<ProcedureModalProps> = ({
               {copied ? '✓ Copiado!' : 'Copiar link'}
             </button>
           </p>
+        )}
+
+        {/* Fotos extras (pedido real, 2026-10-22) — cada clique em "+
+         *  Adicionar mais fotos" revela mais 1 linha abaixo, no mesmo
+         *  formato da linha principal acima (quadrado + botão "ESCOLHER
+         *  FOTO" do lado) — não todas de uma vez. O link some ao atingir
+         *  `MAX_EXTRA_PHOTOS`, indicando que não dá pra adicionar mais. */}
+        {Array.from({ length: extraRowCount }).map((_, i) => {
+          const url = procForm.extra_photos?.[i];
+          const picker = extraSlotPickers[i];
+          return (
+            <div className="lm-svc-photo-row lm-svc-photo-row--extra" key={i}>
+              {url ? (
+                <div className="lm-svc-photo-preview-wrap">
+                  <img src={url} alt={`Foto extra ${i + 1}`} />
+                  {uploadingProcSlot === i && <span className="lm-svc-photo-spinner" aria-label="Enviando foto..." />}
+                </div>
+              ) : (
+                <label className="lm-svc-photo-preview-wrap lm-svc-photo-preview-wrap--empty" onClick={picker.handleLabelClick}>
+                  {uploadingProcSlot === i ? (
+                    <span className="lm-svc-photo-spinner" aria-label="Enviando foto..." />
+                  ) : (
+                    <span className="lm-svc-photo-add-badge">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round">
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                      </svg>
+                    </span>
+                  )}
+                  <input type="file" accept="image/*" onChange={picker.handleChange} style={{ display: 'none' }} />
+                </label>
+              )}
+              <div className="lm-svc-photo-actions">
+                <label className="lm-svc-photo-upload-btn" onClick={picker.handleLabelClick}>
+                  <span>📤 ESCOLHER FOTO</span>
+                  <input type="file" accept="image/*" onChange={picker.handleChange} style={{ display: 'none' }} />
+                </label>
+                {url && (
+                  <button type="button" className="lm-svc-photo-remove-link" onClick={() => removeExtraPhoto(i)}>
+                    Remover foto
+                  </button>
+                )}
+              </div>
+              {i === extraRowCount - 1 && (
+                <button
+                  type="button"
+                  className="lm-svc-photo-extra-retract"
+                  aria-label="Remover esta foto extra"
+                  onClick={() => retractLastExtraRow(i)}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round">
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                </button>
+              )}
+            </div>
+          );
+        })}
+
+        {extraRowCount < MAX_EXTRA_PHOTOS && (
+          <button
+            type="button"
+            className="lm-svc-photo-extra-add-link"
+            onClick={() => setExtraRowCount((c) => Math.min(MAX_EXTRA_PHOTOS, c + 1))}
+          >
+            + Adicionar mais fotos
+          </button>
         )}
       </div>
 
