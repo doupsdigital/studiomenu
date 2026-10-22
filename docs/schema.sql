@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS public.orders (
     slug TEXT UNIQUE NOT NULL,
     client_name TEXT NOT NULL,
     studio_name TEXT,
+    studio_label TEXT,
     niche TEXT DEFAULT 'lash',
     layout_model TEXT DEFAULT 'mosaico',
     theme_variant TEXT DEFAULT 'rose',

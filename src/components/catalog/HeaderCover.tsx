@@ -10,6 +10,7 @@ interface HeaderCoverProps {
   onOpenCoverModal?: () => void;
   onUpdateClientName?: (newName: string) => void;
   onUpdateHeroPhrase?: (newPhrase: string) => void;
+  onUpdateStudioLabel?: (newLabel: string) => void;
   /** Só o showroom (`/c/showcase/[niche]`) passa isso (pedido real,
    *  2026-10-08: testar os botões de Rosé/Luxury flanqueando o selo "Seja
    *  Bem Vinda" em vez do painel flutuante "Personalizar"). `undefined`
@@ -25,6 +26,7 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
   onOpenCoverModal,
   onUpdateClientName,
   onUpdateHeroPhrase,
+  onUpdateStudioLabel,
   themeSwitcher,
 }) => {
   const wspText = encodeURIComponent(`Olá! Vim pelo seu catálogo digital e gostaria de tirar uma dúvida.`);
@@ -143,7 +145,20 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
         {/* Título & Nome */}
         <div className="hero__titulo">
           <div className="hero__studio-line anim-fade-up delay-2">
-            <span className="hero__studio-label">STUDIO</span>
+            <span
+              className="hero__studio-label"
+              data-lm-editable={isEditMode ? 'true' : undefined}
+              contentEditable={isEditMode}
+              suppressContentEditableWarning={true}
+              suppressHydrationWarning={isEditMode}
+              onBlur={(e) => {
+                if (isEditMode && onUpdateStudioLabel) {
+                  onUpdateStudioLabel(e.currentTarget.innerText.trim());
+                }
+              }}
+            >
+              {data.studio_label || 'STUDIO'}
+            </span>
             <span className="hero__studio-divider"></span>
           </div>
 

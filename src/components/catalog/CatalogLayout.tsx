@@ -293,6 +293,13 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
     }
   };
 
+  const handleUpdateStudioLabel = (newLabel: string) => {
+    if (newLabel && newLabel !== catalogState.studio_label) {
+      pushState({ ...catalogState, studio_label: newLabel });
+      showToast('✅ Texto atualizado!');
+    }
+  };
+
   const handleSaveCoverUrl = (url: string) => {
     pushState({ ...catalogState, cover_media_url: url });
     showToast('📷 Foto de capa atualizada!');
@@ -629,6 +636,7 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
             onOpenCoverModal={() => setActiveModal('cover')}
             onUpdateClientName={handleUpdateClientName}
             onUpdateHeroPhrase={handleUpdateHeroPhrase}
+            onUpdateStudioLabel={handleUpdateStudioLabel}
             themeSwitcher={themeSwitcher}
           />
         )}

@@ -49,6 +49,12 @@ export interface CatalogOrderData {
   slug: string;
   client_name: string;
   studio_name?: string;
+  /** Texto pequeno acima do nome na capa (hoje sempre "STUDIO") — editável
+   *  (pedido real, 2026-10-22, de uma cliente que queria "Beauty" em vez de
+   *  "Studio"). Vazio/ausente cai pro padrão "STUDIO" em `HeaderCover.tsx`
+   *  — catálogos antigos continuam mostrando igual, sem precisar de
+   *  migração de dado nenhuma. */
+  studio_label?: string;
   bio_description?: string;
   hero_phrase?: string;
   avatar_url?: string;
