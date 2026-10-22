@@ -20,15 +20,18 @@ export const ProcedureImageGallery: React.FC<ProcedureImageGalleryProps> = ({ ph
   const [activeIndex, setActiveIndex] = useState(0);
   const trackRef = useRef<HTMLDivElement>(null);
 
+  // Não mexe em `document.body.style.overflow` aqui — o `ProcedureDetailModal`
+  // por baixo já trava o scroll enquanto estiver montado (e esta galeria só
+  // existe dentro dele). Fazer isso duas vezes de forma independente
+  // destravava o scroll da página assim que só a galeria fechava, mesmo com
+  // o modal de detalhes ainda aberto (bug real, 2026-10-22).
   useEffect(() => {
-    document.body.style.overflow = 'hidden';
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
     window.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      document.body.style.overflow = '';
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [onClose]);
