@@ -152,7 +152,7 @@ export const ProcedureModal: React.FC<ProcedureModalProps> = ({
 
   return (
     <div className="lm-modal-card lm-modal-card--procedure">
-      <h3 className="lm-modal-title">
+      <h3 className="lm-modal-title lm-modal-title--banner">
         {editingProcIndex !== null ? `✏️ Editar: ${procForm.title || 'Procedimento'}` : '➕ Criar Novo Procedimento'}
       </h3>
 

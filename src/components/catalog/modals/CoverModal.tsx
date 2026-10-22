@@ -16,7 +16,7 @@ export const CoverModal: React.FC<CoverModalProps> = ({ isUploading, onFileUploa
 
   return (
     <div className="lm-modal-card">
-      <h3 className="lm-modal-title">📷 Alterar Foto de Capa</h3>
+      <h3 className="lm-modal-title lm-modal-title--banner">📷 Alterar Foto de Capa</h3>
       <p className="lm-modal-desc">Escolha uma nova imagem para o topo do seu catálogo:</p>
 
       {isKnownInAppBrowser() && (

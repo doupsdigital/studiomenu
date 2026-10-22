@@ -19,7 +19,7 @@ interface SocialModalProps {
 export const SocialModal: React.FC<SocialModalProps> = ({ socialForm, setSocialForm, onSaveSocial, onClose }) => {
   return (
     <div className="lm-modal-card">
-      <h3 className="lm-modal-title">✏️ Editar Contatos</h3>
+      <h3 className="lm-modal-title lm-modal-title--banner">✏️ Editar Contatos</h3>
       <p className="lm-modal-desc">Ajuste seu WhatsApp, Instagram e Cidade exibidos no catálogo:</p>
 
       <div className="lm-form-group">
