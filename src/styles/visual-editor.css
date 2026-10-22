@@ -643,12 +643,35 @@ body[data-theme="luxury"] .lm-cover-edit-btn,
   gap: 6px !important;
 }
 
+/* Faixa de título com contraste de verdade (pedido real, 2026-10-22) — só
+ *  nos modais de EDIÇÃO de conteúdo (Procedimento, Informações, Capa,
+ *  Contatos, Categoria); os de CONFIRMAÇÃO (excluir, descartar) ficam de
+ *  fora de propósito, continuam com o título colorido (vermelho/rosa)
+ *  simples que já sinaliza "atenção" sem precisar de faixa. "Sangra" até
+ *  a borda do card (margens negativas cancelando o padding do
+ *  `.lm-modal-card`) pra cobrir a largura toda, com cantos arredondados
+ *  só em cima pra continuar o arredondado do card. Fonte Fraunces itálica
+ *  — mesma usada no título do modal de detalhes que a cliente final vê
+ *  (`.modal__titulo`), pra os modais do editor pararem de parecer um
+ *  formulário genérico. */
+.lm-modal-title--banner {
+  background: linear-gradient(135deg, #a93259 0%, #c4426e 100%) !important;
+  color: #ffffff !important;
+  font-family: 'Fraunces', Georgia, serif !important;
+  font-style: italic !important;
+  font-weight: 500 !important;
+  font-size: 1.5rem !important;
+  margin: -24px -20px 20px -20px !important;
+  padding: 20px 20px 16px !important;
+  border-radius: 24px 24px 0 0 !important;
+}
+
 .lm-modal-desc {
-  font-size: 0.82rem !important;
+  font-size: 0.88rem !important;
   color: #7a525f !important;
   text-align: center !important;
   margin: 0 0 18px 0 !important;
-  line-height: 1.4 !important;
+  line-height: 1.5 !important;
 }
 
 .lm-form-group {
@@ -657,10 +680,10 @@ body[data-theme="luxury"] .lm-cover-edit-btn,
 
 .lm-form-group label {
   display: block !important;
-  font-size: 0.72rem !important;
+  font-size: 0.8rem !important;
   font-weight: 700 !important;
   color: #b03e5e !important;
-  margin-bottom: 6px !important;
+  margin-bottom: 7px !important;
   text-transform: uppercase !important;
   letter-spacing: 0.03em !important;
 }
@@ -689,8 +712,11 @@ body[data-theme="luxury"] .lm-cover-edit-btn,
   background: #fff0f3 !important;
   border: 1.5px solid #f2bdc9 !important;
   border-radius: 14px !important;
-  padding: 10px 14px !important;
-  font-size: 0.88rem !important;
+  padding: 13px 14px !important;
+  /* 16px (1rem) de propósito, não só por legibilidade — abaixo disso o
+   *  Safari do iPhone dá zoom automático ao focar o campo (comportamento
+   *  do navegador, não dá pra desativar por CSS). */
+  font-size: 1rem !important;
   color: #2b141b !important;
   outline: none !important;
   box-sizing: border-box !important;
