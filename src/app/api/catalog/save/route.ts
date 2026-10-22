@@ -65,10 +65,21 @@ export async function POST(request: Request) {
     // pra não quebrar agendamentos que referenciam order_services.id (ver
     // docs/historico/PLANO_AGENDAMENTO_STUDIOMENU_PLUS.md, Fase 0) — antes, o id de
     // todo procedimento mudava a cada save, mesmo sem edição nenhuma nele.
+    // Mapa id-provisório → id-real (pedido real, 2026-10-22, ver
+    // comentário mais abaixo sobre por que isso agora importa de verdade).
+    const idMap: Record<string, string> = {};
+
     if (Array.isArray(catalogData.procedures)) {
       const rows = buildServicesPayload(catalogData.procedures, orderId);
       const rowsWithId = rows.filter((r) => isValidServiceId(r.id as string | undefined));
       const rowsWithoutId = rows.filter((r) => !isValidServiceId(r.id as string | undefined));
+      // Mesmo filtro aplicado direto nos procedimentos originais (não nas
+      // rows, que não carregam `id` nenhum pros provisórios) — preserva a
+      // MESMA ordem relativa de `rowsWithoutId`, pra conseguir casar cada
+      // id provisório com o id real devolvido pelo INSERT logo abaixo.
+      const provisionalIdsForNewRows = catalogData.procedures
+        .filter((p) => !isValidServiceId(p.id))
+        .map((p) => p.id);
       const keepIds = new Set<string>(rowsWithId.map((r) => r.id as string));
 
       if (rowsWithId.length > 0) {
@@ -98,7 +109,18 @@ export async function POST(request: Request) {
             { status: 500 }
           );
         }
-        (inserted || []).forEach((r) => keepIds.add(r.id as string));
+        // Devolve o id real pro cliente trocar o provisório (pedido real,
+        // 2026-10-22) — sem isso, salvar de novo o MESMO procedimento novo
+        // antes de recarregar a página (agora bem mais provável, já que o
+        // "Salvar Alterações" do Procedimento passou a persistir na hora)
+        // inseria uma linha DUPLICADA a cada vez, em vez de atualizar a
+        // mesma — o cliente nunca aprendia o id real da primeira vez.
+        (inserted || []).forEach((r, i) => {
+          const realId = r.id as string;
+          keepIds.add(realId);
+          const provisionalId = provisionalIdsForNewRows[i];
+          if (provisionalId) idMap[provisionalId] = realId;
+        });
       }
 
       // Apaga só os procedimentos que o editor de fato removeu (existiam no
@@ -131,6 +153,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       message: 'Catálogo publicado com sucesso!',
+      idMap,
     });
   } catch (error: any) {
     console.error('[API Catalog Save Exception]:', error);
