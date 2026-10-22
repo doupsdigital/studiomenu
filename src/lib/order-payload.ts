@@ -140,6 +140,7 @@ export function buildOrderInsertPayload(input: OrderInsertInput) {
 export function buildOrderUpdatePayload(data: CatalogOrderData) {
   return {
     studio_name: data.studio_name,
+    studio_label: data.studio_label,
     client_name: data.client_name,
     bio_description: data.bio_description,
     hero_phrase: data.hero_phrase,
