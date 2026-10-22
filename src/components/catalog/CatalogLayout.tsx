@@ -585,8 +585,15 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
       className={`mosaico-wrapper ${isLuxury ? 'theme-luxury' : 'theme-rose'}`}
       data-theme={isLuxury ? 'luxury' : 'rose'}
     >
-      {/* 0. TOAST DE FEEDBACK DAS EDIÇÕES LOCAIS */}
-      {isEditMode && toastMessage && <div className="lm-inline-toast">{toastMessage}</div>}
+      {/* 0. TOAST DE FEEDBACK DAS EDIÇÕES LOCAIS (pedido real, 2026-10-22:
+       *  centralizado na tela, com o fundo desfocado — antes era um pill
+       *  pequeno perto do topo, fácil de passar despercebido com o
+       *  conteúdo do catálogo atrás). */}
+      {isEditMode && toastMessage && (
+        <div className="lm-inline-toast-overlay">
+          <div className="lm-inline-toast">{toastMessage}</div>
+        </div>
+      )}
 
       {/* 0.5 OVERLAY DE BOAS-VINDAS (SÓ NO PRIMEIRO ACESSO DE UM CATÁLOGO RECÉM-CRIADO) */}
       {isEditMode && showWelcomeOverlay && (
