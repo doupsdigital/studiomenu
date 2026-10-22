@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ProcedureItem } from '@/types/catalog';
 import { formatCurrencyBRL, formatMinutesToLabel, parseDurationToMinutes } from '@/lib/format';
 import { useFilePickerFallback } from '@/lib/use-file-picker-fallback';
@@ -82,6 +82,53 @@ export const ProcedureModal: React.FC<ProcedureModalProps> = ({
   const extraSlot1 = useFilePickerFallback((e) => onFileUploadExtra?.(e, 1));
   const extraSlotPickers = [extraSlot0, extraSlot1];
 
+  // Indicador de rolagem próprio (pedido real, 2026-10-22: "quero que ela
+  // apareça sempre") — a barra de rolagem NATIVA do navegador, mesmo
+  // estilizada via `::-webkit-scrollbar`, costuma ficar escondida até o
+  // toque de rolagem na maioria dos navegadores mobile (comportamento do
+  // sistema, não dá pra forçar só com CSS). Esse indicador é desenhado à
+  // mão (recalcula posição/altura a cada scroll), então fica visível o
+  // tempo todo, de verdade.
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [scrollThumb, setScrollThumb] = useState<{ show: boolean; topPct: number; heightPct: number }>({
+    show: false,
+    topPct: 0,
+    heightPct: 100,
+  });
+
+  const updateScrollThumb = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const { scrollTop, scrollHeight, clientHeight } = el;
+    if (scrollHeight <= clientHeight + 1) {
+      setScrollThumb({ show: false, topPct: 0, heightPct: 100 });
+      return;
+    }
+    const heightPct = Math.max(12, (clientHeight / scrollHeight) * 100);
+    const maxTopPct = 100 - heightPct;
+    const topPct = (scrollTop / (scrollHeight - clientHeight)) * maxTopPct;
+    setScrollThumb({ show: true, topPct, heightPct });
+  };
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.addEventListener('scroll', updateScrollThumb);
+    window.addEventListener('resize', updateScrollThumb);
+    return () => {
+      el.removeEventListener('scroll', updateScrollThumb);
+      window.removeEventListener('resize', updateScrollThumb);
+    };
+  }, []);
+
+  // Recalcula depois de QUALQUER re-render (ex: adicionar/remover linha de
+  // foto extra muda a altura do conteúdo) — sem lista de dependências de
+  // propósito, é só uma medição de DOM, barata o suficiente pra rodar
+  // sempre.
+  useEffect(() => {
+    updateScrollThumb();
+  });
+
   // Remove só a foto, mantendo a linha visível (volta pro estado vazio com
   // o "+") — pedido real, 2026-10-22, "relacionado à foto em si".
   const removeExtraPhoto = (index: number) => {
@@ -104,11 +151,29 @@ export const ProcedureModal: React.FC<ProcedureModalProps> = ({
   };
 
   return (
-    <div className="lm-modal-card">
+    <div className="lm-modal-card lm-modal-card--procedure">
       <h3 className="lm-modal-title">
         {editingProcIndex !== null ? `✏️ Editar: ${procForm.title || 'Procedimento'}` : '➕ Criar Novo Procedimento'}
       </h3>
 
+      {/* Wrapper próprio de scroll (pedido real, 2026-10-22 — "vazou" por
+       *  baixo dos botões no celular). `.lm-modal-card` sozinho (scroll +
+       *  `position: sticky` no rodapé) é o padrão dos outros modais, mas
+       *  só este aqui tem conteúdo longo o suficiente pra realmente rolar
+       *  — por segurança, vira um container flex de verdade (título fixo
+       *  em cima, rodapé fixo embaixo, só o meio rola), que não depende de
+       *  sticky dentro de overflow:auto (mais sensível a quirks de mobile
+       *  com toolbar dinâmica). */}
+      <div className="lm-modal-scroll-wrap">
+      {scrollThumb.show && (
+        <div className="lm-modal-scroll-track" aria-hidden="true">
+          <div
+            className="lm-modal-scroll-thumb"
+            style={{ top: `${scrollThumb.topPct}%`, height: `${scrollThumb.heightPct}%` }}
+          />
+        </div>
+      )}
+      <div className="lm-modal-scroll" ref={scrollRef}>
       <div className="lm-form-group">
         <label>NOME DO SERVIÇO *</label>
         <input
@@ -354,6 +419,8 @@ export const ProcedureModal: React.FC<ProcedureModalProps> = ({
           ⚠️ {procFormError}
         </div>
       )}
+      </div>
+      </div>
 
       <div className="lm-modal-actions">
         <button type="button" className="lm-modal-btn lm-modal-btn-cancel" onClick={onClose}>
