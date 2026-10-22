@@ -199,7 +199,6 @@ export function buildServicesPayload(procedures: ProcedureItem[], orderId: strin
       bookable: p.bookable !== false,
       category: p.category || 'Geral',
       image_url: p.image_url || '',
-      extra_photos: p.extra_photos || [],
       badge: p.badge || '',
       is_highlight: Boolean(p.is_highlight),
       specs: p.specs || [],

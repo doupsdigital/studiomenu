@@ -12,7 +12,7 @@ interface CategoryModalProps {
 export const CategoryModal: React.FC<CategoryModalProps> = ({ newCatName, setNewCatName, onAddCategory, onClose }) => {
   return (
     <div className="lm-modal-card">
-      <h3 className="lm-modal-title lm-modal-title--banner">➕ Criar Nova Categoria</h3>
+      <h3 className="lm-modal-title">➕ Criar Nova Categoria</h3>
       <p className="lm-modal-desc">Digite o nome da nova categoria para organizar seus procedimentos:</p>
 
       <div className="lm-form-group">

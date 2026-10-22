@@ -248,46 +248,24 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
   }, [catalogState.theme_variant]);
 
   // Persistir ao confirmar no modal de salvamento (sem alerts nativos de navegador)
-  //
-  // Aceita um `stateOverride` opcional (pedido real, 2026-10-22: o "Salvar
-  // Alterações" do Procedimento passou a persistir na hora, não só em
-  // memória) — sem isso, chamar esta função logo depois de um `pushState`
-  // leria o `catalogState` ANTIGO (de antes do pushState) por causa da
-  // assincronia normal do `setState` do React, mandando pro banco uma
-  // versão sem a mudança que acabou de ser feita. `silent` evita o modal
-  // de sucesso de tela cheia (que faz sentido só pro "Salvar" geral,
-  // deliberado) — o toast do próprio modal de procedimento já avisa que
-  // salvou; o modal de ERRO continua aparecendo sempre, por ser acionável.
-  const handleConfirmSaveDatabase = async (stateOverride?: CatalogOrderData, options?: { silent?: boolean }) => {
-    const stateToSave = stateOverride || catalogState;
+  const handleConfirmSaveDatabase = async () => {
     setIsSaving(true);
     try {
       const response = await fetch('/api/catalog/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          slug: stateToSave.slug,
+          slug: catalogState.slug,
           edit_token: editToken,
-          catalogData: stateToSave,
+          catalogData: catalogState,
         }),
       });
 
       const res = await response.json();
       if (res.success) {
         setIsSaved(true);
-        // Troca os ids provisórios de procedimentos recém-criados pelos
-        // ids reais que o banco gerou (ver comentário no endpoint) — sem
-        // pushState (não é uma mudança de conteúdo pra entrar no
-        // undo/redo, só uma correção interna de id).
-        const idMap = res.idMap as Record<string, string> | undefined;
-        if (idMap && Object.keys(idMap).length > 0) {
-          setCatalogState((prev) => ({
-            ...prev,
-            procedures: prev.procedures.map((p) => (idMap[p.id] ? { ...p, id: idMap[p.id] } : p)),
-          }));
-        }
-        if (!options?.silent) setActiveModal('save_success');
-        capture('catalog_edit_saved', { slug: stateToSave.slug });
+        setActiveModal('save_success');
+        capture('catalog_edit_saved', { slug: catalogState.slug });
       } else {
         setSaveErrorMessage(res.message || 'Erro ao salvar as alterações no catálogo.');
         setActiveModal('save_error');
@@ -389,15 +367,7 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
     showToast('🗑️ Informação excluída!');
   };
 
-  // Pedido real, 2026-10-22: o "Salvar Alterações" do Procedimento só
-  // atualizava o estado local — ela precisava lembrar de clicar no "Salvar"
-  // geral depois pra persistir de verdade (uma cliente achou que tinha
-  // perdido as edições por isso). Agora persiste na hora, reaproveitando o
-  // mesmo `handleConfirmSaveDatabase` do "Salvar" geral (mesmo endpoint,
-  // payload completo do catálogo — não só o procedimento), passando o
-  // `newState` direto em vez de depender do `catalogState` do closure
-  // (ainda não atualizado pelo `pushState` nesse mesmo instante). */
-  const handleSaveProcedure = async (proc: ProcedureItem, index: number | null) => {
+  const handleSaveProcedure = (proc: ProcedureItem, index: number | null) => {
     const { maintenance, visualEffect, ...rest } = proc as ProcedureItem & {
       maintenance?: string;
       visualEffect?: string;
@@ -424,10 +394,8 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
     } else {
       newProcs.push({ ...normalizedProc, id: String(Date.now()) });
     }
-    const newState = { ...catalogState, procedures: newProcs };
-    pushState(newState);
+    pushState({ ...catalogState, procedures: newProcs });
     showToast(isNew ? '✨ Procedimento adicionado!' : '✅ Procedimento salvo!');
-    await handleConfirmSaveDatabase(newState, { silent: true });
   };
 
   const handleDeleteProcedure = (proc: ProcedureItem) => {
@@ -585,15 +553,8 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
       className={`mosaico-wrapper ${isLuxury ? 'theme-luxury' : 'theme-rose'}`}
       data-theme={isLuxury ? 'luxury' : 'rose'}
     >
-      {/* 0. TOAST DE FEEDBACK DAS EDIÇÕES LOCAIS (pedido real, 2026-10-22:
-       *  centralizado na tela, com o fundo desfocado — antes era um pill
-       *  pequeno perto do topo, fácil de passar despercebido com o
-       *  conteúdo do catálogo atrás). */}
-      {isEditMode && toastMessage && (
-        <div className="lm-inline-toast-overlay">
-          <div className="lm-inline-toast">{toastMessage}</div>
-        </div>
-      )}
+      {/* 0. TOAST DE FEEDBACK DAS EDIÇÕES LOCAIS */}
+      {isEditMode && toastMessage && <div className="lm-inline-toast">{toastMessage}</div>}
 
       {/* 0.5 OVERLAY DE BOAS-VINDAS (SÓ NO PRIMEIRO ACESSO DE UM CATÁLOGO RECÉM-CRIADO) */}
       {isEditMode && showWelcomeOverlay && (

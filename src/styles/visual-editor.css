@@ -85,59 +85,37 @@ body.has-lm-editor .mosaico-app {
    "Publicar Alterações" e nos toasts do /admin. Nem Rose (rosa) nem
    Luxury (dourado/marrom) usam essa faixa de cor em nenhum lugar do
    design, então sempre destaca da foto de capa por trás, nos dois temas. */
-/* Overlay centralizado com fundo desfocado (pedido real, 2026-10-22) —
- *  antes era só o pill perto do topo, sem destaque de fundo nenhum, fácil
- *  de passar despercebido com o conteúdo do catálogo atrás. `pointer-events:
- *  none` de propósito — é um flash rápido (2.6s, ver `showToast` em
- *  `CatalogLayout.tsx`), não deve travar nenhum toque por baixo. */
-.lm-inline-toast-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 999995;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(20, 14, 16, 0.4);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  pointer-events: none;
-  animation: lmToastOverlayIn 0.2s ease-out;
-}
-
 .lm-inline-toast {
+  position: fixed;
+  top: 64px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999995;
   background: #10b981;
   border: 1.5px solid #6ee7b7;
   color: #ffffff;
-  font-size: 0.95rem;
+  font-size: 0.88rem;
   font-weight: 700;
-  padding: 15px 26px;
+  padding: 13px 24px;
   border-radius: 100px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), 0 0 0 4px rgba(16, 185, 129, 0.18);
   display: flex;
   align-items: center;
   gap: 6px;
   animation: lmToastIn 0.25s ease-out;
-  max-width: calc(100vw - 48px);
+  pointer-events: none;
+  max-width: calc(100vw - 24px);
   text-align: center;
-}
-
-@keyframes lmToastOverlayIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
 }
 
 @keyframes lmToastIn {
   from {
     opacity: 0;
-    transform: scale(0.92);
+    transform: translate(-50%, -8px);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: translate(-50%, 0);
   }
 }
 
@@ -551,111 +529,8 @@ body[data-theme="luxury"] .lm-cover-edit-btn,
   box-sizing: border-box !important;
   display: block !important;
   color: #2b141b !important;
-  /* Jost é a fonte de corpo do catálogo inteiro (ver `html, body` em
-   *  `catalog-theme.css`) — os modais do editor usavam uma pilha
-   *  genérica de sistema, destoando do resto do produto (pedido real,
-   *  2026-10-22). Mantém o fallback de sistema só como rede de segurança
-   *  caso a fonte não carregue a tempo. */
-  font-family: 'Jost', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
   margin: 0 !important;
-  /* Barra de rolagem sempre visível (pedido real, 2026-10-22) — pista de
-   *  que dá pra rolar e tem mais campos abaixo (mobile costuma esconder a
-   *  barra padrão até o toque de rolagem). */
-  scrollbar-width: thin !important;
-  scrollbar-color: rgba(192, 75, 107, 0.4) transparent !important;
-}
-
-.lm-modal-card::-webkit-scrollbar {
-  width: 5px !important;
-}
-
-.lm-modal-card::-webkit-scrollbar-track {
-  background: transparent !important;
-}
-
-.lm-modal-card::-webkit-scrollbar-thumb {
-  background: rgba(192, 75, 107, 0.4) !important;
-  border-radius: 10px !important;
-}
-
-/* Correção mais robusta só pro modal de Procedimento (pedido real,
- *  2026-10-22 — "vazou" por baixo dos botões fixos no celular real). Vira
- *  um container flex de verdade: título fixo em cima, `.lm-modal-scroll`
- *  é a ÚNICA parte que rola, `.lm-modal-actions` fica fora da área de
- *  scroll (não depende de `position: sticky` dentro de `overflow:auto`,
- *  que tem comportamento inconsistente em alguns navegadores mobile com
- *  barra de endereço dinâmica). Os outros modais (mais curtos, raramente
- *  rolam) continuam no padrão sticky acima, sem essa classe extra. */
-.lm-modal-card--procedure {
-  display: flex !important;
-  flex-direction: column !important;
-  overflow: hidden !important;
-}
-
-/* Envolve `.lm-modal-scroll` + o indicador de rolagem próprio — fica
- *  parado (não rola), só pra servir de referência de posição pro track
- *  do indicador ficar fixo visualmente enquanto o conteúdo rola por
- *  dentro.
- *
- *  Bug real, 2026-10-22: a 1ª versão usava `position: absolute; inset: 0`
- *  no `.lm-modal-scroll` — isso tira ele do fluxo normal, então o card
- *  nunca "sentia" a altura real do conteúdo e encolhia pro mínimo (só
- *  título + botões, sem nada no meio). Virou flex aninhado em vez disso:
- *  `.lm-modal-scroll-wrap` TAMBÉM é um container flex de 1 filho só — o
- *  conteúdo real continua contribuindo sua altura normalmente, e só
- *  encolhe/ganha scroll quando o conjunto passa de `max-height` no card
- *  de fora. */
-.lm-modal-scroll-wrap {
-  position: relative !important;
-  display: flex !important;
-  flex-direction: column !important;
-  flex: 1 1 auto !important;
-  min-height: 0 !important;
-}
-
-.lm-modal-scroll {
-  flex: 1 1 auto !important;
-  min-height: 0 !important;
-  overflow-y: auto !important;
-  padding-right: 14px !important;
-  /* Esconde a barra NATIVA de vez (pedido real, 2026-10-22 — ela aparecia
-   *  junto com o indicador desenhado à mão durante o toque de rolagem,
-   *  misturando os dois visualmente). Só o indicador próprio fica. */
-  scrollbar-width: none !important;
-}
-
-.lm-modal-scroll::-webkit-scrollbar {
-  display: none !important;
-  width: 0 !important;
-}
-
-/* Indicador de rolagem desenhado à mão (pedido real, 2026-10-22: "quero
- *  que ela apareça sempre") — a barra nativa do navegador, mesmo com
- *  `::-webkit-scrollbar` estilizado, some sozinha fora do toque de
- *  rolagem na maioria dos navegadores mobile (comportamento do sistema).
- *  Esse aqui é um `<div>` normal, sem depender de scrollbar nenhuma. */
-.lm-modal-scroll-track {
-  position: absolute !important;
-  top: 0 !important;
-  bottom: 0 !important;
-  right: 2px !important;
-  width: 5px !important;
-  border-radius: 10px !important;
-  z-index: 3 !important;
-  pointer-events: none !important;
-}
-
-.lm-modal-scroll-thumb {
-  position: absolute !important;
-  left: 0 !important;
-  width: 100% !important;
-  border-radius: 10px !important;
-  background: rgba(192, 75, 107, 0.45) !important;
-}
-
-.lm-modal-card--procedure .lm-modal-actions {
-  position: static !important;
-  flex-shrink: 0 !important;
 }
 
 .lm-modal-title {
@@ -670,35 +545,12 @@ body[data-theme="luxury"] .lm-cover-edit-btn,
   gap: 6px !important;
 }
 
-/* Faixa de título com contraste de verdade (pedido real, 2026-10-22) — só
- *  nos modais de EDIÇÃO de conteúdo (Procedimento, Informações, Capa,
- *  Contatos, Categoria); os de CONFIRMAÇÃO (excluir, descartar) ficam de
- *  fora de propósito, continuam com o título colorido (vermelho/rosa)
- *  simples que já sinaliza "atenção" sem precisar de faixa. "Sangra" até
- *  a borda do card (margens negativas cancelando o padding do
- *  `.lm-modal-card`) pra cobrir a largura toda, com cantos arredondados
- *  só em cima pra continuar o arredondado do card. Fonte Fraunces itálica
- *  — mesma usada no título do modal de detalhes que a cliente final vê
- *  (`.modal__titulo`), pra os modais do editor pararem de parecer um
- *  formulário genérico. */
-.lm-modal-title--banner {
-  background: linear-gradient(135deg, #a93259 0%, #c4426e 100%) !important;
-  color: #ffffff !important;
-  font-family: 'Fraunces', Georgia, serif !important;
-  font-style: italic !important;
-  font-weight: 500 !important;
-  font-size: 1.5rem !important;
-  margin: -24px -20px 20px -20px !important;
-  padding: 20px 20px 16px !important;
-  border-radius: 24px 24px 0 0 !important;
-}
-
 .lm-modal-desc {
-  font-size: 0.88rem !important;
+  font-size: 0.82rem !important;
   color: #7a525f !important;
   text-align: center !important;
   margin: 0 0 18px 0 !important;
-  line-height: 1.5 !important;
+  line-height: 1.4 !important;
 }
 
 .lm-form-group {
@@ -707,39 +559,29 @@ body[data-theme="luxury"] .lm-cover-edit-btn,
 
 .lm-form-group label {
   display: block !important;
-  font-size: 0.8rem !important;
+  font-size: 0.72rem !important;
   font-weight: 700 !important;
   color: #b03e5e !important;
-  margin-bottom: 7px !important;
+  margin-bottom: 6px !important;
   text-transform: uppercase !important;
   letter-spacing: 0.03em !important;
 }
 
-/* Pedido real, 2026-10-22: "+ Nova Categoria" e "+ Adicionar mais fotos"
- *  eram só texto sublinhado, sem diferença nenhuma dos títulos dos campos
- *  (mesma cor/tamanho) — ninguém percebia que eram botões clicáveis.
- *  Viram um chip pequeno com fundo e borda (mesma linguagem visual do
- *  "ESCOLHER FOTO" ao lado), só menor/mais discreto por ser uma ação
- *  secundária. */
 .lm-btn-add-cat-inline {
-  display: inline-flex !important;
-  align-items: center !important;
-  background: #fff0f3 !important;
-  border: 1.5px solid #f2bdc9 !important;
-  border-radius: 100px !important;
+  background: none !important;
+  border: none !important;
   color: #c04b6b !important;
-  font-size: 0.82rem !important;
+  font-size: 0.75rem !important;
   font-weight: 700 !important;
-  text-decoration: none !important;
+  text-decoration: underline !important;
   cursor: pointer !important;
-  padding: 7px 14px !important;
+  padding: 0 !important;
   margin: 0 !important;
-  transition: all 0.2s ease !important;
+  transition: opacity 0.2s ease !important;
 }
 
 .lm-btn-add-cat-inline:hover {
-  background: #ffe3e9 !important;
-  border-color: #c04b6b !important;
+  opacity: 0.8 !important;
 }
 
 .lm-form-group input:not([type="file"]),
@@ -749,11 +591,8 @@ body[data-theme="luxury"] .lm-cover-edit-btn,
   background: #fff0f3 !important;
   border: 1.5px solid #f2bdc9 !important;
   border-radius: 14px !important;
-  padding: 13px 14px !important;
-  /* 16px (1rem) de propósito, não só por legibilidade — abaixo disso o
-   *  Safari do iPhone dá zoom automático ao focar o campo (comportamento
-   *  do navegador, não dá pra desativar por CSS). */
-  font-size: 1rem !important;
+  padding: 10px 14px !important;
+  font-size: 0.88rem !important;
   color: #2b141b !important;
   outline: none !important;
   box-sizing: border-box !important;
@@ -783,57 +622,19 @@ body[data-theme="luxury"] .lm-cover-edit-btn,
 }
 
 .lm-svc-photo-preview-wrap {
-  width: 80px !important;
-  height: 80px !important;
-  border-radius: 14px !important;
+  width: 56px !important;
+  height: 56px !important;
+  border-radius: 12px !important;
   border: 2px dashed #f2bdc9 !important;
   overflow: hidden !important;
   flex-shrink: 0 !important;
   background: #fff0f3 !important;
-  position: relative !important;
 }
 
 .lm-svc-photo-preview-wrap img {
   width: 100% !important;
   height: 100% !important;
   object-fit: cover !important;
-}
-
-/* Spinner de upload (pedido real, 2026-10-22) — centralizado no quadrado,
- *  pra deixar claro que a foto está carregando (sem isso parecia travado).
- *  Quando já tem foto por baixo, ganha um fundo escuro translúcido pra ficar
- *  visível em cima de qualquer imagem. */
-.lm-svc-photo-spinner {
-  position: absolute !important;
-  inset: 0 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-
-.lm-svc-photo-preview-wrap img ~ .lm-svc-photo-spinner {
-  background: rgba(0, 0, 0, 0.35) !important;
-}
-
-.lm-svc-photo-spinner::after {
-  content: '' !important;
-  width: 22px !important;
-  height: 22px !important;
-  border-radius: 50% !important;
-  border: 3px solid rgba(255, 255, 255, 0.5) !important;
-  border-top-color: #ffffff !important;
-  animation: lm-svc-photo-spin 0.7s linear infinite !important;
-}
-
-.lm-svc-photo-preview-wrap--empty .lm-svc-photo-spinner::after {
-  border: 3px solid rgba(192, 75, 107, 0.25) !important;
-  border-top-color: #c04b6b !important;
-}
-
-@keyframes lm-svc-photo-spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 .lm-svc-photo-upload-btn {
@@ -855,117 +656,6 @@ body[data-theme="luxury"] .lm-cover-edit-btn,
 
 .lm-svc-photo-upload-btn:hover {
   background: #ffe3e9 !important;
-}
-
-/* Fotos extras do procedimento (pedido real, 2026-10-22) — continua mais
- *  discreto que o botão principal "ESCOLHER FOTO" (a maioria das
- *  profissionais só usa 1 foto), mas agora com cara de botão de verdade
- *  (chip com fundo/borda) — sem isso ficava indistinguível dos títulos
- *  dos campos (mesma cor/tamanho, sem nenhum contorno). */
-.lm-svc-photo-extra-add-link {
-  display: inline-flex !important;
-  align-items: center !important;
-  background: #fff0f3 !important;
-  border: 1.5px solid #f2bdc9 !important;
-  border-radius: 100px !important;
-  color: #c04b6b !important;
-  font-size: 0.85rem !important;
-  font-weight: 700 !important;
-  text-decoration: none !important;
-  cursor: pointer !important;
-  padding: 9px 16px !important;
-  margin-top: 10px !important;
-  transition: all 0.2s ease !important;
-}
-
-.lm-svc-photo-extra-add-link:hover {
-  background: #ffe3e9 !important;
-  border-color: #c04b6b !important;
-}
-
-/* Linha de foto extra — reaproveita `.lm-svc-photo-row` (quadrado + botão
- *  "ESCOLHER FOTO"), igual à linha principal, só com espaço acima pra
- *  separar visualmente (pedido real, 2026-10-22: uma linha por clique em
- *  "+ Adicionar mais fotos", não quadradinhos lado a lado). */
-.lm-svc-photo-row--extra {
-  margin-top: 12px !important;
-  flex-wrap: wrap !important;
-}
-
-/* Seletor com um pouco mais de especificidade que `.lm-form-group label`
- *  (que força `display:block` em qualquer `<label>` do form) — sem isso o
- *  `display:flex` abaixo perde e o "+" fica desalinhado no canto. */
-.lm-svc-photo-row label.lm-svc-photo-preview-wrap--empty {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  cursor: pointer !important;
-  transition: background-color 0.2s ease, border-color 0.2s ease !important;
-}
-
-.lm-svc-photo-preview-wrap--empty:hover {
-  background: #ffe3e9 !important;
-  border-color: #c04b6b !important;
-}
-
-/* Badge redondo rosa com o "+" branco (pedido real, 2026-10-22), em vez do
- *  ícone solto na cor vinho. */
-.lm-svc-photo-add-badge {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 32px !important;
-  height: 32px !important;
-  border-radius: 50% !important;
-  background: #c04b6b !important;
-  color: #ffffff !important;
-}
-
-.lm-svc-photo-actions {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: flex-start !important;
-  gap: 7px !important;
-}
-
-.lm-svc-photo-remove-link {
-  background: none !important;
-  border: none !important;
-  color: #9c6b78 !important;
-  font-size: 0.72rem !important;
-  font-weight: 600 !important;
-  text-decoration: underline !important;
-  cursor: pointer !important;
-  padding: 0 2px !important;
-}
-
-.lm-svc-photo-remove-link:hover {
-  color: #c04b6b !important;
-}
-
-/* Botão "−" pra recolher a última linha de foto extra revelada (pedido
- *  real, 2026-10-22) — fica no final da linha (`margin-left: auto`
- *  empurra pro fim, já que a linha tem `flex-wrap`). Só aparece na última
- *  linha — recolher sempre a partir do fim, simétrico ao "+" que adiciona. */
-.lm-svc-photo-extra-retract {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 28px !important;
-  height: 28px !important;
-  border-radius: 50% !important;
-  border: 1.5px solid #f2bdc9 !important;
-  background: #ffffff !important;
-  color: #c04b6b !important;
-  cursor: pointer !important;
-  margin-left: auto !important;
-  padding: 0 !important;
-  transition: all 0.2s ease !important;
-}
-
-.lm-svc-photo-extra-retract:hover {
-  background: #fff0f3 !important;
-  border-color: #c04b6b !important;
 }
 
 /* Dicas de fallback pro seletor de arquivo (achado real, 2026-10-02) —
@@ -1008,34 +698,21 @@ body[data-theme="luxury"] .lm-cover-edit-btn,
 }
 
 /* Modal Action Buttons (Footer) */
-/* Fixo embaixo do modal ao rolar (pedido real, 2026-10-22) — `.lm-modal-card`
- *  já é o próprio container com scroll (`overflow-y: auto`), então um filho
- *  `position: sticky` gruda nele sem precisar reestruturar o JSX de nenhum
- *  modal. Fundo opaco igual ao do card, senão o conteúdo rolando por baixo
- *  apareceria atrás dos botões. Vale pra todos os modais que usam essa
- *  classe (Procedimento, Capa, Categoria, etc.) — em modais curtos que não
- *  rolam, fica idêntico a antes. */
 .lm-modal-actions {
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
   gap: 12px !important;
   margin-top: 22px !important;
-  position: sticky !important;
-  bottom: 0 !important;
-  padding-top: 14px !important;
-  background: #fff8f9 !important;
-  box-shadow: 0 -8px 12px -6px rgba(0, 0, 0, 0.12) !important;
-  z-index: 2 !important;
 }
 
 .lm-modal-btn {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  height: 48px !important;
+  height: 46px !important;
   border-radius: 100px !important;
-  font-size: 0.98rem !important;
+  font-size: 0.88rem !important;
   font-weight: 700 !important;
   cursor: pointer !important;
   border: none !important;
@@ -1043,11 +720,6 @@ body[data-theme="luxury"] .lm-cover-edit-btn,
   text-decoration: none !important;
   user-select: none !important;
   -webkit-tap-highlight-color: transparent !important;
-  /* `<button>` não herda `font-family` do ancestral por padrão em alguns
-   *  navegadores (usa a fonte nativa do sistema/SO) — sem isso, os botões
-   *  ficavam na fonte genérica mesmo depois de trocar `.lm-modal-card`
-   *  pra Jost (pedido real, 2026-10-22). */
-  font-family: inherit !important;
 }
 
 .lm-modal-btn-cancel {

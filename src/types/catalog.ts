@@ -17,12 +17,6 @@ export interface ProcedureItem {
   bookable?: boolean;
   category?: string;
   image_url?: string;
-  /** Fotos extras do procedimento (pedido real, 2026-10-22 — uma cliente
-   *  queria mais de 1 foto por técnica, pra cliente final comparar antes de
-   *  decidir). Opcional, no máx. 2 (3 fotos no total com `image_url`) —
-   *  mostradas na galeria em tela cheia do modal de detalhes
-   *  (`ProcedureImageGallery.tsx`). A maioria dos catálogos não usa. */
-  extra_photos?: string[];
   badge?: string;
   is_highlight?: boolean;
   specs?: [string, string][];

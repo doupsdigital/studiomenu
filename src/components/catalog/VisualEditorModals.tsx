@@ -93,11 +93,6 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
   }, [categories, editingProc]);
 
   const [isUploading, setIsUploading] = useState(false);
-  // Qual quadrado de foto do procedimento está carregando agora (pedido
-  // real, 2026-10-22: spinner centralizado no quadrado certo, não um
-  // indicador genérico — `isUploading` sozinho não diz QUAL foto). 'main' =
-  // foto principal, número = índice da foto extra, null = nenhuma.
-  const [uploadingProcSlot, setUploadingProcSlot] = useState<'main' | number | null>(null);
 
   // Gerar resumo de alterações da sessão de edição
   const getChangesSummary = (): string[] => {
@@ -133,17 +128,18 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
       changes.push(`✨ Novos procedimentos: ${currentProcs.length - initialProcs.length} item(ns)`);
     }
 
-    // Bug real, 2026-10-22: comparar só uma lista fixa de campos (título,
-    // preço, duração, foto, categoria, descrição) fazia qualquer mudança
-    // em campo de fora dela (ex: `extra_photos`, `specs`, `badge`) passar
-    // batido e mostrar "Nenhuma alteração pendente" mesmo tendo mudado de
-    // verdade. Comparação do objeto inteiro cobre qualquer campo, hoje ou
-    // no futuro, sem precisar lembrar de atualizar uma lista toda vez que
-    // um campo novo for adicionado ao procedimento.
     let modifiedCount = 0;
     currentProcs.forEach((proc, idx) => {
       const orig = initialProcs[idx];
-      if (orig && JSON.stringify(proc) !== JSON.stringify(orig)) {
+      if (
+        orig &&
+        (proc.title !== orig.title ||
+          proc.price !== orig.price ||
+          proc.duration !== orig.duration ||
+          proc.image_url !== orig.image_url ||
+          proc.category !== orig.category ||
+          proc.description !== orig.description)
+      ) {
         modifiedCount++;
       }
     });
@@ -251,17 +247,11 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
   // enviar (capa maior que a foto de um procedimento, pois ocupa a tela
   // inteira no topo do catálogo). A rota de upload comprime de novo no
   // servidor, então isso aqui é sobre velocidade de envio, não segurança.
-  const handleFileUpload = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-    target: 'cover' | 'proc' | 'proc_extra',
-    extraIndex?: number
-  ) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, target: 'cover' | 'proc') => {
     const rawFile = e.target.files?.[0];
     if (!rawFile) return;
 
     setIsUploading(true);
-    if (target === 'proc') setUploadingProcSlot('main');
-    else if (target === 'proc_extra' && typeof extraIndex === 'number') setUploadingProcSlot(extraIndex);
     try {
       const file = await compressImageFile(rawFile, { maxDimension: target === 'cover' ? 1600 : 1000 });
       const formData = new FormData();
@@ -281,12 +271,6 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
           onClose();
         } else if (target === 'proc') {
           setProcForm((prev) => ({ ...prev, image_url: result.url }));
-        } else if (target === 'proc_extra' && typeof extraIndex === 'number') {
-          setProcForm((prev) => {
-            const next = [...(prev.extra_photos || [])];
-            next[extraIndex] = result.url;
-            return { ...prev, extra_photos: next };
-          });
         }
       } else {
         onUploadError?.(result.message || 'Não foi possível enviar a imagem. Tente novamente.');
@@ -295,7 +279,6 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
       onUploadError?.('Falha de conexão ao enviar a imagem. Tente novamente.');
     } finally {
       setIsUploading(false);
-      setUploadingProcSlot(null);
     }
   };
 
@@ -317,8 +300,6 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
           setProcFormError={setProcFormError}
           onOpenAddCatModal={onOpenAddCatModal}
           onFileUpload={(e) => handleFileUpload(e, 'proc')}
-          onFileUploadExtra={(e, i) => handleFileUpload(e, 'proc_extra', i)}
-          uploadingProcSlot={uploadingProcSlot}
           onSaveProcedure={onSaveProcedure}
           onClose={onClose}
         />

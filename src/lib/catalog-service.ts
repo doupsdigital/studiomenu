@@ -35,7 +35,6 @@ export async function getCatalogBySlug(slug: string): Promise<CatalogOrderData |
         duration: s.duration || s.duracao || '',
         category: s.category || s.catLabel || s.cat || 'Geral',
         image_url: s.image_url || s.img || '',
-        extra_photos: Array.isArray(s.extra_photos) ? s.extra_photos : [],
         badge: s.badge || '',
         is_highlight: Boolean(s.destaque || s.is_highlight),
         specs: Array.isArray(s.specs) ? s.specs : [],
