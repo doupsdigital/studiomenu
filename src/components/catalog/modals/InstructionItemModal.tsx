@@ -26,7 +26,7 @@ export const InstructionItemModal: React.FC<InstructionItemModalProps> = ({
 
   return (
     <div className="lm-modal-card">
-      <h3 className="lm-modal-title">{isNew ? '➕ Adicionar Informação' : '✏️ Editar Informação'}</h3>
+      <h3 className="lm-modal-title lm-modal-title--banner">{isNew ? '➕ Adicionar Informação' : '✏️ Editar Informação'}</h3>
       <p className="lm-modal-desc">
         Título curto + descrição — use pra política de cancelamento, pontualidade, formas de
         pagamento, ou qualquer outro aviso que seu catálogo precise.
