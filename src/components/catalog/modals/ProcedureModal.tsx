@@ -96,18 +96,30 @@ export const ProcedureModal: React.FC<ProcedureModalProps> = ({
     heightPct: 100,
   });
 
+  // Bug real, 2026-10-22: chamar `setScrollThumb` incondicionalmente aqui,
+  // combinado com o `useEffect` sem dependências logo abaixo (que roda
+  // depois de QUALQUER render), criava um loop infinito — cada
+  // `setScrollThumb` gera um objeto novo, dispara um re-render, que
+  // dispara o efeito de novo, pra sempre ("Maximum update depth
+  // exceeded" nos logs, travando o navegador e derrubando até o
+  // "Salvar"). Correção: usa a forma funcional do `setState` pra comparar
+  // com o valor ATUAL antes de decidir se precisa atualizar — só troca o
+  // estado (e permite nova renderização) quando o número de verdade mudou.
   const updateScrollThumb = () => {
     const el = scrollRef.current;
     if (!el) return;
     const { scrollTop, scrollHeight, clientHeight } = el;
-    if (scrollHeight <= clientHeight + 1) {
-      setScrollThumb({ show: false, topPct: 0, heightPct: 100 });
-      return;
-    }
-    const heightPct = Math.max(12, (clientHeight / scrollHeight) * 100);
-    const maxTopPct = 100 - heightPct;
-    const topPct = (scrollTop / (scrollHeight - clientHeight)) * maxTopPct;
-    setScrollThumb({ show: true, topPct, heightPct });
+
+    setScrollThumb((prev) => {
+      if (scrollHeight <= clientHeight + 1) {
+        return prev.show ? { show: false, topPct: 0, heightPct: 100 } : prev;
+      }
+      const heightPct = Math.max(12, (clientHeight / scrollHeight) * 100);
+      const maxTopPct = 100 - heightPct;
+      const topPct = (scrollTop / (scrollHeight - clientHeight)) * maxTopPct;
+      const changed = !prev.show || Math.abs(prev.topPct - topPct) > 0.1 || Math.abs(prev.heightPct - heightPct) > 0.1;
+      return changed ? { show: true, topPct, heightPct } : prev;
+    });
   };
 
   useEffect(() => {
