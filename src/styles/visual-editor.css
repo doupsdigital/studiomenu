@@ -529,7 +529,12 @@ body[data-theme="luxury"] .lm-cover-edit-btn,
   box-sizing: border-box !important;
   display: block !important;
   color: #2b141b !important;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  /* Jost é a fonte de corpo do catálogo inteiro (ver `html, body` em
+   *  `catalog-theme.css`) — os modais do editor usavam uma pilha
+   *  genérica de sistema, destoando do resto do produto (pedido real,
+   *  2026-10-22). Mantém o fallback de sistema só como rede de segurança
+   *  caso a fonte não carregue a tempo. */
+  font-family: 'Jost', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
   margin: 0 !important;
   /* Barra de rolagem sempre visível (pedido real, 2026-10-22) — pista de
    *  que dá pra rolar e tem mais campos abaixo (mobile costuma esconder a
@@ -688,21 +693,31 @@ body[data-theme="luxury"] .lm-cover-edit-btn,
   letter-spacing: 0.03em !important;
 }
 
+/* Pedido real, 2026-10-22: "+ Nova Categoria" e "+ Adicionar mais fotos"
+ *  eram só texto sublinhado, sem diferença nenhuma dos títulos dos campos
+ *  (mesma cor/tamanho) — ninguém percebia que eram botões clicáveis.
+ *  Viram um chip pequeno com fundo e borda (mesma linguagem visual do
+ *  "ESCOLHER FOTO" ao lado), só menor/mais discreto por ser uma ação
+ *  secundária. */
 .lm-btn-add-cat-inline {
-  background: none !important;
-  border: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  background: #fff0f3 !important;
+  border: 1.5px solid #f2bdc9 !important;
+  border-radius: 100px !important;
   color: #c04b6b !important;
-  font-size: 0.75rem !important;
+  font-size: 0.82rem !important;
   font-weight: 700 !important;
-  text-decoration: underline !important;
+  text-decoration: none !important;
   cursor: pointer !important;
-  padding: 0 !important;
+  padding: 7px 14px !important;
   margin: 0 !important;
-  transition: opacity 0.2s ease !important;
+  transition: all 0.2s ease !important;
 }
 
 .lm-btn-add-cat-inline:hover {
-  opacity: 0.8 !important;
+  background: #ffe3e9 !important;
+  border-color: #c04b6b !important;
 }
 
 .lm-form-group input:not([type="file"]),
@@ -820,19 +835,30 @@ body[data-theme="luxury"] .lm-cover-edit-btn,
   background: #ffe3e9 !important;
 }
 
-/* Fotos extras do procedimento (pedido real, 2026-10-22) — discreto de
- *  propósito: link pequeno, sem caixa pesada, pra não competir com o botão
- *  principal "ESCOLHER FOTO" acima (a maioria das profissionais só usa 1
- *  foto). Mesma paleta rosa/vinho do resto do form de procedimento. */
+/* Fotos extras do procedimento (pedido real, 2026-10-22) — continua mais
+ *  discreto que o botão principal "ESCOLHER FOTO" (a maioria das
+ *  profissionais só usa 1 foto), mas agora com cara de botão de verdade
+ *  (chip com fundo/borda) — sem isso ficava indistinguível dos títulos
+ *  dos campos (mesma cor/tamanho, sem nenhum contorno). */
 .lm-svc-photo-extra-add-link {
-  background: none !important;
-  border: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  background: #fff0f3 !important;
+  border: 1.5px solid #f2bdc9 !important;
+  border-radius: 100px !important;
   color: #c04b6b !important;
-  font-size: 0.76rem !important;
+  font-size: 0.85rem !important;
   font-weight: 700 !important;
-  text-decoration: underline !important;
+  text-decoration: none !important;
   cursor: pointer !important;
-  padding: 10px 0 0 !important;
+  padding: 9px 16px !important;
+  margin-top: 10px !important;
+  transition: all 0.2s ease !important;
+}
+
+.lm-svc-photo-extra-add-link:hover {
+  background: #ffe3e9 !important;
+  border-color: #c04b6b !important;
 }
 
 /* Linha de foto extra — reaproveita `.lm-svc-photo-row` (quadrado + botão
@@ -985,9 +1011,9 @@ body[data-theme="luxury"] .lm-cover-edit-btn,
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  height: 46px !important;
+  height: 48px !important;
   border-radius: 100px !important;
-  font-size: 0.88rem !important;
+  font-size: 0.98rem !important;
   font-weight: 700 !important;
   cursor: pointer !important;
   border: none !important;
@@ -995,6 +1021,11 @@ body[data-theme="luxury"] .lm-cover-edit-btn,
   text-decoration: none !important;
   user-select: none !important;
   -webkit-tap-highlight-color: transparent !important;
+  /* `<button>` não herda `font-family` do ancestral por padrão em alguns
+   *  navegadores (usa a fonte nativa do sistema/SO) — sem isso, os botões
+   *  ficavam na fonte genérica mesmo depois de trocar `.lm-modal-card`
+   *  pra Jost (pedido real, 2026-10-22). */
+  font-family: inherit !important;
 }
 
 .lm-modal-btn-cancel {
