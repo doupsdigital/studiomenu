@@ -40,7 +40,12 @@ export const ProcedureDetailModal: React.FC<ProcedureDetailModalProps> = ({
   // Lock body scroll when modal is active
   useEffect(() => {
     document.body.style.overflow = 'hidden';
+    // Enquanto a galeria (empilhada por cima) está aberta, ignora o Esc
+    // aqui — ela tem o próprio listener e deve fechar primeiro. Sem essa
+    // guarda, os dois listeners de `window` disparavam juntos no mesmo
+    // Esc e fechavam os dois modais de uma vez (bug real, 2026-10-22).
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (galleryOpen) return;
       if (e.key === 'Escape') {
         onClose();
       }
@@ -51,7 +56,7 @@ export const ProcedureDetailModal: React.FC<ProcedureDetailModalProps> = ({
       document.body.style.overflow = '';
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [onClose]);
+  }, [onClose, galleryOpen]);
 
   const formatPrice = (val: string) => {
     if (!val) return 'Sob Consulta';
