@@ -531,6 +531,24 @@ body[data-theme="luxury"] .lm-cover-edit-btn,
   color: #2b141b !important;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
   margin: 0 !important;
+  /* Barra de rolagem sempre visível (pedido real, 2026-10-22) — pista de
+   *  que dá pra rolar e tem mais campos abaixo (mobile costuma esconder a
+   *  barra padrão até o toque de rolagem). */
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(192, 75, 107, 0.4) transparent !important;
+}
+
+.lm-modal-card::-webkit-scrollbar {
+  width: 5px !important;
+}
+
+.lm-modal-card::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+.lm-modal-card::-webkit-scrollbar-thumb {
+  background: rgba(192, 75, 107, 0.4) !important;
+  border-radius: 10px !important;
 }
 
 .lm-modal-title {
@@ -836,12 +854,25 @@ body[data-theme="luxury"] .lm-cover-edit-btn,
 }
 
 /* Modal Action Buttons (Footer) */
+/* Fixo embaixo do modal ao rolar (pedido real, 2026-10-22) — `.lm-modal-card`
+ *  já é o próprio container com scroll (`overflow-y: auto`), então um filho
+ *  `position: sticky` gruda nele sem precisar reestruturar o JSX de nenhum
+ *  modal. Fundo opaco igual ao do card, senão o conteúdo rolando por baixo
+ *  apareceria atrás dos botões. Vale pra todos os modais que usam essa
+ *  classe (Procedimento, Capa, Categoria, etc.) — em modais curtos que não
+ *  rolam, fica idêntico a antes. */
 .lm-modal-actions {
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
   gap: 12px !important;
   margin-top: 22px !important;
+  position: sticky !important;
+  bottom: 0 !important;
+  padding-top: 14px !important;
+  background: #fff8f9 !important;
+  box-shadow: 0 -8px 12px -6px rgba(0, 0, 0, 0.12) !important;
+  z-index: 2 !important;
 }
 
 .lm-modal-btn {
