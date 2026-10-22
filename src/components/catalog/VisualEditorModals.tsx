@@ -133,18 +133,17 @@ export const VisualEditorModals: React.FC<VisualEditorModalsProps> = ({
       changes.push(`✨ Novos procedimentos: ${currentProcs.length - initialProcs.length} item(ns)`);
     }
 
+    // Bug real, 2026-10-22: comparar só uma lista fixa de campos (título,
+    // preço, duração, foto, categoria, descrição) fazia qualquer mudança
+    // em campo de fora dela (ex: `extra_photos`, `specs`, `badge`) passar
+    // batido e mostrar "Nenhuma alteração pendente" mesmo tendo mudado de
+    // verdade. Comparação do objeto inteiro cobre qualquer campo, hoje ou
+    // no futuro, sem precisar lembrar de atualizar uma lista toda vez que
+    // um campo novo for adicionado ao procedimento.
     let modifiedCount = 0;
     currentProcs.forEach((proc, idx) => {
       const orig = initialProcs[idx];
-      if (
-        orig &&
-        (proc.title !== orig.title ||
-          proc.price !== orig.price ||
-          proc.duration !== orig.duration ||
-          proc.image_url !== orig.image_url ||
-          proc.category !== orig.category ||
-          proc.description !== orig.description)
-      ) {
+      if (orig && JSON.stringify(proc) !== JSON.stringify(orig)) {
         modifiedCount++;
       }
     });
