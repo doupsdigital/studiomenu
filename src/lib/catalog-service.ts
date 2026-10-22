@@ -117,6 +117,7 @@ export async function getCatalogBySlug(slug: string): Promise<CatalogOrderData |
         orderData.subscription_status !== 'ativo',
       client_name: orderData.client_name || orderData.name || normalizedSlug,
       studio_name: orderData.studio_name || `Studio ${orderData.client_name || normalizedSlug}`,
+      studio_label: orderData.studio_label || 'STUDIO',
       hero_phrase: orderData.hero_phrase || 'A arte de transformar a sua beleza com leveza e precisão.',
       bio_description: orderData.bio_description || '',
       avatar_url: orderData.avatar_url || orderData.cover_media_url,
