@@ -12,16 +12,15 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(self.clients.claim());
 });
 
-// Bug real, 2026-10-22: isso aqui tinha um handler de 'fetch' que não
-// chamava `event.respondWith(...)` nenhuma — o "passthrough implícito"
-// (deixar sem responder) é tecnicamente válido pela spec, mas é frágil na
-// prática: junto com o dev server recarregando o worker toda hora, isso
-// derrubava o POST de `/api/catalog/save` com "falha de rede" (sem log
-// nenhum no servidor, porque a requisição nem chegava lá). Responde de
-// verdade, sem nenhuma estratégia de cache — passthrough explícito.
-self.addEventListener('fetch', (event) => {
-  event.respondWith(fetch(event.request));
-});
+// Passthrough implícito (sem `event.respondWith(...)`) — sem estratégia de
+// cache por enquanto. NÃO trocar por `event.respondWith(fetch(event.request))`:
+// incidente real em produção, 2026-10-22 — `fetch()` recusa (TypeError) uma
+// `Request` cujo `mode` é `'navigate'` (toda navegação de página usa esse
+// modo), e isso derrubou o carregamento de páginas inteiras pra quem tinha
+// o worker antigo (alcance `/`, de antes do fix de scope em
+// `ServiceWorkerRegister.tsx`) ainda ativo. Passthrough implícito é válido
+// pela spec e é o comportamento seguro já comprovado em produção.
+self.addEventListener('fetch', () => {});
 
 // Push notifications (docs/PLANO_PRODUCAO_V1.md, Fase 18) — recebe o payload
 // JSON enviado por src/lib/push-notifications.ts e mostra a notificação do
