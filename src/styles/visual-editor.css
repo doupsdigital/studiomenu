@@ -591,6 +591,15 @@ body[data-theme="luxury"] .lm-cover-edit-btn,
   min-height: 0 !important;
   overflow-y: auto !important;
   padding-right: 14px !important;
+  /* Esconde a barra NATIVA de vez (pedido real, 2026-10-22 — ela aparecia
+   *  junto com o indicador desenhado à mão durante o toque de rolagem,
+   *  misturando os dois visualmente). Só o indicador próprio fica. */
+  scrollbar-width: none !important;
+}
+
+.lm-modal-scroll::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
 }
 
 /* Indicador de rolagem desenhado à mão (pedido real, 2026-10-22: "quero
