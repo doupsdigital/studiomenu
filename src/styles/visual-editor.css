@@ -551,6 +551,77 @@ body[data-theme="luxury"] .lm-cover-edit-btn,
   border-radius: 10px !important;
 }
 
+/* Correção mais robusta só pro modal de Procedimento (pedido real,
+ *  2026-10-22 — "vazou" por baixo dos botões fixos no celular real). Vira
+ *  um container flex de verdade: título fixo em cima, `.lm-modal-scroll`
+ *  é a ÚNICA parte que rola, `.lm-modal-actions` fica fora da área de
+ *  scroll (não depende de `position: sticky` dentro de `overflow:auto`,
+ *  que tem comportamento inconsistente em alguns navegadores mobile com
+ *  barra de endereço dinâmica). Os outros modais (mais curtos, raramente
+ *  rolam) continuam no padrão sticky acima, sem essa classe extra. */
+.lm-modal-card--procedure {
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+/* Envolve `.lm-modal-scroll` + o indicador de rolagem próprio — fica
+ *  parado (não rola), só pra servir de referência de posição pro track
+ *  do indicador ficar fixo visualmente enquanto o conteúdo rola por
+ *  dentro.
+ *
+ *  Bug real, 2026-10-22: a 1ª versão usava `position: absolute; inset: 0`
+ *  no `.lm-modal-scroll` — isso tira ele do fluxo normal, então o card
+ *  nunca "sentia" a altura real do conteúdo e encolhia pro mínimo (só
+ *  título + botões, sem nada no meio). Virou flex aninhado em vez disso:
+ *  `.lm-modal-scroll-wrap` TAMBÉM é um container flex de 1 filho só — o
+ *  conteúdo real continua contribuindo sua altura normalmente, e só
+ *  encolhe/ganha scroll quando o conjunto passa de `max-height` no card
+ *  de fora. */
+.lm-modal-scroll-wrap {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+}
+
+.lm-modal-scroll {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  padding-right: 14px !important;
+}
+
+/* Indicador de rolagem desenhado à mão (pedido real, 2026-10-22: "quero
+ *  que ela apareça sempre") — a barra nativa do navegador, mesmo com
+ *  `::-webkit-scrollbar` estilizado, some sozinha fora do toque de
+ *  rolagem na maioria dos navegadores mobile (comportamento do sistema).
+ *  Esse aqui é um `<div>` normal, sem depender de scrollbar nenhuma. */
+.lm-modal-scroll-track {
+  position: absolute !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  right: 2px !important;
+  width: 5px !important;
+  border-radius: 10px !important;
+  z-index: 3 !important;
+  pointer-events: none !important;
+}
+
+.lm-modal-scroll-thumb {
+  position: absolute !important;
+  left: 0 !important;
+  width: 100% !important;
+  border-radius: 10px !important;
+  background: rgba(192, 75, 107, 0.45) !important;
+}
+
+.lm-modal-card--procedure .lm-modal-actions {
+  position: static !important;
+  flex-shrink: 0 !important;
+}
+
 .lm-modal-title {
   font-size: 1.2rem !important;
   font-weight: 700 !important;
