@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ProcedureItem } from '@/types/catalog';
 import { formatCurrencyBRL, formatMinutesToLabel, parseDurationToMinutes } from '@/lib/format';
 import { useFilePickerFallback } from '@/lib/use-file-picker-fallback';
@@ -66,6 +66,18 @@ export const ProcedureModal: React.FC<ProcedureModalProps> = ({
   // Começa já mostrando as linhas de fotos que o procedimento já tem
   // salvas, pra reabrir pra editar não esconder o que já foi configurado.
   const [extraRowCount, setExtraRowCount] = useState(() => procForm.extra_photos?.length || 0);
+  // Bug real, 2026-10-22: `procForm` chega aqui ainda desatualizado no 1º
+  // render (o componente pai, `VisualEditorModals.tsx`, só corrige o
+  // `procForm` dele num `useEffect` que roda 1 ciclo DEPOIS de abrir pra
+  // editar) — o `useState` lazy acima então calculava `extraRowCount` a
+  // partir do procedimento ERRADO (o que estava sendo editado antes) e
+  // nunca mais corrigia. `procForm.id` é o sinal confiável de "é outro
+  // procedimento de verdade" (também chega desatualizado no 1º render,
+  // mas muda de novo quando o pai corrige — refazendo este efeito).
+  useEffect(() => {
+    setExtraRowCount(procForm.extra_photos?.length || 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [procForm.id]);
   const extraSlot0 = useFilePickerFallback((e) => onFileUploadExtra?.(e, 0));
   const extraSlot1 = useFilePickerFallback((e) => onFileUploadExtra?.(e, 1));
   const extraSlotPickers = [extraSlot0, extraSlot1];
