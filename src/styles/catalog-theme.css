@@ -1211,11 +1211,20 @@ button {
  *  compressão necessária, quando a lista é longa demais pro espaço
  *  disponível, recair só sobre este bloco (comportamento padrão do
  *  flexbox), que por sua vez repassa pro cartão (`flex: 1 1 auto` +
- *  `min-height: 0`), revelando a rolagem interna dele. */
+ *  `min-height: 0`), revelando a rolagem interna dele.
+ *
+ *  Bug real, 2026-10-23 (achado pela usuária testando): faltava
+ *  `min-height: 0` AQUI também — por padrão (`min-height: auto`), um
+ *  item flex nunca encolhe abaixo do tamanho natural do próprio
+ *  conteúdo, mesmo com `flex-shrink` ativo nos irmãos (regra do
+ *  flexbox, não é falta de espaço calculada errado). Sem isso, o bloco
+ *  nunca tinha permissão de ficar menor que a lista inteira — voltou a
+ *  vazar pra fora da seção em listas longas. */
 .secao-orientacoes__corpo {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  min-height: 0;
   margin: auto 0;
 }
 
