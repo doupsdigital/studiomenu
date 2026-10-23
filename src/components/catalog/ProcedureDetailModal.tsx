@@ -103,17 +103,24 @@ export const ProcedureDetailModal: React.FC<ProcedureDetailModalProps> = ({
           >
             ✕
           </button>
-          <button
-            type="button"
-            className="modal__ver-imagem"
-            onClick={() => setGalleryOpen(true)}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="11" cy="11" r="7" />
-              <line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
-            Ver {photos.length > 1 ? 'imagens' : 'imagem'}
-          </button>
+          {/* Só aparece quando há foto de verdade (pedido real, 2026-10-23) —
+           *  sem isso, procedimentos sem foto (placeholder "imagens em
+           *  breve") mostravam o botão mesmo sem nada pra ver em tela
+           *  cheia; clicar não fazia nada (`ProcedureImageGallery` recusa
+           *  renderizar com `photos` vazio). */}
+          {photos.length > 0 && (
+            <button
+              type="button"
+              className="modal__ver-imagem"
+              onClick={() => setGalleryOpen(true)}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="7" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              Ver {photos.length > 1 ? 'imagens' : 'imagem'}
+            </button>
+          )}
         </div>
 
         <div className="modal__corpo">
