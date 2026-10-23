@@ -1228,6 +1228,11 @@ button {
   line-height: 1.15;
   font-weight: 400;
   color: var(--orient-title-color);
+  /* Pedido real da usuária, 2026-10-23 — não tinha text-align nenhum (ficava
+   *  alinhado à esquerda por padrão), inconsistente com o resto do
+   *  catálogo: o título da tela "Meus Links" (.secao-contato__titulo) já é
+   *  centralizado. */
+  text-align: center;
 }
 
 .secao-orientacoes__titulo em {
