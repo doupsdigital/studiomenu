@@ -85,8 +85,10 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
 
   return (
     <section className={`hero is-visible ${isClassicoLayout ? 'hero--classico' : ''}`} id="hero" data-screen-label="Capa">
-      {/* 1. Foto de Fundo Ken Burns */}
-      <div className="hero__foto-wrap">
+      {/* 1. Foto de Fundo Ken Burns — `data-tour` é alvo do tour didático do
+       *  showroom (pedido real, 2026-10-23, "Sua foto aqui"); inofensivo em
+       *  catálogos reais, onde nenhum tour aponta pra ele. */}
+      <div className="hero__foto-wrap" data-tour="showroom-cover-photo">
         <img
           src={heroImage}
           alt={data.studio_name || data.client_name}
@@ -120,7 +122,10 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
       {/* 4. Conteúdo Sobreposto */}
       <div className="hero__conteudo">
         {/* Selo Seja Bem Vinda — com showroom, flanqueado pelos botões de tema */}
-        <div className={`hero__selo anim-fade-up delay-1${themeSwitcher ? ' hero__selo--with-switcher' : ''}`}>
+        <div
+          className={`hero__selo anim-fade-up delay-1${themeSwitcher ? ' hero__selo--with-switcher' : ''}`}
+          data-tour={themeSwitcher ? 'showroom-theme' : undefined}
+        >
           {themeSwitcher && (
             <button
               type="button"
