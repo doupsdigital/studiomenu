@@ -17,6 +17,13 @@ interface HeaderCoverProps {
    *  em catálogos reais, que continuam mostrando só o selo, sem alteração
    *  nenhuma. */
   themeSwitcher?: { value: ThemeVariant; onChange: (variant: ThemeVariant) => void };
+  /** Dicas didáticas do showroom (pedido real, 2026-10-23) — "troque as
+   *  cores do tema" (sempre apontando pro botão OPOSTO ao tema ativo, convite
+   *  pra experimentar o outro) + "troque a foto de capa". Decorativas,
+   *  `pointer-events: none`, sem sequência/estado pra travar — só refletem
+   *  "a visitante está na Capa agora" (`CatalogLayout.tsx` decide quando).
+   *  `undefined`/`false` em catálogos reais e no editor. */
+  showHints?: boolean;
 }
 
 export const HeaderCover: React.FC<HeaderCoverProps> = ({
@@ -28,6 +35,7 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
   onUpdateHeroPhrase,
   onUpdateStudioLabel,
   themeSwitcher,
+  showHints = false,
 }) => {
   const wspText = encodeURIComponent(`Olá! Vim pelo seu catálogo digital e gostaria de tirar uma dúvida.`);
   const wspUrl = `https://wa.me/${data.whatsapp_number}?text=${wspText}`;
@@ -84,20 +92,10 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
   };
 
   return (
-    // `data-tour` na SEÇÃO inteira (não em `.hero__foto-wrap` abaixo) — é
-    // alvo do tour didático do showroom (pedido real, 2026-10-23, "Troque a
-    // foto de capa"); inofensivo em catálogos reais, onde nenhum tour
-    // aponta pra ele. Bug real, 2026-10-23: o alvo era `.hero__foto-wrap`
-    // (`position: absolute; inset: -10%`, só pro efeito Ken Burns de zoom
-    // da foto) — o retângulo dele se estende 10% além de cada borda da
-    // seção, o que quebrava o cálculo de posição/scroll do Joyride (balão
-    // não aparecia, ou aparecia desalinhado só depois de rolar na mão).
-    // Esta seção tem tamanho normal (sem absolute/inset), alvo estável.
     <section
       className={`hero is-visible ${isClassicoLayout ? 'hero--classico' : ''}`}
       id="hero"
       data-screen-label="Capa"
-      data-tour="showroom-cover-photo"
     >
       {/* 1. Foto de Fundo Ken Burns */}
       <div className="hero__foto-wrap">
@@ -134,10 +132,7 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
       {/* 4. Conteúdo Sobreposto */}
       <div className="hero__conteudo">
         {/* Selo Seja Bem Vinda — com showroom, flanqueado pelos botões de tema */}
-        <div
-          className={`hero__selo anim-fade-up delay-1${themeSwitcher ? ' hero__selo--with-switcher' : ''}`}
-          data-tour={themeSwitcher ? 'showroom-theme' : undefined}
-        >
+        <div className={`hero__selo anim-fade-up delay-1${themeSwitcher ? ' hero__selo--with-switcher' : ''}`}>
           {themeSwitcher && (
             <button
               type="button"
@@ -158,6 +153,26 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
             </button>
           )}
         </div>
+
+        {/* Dicas didáticas do showroom (pedido real, 2026-10-23) — decorativas,
+         *  pointer-events: none, sem sequência nenhuma pra travar (ver
+         *  comentário completo na prop `showHints`). Aponta sempre pro botão
+         *  de tema OPOSTO ao ativo agora (convite pra experimentar o outro),
+         *  igual já funcionava na landing page. */}
+        {showHints && themeSwitcher && (
+          <div className={`hero__hint hero__hint--theme-${themeSwitcher.value === 'rose' ? 'luxury' : 'rose'}`} aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
+              <line x1="12" y1="19" x2="12" y2="5" />
+              <polyline points="5 12 12 5 19 12" />
+            </svg>
+            <span>Mude as cores do tema</span>
+          </div>
+        )}
+        {showHints && (
+          <div className="hero__hint hero__hint--photo" aria-hidden="true">
+            <span>Troque a foto de capa</span>
+          </div>
+        )}
 
         {/* Título & Nome */}
         <div className="hero__titulo">

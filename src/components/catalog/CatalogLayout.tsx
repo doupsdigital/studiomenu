@@ -74,16 +74,10 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
   showcaseTour = false,
 }) => {
   const [showWelcomeOverlay, setShowWelcomeOverlay] = useState(isNewCatalog);
-  // Bug real, 2026-10-23: se a visitante clica direto num card (em vez de
-  // "Próximo") enquanto o passo "Clique nos cards" do tour do showroom
-  // ainda está ativo, o toque passa por baixo do balão e abre o modal de
-  // detalhes mesmo assim — o tour de página (`showroomTourSteps` abaixo)
-  // não sabia disso e continuava "vivo", disputando tela com o balão do
-  // modal ("Agende direto por aqui"), os dois aparecendo ao mesmo tempo.
-  // `ProcedureGrid.tsx` avisa aqui sempre que o modal de detalhes abre/fecha
-  // (`onDetailModalChange`); desmontar o `<ProductTour>` de propósito
-  // (não só "pausar") fecha o balão dele na hora, sem precisar estender a
-  // API do componente pra ter um "parar à força".
+  // Dicas didáticas do showroom (pedido real, 2026-10-23) — `ProcedureGrid.tsx`
+  // avisa aqui sempre que o modal de detalhes abre/fecha; some com as dicas
+  // de página (card/formato/tema/capa) enquanto o modal estiver aberto, e
+  // liga a dica própria do modal ("Agendar agora").
   const [showroomDetailModalOpen, setShowroomDetailModalOpen] = useState(false);
   const [catalogState, setCatalogState] = useState<CatalogOrderData>(data);
   const [isSaved, setIsSaved] = useState(true);
@@ -575,60 +569,39 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
     return steps;
   }, [catalogState.procedures.length]);
 
-  // Tour guiado didático do showroom (pedido real, 2026-10-23) — reaproveita
-  // o mesmo `ProductTour` do editor acima, mas com alvos/texto próprios pra
-  // uma visitante vendo o catálogo pela 1a vez, não a profissional editando.
-  // Só 4 passos "de página" aqui — o 5o (apontar o "Agendar agora") vive
-  // dentro de `ProcedureGrid.tsx`, que é quem sabe quando o modal de
-  // detalhes está aberto (não dá pra apontar um alvo que só existe depois
-  // de um clique real dela).
-  const showroomTourSteps = useMemo<Step[]>(
-    () => [
-      {
-        target: '[data-tour="showroom-theme"]',
-        title: 'Troque as cores do tema',
-        content: 'Rosé ou Luxury — escolha o visual que combina com o seu studio.',
-        skipScroll: true,
+  // Dicas didáticas do showroom (pedido real, 2026-10-23) — 2a tentativa:
+  // a 1a usava react-joyride (tour sequencial, "Próximo"/"Pular"), igual ao
+  // tour do editor acima. Na prática quebrou repetidas vezes porque a
+  // visitante pode interagir com a página de verdade a qualquer momento
+  // (clicar um card, clicar "Agendar agora") sem passar pelos botões do
+  // tour — cada interrupção nova exigia mais um caso especial pra "religar"
+  // o tour sem duplicar/travar. Reescrito no mesmo modelo já comprovado da
+  // landing page (`MockupModal.tsx`): dicas INDEPENDENTES, sem sequência
+  // nenhuma pra quebrar — cada uma só reflete "a visitante está nessa tela
+  // agora" (via `showcaseActiveScreen` abaixo) e `pointer-events: none`,
+  // sem Próximo/Pular. Nada pra ficar "preso": qualquer interação real some
+  // com a dica na hora (`showroomDetailModalOpen`) e ela reaparece sozinha
+  // se a visitante voltar pra aquela tela depois.
+  const [showcaseActiveScreen, setShowcaseActiveScreen] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!showcaseTour) return;
+    const sections = document.querySelectorAll('[data-screen-label]');
+    if (!sections.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setShowcaseActiveScreen(entry.target.getAttribute('data-screen-label'));
+          }
+        });
       },
-      {
-        // Bug real, 2026-10-23: mesmo depois de trocar o alvo de
-        // `.hero__foto-wrap` pra `.hero` inteira, continuava quebrado — a
-        // seção tem a altura da tela inteira, então o balão (que por
-        // padrão se posiciona "abaixo" do alvo) tentava aparecer abaixo de
-        // uma seção do tamanho da tela toda, ou seja, na PRÓXIMA seção,
-        // fora da área visível (só aparecia "certo" depois de rolar até
-        // lá). Resolvido com `placement: 'center'` — centraliza na tela,
-        // sem depender de posição/tamanho de elemento nenhum (pedido real
-        // da usuária: "aparecer tipo 'tela toda'"). `target: 'body'` é só
-        // formalidade do tipo do Joyride quando usa center.
-        target: 'body',
-        placement: 'center',
-        title: 'Troque a foto de capa',
-        content: 'Se quiser, troque a imagem da capa por uma foto sua ou do seu studio.',
-        skipScroll: true,
-      },
-      {
-        target: '[data-tour="showroom-card"]',
-        title: 'Clique nos cards',
-        content: 'Toque em qualquer procedimento pra ver os detalhes completos.',
-      },
-      {
-        // Pedido real, 2026-10-23 — ela queria esse passo também (tinha
-        // ficado de fora da 1a versão), depois do "Clique nos cards".
-        //
-        // Bug real, 2026-10-23: `skipScroll: true` aqui partia do princípio
-        // de que o seletor (topo da seção de serviços) continuava visível
-        // depois do passo anterior — mas "Clique nos cards" rola bastante
-        // pra centralizar o 1o CARD na tela, deixando o seletor (acima dos
-        // cards) escondido pra fora da área visível. Sem `skipScroll`, o
-        // Joyride volta a rolar pra cima quando precisar.
-        target: '[data-tour="showroom-layout"]',
-        title: 'Troque o formato do catálogo',
-        content: 'Mosaico ou Clássico — dois estilos diferentes pra mostrar os mesmos procedimentos.',
-      },
-    ],
-    []
-  );
+      { threshold: 0.3 }
+    );
+    sections.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [showcaseTour, catalogState.layout_model]);
 
   // Reordenar categoria (setas ‹ › nos chips de filtro, modo edição).
   // Usa a lista `categories` completa (não só catalogState.categories) pra
@@ -684,12 +657,6 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
        *  algum dia coexistirem na mesma rota. */}
       {isEditMode && (
         <ProductTour tourId="catalogo" slug={catalogState.slug} steps={catalogEditorSteps} enabled={!showWelcomeOverlay} scrollOffset={20} />
-      )}
-
-      {/* 0.7 TOUR GUIADO DIDÁTICO DO SHOWROOM (pedido real, 2026-10-23) —
-       *  mesmo mecanismo acima, alvos/texto pra visitante, não profissional. */}
-      {showcaseTour && !isEditMode && !showroomDetailModalOpen && (
-        <ProductTour tourId="showroom" slug="showroom" steps={showroomTourSteps} enabled scrollOffset={20} />
       )}
 
       {/* 1. CONTROLES DO EDITOR VISUAL IN-PLACE (BARRA INFERIOR E TOP STATUS) */}
@@ -770,6 +737,7 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
             onUpdateHeroPhrase={handleUpdateHeroPhrase}
             onUpdateStudioLabel={handleUpdateStudioLabel}
             themeSwitcher={themeSwitcher}
+            showHints={showcaseTour && showcaseActiveScreen === 'Capa' && !showroomDetailModalOpen}
           />
         )}
 
@@ -812,7 +780,12 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
             demoBookingOnly && (!catalogState.booking_enabled || catalogState.agenda_paused) ? setFakeWhatsappItem : undefined
           }
           layoutSwitcher={layoutSwitcher}
-          showcaseTour={showcaseTour}
+          showHints={
+            showcaseTour &&
+            (showcaseActiveScreen === 'Mosaico' || showcaseActiveScreen === 'Serviços') &&
+            !showroomDetailModalOpen
+          }
+          showAgendarHint={showcaseTour}
           onDetailModalChange={setShowroomDetailModalOpen}
         />
 

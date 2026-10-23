@@ -254,11 +254,104 @@ button {
  *  Reaproveita as variáveis de cor do `.filtro-chip` (já responsivas por
  *  tema) em vez de cores fixas. */
 .etiqueta-linha--with-switcher {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
   width: 100%;
+}
+
+/* Dicas didáticas do showroom (pedido real, 2026-10-23) — mesma linguagem
+ *  visual das outras (`.hero__hint` em `HeaderCover.tsx`): pílula branca,
+ *  borda/sombra rosé, pulso suave. Decorativas, sem sequência nenhuma pra
+ *  travar (ver comentário completo na prop `showHints` do componente). */
+.catalogo__hint-formato {
+  position: absolute;
+  top: -34px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #c84b72;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(200, 75, 114, 0.35);
+  box-shadow: 0 4px 14px rgba(200, 75, 114, 0.22);
+  white-space: nowrap;
+  pointer-events: none;
+  animation: catalogoHintFormatoPulse 2.4s infinite ease-in-out;
+}
+
+@keyframes catalogoHintFormatoPulse {
+  0%, 100% {
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    transform: translateX(-50%) scale(1.04);
+  }
+}
+
+/* Wrapper só pra dar contexto de posicionamento (`position: relative`) pro
+ *  balão "Clique nos cards" flutuar por cima da grade/lista, sem interferir
+ *  em nada do layout do grid/drag-and-drop por dentro. */
+.catalogo__grid-wrap {
+  position: relative;
+}
+
+.catalogo__hint-cards {
+  position: absolute;
+  top: -8px;
+  right: 8px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #c84b72;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(200, 75, 114, 0.35);
+  box-shadow: 0 4px 14px rgba(200, 75, 114, 0.22);
+  white-space: nowrap;
+  pointer-events: none;
+  animation: catalogoHintPulse 2.4s infinite ease-in-out;
+}
+
+.catalogo__hint-cards svg {
+  animation: catalogoHintTapPulse 1.4s infinite ease-in-out;
+}
+
+@keyframes catalogoHintPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+@keyframes catalogoHintTapPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.86);
+  }
 }
 
 .layout-pill {
@@ -520,6 +613,76 @@ button {
 .hero__selo--with-switcher {
   justify-content: space-between;
   align-items: center;
+}
+
+/* Dicas didáticas do showroom (pedido real, 2026-10-23) — mesma linguagem
+ *  visual das dicas da landing page (pílula branca, borda/sombra rosé,
+ *  pulso suave; ver `.lp-scroll-cue-tag`/`.lp-tag-soft-pulse` em
+ *  `landing-lpb.css`), adaptada pra ficar em cima do conteúdo real da capa
+ *  (sem moldura de celular pra pendurar nela). `pointer-events: none` +
+ *  `z-index` alto o bastante pra ficar por cima da foto/scrim, mas abaixo
+ *  de qualquer modal. */
+.hero__hint {
+  position: absolute;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: #c84b72;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(200, 75, 114, 0.35);
+  box-shadow: 0 4px 14px rgba(200, 75, 114, 0.22);
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: heroHintPulse 2.4s infinite ease-in-out;
+}
+
+.hero__hint--theme-rose {
+  top: 88px;
+  left: 24px;
+}
+
+.hero__hint--theme-luxury {
+  top: 88px;
+  right: 24px;
+}
+
+.hero__hint--photo {
+  top: 42%;
+  left: 50%;
+  transform: translateX(-50%);
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+@keyframes heroHintPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+.hero__hint--photo {
+  animation-name: heroHintPulsePhoto;
+}
+
+@keyframes heroHintPulsePhoto {
+  0%, 100% {
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    transform: translateX(-50%) scale(1.04);
+  }
 }
 
 /* Cada botão sempre mostra a paleta do SEU tema (não a do tema atual da
@@ -1806,8 +1969,47 @@ button {
 }
 
 .modal__acoes {
+  position: relative;
   display: flex;
   gap: 10px;
+}
+
+/* Dica didática do showroom (pedido real, 2026-10-23) — mesma linguagem
+ *  visual das outras (`.hero__hint`, `.catalogo__hint-*`): pílula branca,
+ *  borda/sombra rosé, pulso suave. Decorativa, sem sequência pra travar —
+ *  só reflete "o modal está aberto agora" (ver prop `showAgendarHint`). */
+.modal__hint-agendar {
+  position: absolute;
+  top: -34px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #c84b72;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(200, 75, 114, 0.35);
+  box-shadow: 0 4px 14px rgba(200, 75, 114, 0.22);
+  white-space: nowrap;
+  pointer-events: none;
+  animation: modalHintAgendarPulse 2.4s infinite ease-in-out;
+}
+
+@keyframes modalHintAgendarPulse {
+  0%, 100% {
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    transform: translateX(-50%) scale(1.04);
+  }
 }
 
 .modal__cta {

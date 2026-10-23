@@ -18,6 +18,11 @@ interface ProcedureDetailModalProps {
    *  WhatsApp (que abriria o WhatsApp de verdade na gravação), mostra a
    *  simulação visual (`FakeWhatsappScreen`). */
   onFakeWhatsapp?: (item: ProcedureItem) => void;
+  /** Dica didática do showroom (pedido real, 2026-10-23) — "Agendar agora",
+   *  mesmo padrão não-sequencial das outras dicas (ver `HeaderCover.tsx`):
+   *  decorativa, sem Próximo/Pular, só reflete "o modal está aberto agora".
+   *  `undefined`/`false` em catálogos reais e no editor. */
+  showAgendarHint?: boolean;
 }
 
 export const ProcedureDetailModal: React.FC<ProcedureDetailModalProps> = ({
@@ -30,6 +35,7 @@ export const ProcedureDetailModal: React.FC<ProcedureDetailModalProps> = ({
   bookingEnabled = false,
   onBook,
   onFakeWhatsapp,
+  showAgendarHint = false,
 }) => {
   // Galeria em tela cheia (pedido real, 2026-10-22) — estado próprio, local
   // a este componente: não é um dos modais do editor visual (`activeModal`
@@ -161,16 +167,23 @@ export const ProcedureDetailModal: React.FC<ProcedureDetailModalProps> = ({
              *  a altura fixa do botão (48px) e quebrava numa segunda linha
              *  apertada. Texto curto nunca quebra, não importa o tamanho do
              *  nome do serviço. */}
-            {/* data-tour (pedido real, 2026-10-23) é o alvo do passo 4 do
-             *  tour didático do showroom ("Agende direto por aqui") — nas 3
-             *  variantes, pra funcionar com qualquer uma que esteja
-             *  renderizada. Inofensivo em catálogos reais (nenhum tour
-             *  aponta pra ele lá). */}
+            {/* Dica didática do showroom (pedido real, 2026-10-23) — "Agendar
+             *  agora", mesmo padrão não-sequencial das outras (decorativa,
+             *  sem Próximo/Pular). Vive aqui, não dentro de cada variante do
+             *  botão abaixo, porque é a mesma dica nas 3. */}
+            {showAgendarHint && (
+              <div className="modal__hint-agendar" aria-hidden="true">
+                <span>Agende direto por aqui</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <polyline points="19 12 12 19 5 12" />
+                </svg>
+              </div>
+            )}
             {canBook ? (
               <button
                 type="button"
                 className="modal__cta"
-                data-tour="showroom-agendar"
                 onClick={() => onBook?.(item)}
               >
                 Agendar agora →
@@ -179,7 +192,6 @@ export const ProcedureDetailModal: React.FC<ProcedureDetailModalProps> = ({
               <button
                 type="button"
                 className="modal__cta"
-                data-tour="showroom-agendar"
                 onClick={() => onFakeWhatsapp(item)}
               >
                 Agendar agora →
@@ -190,7 +202,6 @@ export const ProcedureDetailModal: React.FC<ProcedureDetailModalProps> = ({
                 target="_blank"
                 rel="noopener noreferrer"
                 className="modal__cta"
-                data-tour="showroom-agendar"
               >
                 Agendar agora →
               </a>

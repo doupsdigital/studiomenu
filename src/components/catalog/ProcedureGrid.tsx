@@ -19,12 +19,10 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-import type { Step } from 'react-joyride';
 import { ProcedureItem, LayoutModel } from '@/types/catalog';
 import { ProcedureCard } from './ProcedureCard';
 import { ProcedureDetailModal } from './ProcedureDetailModal';
 import { ProcedureImage } from './ProcedureImage';
-import { ProductTour } from '@/components/tour/ProductTour';
 
 interface ProcedureGridProps {
   procedures: ProcedureItem[];
@@ -48,15 +46,20 @@ interface ProcedureGridProps {
    *  cabeçalho, mesma ideia do Rosé/Luxury no `HeaderCover`. `undefined`
    *  em catálogos reais, que continuam sem alteração nenhuma aqui. */
   layoutSwitcher?: { value: LayoutModel; onChange: (layout: LayoutModel) => void };
-  /** Tour guiado didático do showroom (pedido real, 2026-10-23) — ver
-   *  comentário completo em `CatalogLayout.tsx`. Só `ShowcaseClient.tsx`
-   *  liga isso; `undefined`/`false` em catálogos reais e no editor. */
-  showcaseTour?: boolean;
+  /** Dicas didáticas do showroom (pedido real, 2026-10-23) — "clique nos
+   *  cards" (1o card) + "troque o formato" (seletor Mosaico/Clássico).
+   *  Decorativas, sem sequência nenhuma pra travar — `CatalogLayout.tsx`
+   *  decide quando mostrar (tela certa + modal de detalhes fechado). Repassa
+   *  `showAgendarHint` adiante pro `ProcedureDetailModal.tsx` (dica própria,
+   *  só enquanto o modal estiver aberto). `undefined`/`false` em catálogos
+   *  reais e no editor. */
+  showHints?: boolean;
+  showAgendarHint?: boolean;
   /** Avisa sempre que o modal de detalhes abre/fecha (pedido real,
-   *  2026-10-23) — `CatalogLayout.tsx` usa isso pra fechar o tour de
-   *  página do showroom na hora, mesmo que a visitante tenha clicado
-   *  direto num card em vez de "Próximo" (bug real: o toque passava por
-   *  baixo do balão do Joyride). Opcional porque só o showroom se importa. */
+   *  2026-10-23) — `CatalogLayout.tsx` usa isso pra esconder as dicas de
+   *  página (card/formato/tema/capa) enquanto o modal estiver aberto, e
+   *  ligar a dica própria dele ("Agendar agora"). Opcional porque só o
+   *  showroom se importa. */
   onDetailModalChange?: (open: boolean) => void;
 }
 
@@ -86,13 +89,7 @@ const SortableProcCard: React.FC<{
   };
 
   return (
-    // `data-tour` só entra aqui (fora do modo edição) quando `dataTour` vem
-    // preenchido — sem isso, pro tour didático do showroom (pedido real,
-    // 2026-10-23), não dá nada pra apontar o balão "Clique nos cards". Em
-    // modo edição o alvo continua sendo só a barra de ações abaixo (mesmo
-    // elemento de sempre), de propósito: não mexe no tour do editor já
-    // testado.
-    <div ref={setNodeRef} style={style} className="lm-sortable-proc" data-tour={!isEditMode ? dataTour : undefined}>
+    <div ref={setNodeRef} style={style} className="lm-sortable-proc">
       {isEditMode && (
         <>
           <div className="lm-svc-actions-bar" data-tour={dataTour}>
@@ -146,20 +143,6 @@ const ServicoCardLista: React.FC<{
   );
 };
 
-/** Passo 4 do tour didático do showroom (pedido real, 2026-10-23) — fora do
- *  componente, de propósito: não depende de nada que mude (igual
- *  `showroomTourSteps` em `CatalogLayout.tsx`, só que esse aqui é 1 passo
- *  só). `.modal__cta` é o mesmo alvo nas 3 variantes de botão de
- *  `ProcedureDetailModal.tsx` (agendamento automático, WhatsApp simulado ou
- *  real) — qualquer uma que esteja renderizada serve de alvo. */
-const showroomAgendarSteps: Step[] = [
-  {
-    target: '[data-tour="showroom-agendar"]',
-    title: 'Agende direto por aqui',
-    content: 'Sua cliente marca o horário sem sair do catálogo nem precisar te chamar no WhatsApp primeiro.',
-  },
-];
-
 export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
   procedures,
   allCategories,
@@ -178,7 +161,8 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
   onRequestBooking,
   onFakeWhatsapp,
   layoutSwitcher,
-  showcaseTour = false,
+  showHints = false,
+  showAgendarHint = false,
   onDetailModalChange,
 }) => {
   const [selectedProcedure, setSelectedProcedure] = useState<ProcedureItem | null>(null);
@@ -287,10 +271,18 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
       <div className="container">
 
         <header className="secao-catalogo__header anim-fade-up delay-1">
-          <div
-            className={`etiqueta-linha${layoutSwitcher ? ' etiqueta-linha--with-switcher' : ''}`}
-            data-tour={layoutSwitcher ? 'showroom-layout' : undefined}
-          >
+          <div className={`etiqueta-linha${layoutSwitcher ? ' etiqueta-linha--with-switcher' : ''}`}>
+            {/* Dica didática do showroom (pedido real, 2026-10-23) — mesmo
+             *  padrão das outras (decorativa, sem sequência pra travar). */}
+            {showHints && layoutSwitcher && (
+              <div className="catalogo__hint-formato" aria-hidden="true">
+                <span>Troque o formato</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <polyline points="19 12 12 19 5 12" />
+                </svg>
+              </div>
+            )}
             {layoutSwitcher && (
               <button
                 type="button"
@@ -393,59 +385,77 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
           </span>
         </div>
 
-        {/* Renderização condicional por modelo (Clássico = Lista / Mosaico = Grid) */}
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <SortableContext
-            items={filteredProcedures.map((p) => p.id)}
-            strategy={isClassico ? verticalListSortingStrategy : rectSortingStrategy}
-          >
-            {isClassico ? (
-              <div className="studio__lista">
-                {filteredProcedures.map((item, idx) => (
-                  <SortableProcCard
-                    key={item.id}
-                    id={item.id}
-                    isEditMode={isEditMode}
-                    onEdit={() => onEditProc?.(item)}
-                    onDelete={() => onDeleteProc?.(item)}
-                    dataTour={idx === 0 ? (isEditMode ? 'cat-edit-proc' : showcaseTour ? 'showroom-card' : undefined) : undefined}
-                  >
-                    <ServicoCardLista
-                      item={item}
-                      clientName={clientName}
+        {/* Dica didática do showroom (pedido real, 2026-10-23) — "Clique nos
+         *  cards", mesmo texto/ícone da landing page. Decorativa (sem apontar
+         *  pra um card específico, igual na landing), vive dentro do wrapper
+         *  `position: relative` logo abaixo pra se ancorar na área da
+         *  grade/lista, não na página inteira. */}
+        <div className="catalogo__grid-wrap">
+          {showHints && (
+            <div className="catalogo__hint-cards" aria-hidden="true">
+              <span>Clique nos cards</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff" stroke="#c84b72" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 9V5a1.5 1.5 0 0 0-3 0v7.5" />
+                <path d="M11 10a1.5 1.5 0 0 0-3 0v4" />
+                <path d="M8 11.5a1.5 1.5 0 0 0-3 0V15a6 6 0 0 0 6 6h2a6 6 0 0 0 6-6v-3a1.5 1.5 0 0 0-3 0" />
+              </svg>
+            </div>
+          )}
+
+          {/* Renderização condicional por modelo (Clássico = Lista / Mosaico = Grid) */}
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext
+              items={filteredProcedures.map((p) => p.id)}
+              strategy={isClassico ? verticalListSortingStrategy : rectSortingStrategy}
+            >
+              {isClassico ? (
+                <div className="studio__lista">
+                  {filteredProcedures.map((item, idx) => (
+                    <SortableProcCard
+                      key={item.id}
+                      id={item.id}
                       isEditMode={isEditMode}
-                      formatPrice={formatPrice}
-                      onClick={() => {
-                        if (!isEditMode) setSelectedProcedure(item);
-                      }}
-                    />
-                  </SortableProcCard>
-                ))}
-              </div>
-            ) : (
-              <div className="mosaico__grid">
-                {filteredProcedures.map((item, idx) => (
-                  <SortableProcCard
-                    key={item.id}
-                    id={item.id}
-                    isEditMode={isEditMode}
-                    onEdit={() => onEditProc?.(item)}
-                    onDelete={() => onDeleteProc?.(item)}
-                    dataTour={idx === 0 ? (isEditMode ? 'cat-edit-proc' : showcaseTour ? 'showroom-card' : undefined) : undefined}
-                  >
-                    <ProcedureCard
-                      item={item}
-                      whatsappNumber={whatsappNumber}
-                      clientName={clientName}
+                      onEdit={() => onEditProc?.(item)}
+                      onDelete={() => onDeleteProc?.(item)}
+                      dataTour={idx === 0 ? 'cat-edit-proc' : undefined}
+                    >
+                      <ServicoCardLista
+                        item={item}
+                        clientName={clientName}
+                        isEditMode={isEditMode}
+                        formatPrice={formatPrice}
+                        onClick={() => {
+                          if (!isEditMode) setSelectedProcedure(item);
+                        }}
+                      />
+                    </SortableProcCard>
+                  ))}
+                </div>
+              ) : (
+                <div className="mosaico__grid">
+                  {filteredProcedures.map((item, idx) => (
+                    <SortableProcCard
+                      key={item.id}
+                      id={item.id}
                       isEditMode={isEditMode}
-                      onSelect={(proc) => setSelectedProcedure(proc)}
-                    />
-                  </SortableProcCard>
-                ))}
-              </div>
-            )}
-          </SortableContext>
-        </DndContext>
+                      onEdit={() => onEditProc?.(item)}
+                      onDelete={() => onDeleteProc?.(item)}
+                      dataTour={idx === 0 ? 'cat-edit-proc' : undefined}
+                    >
+                      <ProcedureCard
+                        item={item}
+                        whatsappNumber={whatsappNumber}
+                        clientName={clientName}
+                        isEditMode={isEditMode}
+                        onSelect={(proc) => setSelectedProcedure(proc)}
+                      />
+                    </SortableProcCard>
+                  ))}
+                </div>
+              )}
+            </SortableContext>
+          </DndContext>
+        </div>
 
         {/* BOTÃO ADICIONAR NOVO PROCEDIMENTO DENTRO DO GRID */}
         {isEditMode && (
@@ -491,23 +501,7 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
                 }
               : undefined
           }
-        />
-      )}
-
-      {/* Tour didático do showroom, passo 4 (pedido real, 2026-10-23) —
-       *  aponta "Agendar agora" DENTRO do modal de detalhes. Vive aqui (não
-       *  em `CatalogLayout.tsx`, como os outros 3 passos) porque é o único
-       *  lugar que sabe quando o modal está realmente aberto — não dá pra
-       *  apontar um alvo que só existe depois de um clique real dela num
-       *  card. `enabled` só liga com o modal aberto; roda uma vez só (mesma
-       *  persistência por `tourId` do `ProductTour`). */}
-      {showcaseTour && (
-        <ProductTour
-          tourId="showroom-agendar"
-          slug="showroom"
-          steps={showroomAgendarSteps}
-          enabled={selectedProcedure !== null}
-          scrollOffset={20}
+          showAgendarHint={showAgendarHint}
         />
       )}
     </section>
