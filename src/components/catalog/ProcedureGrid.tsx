@@ -215,13 +215,22 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
     onReorderProcedures(newFullList);
   };
 
+  // Pedido real, 2026-10-23 — antes era circular (voltava pro 1º ao passar
+  // do último), sem noção de posição. Agora tem início e fim de verdade:
+  // o modal de detalhes só mostra a seta "anterior"/"próximo" quando dá
+  // pra ir nessa direção (ver `selectedProcedureIndex` abaixo).
+  const selectedProcedureIndex = selectedProcedure
+    ? filteredProcedures.findIndex((p) => p.id === selectedProcedure.id)
+    : -1;
+
   const handleNextProcedure = () => {
-    if (!selectedProcedure) return;
-    const currentIndex = filteredProcedures.findIndex((p) => p.id === selectedProcedure.id);
-    if (currentIndex !== -1) {
-      const nextIndex = (currentIndex + 1) % filteredProcedures.length;
-      setSelectedProcedure(filteredProcedures[nextIndex]);
-    }
+    if (selectedProcedureIndex === -1 || selectedProcedureIndex >= filteredProcedures.length - 1) return;
+    setSelectedProcedure(filteredProcedures[selectedProcedureIndex + 1]);
+  };
+
+  const handlePrevProcedure = () => {
+    if (selectedProcedureIndex <= 0) return;
+    setSelectedProcedure(filteredProcedures[selectedProcedureIndex - 1]);
   };
 
   const formatPrice = (val: string) => {
@@ -418,7 +427,12 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
           clientName={clientName}
           whatsappNumber={whatsappNumber}
           onClose={() => setSelectedProcedure(null)}
-          onNext={handleNextProcedure}
+          onPrev={selectedProcedureIndex > 0 ? handlePrevProcedure : undefined}
+          onNext={
+            selectedProcedureIndex !== -1 && selectedProcedureIndex < filteredProcedures.length - 1
+              ? handleNextProcedure
+              : undefined
+          }
           bookingEnabled={bookingEnabled}
           onBook={
             onRequestBooking

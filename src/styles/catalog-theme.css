@@ -1806,6 +1806,10 @@ button {
   background: var(--modal-cta-hover-bg);
 }
 
+/* Pedido real, 2026-10-23 — "anterior" é o mesmo visual de "próximo"
+ *  (`.modal__proximo`), só que à esquerda do botão "Agendar agora" em vez
+ *  da direita (ordem no DOM em `ProcedureDetailModal.tsx`). */
+.modal__anterior,
 .modal__proximo {
   flex: none;
   width: 48px;
@@ -1819,6 +1823,7 @@ button {
   transition: all 0.25s ease;
 }
 
+.modal__anterior:hover,
 .modal__proximo:hover {
   border-color: var(--modal-next-hover-border);
   background: var(--modal-next-hover-bg);

@@ -10,6 +10,7 @@ interface ProcedureDetailModalProps {
   clientName?: string;
   whatsappNumber: string;
   onClose: () => void;
+  onPrev?: () => void;
   onNext?: () => void;
   bookingEnabled?: boolean;
   onBook?: (item: ProcedureItem) => void;
@@ -24,6 +25,7 @@ export const ProcedureDetailModal: React.FC<ProcedureDetailModalProps> = ({
   clientName = 'Mariana',
   whatsappNumber,
   onClose,
+  onPrev,
   onNext,
   bookingEnabled = false,
   onBook,
@@ -138,6 +140,20 @@ export const ProcedureDetailModal: React.FC<ProcedureDetailModalProps> = ({
           </div>
 
           <div className="modal__acoes">
+            {/* Navegar pros outros procedimentos sem fechar o modal (pedido
+             *  real, 2026-10-23) — só aparece em cada direção quando dá pra
+             *  ir (ver `selectedProcedureIndex` em `ProcedureGrid.tsx`): 1º
+             *  item só mostra "próximo", último só mostra "anterior". */}
+            {onPrev && (
+              <button
+                type="button"
+                className="modal__anterior"
+                title="Ver procedimento anterior"
+                onClick={onPrev}
+              >
+                ←
+              </button>
+            )}
             {/* Texto fixo, sem o nome do serviço (bug real reportado,
              *  2026-09-23): nome já aparece bem visível no título do modal
              *  logo acima — repetir ali dentro do botão era redundante e,
