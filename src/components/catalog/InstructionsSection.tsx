@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+
+import React, { useEffect, useRef, useState } from 'react';
 import { CatalogInstructions, CatalogInstructionItem } from '@/types/catalog';
 
 interface InstructionsSectionProps {
@@ -39,6 +41,56 @@ export const InstructionsSection: React.FC<InstructionsSectionProps> = ({
   // `getCatalogBySlug`, `catalog-service.ts`), então nada muda pra eles.
   const items = instructions?.items || [];
 
+  // Degradê "tem mais abaixo" (pedido real de cliente final, 2026-10-23) —
+  // o cartão agora rola internamente quando a lista não cabe na tela (ver
+  // CSS); isso mede se dá pra rolar mais e mostra/esconde o degradê de
+  // acordo.
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [hasMoreBelow, setHasMoreBelow] = useState(false);
+
+  // Indicador de rolagem desenhado à mão (feedback real da usuária,
+  // 2026-10-23, testando no celular) — a barra NATIVA do navegador (mesmo
+  // customizada via `::-webkit-scrollbar`) some sozinha depois de um tempo
+  // sem interação no Android (comportamento do sistema, não dá pra evitar
+  // só com CSS); ela só reaparecia ao reentrar na tela, sumindo de novo ao
+  // navegar pra outras seções e voltar. Esse aqui é um `<div>` normal —
+  // fica sempre visível. Mesmo padrão do modal de Procedimento do editor
+  // (2026-10-22, `ProcedureModal.tsx`).
+  const [scrollThumb, setScrollThumb] = useState<{ show: boolean; topPct: number; heightPct: number }>({
+    show: false,
+    topPct: 0,
+    heightPct: 100,
+  });
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const update = () => {
+      const { scrollTop, scrollHeight, clientHeight } = el;
+      setHasMoreBelow(scrollHeight - scrollTop - clientHeight > 4);
+
+      setScrollThumb((prev) => {
+        if (scrollHeight <= clientHeight + 1) {
+          return prev.show ? { show: false, topPct: 0, heightPct: 100 } : prev;
+        }
+        const heightPct = Math.max(12, (clientHeight / scrollHeight) * 100);
+        const maxTopPct = 100 - heightPct;
+        const topPct = (scrollTop / (scrollHeight - clientHeight)) * maxTopPct;
+        const changed = !prev.show || Math.abs(prev.topPct - topPct) > 0.1 || Math.abs(prev.heightPct - heightPct) > 0.1;
+        return changed ? { show: true, topPct, heightPct } : prev;
+      });
+    };
+
+    update();
+    el.addEventListener('scroll', update);
+    window.addEventListener('resize', update);
+    return () => {
+      el.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
+    };
+  }, [items.length]);
+
   return (
     <section className="secao-orientacoes is-visible" id="orientacoes" data-screen-label="Orientações">
       <div className="secao-orientacoes__foto-wrap">
@@ -64,6 +116,15 @@ export const InstructionsSection: React.FC<InstructionsSectionProps> = ({
 
           {items.length > 0 && (
             <div className="orientacoes__card anim-fade-up delay-3">
+              {scrollThumb.show && (
+                <div className="orientacoes__card-track" aria-hidden="true">
+                  <div
+                    className="orientacoes__card-thumb"
+                    style={{ top: `${scrollThumb.topPct}%`, height: `${scrollThumb.heightPct}%` }}
+                  />
+                </div>
+              )}
+              <div className="orientacoes__card-scroll" ref={scrollRef}>
               {items.map((item, index) => {
                 const isLast = index === items.length - 1;
                 return (
@@ -103,6 +164,8 @@ export const InstructionsSection: React.FC<InstructionsSectionProps> = ({
                   </div>
                 );
               })}
+              </div>
+              {hasMoreBelow && <div className="orientacoes__card-fade" aria-hidden="true" />}
             </div>
           )}
 
