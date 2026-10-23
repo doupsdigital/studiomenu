@@ -53,6 +53,19 @@ export function ShowcaseClient({ niche, forceBasico = false, coverOverride, pres
   // do preset normalmente — só o tema foi fixado.
   const [themeVariant, setThemeVariant] = useState<ThemeVariant>('rose');
 
+  // Tour guiado didático (pedido real, 2026-10-23) — só quando essa página é
+  // acessada DIRETO (o link que ela manda pro lead), não quando está
+  // embutida no iframe do modal de teste da landing page (`MockupModal.tsx`)
+  // — esse já tem o próprio sistema de dicas (coladas na borda da moldura de
+  // celular); ligar os dois juntos duplicaria as dicas, uma por cima da
+  // outra. `useEffect` (não calculado direto no render) pra bater com o SSR,
+  // que nunca tem `window` — começa `false`, só liga depois de montar se de
+  // fato não estiver num iframe.
+  const [isStandalone, setIsStandalone] = useState(false);
+  useEffect(() => {
+    setIsStandalone(window.parent === window);
+  }, []);
+
   // Avisa o pai (mockup da landing page) qual tela está visível, pro
   // indicador de deslize/toque trocar de lado — pedido real, 2026-10-08,
   // re-port do indicador dinâmico que só existia no legado. Observa TODAS
@@ -148,6 +161,7 @@ export function ShowcaseClient({ niche, forceBasico = false, coverOverride, pres
         themeSwitcher={{ value: themeVariant, onChange: setThemeVariant }}
         layoutSwitcher={{ value: layoutModel, onChange: setLayoutModel }}
         hideCoverSection={hideCoverSection}
+        showcaseTour={isStandalone && !hideCoverSection}
       />
     </div>
   );
