@@ -567,7 +567,7 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
   // Tour guiado didático do showroom (pedido real, 2026-10-23) — reaproveita
   // o mesmo `ProductTour` do editor acima, mas com alvos/texto próprios pra
   // uma visitante vendo o catálogo pela 1a vez, não a profissional editando.
-  // Só 3 passos "de página" aqui — o 4o (apontar o "Agendar agora") vive
+  // Só 4 passos "de página" aqui — o 5o (apontar o "Agendar agora") vive
   // dentro de `ProcedureGrid.tsx`, que é quem sabe quando o modal de
   // detalhes está aberto (não dá pra apontar um alvo que só existe depois
   // de um clique real dela).
@@ -576,19 +576,34 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
       {
         target: '[data-tour="showroom-theme"]',
         title: 'Troque as cores do tema',
-        content: 'Rosé ou Luxury — sua cliente escolhe o visual que combina com o studio dela.',
+        content: 'Rosé ou Luxury — escolha o visual que combina com o seu studio.',
         skipScroll: true,
       },
       {
+        // Bug real, 2026-10-23: o alvo era `.hero__foto-wrap`
+        // (`position: absolute; inset: -10%`, só pro efeito Ken Burns de
+        // zoom da foto) — o retângulo dele se estende 10% além de cada
+        // borda da seção, então o cálculo de posição/scroll do Joyride
+        // saía todo errado (balão não aparecia, ou aparecia quebrado só
+        // depois de rolar manualmente). Alvo trocado pra seção inteira
+        // (`.hero`, ver `HeaderCover.tsx`), que tem tamanho normal.
         target: '[data-tour="showroom-cover-photo"]',
-        title: 'Sua foto aqui',
-        content: 'Essa é só uma foto de exemplo — no catálogo dela, a capa é a foto real do studio.',
+        title: 'Troque a foto de capa',
+        content: 'Se quiser, troque a imagem da capa por uma foto sua ou do seu studio.',
         skipScroll: true,
       },
       {
         target: '[data-tour="showroom-card"]',
         title: 'Clique nos cards',
         content: 'Toque em qualquer procedimento pra ver os detalhes completos.',
+      },
+      {
+        // Pedido real, 2026-10-23 — ela queria esse passo também (tinha
+        // ficado de fora da 1a versão), depois do "Clique nos cards".
+        target: '[data-tour="showroom-layout"]',
+        title: 'Troque o formato do catálogo',
+        content: 'Mosaico ou Clássico — dois estilos diferentes pra mostrar os mesmos procedimentos.',
+        skipScroll: true,
       },
     ],
     []

@@ -276,7 +276,10 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
       <div className="container">
 
         <header className="secao-catalogo__header anim-fade-up delay-1">
-          <div className={`etiqueta-linha${layoutSwitcher ? ' etiqueta-linha--with-switcher' : ''}`}>
+          <div
+            className={`etiqueta-linha${layoutSwitcher ? ' etiqueta-linha--with-switcher' : ''}`}
+            data-tour={layoutSwitcher ? 'showroom-layout' : undefined}
+          >
             {layoutSwitcher && (
               <button
                 type="button"
