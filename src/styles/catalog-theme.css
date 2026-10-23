@@ -1191,24 +1191,41 @@ button {
 .secao-orientacoes__topo {
   display: flex;
   justify-content: center;
+  flex-shrink: 0;
 }
 
-/* Pedido real de cliente final, 2026-10-23, via usuária — antes
- *  `margin: auto 0` centralizava o bloco (título + cartão) e deixava
- *  espaço vazio desperdiçado acima e abaixo quando a lista crescia
- *  (justo quando mais espaço fazia falta). `flex: 1` faz o bloco ocupar
- *  todo o espaço entre a etiqueta "Orientações" e o indicador "Deslize"
- *  — menos necessidade de rolar, e o cartão (também flex) usa o que
- *  sobrar de verdade. `margin-bottom` garante um respiro fixo antes do
- *  indicador "Deslize" (feedback real da usuária, 2026-10-23 — sem isso o
- *  cartão, ao crescer pra preencher o espaço todo, encostava direto nele). */
+/* Pedido real de cliente final, 2026-10-23, via usuária — `flex: 1 1 auto`
+ *  (tentativa anterior) fazia o bloco (título + cartão) SEMPRE preencher
+ *  100% do espaço disponível, mesmo com poucos itens — ótimo pra lista
+ *  longa, mas sobrava espaço vazio DENTRO do cartão em listas curtas (ex:
+ *  os 4 itens padrão de um catálogo recém-criado), achado real da
+ *  usuária testando.
+ *
+ *  `margin: auto 0` volta a centralizar o bloco (só ocupa o que o
+ *  conteúdo precisa, sem esticar à toa) — SEM `max-height` explícito
+ *  aqui de propósito: `max-height: 100%` num item flex dentro de uma
+ *  coluna com irmãos (`.secao-orientacoes__topo` acima,
+ *  `.secao-orientacoes__scroll-cue` abaixo) é ambíguo e não desconta o
+ *  espaço que os irmãos já ocupam. Em vez disso, `topo` e `scroll-cue`
+ *  ganham `flex-shrink: 0` (nunca comprimem) — isso faz TODA a
+ *  compressão necessária, quando a lista é longa demais pro espaço
+ *  disponível, recair só sobre este bloco (comportamento padrão do
+ *  flexbox), que por sua vez repassa pro cartão (`flex: 1 1 auto` +
+ *  `min-height: 0`), revelando a rolagem interna dele.
+ *
+ *  Bug real, 2026-10-23 (achado pela usuária testando): faltava
+ *  `min-height: 0` AQUI também — por padrão (`min-height: auto`), um
+ *  item flex nunca encolhe abaixo do tamanho natural do próprio
+ *  conteúdo, mesmo com `flex-shrink` ativo nos irmãos (regra do
+ *  flexbox, não é falta de espaço calculada errado). Sem isso, o bloco
+ *  nunca tinha permissão de ficar menor que a lista inteira — voltou a
+ *  vazar pra fora da seção em listas longas. */
 .secao-orientacoes__corpo {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  flex: 1 1 auto;
   min-height: 0;
-  margin-bottom: 20px;
+  margin: auto 0;
 }
 
 /* Pedido real de cliente final, 2026-10-23, via usuária — "Informações
@@ -1416,11 +1433,18 @@ button {
   line-height: 1.4;
 }
 
+/* `margin-top` garante o respiro antes do "Deslize" (feedback real da
+ *  usuária, 2026-10-23) independente do tamanho do cartão acima — fica
+ *  certo tanto com lista curta (bloco centralizado) quanto longa (cartão
+ *  esticado perto do teto). `flex-shrink: 0` protege de ser comprimido
+ *  caso o conteúdo acima precise de mais espaço. */
 .secao-orientacoes__scroll-cue {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
+  margin-top: 20px;
   color: var(--orient-scroll-color);
 }
 
