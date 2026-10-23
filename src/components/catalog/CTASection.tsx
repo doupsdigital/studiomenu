@@ -162,7 +162,13 @@ export const CTASection: React.FC<CTASectionProps> = ({
                 </svg>
                 <span>{instagramHandle}</span>
               </span>
-              <span className="btn__arrow">↗</span>
+              {/* Pedido real de cliente final (via usuária, 2026-10-23, iPhone)
+               *  — a seta diagonal (↗) renderiza como emoji colorido no iOS
+               *  por padrão (diferente da seta reta → do WhatsApp, que nunca
+               *  vira emoji em nenhuma plataforma), destoando visualmente dos
+               *  outros botões. `︎` força a apresentação em texto puro
+               *  (mesmo estilo da seta do WhatsApp) em qualquer plataforma. */}
+              <span className="btn__arrow">{'↗︎'}</span>
             </a>
 
             {/* Botão Google Maps — só aparece na visualização pública quando o
@@ -199,7 +205,7 @@ export const CTASection: React.FC<CTASectionProps> = ({
                   <MapPin className="btn__icon" strokeWidth={2.2} />
                   <span>Localização</span>
                 </span>
-                <span className="btn__arrow">↗</span>
+                <span className="btn__arrow">{'↗︎'}</span>
               </a>
             )}
           </div>
