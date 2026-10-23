@@ -1211,11 +1211,20 @@ button {
   margin-bottom: 20px;
 }
 
+/* Pedido real de cliente final, 2026-10-23, via usuária — "Informações
+ *  importantes" quebrava em 2 linhas no iPhone dela, mas cabia numa linha
+ *  só no Android (POCO X6) da usuária. Não é bug de lógica nenhuma: o
+ *  texto fica bem no limite da largura disponível em 30px fixo, e iPhones
+ *  costumam ter a tela um pouco mais estreita (~375-393px de largura útil)
+ *  que a maioria dos Android recentes (~412px+) — poucos pixels de
+ *  diferença bastam pra decidir se quebra ou não. `clamp()` reduz a fonte
+ *  gradualmente em telas mais estreitas (sem salto brusco de breakpoint) e
+ *  mantém o tamanho de sempre (30px) a partir de ~435px, onde já cabia. */
 .secao-orientacoes__titulo {
   margin: 0;
   flex: 0 0 auto;
   font-family: 'Fraunces', Georgia, serif;
-  font-size: 30px;
+  font-size: clamp(25px, 6.9vw, 30px);
   line-height: 1.15;
   font-weight: 400;
   color: var(--orient-title-color);
