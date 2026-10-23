@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+
+import React, { useEffect, useRef, useState } from 'react';
 import { CatalogInstructions, CatalogInstructionItem } from '@/types/catalog';
 
 interface InstructionsSectionProps {
@@ -39,6 +41,31 @@ export const InstructionsSection: React.FC<InstructionsSectionProps> = ({
   // `getCatalogBySlug`, `catalog-service.ts`), então nada muda pra eles.
   const items = instructions?.items || [];
 
+  // Degradê "tem mais abaixo" (pedido real de cliente final, 2026-10-23) —
+  // o cartão agora rola internamente quando a lista não cabe na tela (ver
+  // CSS), mas uma barra de rolagem fininha sozinha passa despercebida no
+  // toque; isso mede se dá pra rolar mais e mostra/esconde o degradê de
+  // acordo, igual ao indicador do modal de Procedimento do editor.
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [hasMoreBelow, setHasMoreBelow] = useState(false);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const update = () => {
+      setHasMoreBelow(el.scrollHeight - el.scrollTop - el.clientHeight > 4);
+    };
+
+    update();
+    el.addEventListener('scroll', update);
+    window.addEventListener('resize', update);
+    return () => {
+      el.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
+    };
+  }, [items.length]);
+
   return (
     <section className="secao-orientacoes is-visible" id="orientacoes" data-screen-label="Orientações">
       <div className="secao-orientacoes__foto-wrap">
@@ -64,6 +91,7 @@ export const InstructionsSection: React.FC<InstructionsSectionProps> = ({
 
           {items.length > 0 && (
             <div className="orientacoes__card anim-fade-up delay-3">
+              <div className="orientacoes__card-scroll" ref={scrollRef}>
               {items.map((item, index) => {
                 const isLast = index === items.length - 1;
                 return (
@@ -103,6 +131,8 @@ export const InstructionsSection: React.FC<InstructionsSectionProps> = ({
                   </div>
                 );
               })}
+              </div>
+              {hasMoreBelow && <div className="orientacoes__card-fade" aria-hidden="true" />}
             </div>
           )}
 
