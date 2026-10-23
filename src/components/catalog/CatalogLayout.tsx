@@ -580,14 +580,18 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
         skipScroll: true,
       },
       {
-        // Bug real, 2026-10-23: o alvo era `.hero__foto-wrap`
-        // (`position: absolute; inset: -10%`, só pro efeito Ken Burns de
-        // zoom da foto) — o retângulo dele se estende 10% além de cada
-        // borda da seção, então o cálculo de posição/scroll do Joyride
-        // saía todo errado (balão não aparecia, ou aparecia quebrado só
-        // depois de rolar manualmente). Alvo trocado pra seção inteira
-        // (`.hero`, ver `HeaderCover.tsx`), que tem tamanho normal.
-        target: '[data-tour="showroom-cover-photo"]',
+        // Bug real, 2026-10-23: mesmo depois de trocar o alvo de
+        // `.hero__foto-wrap` pra `.hero` inteira, continuava quebrado — a
+        // seção tem a altura da tela inteira, então o balão (que por
+        // padrão se posiciona "abaixo" do alvo) tentava aparecer abaixo de
+        // uma seção do tamanho da tela toda, ou seja, na PRÓXIMA seção,
+        // fora da área visível (só aparecia "certo" depois de rolar até
+        // lá). Resolvido com `placement: 'center'` — centraliza na tela,
+        // sem depender de posição/tamanho de elemento nenhum (pedido real
+        // da usuária: "aparecer tipo 'tela toda'"). `target: 'body'` é só
+        // formalidade do tipo do Joyride quando usa center.
+        target: 'body',
+        placement: 'center',
         title: 'Troque a foto de capa',
         content: 'Se quiser, troque a imagem da capa por uma foto sua ou do seu studio.',
         skipScroll: true,
@@ -600,10 +604,16 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
       {
         // Pedido real, 2026-10-23 — ela queria esse passo também (tinha
         // ficado de fora da 1a versão), depois do "Clique nos cards".
+        //
+        // Bug real, 2026-10-23: `skipScroll: true` aqui partia do princípio
+        // de que o seletor (topo da seção de serviços) continuava visível
+        // depois do passo anterior — mas "Clique nos cards" rola bastante
+        // pra centralizar o 1o CARD na tela, deixando o seletor (acima dos
+        // cards) escondido pra fora da área visível. Sem `skipScroll`, o
+        // Joyride volta a rolar pra cima quando precisar.
         target: '[data-tour="showroom-layout"]',
         title: 'Troque o formato do catálogo',
         content: 'Mosaico ou Clássico — dois estilos diferentes pra mostrar os mesmos procedimentos.',
-        skipScroll: true,
       },
     ],
     []
