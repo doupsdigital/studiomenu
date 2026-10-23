@@ -19,12 +19,10 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-import type { Step } from 'react-joyride';
 import { ProcedureItem, LayoutModel } from '@/types/catalog';
 import { ProcedureCard } from './ProcedureCard';
 import { ProcedureDetailModal } from './ProcedureDetailModal';
 import { ProcedureImage } from './ProcedureImage';
-import { ProductTour } from '@/components/tour/ProductTour';
 
 interface ProcedureGridProps {
   procedures: ProcedureItem[];
@@ -48,10 +46,6 @@ interface ProcedureGridProps {
    *  cabeçalho, mesma ideia do Rosé/Luxury no `HeaderCover`. `undefined`
    *  em catálogos reais, que continuam sem alteração nenhuma aqui. */
   layoutSwitcher?: { value: LayoutModel; onChange: (layout: LayoutModel) => void };
-  /** Tour guiado didático do showroom (pedido real, 2026-10-23) — ver
-   *  comentário completo em `CatalogLayout.tsx`. Só `ShowcaseClient.tsx`
-   *  liga isso; `undefined`/`false` em catálogos reais e no editor. */
-  showcaseTour?: boolean;
 }
 
 /** Envolve um card de procedimento (mosaico OU clássico) pra deixar arrastar
@@ -80,13 +74,7 @@ const SortableProcCard: React.FC<{
   };
 
   return (
-    // `data-tour` só entra aqui (fora do modo edição) quando `dataTour` vem
-    // preenchido — sem isso, pro tour didático do showroom (pedido real,
-    // 2026-10-23), não dá nada pra apontar o balão "Clique nos cards". Em
-    // modo edição o alvo continua sendo só a barra de ações abaixo (mesmo
-    // elemento de sempre), de propósito: não mexe no tour do editor já
-    // testado.
-    <div ref={setNodeRef} style={style} className="lm-sortable-proc" data-tour={!isEditMode ? dataTour : undefined}>
+    <div ref={setNodeRef} style={style} className="lm-sortable-proc">
       {isEditMode && (
         <>
           <div className="lm-svc-actions-bar" data-tour={dataTour}>
@@ -140,20 +128,6 @@ const ServicoCardLista: React.FC<{
   );
 };
 
-/** Passo 4 do tour didático do showroom (pedido real, 2026-10-23) — fora do
- *  componente, de propósito: não depende de nada que mude (igual
- *  `showroomTourSteps` em `CatalogLayout.tsx`, só que esse aqui é 1 passo
- *  só). `.modal__cta` é o mesmo alvo nas 3 variantes de botão de
- *  `ProcedureDetailModal.tsx` (agendamento automático, WhatsApp simulado ou
- *  real) — qualquer uma que esteja renderizada serve de alvo. */
-const showroomAgendarSteps: Step[] = [
-  {
-    target: '[data-tour="showroom-agendar"]',
-    title: 'Agende direto por aqui',
-    content: 'Sua cliente marca o horário sem sair do catálogo nem precisar te chamar no WhatsApp primeiro.',
-  },
-];
-
 export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
   procedures,
   allCategories,
@@ -172,7 +146,6 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
   onRequestBooking,
   onFakeWhatsapp,
   layoutSwitcher,
-  showcaseTour = false,
 }) => {
   const [selectedProcedure, setSelectedProcedure] = useState<ProcedureItem | null>(null);
 
@@ -276,10 +249,7 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
       <div className="container">
 
         <header className="secao-catalogo__header anim-fade-up delay-1">
-          <div
-            className={`etiqueta-linha${layoutSwitcher ? ' etiqueta-linha--with-switcher' : ''}`}
-            data-tour={layoutSwitcher ? 'showroom-layout' : undefined}
-          >
+          <div className={`etiqueta-linha${layoutSwitcher ? ' etiqueta-linha--with-switcher' : ''}`}>
             {layoutSwitcher && (
               <button
                 type="button"
@@ -397,7 +367,7 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
                     isEditMode={isEditMode}
                     onEdit={() => onEditProc?.(item)}
                     onDelete={() => onDeleteProc?.(item)}
-                    dataTour={idx === 0 ? (isEditMode ? 'cat-edit-proc' : showcaseTour ? 'showroom-card' : undefined) : undefined}
+                    dataTour={idx === 0 ? 'cat-edit-proc' : undefined}
                   >
                     <ServicoCardLista
                       item={item}
@@ -420,7 +390,7 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
                     isEditMode={isEditMode}
                     onEdit={() => onEditProc?.(item)}
                     onDelete={() => onDeleteProc?.(item)}
-                    dataTour={idx === 0 ? (isEditMode ? 'cat-edit-proc' : showcaseTour ? 'showroom-card' : undefined) : undefined}
+                    dataTour={idx === 0 ? 'cat-edit-proc' : undefined}
                   >
                     <ProcedureCard
                       item={item}
@@ -480,23 +450,6 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
                 }
               : undefined
           }
-        />
-      )}
-
-      {/* Tour didático do showroom, passo 4 (pedido real, 2026-10-23) —
-       *  aponta "Agendar agora" DENTRO do modal de detalhes. Vive aqui (não
-       *  em `CatalogLayout.tsx`, como os outros 3 passos) porque é o único
-       *  lugar que sabe quando o modal está realmente aberto — não dá pra
-       *  apontar um alvo que só existe depois de um clique real dela num
-       *  card. `enabled` só liga com o modal aberto; roda uma vez só (mesma
-       *  persistência por `tourId` do `ProductTour`). */}
-      {showcaseTour && (
-        <ProductTour
-          tourId="showroom-agendar"
-          slug="showroom"
-          steps={showroomAgendarSteps}
-          enabled={selectedProcedure !== null}
-          scrollOffset={20}
         />
       )}
     </section>

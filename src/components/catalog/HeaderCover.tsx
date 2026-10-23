@@ -84,21 +84,7 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
   };
 
   return (
-    // `data-tour` na SEÇÃO inteira (não em `.hero__foto-wrap` abaixo) — é
-    // alvo do tour didático do showroom (pedido real, 2026-10-23, "Troque a
-    // foto de capa"); inofensivo em catálogos reais, onde nenhum tour
-    // aponta pra ele. Bug real, 2026-10-23: o alvo era `.hero__foto-wrap`
-    // (`position: absolute; inset: -10%`, só pro efeito Ken Burns de zoom
-    // da foto) — o retângulo dele se estende 10% além de cada borda da
-    // seção, o que quebrava o cálculo de posição/scroll do Joyride (balão
-    // não aparecia, ou aparecia desalinhado só depois de rolar na mão).
-    // Esta seção tem tamanho normal (sem absolute/inset), alvo estável.
-    <section
-      className={`hero is-visible ${isClassicoLayout ? 'hero--classico' : ''}`}
-      id="hero"
-      data-screen-label="Capa"
-      data-tour="showroom-cover-photo"
-    >
+    <section className={`hero is-visible ${isClassicoLayout ? 'hero--classico' : ''}`} id="hero" data-screen-label="Capa">
       {/* 1. Foto de Fundo Ken Burns */}
       <div className="hero__foto-wrap">
         <img
@@ -134,10 +120,7 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
       {/* 4. Conteúdo Sobreposto */}
       <div className="hero__conteudo">
         {/* Selo Seja Bem Vinda — com showroom, flanqueado pelos botões de tema */}
-        <div
-          className={`hero__selo anim-fade-up delay-1${themeSwitcher ? ' hero__selo--with-switcher' : ''}`}
-          data-tour={themeSwitcher ? 'showroom-theme' : undefined}
-        >
+        <div className={`hero__selo anim-fade-up delay-1${themeSwitcher ? ' hero__selo--with-switcher' : ''}`}>
           {themeSwitcher && (
             <button
               type="button"

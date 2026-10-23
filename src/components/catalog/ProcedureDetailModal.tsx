@@ -161,16 +161,10 @@ export const ProcedureDetailModal: React.FC<ProcedureDetailModalProps> = ({
              *  a altura fixa do botão (48px) e quebrava numa segunda linha
              *  apertada. Texto curto nunca quebra, não importa o tamanho do
              *  nome do serviço. */}
-            {/* data-tour (pedido real, 2026-10-23) é o alvo do passo 4 do
-             *  tour didático do showroom ("Agende direto por aqui") — nas 3
-             *  variantes, pra funcionar com qualquer uma que esteja
-             *  renderizada. Inofensivo em catálogos reais (nenhum tour
-             *  aponta pra ele lá). */}
             {canBook ? (
               <button
                 type="button"
                 className="modal__cta"
-                data-tour="showroom-agendar"
                 onClick={() => onBook?.(item)}
               >
                 Agendar agora →
@@ -179,7 +173,6 @@ export const ProcedureDetailModal: React.FC<ProcedureDetailModalProps> = ({
               <button
                 type="button"
                 className="modal__cta"
-                data-tour="showroom-agendar"
                 onClick={() => onFakeWhatsapp(item)}
               >
                 Agendar agora →
@@ -190,7 +183,6 @@ export const ProcedureDetailModal: React.FC<ProcedureDetailModalProps> = ({
                 target="_blank"
                 rel="noopener noreferrer"
                 className="modal__cta"
-                data-tour="showroom-agendar"
               >
                 Agendar agora →
               </a>

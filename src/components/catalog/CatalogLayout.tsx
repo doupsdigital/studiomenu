@@ -51,14 +51,6 @@ interface CatalogLayoutProps {
    *  no topo, sem nenhuma chamada de scroll envolvida. Não muda nada em
    *  catálogos reais nem no showroom normal — default `false`. */
   hideCoverSection?: boolean;
-  /** Tour guiado didático do showroom (`/c/showcase/[niche]`, pedido real,
-   *  2026-10-23) — balões apontando tema, foto de capa e "clique nos
-   *  cards", igual às dicas da landing page, só que sem moldura de celular
-   *  pra ancorar nelas (showroom é tela cheia de verdade). Reaproveita o
-   *  mesmo `ProductTour` do editor (`catalogEditorSteps` abaixo), visual
-   *  idêntico. `undefined`/`false` em catálogos reais e no editor — só
-   *  `ShowcaseClient.tsx` liga isso. */
-  showcaseTour?: boolean;
 }
 
 export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
@@ -71,7 +63,6 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
   themeSwitcher,
   layoutSwitcher,
   hideCoverSection = false,
-  showcaseTour = false,
 }) => {
   const [showWelcomeOverlay, setShowWelcomeOverlay] = useState(isNewCatalog);
   const [catalogState, setCatalogState] = useState<CatalogOrderData>(data);
@@ -564,61 +555,6 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
     return steps;
   }, [catalogState.procedures.length]);
 
-  // Tour guiado didático do showroom (pedido real, 2026-10-23) — reaproveita
-  // o mesmo `ProductTour` do editor acima, mas com alvos/texto próprios pra
-  // uma visitante vendo o catálogo pela 1a vez, não a profissional editando.
-  // Só 4 passos "de página" aqui — o 5o (apontar o "Agendar agora") vive
-  // dentro de `ProcedureGrid.tsx`, que é quem sabe quando o modal de
-  // detalhes está aberto (não dá pra apontar um alvo que só existe depois
-  // de um clique real dela).
-  const showroomTourSteps = useMemo<Step[]>(
-    () => [
-      {
-        target: '[data-tour="showroom-theme"]',
-        title: 'Troque as cores do tema',
-        content: 'Rosé ou Luxury — escolha o visual que combina com o seu studio.',
-        skipScroll: true,
-      },
-      {
-        // Bug real, 2026-10-23: mesmo depois de trocar o alvo de
-        // `.hero__foto-wrap` pra `.hero` inteira, continuava quebrado — a
-        // seção tem a altura da tela inteira, então o balão (que por
-        // padrão se posiciona "abaixo" do alvo) tentava aparecer abaixo de
-        // uma seção do tamanho da tela toda, ou seja, na PRÓXIMA seção,
-        // fora da área visível (só aparecia "certo" depois de rolar até
-        // lá). Resolvido com `placement: 'center'` — centraliza na tela,
-        // sem depender de posição/tamanho de elemento nenhum (pedido real
-        // da usuária: "aparecer tipo 'tela toda'"). `target: 'body'` é só
-        // formalidade do tipo do Joyride quando usa center.
-        target: 'body',
-        placement: 'center',
-        title: 'Troque a foto de capa',
-        content: 'Se quiser, troque a imagem da capa por uma foto sua ou do seu studio.',
-        skipScroll: true,
-      },
-      {
-        target: '[data-tour="showroom-card"]',
-        title: 'Clique nos cards',
-        content: 'Toque em qualquer procedimento pra ver os detalhes completos.',
-      },
-      {
-        // Pedido real, 2026-10-23 — ela queria esse passo também (tinha
-        // ficado de fora da 1a versão), depois do "Clique nos cards".
-        //
-        // Bug real, 2026-10-23: `skipScroll: true` aqui partia do princípio
-        // de que o seletor (topo da seção de serviços) continuava visível
-        // depois do passo anterior — mas "Clique nos cards" rola bastante
-        // pra centralizar o 1o CARD na tela, deixando o seletor (acima dos
-        // cards) escondido pra fora da área visível. Sem `skipScroll`, o
-        // Joyride volta a rolar pra cima quando precisar.
-        target: '[data-tour="showroom-layout"]',
-        title: 'Troque o formato do catálogo',
-        content: 'Mosaico ou Clássico — dois estilos diferentes pra mostrar os mesmos procedimentos.',
-      },
-    ],
-    []
-  );
-
   // Reordenar categoria (setas ‹ › nos chips de filtro, modo edição).
   // Usa a lista `categories` completa (não só catalogState.categories) pra
   // funcionar mesmo com categorias "implícitas" (que só existem porque um
@@ -673,12 +609,6 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
        *  algum dia coexistirem na mesma rota. */}
       {isEditMode && (
         <ProductTour tourId="catalogo" slug={catalogState.slug} steps={catalogEditorSteps} enabled={!showWelcomeOverlay} scrollOffset={20} />
-      )}
-
-      {/* 0.7 TOUR GUIADO DIDÁTICO DO SHOWROOM (pedido real, 2026-10-23) —
-       *  mesmo mecanismo acima, alvos/texto pra visitante, não profissional. */}
-      {showcaseTour && !isEditMode && (
-        <ProductTour tourId="showroom" slug="showroom" steps={showroomTourSteps} enabled scrollOffset={20} />
       )}
 
       {/* 1. CONTROLES DO EDITOR VISUAL IN-PLACE (BARRA INFERIOR E TOP STATUS) */}
@@ -801,7 +731,6 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
             demoBookingOnly && (!catalogState.booking_enabled || catalogState.agenda_paused) ? setFakeWhatsappItem : undefined
           }
           layoutSwitcher={layoutSwitcher}
-          showcaseTour={showcaseTour}
         />
 
         {/* Seção Orientações — some de vez na visualização pública se a
