@@ -656,7 +656,19 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
           onConfirmDeleteInstructionItem={handleConfirmDeleteInstructionItem}
           onConfirmDiscard={handleConfirmDiscard}
           onOpenAddCatModal={() => setActiveModal('category')}
-          onConfirmSaveDatabase={handleConfirmSaveDatabase}
+          // Bug critico real em producao, 2026-10-23: NUNCA passar
+          // `handleConfirmSaveDatabase` direto como handler de `onClick` em
+          // lugar nenhum da cadeia (ConfirmModals.tsx -> VisualEditorModals.tsx
+          // -> aqui) -- o React invoca o handler passando o SyntheticEvent do
+          // clique como 1o argumento, que vira `stateOverride` (o parametro
+          // novo de d90073a, pro "Salvar Alteracoes" do Procedimento persistir
+          // na hora). O evento tem referencia circular pro DOM -- o
+          // `JSON.stringify` no corpo da funcao lancava excecao ANTES da
+          // requisicao sair, aparecendo como "Falha na conexao de rede" pra
+          // QUALQUER catalogo, em qualquer navegador (nao era rede nem Service
+          // Worker nenhum). Arrow function sem argumento garante que nunca
+          // recebe nada no lugar de `stateOverride`.
+          onConfirmSaveDatabase={() => handleConfirmSaveDatabase()}
           onUploadError={(msg) => showToast(`❌ ${msg}`)}
           isSaving={isSaving}
         />
