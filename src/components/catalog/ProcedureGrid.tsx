@@ -52,6 +52,12 @@ interface ProcedureGridProps {
    *  comentário completo em `CatalogLayout.tsx`. Só `ShowcaseClient.tsx`
    *  liga isso; `undefined`/`false` em catálogos reais e no editor. */
   showcaseTour?: boolean;
+  /** Avisa sempre que o modal de detalhes abre/fecha (pedido real,
+   *  2026-10-23) — `CatalogLayout.tsx` usa isso pra fechar o tour de
+   *  página do showroom na hora, mesmo que a visitante tenha clicado
+   *  direto num card em vez de "Próximo" (bug real: o toque passava por
+   *  baixo do balão do Joyride). Opcional porque só o showroom se importa. */
+  onDetailModalChange?: (open: boolean) => void;
 }
 
 /** Envolve um card de procedimento (mosaico OU clássico) pra deixar arrastar
@@ -173,8 +179,13 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
   onFakeWhatsapp,
   layoutSwitcher,
   showcaseTour = false,
+  onDetailModalChange,
 }) => {
   const [selectedProcedure, setSelectedProcedure] = useState<ProcedureItem | null>(null);
+
+  useEffect(() => {
+    onDetailModalChange?.(selectedProcedure !== null);
+  }, [selectedProcedure]);
 
   // Avisa o pai (mockup/modal de teste da landing page) se o modal de
   // detalhe do procedimento está aberto ou não — pedido real, 2026-10-16:

@@ -74,6 +74,17 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
   showcaseTour = false,
 }) => {
   const [showWelcomeOverlay, setShowWelcomeOverlay] = useState(isNewCatalog);
+  // Bug real, 2026-10-23: se a visitante clica direto num card (em vez de
+  // "Próximo") enquanto o passo "Clique nos cards" do tour do showroom
+  // ainda está ativo, o toque passa por baixo do balão e abre o modal de
+  // detalhes mesmo assim — o tour de página (`showroomTourSteps` abaixo)
+  // não sabia disso e continuava "vivo", disputando tela com o balão do
+  // modal ("Agende direto por aqui"), os dois aparecendo ao mesmo tempo.
+  // `ProcedureGrid.tsx` avisa aqui sempre que o modal de detalhes abre/fecha
+  // (`onDetailModalChange`); desmontar o `<ProductTour>` de propósito
+  // (não só "pausar") fecha o balão dele na hora, sem precisar estender a
+  // API do componente pra ter um "parar à força".
+  const [showroomDetailModalOpen, setShowroomDetailModalOpen] = useState(false);
   const [catalogState, setCatalogState] = useState<CatalogOrderData>(data);
   const [isSaved, setIsSaved] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -677,7 +688,7 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
 
       {/* 0.7 TOUR GUIADO DIDÁTICO DO SHOWROOM (pedido real, 2026-10-23) —
        *  mesmo mecanismo acima, alvos/texto pra visitante, não profissional. */}
-      {showcaseTour && !isEditMode && (
+      {showcaseTour && !isEditMode && !showroomDetailModalOpen && (
         <ProductTour tourId="showroom" slug="showroom" steps={showroomTourSteps} enabled scrollOffset={20} />
       )}
 
@@ -802,6 +813,7 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
           }
           layoutSwitcher={layoutSwitcher}
           showcaseTour={showcaseTour}
+          onDetailModalChange={setShowroomDetailModalOpen}
         />
 
         {/* Seção Orientações — some de vez na visualização pública se a
