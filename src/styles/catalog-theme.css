@@ -136,6 +136,7 @@
   --orient-card-border: rgba(169, 50, 89, 0.20);
   --orient-card-shadow: 0 16px 40px rgba(70, 25, 40, 0.10);
   --orient-item-border: rgba(169, 50, 89, 0.10);
+  --orient-scrollbar-thumb: rgba(169, 50, 89, 0.4);
   --orient-icon-bg: linear-gradient(135deg, rgba(242, 202, 213, 0.55), rgba(255, 240, 244, 0.9));
   --orient-icon-border: rgba(169, 50, 89, 0.18);
   --orient-icon-color: #a93259;
@@ -1213,6 +1214,16 @@ button {
   color: var(--orient-title-em-color);
 }
 
+/* Rolagem própria do cartão (pedido real de cliente final, 2026-10-23, via
+ *  usuária — "Orientações" é uma das telas de altura fixa do catálogo
+ *  [`.secao-orientacoes { height: 100%; overflow: hidden }`] e o cartão
+ *  antes crescia livre com a lista; numa tela de celular, uma lista de 6+
+ *  itens passava da altura disponível e a seção simplesmente CORTAVA o
+ *  resto, sem nenhuma barra ou aviso — a profissional só via metade da
+ *  lista no celular, mesmo vendo ela inteira no admin [janela mais alta
+ *  que a tela de um iPhone]). `max-height` deixa espaço pro título acima e
+ *  padding/indicador "Deslize" abaixo; dá pra colocar quantos itens
+ *  quiser agora, só rola dentro do cartão em vez de cortar. */
 .orientacoes__card {
   background: var(--orient-card-bg);
   border: 1px solid var(--orient-card-border);
@@ -1221,6 +1232,24 @@ button {
   box-shadow: var(--orient-card-shadow);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
+  max-height: 46vh;
+  max-height: 46dvh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--orient-scrollbar-thumb) transparent;
+}
+
+.orientacoes__card::-webkit-scrollbar {
+  width: 5px;
+}
+
+.orientacoes__card::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.orientacoes__card::-webkit-scrollbar-thumb {
+  background: var(--orient-scrollbar-thumb);
+  border-radius: 10px;
 }
 
 .orientacao__item {
@@ -2193,6 +2222,7 @@ html[data-theme="luxury"], body[data-theme="luxury"] {
   --orient-card-border: rgba(201, 163, 137, 0.25);
   --orient-card-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
   --orient-item-border: rgba(201, 163, 137, 0.12);
+  --orient-scrollbar-thumb: rgba(201, 163, 137, 0.45);
   --orient-icon-bg: linear-gradient(135deg, rgba(45, 34, 28, 0.9), rgba(30, 22, 18, 0.95));
   --orient-icon-border: rgba(201, 163, 137, 0.28);
   --orient-icon-color: #c9a389;
