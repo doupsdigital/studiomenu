@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ProcedureItem } from '@/types/catalog';
 import { formatCurrencyBRL, formatMinutesToLabel, parseDurationToMinutes } from '@/lib/format';
 import { useFilePickerFallback } from '@/lib/use-file-picker-fallback';
@@ -18,6 +18,8 @@ function roundToNearestQuarter(minutes: number): number {
   return Math.round(minutes / 15) * 15;
 }
 
+const MAX_EXTRA_PHOTOS = 2;
+
 interface ProcedureModalProps {
   procForm: ProcForm;
   setProcForm: React.Dispatch<React.SetStateAction<ProcForm>>;
@@ -27,6 +29,15 @@ interface ProcedureModalProps {
   setProcFormError: (msg: string) => void;
   onOpenAddCatModal?: () => void;
   onFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  /** Fotos extras do procedimento (pedido real, 2026-10-22), opcional — no
+   *  máx. `MAX_EXTRA_PHOTOS`. Mesmo mecanismo de upload da foto principal
+   *  (`onFileUpload`), só que escreve em `procForm.extra_photos[index]` em
+   *  vez de `procForm.image_url` (ver `VisualEditorModals.tsx`). */
+  onFileUploadExtra?: (e: React.ChangeEvent<HTMLInputElement>, index: number) => void;
+  /** Qual quadrado de foto está com upload em andamento agora (pedido real,
+   *  2026-10-22) — 'main' pra foto principal, índice pra foto extra, null
+   *  pra nenhuma. Mostra um spinner centralizado no quadrado certo. */
+  uploadingProcSlot?: 'main' | number | null;
   onSaveProcedure: (proc: ProcedureItem, index: number | null) => void;
   onClose: () => void;
 }
@@ -40,6 +51,8 @@ export const ProcedureModal: React.FC<ProcedureModalProps> = ({
   setProcFormError,
   onOpenAddCatModal,
   onFileUpload,
+  onFileUploadExtra,
+  uploadingProcSlot = null,
   onSaveProcedure,
   onClose,
 }) => {
@@ -47,6 +60,102 @@ export const ProcedureModal: React.FC<ProcedureModalProps> = ({
   const [durationHours, setDurationHours] = useState(() => Math.min(6, Math.floor(initialTotalMinutes / 60)));
   const [durationMinutesPart, setDurationMinutesPart] = useState(() => initialTotalMinutes % 60);
   const { showStuckHint, copied, handleLabelClick, handleChange: handleFileChange, copyPageLink } = useFilePickerFallback(onFileUpload);
+  // Quantas linhas de foto extra já estão reveladas — uma por clique em
+  // "+ Adicionar mais fotos" (pedido real, 2026-10-22: mesmo formato da
+  // linha principal, reveladas uma de cada vez, não todas de uma vez).
+  // Começa já mostrando as linhas de fotos que o procedimento já tem
+  // salvas, pra reabrir pra editar não esconder o que já foi configurado.
+  const [extraRowCount, setExtraRowCount] = useState(() => procForm.extra_photos?.length || 0);
+  // Bug real, 2026-10-22: `procForm` chega aqui ainda desatualizado no 1º
+  // render (o componente pai, `VisualEditorModals.tsx`, só corrige o
+  // `procForm` dele num `useEffect` que roda 1 ciclo DEPOIS de abrir pra
+  // editar) — o `useState` lazy acima então calculava `extraRowCount` a
+  // partir do procedimento ERRADO (o que estava sendo editado antes) e
+  // nunca mais corrigia. `procForm.id` é o sinal confiável de "é outro
+  // procedimento de verdade" (também chega desatualizado no 1º render,
+  // mas muda de novo quando o pai corrige — refazendo este efeito).
+  useEffect(() => {
+    setExtraRowCount(procForm.extra_photos?.length || 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [procForm.id]);
+  const extraSlot0 = useFilePickerFallback((e) => onFileUploadExtra?.(e, 0));
+  const extraSlot1 = useFilePickerFallback((e) => onFileUploadExtra?.(e, 1));
+  const extraSlotPickers = [extraSlot0, extraSlot1];
+
+  // Indicador de rolagem próprio (pedido real, 2026-10-22: "quero que ela
+  // apareça sempre") — a barra de rolagem NATIVA do navegador, mesmo
+  // estilizada via `::-webkit-scrollbar`, costuma ficar escondida até o
+  // toque de rolagem na maioria dos navegadores mobile (comportamento do
+  // sistema, não dá pra forçar só com CSS). Esse indicador é desenhado à
+  // mão (recalcula posição/altura a cada scroll), então fica visível o
+  // tempo todo, de verdade.
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [scrollThumb, setScrollThumb] = useState<{ show: boolean; topPct: number; heightPct: number }>({
+    show: false,
+    topPct: 0,
+    heightPct: 100,
+  });
+
+  // Bug real, 2026-10-22: chamar `setScrollThumb` incondicionalmente aqui,
+  // combinado com o `useEffect` sem dependências logo abaixo (que roda
+  // depois de QUALQUER render), criava um loop infinito — cada
+  // `setScrollThumb` gera um objeto novo, dispara um re-render, que
+  // dispara o efeito de novo, pra sempre ("Maximum update depth
+  // exceeded" nos logs, travando o navegador e derrubando até o
+  // "Salvar"). Correção: usa a forma funcional do `setState` pra comparar
+  // com o valor ATUAL antes de decidir se precisa atualizar — só troca o
+  // estado (e permite nova renderização) quando o número de verdade mudou.
+  const updateScrollThumb = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const { scrollTop, scrollHeight, clientHeight } = el;
+
+    setScrollThumb((prev) => {
+      if (scrollHeight <= clientHeight + 1) {
+        return prev.show ? { show: false, topPct: 0, heightPct: 100 } : prev;
+      }
+      const heightPct = Math.max(12, (clientHeight / scrollHeight) * 100);
+      const maxTopPct = 100 - heightPct;
+      const topPct = (scrollTop / (scrollHeight - clientHeight)) * maxTopPct;
+      const changed = !prev.show || Math.abs(prev.topPct - topPct) > 0.1 || Math.abs(prev.heightPct - heightPct) > 0.1;
+      return changed ? { show: true, topPct, heightPct } : prev;
+    });
+  };
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.addEventListener('scroll', updateScrollThumb);
+    window.addEventListener('resize', updateScrollThumb);
+    return () => {
+      el.removeEventListener('scroll', updateScrollThumb);
+      window.removeEventListener('resize', updateScrollThumb);
+    };
+  }, []);
+
+  // Recalcula depois de QUALQUER re-render (ex: adicionar/remover linha de
+  // foto extra muda a altura do conteúdo) — sem lista de dependências de
+  // propósito, é só uma medição de DOM, barata o suficiente pra rodar
+  // sempre.
+  useEffect(() => {
+    updateScrollThumb();
+  });
+
+  // Remove só a foto, mantendo a linha visível (volta pro estado vazio com
+  // o "+") — pedido real, 2026-10-22, "relacionado à foto em si".
+  const removeExtraPhoto = (index: number) => {
+    setProcForm((prev) => ({
+      ...prev,
+      extra_photos: (prev.extra_photos || []).filter((_, i) => i !== index),
+    }));
+  };
+
+  // Recolhe a última linha de foto extra revelada — remove a linha inteira
+  // (não só a foto), e o link "+ Adicionar mais fotos" volta a aparecer.
+  const retractLastExtraRow = (index: number) => {
+    setExtraRowCount((c) => Math.max(0, c - 1));
+    removeExtraPhoto(index);
+  };
 
   const applyDuration = (hours: number, minutesPart: number) => {
     const total = hours * 60 + minutesPart;
@@ -54,11 +163,29 @@ export const ProcedureModal: React.FC<ProcedureModalProps> = ({
   };
 
   return (
-    <div className="lm-modal-card">
-      <h3 className="lm-modal-title">
+    <div className="lm-modal-card lm-modal-card--procedure">
+      <h3 className="lm-modal-title lm-modal-title--banner">
         {editingProcIndex !== null ? `✏️ Editar: ${procForm.title || 'Procedimento'}` : '➕ Criar Novo Procedimento'}
       </h3>
 
+      {/* Wrapper próprio de scroll (pedido real, 2026-10-22 — "vazou" por
+       *  baixo dos botões no celular). `.lm-modal-card` sozinho (scroll +
+       *  `position: sticky` no rodapé) é o padrão dos outros modais, mas
+       *  só este aqui tem conteúdo longo o suficiente pra realmente rolar
+       *  — por segurança, vira um container flex de verdade (título fixo
+       *  em cima, rodapé fixo embaixo, só o meio rola), que não depende de
+       *  sticky dentro de overflow:auto (mais sensível a quirks de mobile
+       *  com toolbar dinâmica). */}
+      <div className="lm-modal-scroll-wrap">
+      {scrollThumb.show && (
+        <div className="lm-modal-scroll-track" aria-hidden="true">
+          <div
+            className="lm-modal-scroll-thumb"
+            style={{ top: `${scrollThumb.topPct}%`, height: `${scrollThumb.heightPct}%` }}
+          />
+        </div>
+      )}
+      <div className="lm-modal-scroll" ref={scrollRef}>
       <div className="lm-form-group">
         <label>NOME DO SERVIÇO *</label>
         <input
@@ -180,16 +307,37 @@ export const ProcedureModal: React.FC<ProcedureModalProps> = ({
           </p>
         )}
         <div className="lm-svc-photo-row">
-          <div className="lm-svc-photo-preview-wrap">
-            <img
-              src={procForm.image_url || 'https://images.unsplash.com/photo-1583001809873-a1284d563391?auto=format&fit=crop&w=400&q=80'}
-              alt="Preview"
-            />
+          {procForm.image_url ? (
+            <div className="lm-svc-photo-preview-wrap">
+              <img src={procForm.image_url} alt="Preview" />
+              {uploadingProcSlot === 'main' && <span className="lm-svc-photo-spinner" aria-label="Enviando foto..." />}
+            </div>
+          ) : (
+            <label className="lm-svc-photo-preview-wrap lm-svc-photo-preview-wrap--empty" onClick={handleLabelClick}>
+              {uploadingProcSlot === 'main' ? (
+                <span className="lm-svc-photo-spinner" aria-label="Enviando foto..." />
+              ) : (
+                <span className="lm-svc-photo-add-badge">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                </span>
+              )}
+              <input type="file" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
+            </label>
+          )}
+          <div className="lm-svc-photo-actions">
+            <label className="lm-svc-photo-upload-btn" onClick={handleLabelClick}>
+              <span>📤 ESCOLHER FOTO</span>
+              <input type="file" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
+            </label>
+            {procForm.image_url && (
+              <button type="button" className="lm-svc-photo-remove-link" onClick={() => setProcForm((prev) => ({ ...prev, image_url: '' }))}>
+                Remover foto
+              </button>
+            )}
           </div>
-          <label className="lm-svc-photo-upload-btn" onClick={handleLabelClick}>
-            <span>📤 ESCOLHER FOTO</span>
-            <input type="file" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
-          </label>
         </div>
         {showStuckHint && (
           <p className="lm-filepicker-stuck-hint">
@@ -198,6 +346,73 @@ export const ProcedureModal: React.FC<ProcedureModalProps> = ({
               {copied ? '✓ Copiado!' : 'Copiar link'}
             </button>
           </p>
+        )}
+
+        {/* Fotos extras (pedido real, 2026-10-22) — cada clique em "+
+         *  Adicionar mais fotos" revela mais 1 linha abaixo, no mesmo
+         *  formato da linha principal acima (quadrado + botão "ESCOLHER
+         *  FOTO" do lado) — não todas de uma vez. O link some ao atingir
+         *  `MAX_EXTRA_PHOTOS`, indicando que não dá pra adicionar mais. */}
+        {Array.from({ length: extraRowCount }).map((_, i) => {
+          const url = procForm.extra_photos?.[i];
+          const picker = extraSlotPickers[i];
+          return (
+            <div className="lm-svc-photo-row lm-svc-photo-row--extra" key={i}>
+              {url ? (
+                <div className="lm-svc-photo-preview-wrap">
+                  <img src={url} alt={`Foto extra ${i + 1}`} />
+                  {uploadingProcSlot === i && <span className="lm-svc-photo-spinner" aria-label="Enviando foto..." />}
+                </div>
+              ) : (
+                <label className="lm-svc-photo-preview-wrap lm-svc-photo-preview-wrap--empty" onClick={picker.handleLabelClick}>
+                  {uploadingProcSlot === i ? (
+                    <span className="lm-svc-photo-spinner" aria-label="Enviando foto..." />
+                  ) : (
+                    <span className="lm-svc-photo-add-badge">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round">
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                      </svg>
+                    </span>
+                  )}
+                  <input type="file" accept="image/*" onChange={picker.handleChange} style={{ display: 'none' }} />
+                </label>
+              )}
+              <div className="lm-svc-photo-actions">
+                <label className="lm-svc-photo-upload-btn" onClick={picker.handleLabelClick}>
+                  <span>📤 ESCOLHER FOTO</span>
+                  <input type="file" accept="image/*" onChange={picker.handleChange} style={{ display: 'none' }} />
+                </label>
+                {url && (
+                  <button type="button" className="lm-svc-photo-remove-link" onClick={() => removeExtraPhoto(i)}>
+                    Remover foto
+                  </button>
+                )}
+              </div>
+              {i === extraRowCount - 1 && (
+                <button
+                  type="button"
+                  className="lm-svc-photo-extra-retract"
+                  aria-label="Remover esta foto extra"
+                  onClick={() => retractLastExtraRow(i)}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round">
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                </button>
+              )}
+            </div>
+          );
+        })}
+
+        {extraRowCount < MAX_EXTRA_PHOTOS && (
+          <button
+            type="button"
+            className="lm-svc-photo-extra-add-link"
+            onClick={() => setExtraRowCount((c) => Math.min(MAX_EXTRA_PHOTOS, c + 1))}
+          >
+            + Adicionar mais fotos
+          </button>
         )}
       </div>
 
@@ -216,6 +431,8 @@ export const ProcedureModal: React.FC<ProcedureModalProps> = ({
           ⚠️ {procFormError}
         </div>
       )}
+      </div>
+      </div>
 
       <div className="lm-modal-actions">
         <button type="button" className="lm-modal-btn lm-modal-btn-cancel" onClick={onClose}>

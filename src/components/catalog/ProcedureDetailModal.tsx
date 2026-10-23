@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ProcedureItem } from '@/types/catalog';
 import { ProcedureImage } from './ProcedureImage';
+import { ProcedureImageGallery } from './ProcedureImageGallery';
 
 interface ProcedureDetailModalProps {
   item: ProcedureItem;
@@ -28,10 +29,23 @@ export const ProcedureDetailModal: React.FC<ProcedureDetailModalProps> = ({
   onBook,
   onFakeWhatsapp,
 }) => {
+  // Galeria em tela cheia (pedido real, 2026-10-22) — estado próprio, local
+  // a este componente: não é um dos modais do editor visual (`activeModal`
+  // em CatalogLayout.tsx, que é exclusivo do modo de edição) nem precisa
+  // ser conhecido por `ProcedureGrid.tsx` — só empilha visualmente por cima
+  // deste modal enquanto estiver aberto.
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const photos = [item.image_url, ...(item.extra_photos || [])].filter((url): url is string => Boolean(url));
+
   // Lock body scroll when modal is active
   useEffect(() => {
     document.body.style.overflow = 'hidden';
+    // Enquanto a galeria (empilhada por cima) está aberta, ignora o Esc
+    // aqui — ela tem o próprio listener e deve fechar primeiro. Sem essa
+    // guarda, os dois listeners de `window` disparavam juntos no mesmo
+    // Esc e fechavam os dois modais de uma vez (bug real, 2026-10-22).
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (galleryOpen) return;
       if (e.key === 'Escape') {
         onClose();
       }
@@ -42,7 +56,7 @@ export const ProcedureDetailModal: React.FC<ProcedureDetailModalProps> = ({
       document.body.style.overflow = '';
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [onClose]);
+  }, [onClose, galleryOpen]);
 
   const formatPrice = (val: string) => {
     if (!val) return 'Sob Consulta';
@@ -88,6 +102,17 @@ export const ProcedureDetailModal: React.FC<ProcedureDetailModalProps> = ({
             onClick={onClose}
           >
             ✕
+          </button>
+          <button
+            type="button"
+            className="modal__ver-imagem"
+            onClick={() => setGalleryOpen(true)}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="7" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            Ver {photos.length > 1 ? 'imagens' : 'imagem'}
           </button>
         </div>
 
@@ -152,6 +177,8 @@ export const ProcedureDetailModal: React.FC<ProcedureDetailModalProps> = ({
           </div>
         </div>
       </div>
+
+      {galleryOpen && <ProcedureImageGallery photos={photos} onClose={() => setGalleryOpen(false)} />}
     </div>
   );
 };
