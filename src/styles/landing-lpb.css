@@ -1264,7 +1264,17 @@
   font-weight: 600;
 }
 
-.lp-pricing-tier-card--vip .lp-tier-price-sub { color: rgba(255, 255, 255, 0.9); }
+.lp-pricing-tier-card--vip .lp-tier-price-sub {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 3px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.01em;
+}
 
 /* Âncora "De R$X por" (teste de plano único, pedido real, 2026-10-19) —
  *  só aparece quando `content.singleAnnualPlanTest` existe (ver
