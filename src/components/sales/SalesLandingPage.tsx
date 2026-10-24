@@ -380,6 +380,9 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
                     <span className="lp-tier-cents">,{anualParts.cents}</span>
                     <span className="lp-tier-period">/ano</span>
                   </div>
+                  <div className="lp-tier-price-sub">
+                    {singlePlanTest ? 'menos de R$ 10,00 por mês' : 'pagamento único'}
+                  </div>
                 </div>
 
                 <ul className="lp-tier-bullets">
