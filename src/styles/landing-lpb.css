@@ -345,7 +345,7 @@
   font-weight: 900;
   line-height: 1.16;
   letter-spacing: -0.03em;
-  margin-bottom: 18px;
+  margin-bottom: 8px;
 }
 
 /* Voltou a ser texto simples, sem fundo (pedido real, 2026-10-20 — a
@@ -412,7 +412,7 @@
   max-width: 480px;
   height: auto;
   border-radius: var(--lp-radius-md);
-  margin-bottom: 24px;
+  margin-bottom: 10px;
 }
 
 .lp-hero-actions {
