@@ -129,8 +129,9 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     ),
     heroTitle: (
       <>
-        Você ainda manda <span className="lp-text-gradient">Tabela de Preços em PDF</span> ou{' '}
-        <span className="lp-text-wine">fotos soltas no WhatsApp?</span>
+        Sua cliente compra com os <span className="lp-text-gradient">olhos</span>: troque o{' '}
+        <span className="lp-text-wine">PDF antigo</span> por um{' '}
+        <span className="lp-text-gradient">Menu Digital</span> moderno e interativo.
       </>
     ),
     heroSubtitle: (
@@ -138,12 +139,12 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
         <span className="lp-hero-subtitle-lead">
           Conheça o <strong className="lp-hero-subtitle-brand">Studio<em className="lp-text-gradient">Menu</em></strong>.
         </span>
-        <strong className="lp-text-wine">Não é PDF nem Canva</strong>.
+        Seu catálogo interativo em um link exclusivo para a Bio e WhatsApp.
         <br />
-        Apresente seus procedimentos em um <strong className="lp-text-gradient">Catálogo Digital interativo</strong> direto no celular da cliente.
+        <strong className="lp-text-wine">Prático para a cliente escolher, irresistível para ela agendar.</strong>
       </>
     ),
-    whatsappPainImage: '/whatsapp_lash.webp',
+    whatsappPainImage: '/capa_hero_nova.png',
     secondPainImage: '/whatsapp_vermelho_lash.webp',
     secondPainHeading: (
       <>
