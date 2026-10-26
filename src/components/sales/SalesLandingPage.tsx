@@ -13,8 +13,8 @@ import type { LandingNicheContent } from '@/data/landing-niche-content';
 /** Evento nomeado pros 3 CTAs de maior valor, além do clique "cru" que o
  *  autocapture do PostHog já pega sozinho em qualquer botão/link — nomear
  *  facilita muito montar funil de conversão depois (2026-10-13). */
-function trackCta(plan: 'catalogo' | 'vitalicio' | 'anual' | 'duvida_generica') {
-  capture('cta_click', { plan });
+function trackCta(plan: 'catalogo' | 'vitalicio' | 'anual' | 'duvida_generica', properties?: Record<string, unknown>) {
+  capture('cta_click', { plan, ...properties });
 }
 
 const WHATSAPP_NUMBER = '5562991083435';
@@ -82,9 +82,11 @@ const ANUAL_DISCOUNT_PERCENT = 50;
 
 interface SalesLandingPageProps {
   content: LandingNicheContent;
+  variant?: 'longa' | 'curta';
 }
 
-export function SalesLandingPage({ content }: SalesLandingPageProps) {
+export function SalesLandingPage({ content, variant = 'longa' }: SalesLandingPageProps) {
+  const isCurta = variant === 'curta';
   const catalogoParts = priceParts(TEST_CATALOGO_PRICE);
   const vitalicioParts = priceParts(TEST_VITALICIO_PRICE);
   // Teste de plano único anual (pedido real, 2026-10-19) — quando o nicho
@@ -101,17 +103,14 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
     ? Math.round((1 - singlePlanTest.price / singlePlanTest.anchorPrice) * 100)
     : ANUAL_DISCOUNT_PERCENT;
   const anualCtaLabel = singlePlanTest?.ctaLabel ?? 'QUERO O PLANO ANUAL';
-  /* Mensagem do WhatsApp (pedido real, 2026-10-19, texto revisado em
-   *  2026-10-21) — citar o preço criava uma quebra de expectativa com o
-   *  CTA "TESTAR NO MEU STUDIO" (baixo compromisso): a mensagem assumia
-   *  compra fechada ("quero... por R$X/ano"), o que soma fricção em vez
-   *  de reduzir. Preço também não serve mais pra identificar o plano da
-   *  lead (só existe 1 preço no teste de plano único hoje). Nova mensagem
-   *  espelha o verbo do botão ("testar"), sem preço. Continua citando o
-   *  nicho via `nicheLabel` — já vem certo por nicho (Lash/Nail Designer),
-   *  não precisa trocar nada aqui. */
+  /* Mensagem do WhatsApp:
+   *  Diferenciada por variante para rastreio direto no WhatsApp sem alterar Meta Ads:
+   *  - Curta: termina com '✨' (mensagem mais direta)
+   *  - Longa: termina com '😊' (mensagem clássica) */
   const anualWhatsappMessage = singlePlanTest
-    ? `Oi! Vi a página do StudioMenu pra ${singlePlanTest.nicheLabel} e quero testar como ficaria o Menu Digital no meu studio 😊`
+    ? isCurta
+      ? `Oi! Vi o StudioMenu pra ${singlePlanTest.nicheLabel} e quero testar o Menu Digital no meu studio ✨`
+      : `Oi! Vi a página do StudioMenu pra ${singlePlanTest.nicheLabel} e quero testar como ficaria o Menu Digital no meu studio 😊`
     : `Olá! Vi a página do StudioMenu e quero o Menu Digital Plano Anual por R$${anualParts.whole},${anualParts.cents}, pagamento único`;
   const agendaParts = priceParts(AGENDA_PRICE);
   const [mockupOpen, setMockupOpen] = useState(false);
@@ -222,24 +221,29 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
           </div>
         </section>
 
-        {/* 2. ENTREGA EXPRESSA — virou seção própria com fundo rosa forte
-         *  (pedido real, 2026-10-14), antes era só um badge pequeno dentro
-         *  da Hero. Cria a alternância branco/rosa que ela gosta logo cedo
-         *  na página. */}
-        <section className="lp-delivery-highlight-section">
-          <div className="lp-container" data-reveal>
-            <div className="lp-delivery-highlight-header">
-              <div className="lp-delivery-highlight-icon" aria-hidden="true">⚡</div>
-              <h2 className="lp-delivery-highlight-title">Entrega Expressa</h2>
-            </div>
-            <p className="lp-delivery-highlight-text">
-              Deixamos o seu Menu Digital pronto em até <strong>24 horas</strong> — ou bem antes 😉
-            </p>
-          </div>
-        </section>
+        {/* 2 e 3: Omitidos na variante 'curta' (LP de 3 dobras: Hero, Testar, Valor) */}
+        {!isCurta && (
+          <>
+            {/* 2. ENTREGA EXPRESSA — virou seção própria com fundo rosa forte
+             *  (pedido real, 2026-10-14), antes era só um badge pequeno dentro
+             *  da Hero. Cria a alternância branco/rosa que ela gosta logo cedo
+             *  na página. */}
+            <section className="lp-delivery-highlight-section">
+              <div className="lp-container" data-reveal>
+                <div className="lp-delivery-highlight-header">
+                  <div className="lp-delivery-highlight-icon" aria-hidden="true">⚡</div>
+                  <h2 className="lp-delivery-highlight-title">Entrega Expressa</h2>
+                </div>
+                <p className="lp-delivery-highlight-text">
+                  Deixamos o seu Menu Digital pronto em até <strong>24 horas</strong> — ou bem antes 😉
+                </p>
+              </div>
+            </section>
 
-        {/* 3. COMO FUNCIONA */}
-        <HowItWorksSection singlePlan={Boolean(singlePlanTest)} />
+            {/* 3. COMO FUNCIONA */}
+            <HowItWorksSection singlePlan={Boolean(singlePlanTest)} />
+          </>
+        )}
 
         {/* 4. OFERTA */}
         <section id="oferta" className="lp-pricing-section">
@@ -407,7 +411,7 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="lp-btn lp-btn--whatsapp"
-                  onClick={() => trackCta('anual')}
+                  onClick={() => trackCta('anual', { variant })}
                 >
                   {WHATSAPP_ICON}
                   {anualCtaLabel}
@@ -455,87 +459,92 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
           </div>
         </section>
 
-        {/* 4.5 REFORÇO DA DOR (pedido real, 2026-10-20) — depois do preço,
-         *  antes do FAQ: reforça mais uma vez a dor (conversa de WhatsApp
-         *  com X vermelho) bem no momento em que a pessoa acabou de ver o
-         *  valor, pra empurrar pra decisão. Só nichos com `secondPainImage`
-         *  (lash por enquanto). */}
-        {content.secondPainImage && (
-          <section className="lp-pain-reinforce-section">
-            <div className="lp-container">
-              <p className="lp-pain-reinforce-heading">{content.secondPainHeading}</p>
-              <p className="lp-pain-reinforce-text">{content.secondPainText}</p>
-              <div className="lp-pain-reinforce-images-row">
-                <div className="lp-pain-reinforce-image-wrap lp-pain-reinforce-image-wrap--bad">
-                  <img
-                    src={content.secondPainImage}
-                    alt="Conversa de WhatsApp com tabela de preços e fotos soltas, marcada com X vermelho"
-                    className="lp-pain-reinforce-image lp-pain-reinforce-image--bad"
-                    loading="lazy"
-                  />
-                </div>
-                {content.goodMockupImage && (
-                  <div className="lp-pain-reinforce-image-wrap lp-pain-reinforce-image-wrap--good">
-                    {/* Brilho prateado deslizando (pedido real, 2026-10-20) —
-                     *  mesmo efeito das cápsulas da capa (`.hero__chip::after`
-                     *  + `@keyframes heroChipShine` em `catalog-theme.css`),
-                     *  só que varrendo a imagem inteira. `mask-image` usa a
-                     *  própria imagem como máscara (via custom property, já
-                     *  que cada nicho tem uma foto diferente) — sem isso, o
-                     *  brilho apareceria como uma faixa reta sobre o fundo
-                     *  TRANSPARENTE ao redor do celular, não só na silhueta
-                     *  dele. Rotação fica nesse wrapper (não na `<img>`), pra
-                     *  a máscara girar junto e continuar alinhada com a foto. */}
-                    <div
-                      className="lp-pain-reinforce-shine-wrap"
-                      style={{ ['--good-mockup-mask' as any]: `url(${content.goodMockupImage})` }}
-                    >
+        {/* 4.5, 5 e 6: Omitidos na variante 'curta' */}
+        {!isCurta && (
+          <>
+            {/* 4.5 REFORÇO DA DOR (pedido real, 2026-10-20) — depois do preço,
+             *  antes do FAQ: reforça mais uma vez a dor (conversa de WhatsApp
+             *  com X vermelho) bem no momento em que a pessoa acabou de ver o
+             *  valor, pra empurrar pra decisão. Só nichos com `secondPainImage`
+             *  (lash por enquanto). */}
+            {content.secondPainImage && (
+              <section className="lp-pain-reinforce-section">
+                <div className="lp-container">
+                  <p className="lp-pain-reinforce-heading">{content.secondPainHeading}</p>
+                  <p className="lp-pain-reinforce-text">{content.secondPainText}</p>
+                  <div className="lp-pain-reinforce-images-row">
+                    <div className="lp-pain-reinforce-image-wrap lp-pain-reinforce-image-wrap--bad">
                       <img
-                        src={content.goodMockupImage}
-                        alt="Catálogo digital StudioMenu organizado, com fotos e preços de cada serviço"
-                        className="lp-pain-reinforce-image lp-pain-reinforce-image--good"
+                        src={content.secondPainImage}
+                        alt="Conversa de WhatsApp com tabela de preços e fotos soltas, marcada com X vermelho"
+                        className="lp-pain-reinforce-image lp-pain-reinforce-image--bad"
                         loading="lazy"
                       />
                     </div>
-                    <span className="lp-pain-reinforce-check-badge" aria-hidden="true">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
-                    </span>
+                    {content.goodMockupImage && (
+                      <div className="lp-pain-reinforce-image-wrap lp-pain-reinforce-image-wrap--good">
+                        {/* Brilho prateado deslizando (pedido real, 2026-10-20) —
+                         *  mesmo efeito das cápsulas da capa (`.hero__chip::after`
+                         *  + `@keyframes heroChipShine` em `catalog-theme.css`),
+                         *  só que varrendo a imagem inteira. `mask-image` usa a
+                         *  própria imagem como máscara (via custom property, já
+                         *  que cada nicho tem uma foto diferente) — sem isso, o
+                         *  brilho apareceria como uma faixa reta sobre o fundo
+                         *  TRANSPARENTE ao redor do celular, não só na silhueta
+                         *  dele. Rotação fica nesse wrapper (não na `<img>`), pra
+                         *  a máscara girar junto e continuar alinhada com a foto. */}
+                        <div
+                          className="lp-pain-reinforce-shine-wrap"
+                          style={{ ['--good-mockup-mask' as any]: `url(${content.goodMockupImage})` }}
+                        >
+                          <img
+                            src={content.goodMockupImage}
+                            alt="Catálogo digital StudioMenu organizado, com fotos e preços de cada serviço"
+                            className="lp-pain-reinforce-image lp-pain-reinforce-image--good"
+                            loading="lazy"
+                          />
+                        </div>
+                        <span className="lp-pain-reinforce-check-badge" aria-hidden="true">
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="20 6 9 17 4 12" />
+                          </svg>
+                        </span>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* 5. DÚVIDAS FREQUENTES — antes do carrossel de prova social (pedido
-         *  real, 2026-10-15; antes vinha depois). */}
-        <FaqSection
-          firstItem={content.faqFirstItem}
-          subscriptionItemOverride={content.subscriptionFaqOverride}
-          singlePlan={Boolean(singlePlanTest)}
-        />
-
-        {/* 6. MARQUEE DE PROVA SOCIAL */}
-        <section className="lp-marquee-ribbon-section">
-          <div className="lp-marquee-ribbon-wrap" data-reveal>
-            <div className="lp-marquee-ribbon-track">
-              {[...TESTIMONIALS, ...TESTIMONIALS].map((t, i) => (
-                <div key={i} className="lp-marquee-review-card">
-                  <div className="lp-mrc-header">
-                    <img src={t.avatar} alt={t.name} className="lp-mrc-avatar" />
-                    <div className="lp-mrc-user">
-                      <span className="lp-mrc-name">{t.name}</span>
-                      <span className="lp-mrc-stars">★★★★★</span>
-                    </div>
-                  </div>
-                  <p className="lp-mrc-quote">&quot;{t.quote}&quot;</p>
                 </div>
-              ))}
-            </div>
-          </div>
-        </section>
+              </section>
+            )}
+
+            {/* 5. DÚVIDAS FREQUENTES — antes do carrossel de prova social (pedido
+             *  real, 2026-10-15; antes vinha depois). */}
+            <FaqSection
+              firstItem={content.faqFirstItem}
+              subscriptionItemOverride={content.subscriptionFaqOverride}
+              singlePlan={Boolean(singlePlanTest)}
+            />
+
+            {/* 6. MARQUEE DE PROVA SOCIAL */}
+            <section className="lp-marquee-ribbon-section">
+              <div className="lp-marquee-ribbon-wrap" data-reveal>
+                <div className="lp-marquee-ribbon-track">
+                  {[...TESTIMONIALS, ...TESTIMONIALS].map((t, i) => (
+                    <div key={i} className="lp-marquee-review-card">
+                      <div className="lp-mrc-header">
+                        <img src={t.avatar} alt={t.name} className="lp-mrc-avatar" />
+                        <div className="lp-mrc-user">
+                          <span className="lp-mrc-name">{t.name}</span>
+                          <span className="lp-mrc-stars">★★★★★</span>
+                        </div>
+                      </div>
+                      <p className="lp-mrc-quote">&quot;{t.quote}&quot;</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+          </>
+        )}
       </main>
 
       <footer className="lp-site-footer">
@@ -550,26 +559,23 @@ export function SalesLandingPage({ content }: SalesLandingPageProps) {
         </div>
       </footer>
 
-      {/* Botão Flutuante de WhatsApp — contato genérico ("tenho dúvidas"),
-       *  diferente dos CTAs específicos de cada plano acima (cada um com
-       *  sua própria mensagem, pra ela saber de onde a cliente veio e qual
-       *  plano/página gerou o contato — pedido explícito: no começo das
-       *  vendas ela mesma monta os catálogos, então todo CTA vai pro
-       *  WhatsApp dela em vez do formulário self-service, 2026-09-24). */}
-      <div className="lp-sticky-wa-bar">
-        <a
-          href={whatsappLink('Olá! Vi a página do StudioMenu e fiquei com uma dúvida sobre o Menu Digital')}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="lp-sticky-wa-btn"
-          onClick={() => trackCta('duvida_generica')}
-        >
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l.278.444-1.157 4.226 4.326-1.134.42.259z" />
-          </svg>
-          TIRAR DÚVIDAS NO WHATSAPP
-        </a>
-      </div>
+      {/* Botão Flutuante de WhatsApp — só na versão longa */}
+      {!isCurta && (
+        <div className="lp-sticky-wa-bar">
+          <a
+            href={whatsappLink('Olá! Vi a página do StudioMenu e fiquei com uma dúvida sobre o Menu Digital')}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="lp-sticky-wa-btn"
+            onClick={() => trackCta('duvida_generica', { variant })}
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l.278.444-1.157 4.226 4.326-1.134.42.259z" />
+            </svg>
+            TIRAR DÚVIDAS NO WHATSAPP
+          </a>
+        </div>
+      )}
 
       <MockupModal showcaseSlug={content.showcaseSlug} isOpen={mockupOpen} onClose={() => setMockupOpen(false)} />
     </div>
