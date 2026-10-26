@@ -173,20 +173,6 @@ export function MockupModal({ showcaseSlug, isOpen, onClose }: MockupModalProps)
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
-  /* "Ponte pós-demonstração" (pedido real, 2026-10-19) — fecha o modal e
-   *  rola a página (não o iframe) até a seção de planos. `#oferta` e o
-   *  modal vivem no mesmo documento (só o catálogo em si está no iframe),
-   *  então `getElementById` funciona direto, sem precisar de `postMessage`.
-   *  Atraso pequeno antes de rolar — dá tempo da transição de fechar
-   *  (`0.22s` em `.lp-mockup-modal-overlay`) acontecer primeiro, senão a
-   *  página pula embaixo do modal ainda visível. */
-  function handleViewPlans() {
-    onClose();
-    setTimeout(() => {
-      document.getElementById('oferta')?.scrollIntoView({ behavior: 'smooth' });
-    }, 300);
-  }
-
   return (
     <div
       className={`lp-mockup-modal-overlay${isOpen ? ' is-open' : ''}`}
@@ -209,22 +195,6 @@ export function MockupModal({ showcaseSlug, isOpen, onClose }: MockupModalProps)
         <div className="lp-mockup-modal-screen">
           <div className="lp-mockup-modal-scaler" style={{ transform: `scale(${scale})` }}>
             <iframe ref={iframeRef} src={`/c/showcase/${showcaseSlug}?tema=luxury`} title="Teste o Menu Digital StudioMenu" />
-
-            {/* Ponte pós-demonstração (pedido real, 2026-10-19) — na última
-             *  tela (Contato), em vez de deixar o fluxo morrer aí, oferece
-             *  ir direto pros planos. Diferente das dicas acima (só
-             *  decorativas, `pointer-events: none`), este é um botão de
-             *  verdade — fica dentro do scaler de propósito, pra ter
-             *  exatamente o tamanho certo em qualquer celular. */}
-            {screen === 'contact' && !detailModalOpen && !overlayModalOpen && (
-              <button
-                type="button"
-                className="lp-btn lp-btn--whatsapp lp-mockup-cta-plans"
-                onClick={handleViewPlans}
-              >
-                👉 Gostou da demonstração? Ver valores e garantir o seu
-              </button>
-            )}
           </div>
         </div>
 
