@@ -65,7 +65,9 @@ export function MockupModal({ showcaseSlug, isOpen, onClose }: MockupModalProps)
   // Tema ativo no catálogo embutido (pedido real, 2026-10-19) — usado só
   // pra decidir em qual botão (Rosé/Luxury) mostrar a dica "Mude as cores
   // do tema": sempre no OPOSTO do tema atual, nunca no que já está ativo.
-  const [theme, setTheme] = useState<'rose' | 'luxury'>('rose');
+  // Default 'luxury' (pedido real, 2026-10-26) — bate com o `?tema=luxury`
+  // mandado pro iframe abaixo, que agora abre o mockup direto em Luxury.
+  const [theme, setTheme] = useState<'rose' | 'luxury'>('luxury');
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [overlayModalOpen, setOverlayModalOpen] = useState(false);
   const [hintsReady, setHintsReady] = useState(false);
@@ -171,20 +173,6 @@ export function MockupModal({ showcaseSlug, isOpen, onClose }: MockupModalProps)
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
-  /* "Ponte pós-demonstração" (pedido real, 2026-10-19) — fecha o modal e
-   *  rola a página (não o iframe) até a seção de planos. `#oferta` e o
-   *  modal vivem no mesmo documento (só o catálogo em si está no iframe),
-   *  então `getElementById` funciona direto, sem precisar de `postMessage`.
-   *  Atraso pequeno antes de rolar — dá tempo da transição de fechar
-   *  (`0.22s` em `.lp-mockup-modal-overlay`) acontecer primeiro, senão a
-   *  página pula embaixo do modal ainda visível. */
-  function handleViewPlans() {
-    onClose();
-    setTimeout(() => {
-      document.getElementById('oferta')?.scrollIntoView({ behavior: 'smooth' });
-    }, 300);
-  }
-
   return (
     <div
       className={`lp-mockup-modal-overlay${isOpen ? ' is-open' : ''}`}
@@ -206,23 +194,7 @@ export function MockupModal({ showcaseSlug, isOpen, onClose }: MockupModalProps)
         <div className="lp-mockup-modal-notch" />
         <div className="lp-mockup-modal-screen">
           <div className="lp-mockup-modal-scaler" style={{ transform: `scale(${scale})` }}>
-            <iframe ref={iframeRef} src={`/c/showcase/${showcaseSlug}`} title="Teste o Menu Digital StudioMenu" />
-
-            {/* Ponte pós-demonstração (pedido real, 2026-10-19) — na última
-             *  tela (Contato), em vez de deixar o fluxo morrer aí, oferece
-             *  ir direto pros planos. Diferente das dicas acima (só
-             *  decorativas, `pointer-events: none`), este é um botão de
-             *  verdade — fica dentro do scaler de propósito, pra ter
-             *  exatamente o tamanho certo em qualquer celular. */}
-            {screen === 'contact' && !detailModalOpen && !overlayModalOpen && (
-              <button
-                type="button"
-                className="lp-btn lp-btn--whatsapp lp-mockup-cta-plans"
-                onClick={handleViewPlans}
-              >
-                👉 Gostou da demonstração? Ver valores e garantir o seu
-              </button>
-            )}
+            <iframe ref={iframeRef} src={`/c/showcase/${showcaseSlug}?tema=luxury`} title="Teste o Menu Digital StudioMenu" />
           </div>
         </div>
 
@@ -261,12 +233,6 @@ export function MockupModal({ showcaseSlug, isOpen, onClose }: MockupModalProps)
                 </div>
               </>
             )}
-          </div>
-        )}
-
-        {hintsReady && screen === 'cover' && (
-          <div className="lp-mockup-hint lp-mockup-hint--photo" aria-hidden="true">
-            <span className="lp-scroll-cue-tag">Capa do seu Studio</span>
           </div>
         )}
 

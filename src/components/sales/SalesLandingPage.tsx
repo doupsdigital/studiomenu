@@ -410,7 +410,7 @@ export function SalesLandingPage({ content, variant = 'longa' }: SalesLandingPag
                   href={whatsappLink(anualWhatsappMessage)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="lp-btn lp-btn--whatsapp"
+                  className="lp-btn lp-btn--whatsapp lp-tier-cta-pulse"
                   onClick={() => trackCta('anual', { variant })}
                 >
                   {WHATSAPP_ICON}
