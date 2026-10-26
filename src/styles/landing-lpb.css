@@ -421,13 +421,52 @@
  *  visualmente a dor que a Hero descreve em texto (tabela de preços e
  *  fotos soltas no WhatsApp). Mesmo `max-width` da subheadline acima, pra
  *  ocupar a largura do bloco de texto sem estourar pro lado do mockup. */
-.lp-hero-pain-image {
+.lp-hero-pain-image-wrap {
+  position: relative;
   display: block;
   width: 100%;
   max-width: 480px;
+  margin-bottom: 10px;
+}
+
+.lp-hero-pain-image {
+  display: block;
+  width: 100%;
   height: auto;
   border-radius: var(--lp-radius-md);
-  margin-bottom: 10px;
+}
+
+/* Brilho deslizando só sobre a área do celular dentro da imagem (pedido
+ *  real, 2026-10-26) — mesmo mecanismo visual de `.lp-pain-reinforce-shine-
+ *  wrap` mais abaixo, só que sem máscara de alpha (essa imagem é um
+ *  composto único, sem recorte separado do celular) — em vez disso, um
+ *  retângulo arredondado com `overflow: hidden` posicionado por
+ *  porcentagem, calibrado nos pixels reais de `capa_hero_nova.png` (celular
+ *  ocupa de ~45% a ~98,5% da largura e ~5,5% a ~88% da altura). Reajustar
+ *  esses números se a imagem for trocada por outra com proporções
+ *  diferentes. */
+.lp-hero-pain-shine {
+  position: absolute;
+  left: 45%;
+  right: 1.5%;
+  top: 5.5%;
+  bottom: 12%;
+  border-radius: 11% / 5%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.lp-hero-pain-shine::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.55) 50%, transparent 100%);
+  transform: skewX(-20deg);
+  filter: blur(8px);
+  animation: heroChipShine 4.5s ease-in-out infinite;
 }
 
 .lp-hero-actions {
