@@ -1621,15 +1621,28 @@
  *  com 4 valores diferentes), reforçado pelo blur. */
 .lp-pain-reinforce-image-wrap {
   position: relative;
-  flex: 0 0 auto;
+  /* `flex: 1 1 0` + `min-width: 0` (bug real visto no PostHog, 2026-10-26)
+   *  — antes era `flex: 0 0 auto` (não encolhe), e o aumento de tamanho das
+   *  2 imagens (155→200px / 195→240px, 2026-10-20) fez a largura somada
+   *  (~408px) passar do espaço disponível em QUALQUER celular (`.lp-container`
+   *  só tem ~335-375px de largura útil) — sem poder encolher, a sobra
+   *  invadia pra fora da tela e sumia, cortada pelo `overflow-x: hidden` do
+   *  `.lp-lashmenu` (raiz da página): a borda ESQUERDA da imagem ruim (cabeçalho
+   *  + 1ª mensagem do WhatsApp) e a borda DIREITA da imagem boa ficavam
+   *  invisíveis. Agora os 2 encolhem proporcionalmente pra caber na tela —
+   *  os `max-width` abaixo continuam valendo como teto pro desktop. */
+  flex: 1 1 0;
+  min-width: 0;
 }
 
 /* A imagem BOA é maior e "invade" por cima da ruim (pedido real,
  *  2026-10-20: "como se o bom começasse a entrar no ruim, bem pouquinho")
  *  — margem negativa aproxima as duas, `z-index` maior garante que ela
- *  fica por CIMA na sobreposição. */
+ *  fica por CIMA na sobreposição. Em `%` (não px fixo) de propósito — assim
+ *  a sobreposição encolhe junto com as imagens em telas estreitas, em vez
+ *  de continuar com -32px fixos enquanto as imagens ficam bem menores. */
 .lp-pain-reinforce-image-wrap--good {
-  margin-left: -32px;
+  margin-left: -8%;
   z-index: 2;
 }
 
