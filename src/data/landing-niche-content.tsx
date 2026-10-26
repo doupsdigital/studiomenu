@@ -33,6 +33,17 @@ export interface LandingNicheContent {
    *  `lash`/`nail` por pedido dela — os outros nichos não têm essa imagem
    *  ainda, então simplesmente não renderiza nada pra eles. */
   whatsappPainImage?: string;
+  /** Brilho deslizando só sobre a área do celular dentro de
+   *  `whatsappPainImage` (pedido real, 2026-10-26) — mesmo efeito já usado
+   *  em `goodMockupImage` mais abaixo, só que aqui a imagem é um composto
+   *  único (lista ruim + celular lado a lado, sem recorte separado do
+   *  celular pra usar como máscara de alpha), então a área é um retângulo
+   *  arredondado posicionado por porcentagem (calibrado nos pixels reais
+   *  de `capa_hero_nova.png` — ver `.lp-hero-pain-shine` em
+   *  `landing-lpb.css`). `undefined`/`false` nos nichos cuja
+   *  `whatsappPainImage` não tem um celular dentro (ex: nail, que mostra 2
+   *  capturas de WhatsApp lado a lado). */
+  heroPainImageShine?: boolean;
   /** 2º reforço da dor (pedido real, 2026-10-20) — depois do card de
    *  preços, antes do FAQ: texto grande ("Pare de perder tempo...") em
    *  cima da imagem de conversa de WhatsApp (cliente pedindo preço/fotos,
@@ -145,6 +156,7 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
       </>
     ),
     whatsappPainImage: '/capa_hero_nova.png',
+    heroPainImageShine: true,
     secondPainImage: '/whatsapp_vermelho_lash.webp',
     secondPainHeading: (
       <>

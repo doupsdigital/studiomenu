@@ -171,12 +171,15 @@ export function SalesLandingPage({ content, variant = 'longa' }: SalesLandingPag
                  *  vermelho). Só nichos com `whatsappPainImage` (lash/nail
                  *  por enquanto, ver `landing-niche-content.tsx`). */}
                 {content.whatsappPainImage && (
-                  <img
-                    src={content.whatsappPainImage}
-                    alt="Tabela de preços e fotos soltas no WhatsApp, marcadas com X"
-                    className="lp-hero-pain-image"
-                    fetchPriority="high"
-                  />
+                  <div className="lp-hero-pain-image-wrap">
+                    <img
+                      src={content.whatsappPainImage}
+                      alt="Tabela de preços e fotos soltas no WhatsApp, marcadas com X"
+                      className="lp-hero-pain-image"
+                      fetchPriority="high"
+                    />
+                    {content.heroPainImageShine && <div className="lp-hero-pain-shine" aria-hidden="true" />}
+                  </div>
                 )}
 
                 <p className="lp-hero-subtitle">{content.heroSubtitle}</p>
