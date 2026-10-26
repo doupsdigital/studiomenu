@@ -17,13 +17,6 @@ interface HeaderCoverProps {
    *  em catálogos reais, que continuam mostrando só o selo, sem alteração
    *  nenhuma. */
   themeSwitcher?: { value: ThemeVariant; onChange: (variant: ThemeVariant) => void };
-  /** Dicas didáticas do showroom (pedido real, 2026-10-23) — "troque as
-   *  cores do tema" (sempre apontando pro botão OPOSTO ao tema ativo, convite
-   *  pra experimentar o outro) + "troque a foto de capa". Decorativas,
-   *  `pointer-events: none`, sem sequência/estado pra travar — só refletem
-   *  "a visitante está na Capa agora" (`CatalogLayout.tsx` decide quando).
-   *  `undefined`/`false` em catálogos reais e no editor. */
-  showHints?: boolean;
 }
 
 export const HeaderCover: React.FC<HeaderCoverProps> = ({
@@ -35,7 +28,6 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
   onUpdateHeroPhrase,
   onUpdateStudioLabel,
   themeSwitcher,
-  showHints = false,
 }) => {
   const wspText = encodeURIComponent(`Olá! Vim pelo seu catálogo digital e gostaria de tirar uma dúvida.`);
   const wspUrl = `https://wa.me/${data.whatsapp_number}?text=${wspText}`;
@@ -92,11 +84,7 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
   };
 
   return (
-    <section
-      className={`hero is-visible ${isClassicoLayout ? 'hero--classico' : ''}`}
-      id="hero"
-      data-screen-label="Capa"
-    >
+    <section className={`hero is-visible ${isClassicoLayout ? 'hero--classico' : ''}`} id="hero" data-screen-label="Capa">
       {/* 1. Foto de Fundo Ken Burns */}
       <div className="hero__foto-wrap">
         <img
@@ -153,26 +141,6 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
             </button>
           )}
         </div>
-
-        {/* Dicas didáticas do showroom (pedido real, 2026-10-23) — decorativas,
-         *  pointer-events: none, sem sequência nenhuma pra travar (ver
-         *  comentário completo na prop `showHints`). Aponta sempre pro botão
-         *  de tema OPOSTO ao ativo agora (convite pra experimentar o outro),
-         *  igual já funcionava na landing page. */}
-        {showHints && themeSwitcher && (
-          <div className={`hero__hint hero__hint--theme-${themeSwitcher.value === 'rose' ? 'luxury' : 'rose'}`} aria-hidden="true">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
-              <line x1="12" y1="19" x2="12" y2="5" />
-              <polyline points="5 12 12 5 19 12" />
-            </svg>
-            <span>Mude as cores do tema</span>
-          </div>
-        )}
-        {showHints && (
-          <div className="hero__hint hero__hint--photo" aria-hidden="true">
-            <span>Troque a foto de capa</span>
-          </div>
-        )}
 
         {/* Título & Nome */}
         <div className="hero__titulo">

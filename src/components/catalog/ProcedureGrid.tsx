@@ -46,21 +46,6 @@ interface ProcedureGridProps {
    *  cabeçalho, mesma ideia do Rosé/Luxury no `HeaderCover`. `undefined`
    *  em catálogos reais, que continuam sem alteração nenhuma aqui. */
   layoutSwitcher?: { value: LayoutModel; onChange: (layout: LayoutModel) => void };
-  /** Dicas didáticas do showroom (pedido real, 2026-10-23) — "clique nos
-   *  cards" (1o card) + "troque o formato" (seletor Mosaico/Clássico).
-   *  Decorativas, sem sequência nenhuma pra travar — `CatalogLayout.tsx`
-   *  decide quando mostrar (tela certa + modal de detalhes fechado). Repassa
-   *  `showAgendarHint` adiante pro `ProcedureDetailModal.tsx` (dica própria,
-   *  só enquanto o modal estiver aberto). `undefined`/`false` em catálogos
-   *  reais e no editor. */
-  showHints?: boolean;
-  showAgendarHint?: boolean;
-  /** Avisa sempre que o modal de detalhes abre/fecha (pedido real,
-   *  2026-10-23) — `CatalogLayout.tsx` usa isso pra esconder as dicas de
-   *  página (card/formato/tema/capa) enquanto o modal estiver aberto, e
-   *  ligar a dica própria dele ("Agendar agora"). Opcional porque só o
-   *  showroom se importa. */
-  onDetailModalChange?: (open: boolean) => void;
 }
 
 /** Envolve um card de procedimento (mosaico OU clássico) pra deixar arrastar
@@ -161,15 +146,8 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
   onRequestBooking,
   onFakeWhatsapp,
   layoutSwitcher,
-  showHints = false,
-  showAgendarHint = false,
-  onDetailModalChange,
 }) => {
   const [selectedProcedure, setSelectedProcedure] = useState<ProcedureItem | null>(null);
-
-  useEffect(() => {
-    onDetailModalChange?.(selectedProcedure !== null);
-  }, [selectedProcedure]);
 
   // Avisa o pai (mockup/modal de teste da landing page) se o modal de
   // detalhe do procedimento está aberto ou não — pedido real, 2026-10-16:
@@ -272,17 +250,6 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
 
         <header className="secao-catalogo__header anim-fade-up delay-1">
           <div className={`etiqueta-linha${layoutSwitcher ? ' etiqueta-linha--with-switcher' : ''}`}>
-            {/* Dica didática do showroom (pedido real, 2026-10-23) — mesmo
-             *  padrão das outras (decorativa, sem sequência pra travar). */}
-            {showHints && layoutSwitcher && (
-              <div className="catalogo__hint-formato" aria-hidden="true">
-                <span>Troque o formato</span>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="12" y1="5" x2="12" y2="19" />
-                  <polyline points="19 12 12 19 5 12" />
-                </svg>
-              </div>
-            )}
             {layoutSwitcher && (
               <button
                 type="button"
@@ -385,77 +352,59 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
           </span>
         </div>
 
-        {/* Dica didática do showroom (pedido real, 2026-10-23) — "Clique nos
-         *  cards", mesmo texto/ícone da landing page. Decorativa (sem apontar
-         *  pra um card específico, igual na landing), vive dentro do wrapper
-         *  `position: relative` logo abaixo pra se ancorar na área da
-         *  grade/lista, não na página inteira. */}
-        <div className="catalogo__grid-wrap">
-          {showHints && (
-            <div className="catalogo__hint-cards" aria-hidden="true">
-              <span>Clique nos cards</span>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff" stroke="#c84b72" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                <path d="M14 9V5a1.5 1.5 0 0 0-3 0v7.5" />
-                <path d="M11 10a1.5 1.5 0 0 0-3 0v4" />
-                <path d="M8 11.5a1.5 1.5 0 0 0-3 0V15a6 6 0 0 0 6 6h2a6 6 0 0 0 6-6v-3a1.5 1.5 0 0 0-3 0" />
-              </svg>
-            </div>
-          )}
-
-          {/* Renderização condicional por modelo (Clássico = Lista / Mosaico = Grid) */}
-          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <SortableContext
-              items={filteredProcedures.map((p) => p.id)}
-              strategy={isClassico ? verticalListSortingStrategy : rectSortingStrategy}
-            >
-              {isClassico ? (
-                <div className="studio__lista">
-                  {filteredProcedures.map((item, idx) => (
-                    <SortableProcCard
-                      key={item.id}
-                      id={item.id}
+        {/* Renderização condicional por modelo (Clássico = Lista / Mosaico = Grid) */}
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext
+            items={filteredProcedures.map((p) => p.id)}
+            strategy={isClassico ? verticalListSortingStrategy : rectSortingStrategy}
+          >
+            {isClassico ? (
+              <div className="studio__lista">
+                {filteredProcedures.map((item, idx) => (
+                  <SortableProcCard
+                    key={item.id}
+                    id={item.id}
+                    isEditMode={isEditMode}
+                    onEdit={() => onEditProc?.(item)}
+                    onDelete={() => onDeleteProc?.(item)}
+                    dataTour={idx === 0 ? 'cat-edit-proc' : undefined}
+                  >
+                    <ServicoCardLista
+                      item={item}
+                      clientName={clientName}
                       isEditMode={isEditMode}
-                      onEdit={() => onEditProc?.(item)}
-                      onDelete={() => onDeleteProc?.(item)}
-                      dataTour={idx === 0 ? 'cat-edit-proc' : undefined}
-                    >
-                      <ServicoCardLista
-                        item={item}
-                        clientName={clientName}
-                        isEditMode={isEditMode}
-                        formatPrice={formatPrice}
-                        onClick={() => {
-                          if (!isEditMode) setSelectedProcedure(item);
-                        }}
-                      />
-                    </SortableProcCard>
-                  ))}
-                </div>
-              ) : (
-                <div className="mosaico__grid">
-                  {filteredProcedures.map((item, idx) => (
-                    <SortableProcCard
-                      key={item.id}
-                      id={item.id}
+                      formatPrice={formatPrice}
+                      onClick={() => {
+                        if (!isEditMode) setSelectedProcedure(item);
+                      }}
+                    />
+                  </SortableProcCard>
+                ))}
+              </div>
+            ) : (
+              <div className="mosaico__grid">
+                {filteredProcedures.map((item, idx) => (
+                  <SortableProcCard
+                    key={item.id}
+                    id={item.id}
+                    isEditMode={isEditMode}
+                    onEdit={() => onEditProc?.(item)}
+                    onDelete={() => onDeleteProc?.(item)}
+                    dataTour={idx === 0 ? 'cat-edit-proc' : undefined}
+                  >
+                    <ProcedureCard
+                      item={item}
+                      whatsappNumber={whatsappNumber}
+                      clientName={clientName}
                       isEditMode={isEditMode}
-                      onEdit={() => onEditProc?.(item)}
-                      onDelete={() => onDeleteProc?.(item)}
-                      dataTour={idx === 0 ? 'cat-edit-proc' : undefined}
-                    >
-                      <ProcedureCard
-                        item={item}
-                        whatsappNumber={whatsappNumber}
-                        clientName={clientName}
-                        isEditMode={isEditMode}
-                        onSelect={(proc) => setSelectedProcedure(proc)}
-                      />
-                    </SortableProcCard>
-                  ))}
-                </div>
-              )}
-            </SortableContext>
-          </DndContext>
-        </div>
+                      onSelect={(proc) => setSelectedProcedure(proc)}
+                    />
+                  </SortableProcCard>
+                ))}
+              </div>
+            )}
+          </SortableContext>
+        </DndContext>
 
         {/* BOTÃO ADICIONAR NOVO PROCEDIMENTO DENTRO DO GRID */}
         {isEditMode && (
@@ -501,7 +450,6 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
                 }
               : undefined
           }
-          showAgendarHint={showAgendarHint}
         />
       )}
     </section>

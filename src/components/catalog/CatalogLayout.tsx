@@ -51,14 +51,6 @@ interface CatalogLayoutProps {
    *  no topo, sem nenhuma chamada de scroll envolvida. Não muda nada em
    *  catálogos reais nem no showroom normal — default `false`. */
   hideCoverSection?: boolean;
-  /** Tour guiado didático do showroom (`/c/showcase/[niche]`, pedido real,
-   *  2026-10-23) — balões apontando tema, foto de capa e "clique nos
-   *  cards", igual às dicas da landing page, só que sem moldura de celular
-   *  pra ancorar nelas (showroom é tela cheia de verdade). Reaproveita o
-   *  mesmo `ProductTour` do editor (`catalogEditorSteps` abaixo), visual
-   *  idêntico. `undefined`/`false` em catálogos reais e no editor — só
-   *  `ShowcaseClient.tsx` liga isso. */
-  showcaseTour?: boolean;
 }
 
 export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
@@ -71,14 +63,8 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
   themeSwitcher,
   layoutSwitcher,
   hideCoverSection = false,
-  showcaseTour = false,
 }) => {
   const [showWelcomeOverlay, setShowWelcomeOverlay] = useState(isNewCatalog);
-  // Dicas didáticas do showroom (pedido real, 2026-10-23) — `ProcedureGrid.tsx`
-  // avisa aqui sempre que o modal de detalhes abre/fecha; some com as dicas
-  // de página (card/formato/tema/capa) enquanto o modal estiver aberto, e
-  // liga a dica própria do modal ("Agendar agora").
-  const [showroomDetailModalOpen, setShowroomDetailModalOpen] = useState(false);
   const [catalogState, setCatalogState] = useState<CatalogOrderData>(data);
   const [isSaved, setIsSaved] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -569,40 +555,6 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
     return steps;
   }, [catalogState.procedures.length]);
 
-  // Dicas didáticas do showroom (pedido real, 2026-10-23) — 2a tentativa:
-  // a 1a usava react-joyride (tour sequencial, "Próximo"/"Pular"), igual ao
-  // tour do editor acima. Na prática quebrou repetidas vezes porque a
-  // visitante pode interagir com a página de verdade a qualquer momento
-  // (clicar um card, clicar "Agendar agora") sem passar pelos botões do
-  // tour — cada interrupção nova exigia mais um caso especial pra "religar"
-  // o tour sem duplicar/travar. Reescrito no mesmo modelo já comprovado da
-  // landing page (`MockupModal.tsx`): dicas INDEPENDENTES, sem sequência
-  // nenhuma pra quebrar — cada uma só reflete "a visitante está nessa tela
-  // agora" (via `showcaseActiveScreen` abaixo) e `pointer-events: none`,
-  // sem Próximo/Pular. Nada pra ficar "preso": qualquer interação real some
-  // com a dica na hora (`showroomDetailModalOpen`) e ela reaparece sozinha
-  // se a visitante voltar pra aquela tela depois.
-  const [showcaseActiveScreen, setShowcaseActiveScreen] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!showcaseTour) return;
-    const sections = document.querySelectorAll('[data-screen-label]');
-    if (!sections.length) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setShowcaseActiveScreen(entry.target.getAttribute('data-screen-label'));
-          }
-        });
-      },
-      { threshold: 0.3 }
-    );
-    sections.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, [showcaseTour, catalogState.layout_model]);
-
   // Reordenar categoria (setas ‹ › nos chips de filtro, modo edição).
   // Usa a lista `categories` completa (não só catalogState.categories) pra
   // funcionar mesmo com categorias "implícitas" (que só existem porque um
@@ -737,7 +689,6 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
             onUpdateHeroPhrase={handleUpdateHeroPhrase}
             onUpdateStudioLabel={handleUpdateStudioLabel}
             themeSwitcher={themeSwitcher}
-            showHints={showcaseTour && showcaseActiveScreen === 'Capa' && !showroomDetailModalOpen}
           />
         )}
 
@@ -780,13 +731,6 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
             demoBookingOnly && (!catalogState.booking_enabled || catalogState.agenda_paused) ? setFakeWhatsappItem : undefined
           }
           layoutSwitcher={layoutSwitcher}
-          showHints={
-            showcaseTour &&
-            (showcaseActiveScreen === 'Mosaico' || showcaseActiveScreen === 'Serviços') &&
-            !showroomDetailModalOpen
-          }
-          showAgendarHint={showcaseTour}
-          onDetailModalChange={setShowroomDetailModalOpen}
         />
 
         {/* Seção Orientações — some de vez na visualização pública se a
