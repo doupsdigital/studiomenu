@@ -65,7 +65,9 @@ export function MockupModal({ showcaseSlug, isOpen, onClose }: MockupModalProps)
   // Tema ativo no catálogo embutido (pedido real, 2026-10-19) — usado só
   // pra decidir em qual botão (Rosé/Luxury) mostrar a dica "Mude as cores
   // do tema": sempre no OPOSTO do tema atual, nunca no que já está ativo.
-  const [theme, setTheme] = useState<'rose' | 'luxury'>('rose');
+  // Default 'luxury' (pedido real, 2026-10-26) — bate com o `?tema=luxury`
+  // mandado pro iframe abaixo, que agora abre o mockup direto em Luxury.
+  const [theme, setTheme] = useState<'rose' | 'luxury'>('luxury');
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [overlayModalOpen, setOverlayModalOpen] = useState(false);
   const [hintsReady, setHintsReady] = useState(false);
@@ -206,7 +208,7 @@ export function MockupModal({ showcaseSlug, isOpen, onClose }: MockupModalProps)
         <div className="lp-mockup-modal-notch" />
         <div className="lp-mockup-modal-screen">
           <div className="lp-mockup-modal-scaler" style={{ transform: `scale(${scale})` }}>
-            <iframe ref={iframeRef} src={`/c/showcase/${showcaseSlug}`} title="Teste o Menu Digital StudioMenu" />
+            <iframe ref={iframeRef} src={`/c/showcase/${showcaseSlug}?tema=luxury`} title="Teste o Menu Digital StudioMenu" />
 
             {/* Ponte pós-demonstração (pedido real, 2026-10-19) — na última
              *  tela (Contato), em vez de deixar o fluxo morrer aí, oferece
@@ -261,12 +263,6 @@ export function MockupModal({ showcaseSlug, isOpen, onClose }: MockupModalProps)
                 </div>
               </>
             )}
-          </div>
-        )}
-
-        {hintsReady && screen === 'cover' && (
-          <div className="lp-mockup-hint lp-mockup-hint--photo" aria-hidden="true">
-            <span className="lp-scroll-cue-tag">Capa do seu Studio</span>
           </div>
         )}
 

@@ -2148,12 +2148,6 @@
   animation: lp-mockup-hint-in-swipe 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.lp-mockup-hint--photo {
-  right: -16px;
-  top: 32%;
-  animation: lp-mockup-hint-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
 /* "Mude as cores do tema" (pedido real, 2026-10-19) — perto do topo da
  *  moldura, igual à posição real dos botões Rosé/Luxury na capa (flanqueando
  *  o selo "Seja Bem Vinda"). Seta pro TOPO (`flex-direction: column` com o

@@ -35,23 +35,23 @@ interface ShowcaseClientProps {
    *  ao carregar, não importa o mecanismo usado pra rolar o iframe. Sem
    *  nenhuma chamada de scroll envolvida, esse bug deixa de ser possível. */
   hideCoverSection?: boolean;
+  /** `?tema=luxury` na URL (pedido real, 2026-10-26) — só o `MockupModal.tsx`
+   *  da landing page de vendas manda esse parâmetro no `src` do iframe, pra
+   *  abrir o mockup direto em Luxury. O link normal que ela manda pro lead
+   *  (sem esse parâmetro) continua abrindo em Rosé, como sempre — mesmo
+   *  quando aponta pro MESMO slug usado pelo mockup (ex: `naildesigner`).
+   *  Chegou a fixar Luxury por padrão direto no componente 2 vezes antes
+   *  (Studio em 2026-10-08, mockup da landing em 2026-10-19) e reverteu as
+   *  duas nas primeiras horas por não ter ficado bom no celular — por isso
+   *  agora é opt-in por parâmetro, não mais um default global. */
+  defaultTheme?: ThemeVariant;
 }
 
-export function ShowcaseClient({ niche, forceBasico = false, coverOverride, presetOverride, hideCoverSection = false }: ShowcaseClientProps) {
+export function ShowcaseClient({ niche, forceBasico = false, coverOverride, presetOverride, hideCoverSection = false, defaultTheme = 'rose' }: ShowcaseClientProps) {
   const basePreset = presetOverride || nichePresetsMap[niche];
 
   const [layoutModel, setLayoutModel] = useState<LayoutModel>(basePreset?.layout_model || 'mosaico');
-  // Sempre abre no Rose, mesmo pra nichos cujo preset é Luxury por padrão
-  // (ex: Nail, Estética, Studio) — pedido real, 2026-10-01: ela manda esse
-  // link pra leads de anúncio como primeiro contato, e quer sempre o mesmo
-  // tema de abertura (ela mesma troca pelos botões Rosé/Luxury se quiser
-  // mostrar o Luxury depois). Chegou a abrir Studio direto em Luxury
-  // (2026-10-08), mas testando na prática no celular não ficou legal —
-  // revertido no mesmo dia. Mesma decisão vale pro mockup da landing page de
-  // vendas (testado em Luxury por padrão, 2026-10-19, revertido no mesmo
-  // dia por preferência dela). Layout (Mosaico/Clássico) continua herdando
-  // do preset normalmente — só o tema foi fixado.
-  const [themeVariant, setThemeVariant] = useState<ThemeVariant>('rose');
+  const [themeVariant, setThemeVariant] = useState<ThemeVariant>(defaultTheme);
 
   // Tour guiado didático (pedido real, 2026-10-23) — só quando essa página é
   // acessada DIRETO (o link que ela manda pro lead), não quando está
