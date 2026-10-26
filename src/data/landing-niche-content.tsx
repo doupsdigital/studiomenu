@@ -190,7 +190,7 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     // pra R$119,90 em 2026-10-24) — ver comentário de `singleAnnualPlanTest`
     // na interface acima.
     singleAnnualPlanTest: {
-      price: 119.9,
+      price: 97.0,
       anchorPrice: 199.9,
       ctaLabel: 'QUERO VER NO MEU STUDIO',
       nicheLabel: 'Lash Designer',
@@ -269,11 +269,7 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     // Teste de plano único anual (pedido real, 2026-10-19) — ver
     // comentário de `singleAnnualPlanTest` na interface acima.
     singleAnnualPlanTest: {
-      // Preço ajustado pra R$119,90 em 2026-10-24. Âncora continua
-      // R$199,90 — o % do selo de desconto é sempre CALCULADO (ver
-      // `anualDiscountPercent` em SalesLandingPage.tsx), então não precisa
-      // mexer em mais nada além do preço aqui.
-      price: 119.9,
+      price: 97.0,
       anchorPrice: 199.9,
       ctaLabel: 'QUERO MEU MENU DIGITAL',
       nicheLabel: 'Nail Designer',
