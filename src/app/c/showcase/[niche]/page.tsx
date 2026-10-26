@@ -7,7 +7,7 @@ import { nailLandingMockupPreset } from '@/data/niche-presets/nail-landing-mocku
 
 interface ShowcasePageProps {
   params: Promise<{ niche: string }>;
-  searchParams: Promise<{ tela?: string }>;
+  searchParams: Promise<{ tela?: string; tema?: string }>;
 }
 
 /** Resolve o slug da URL pro nicho real + se é a versão "Básico" (agenda via
@@ -95,7 +95,7 @@ export async function generateMetadata({ params }: ShowcasePageProps): Promise<M
 
 export default async function ShowcasePage({ params, searchParams }: ShowcasePageProps) {
   const { niche: nicheParam } = await params;
-  const { tela } = await searchParams;
+  const { tela, tema } = await searchParams;
   const { niche, forceBasico, coverOverride, presetOverride } = resolveShowcaseSlug(nicheParam);
   return (
     <ShowcaseClient
@@ -104,6 +104,7 @@ export default async function ShowcasePage({ params, searchParams }: ShowcasePag
       coverOverride={coverOverride}
       presetOverride={presetOverride}
       hideCoverSection={tela === 'catalogo'}
+      defaultTheme={tema === 'luxury' ? 'luxury' : 'rose'}
     />
   );
 }

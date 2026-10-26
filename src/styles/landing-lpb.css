@@ -157,6 +157,21 @@
   transform: translateY(-2px);
 }
 
+/* Pulsação pra dar mais destaque ao CTA principal da Oferta (pedido real,
+ *  2026-10-26) — mesmo espírito do `lp-slow-cta-pulse` já usado em
+ *  `.lp-btn--primary`, só com o glow na cor verde do próprio botão em vez
+ *  do rosa do accent. Classe própria (não em `.lp-btn--whatsapp` direto)
+ *  pra não animar os outros CTAs de WhatsApp da página que reaproveitam a
+ *  mesma classe base. */
+.lp-tier-cta-pulse {
+  animation: lp-tier-cta-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes lp-tier-cta-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 8px 26px rgba(37, 211, 102, 0.35); }
+  50% { transform: scale(1.03); box-shadow: 0 12px 36px rgba(37, 211, 102, 0.6), 0 0 18px rgba(37, 211, 102, 0.35); }
+}
+
 @keyframes lp-slow-cta-pulse {
   0%, 100% { transform: scale(1); box-shadow: 0 8px 24px rgba(200, 75, 114, 0.35); }
   50% { transform: scale(1.025); box-shadow: 0 12px 34px rgba(200, 75, 114, 0.55), 0 0 15px rgba(200, 75, 114, 0.3); }
@@ -2148,12 +2163,6 @@
   animation: lp-mockup-hint-in-swipe 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.lp-mockup-hint--photo {
-  right: -16px;
-  top: 32%;
-  animation: lp-mockup-hint-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
 /* "Mude as cores do tema" (pedido real, 2026-10-19) — perto do topo da
  *  moldura, igual à posição real dos botões Rosé/Luxury na capa (flanqueando
  *  o selo "Seja Bem Vinda"). Seta pro TOPO (`flex-direction: column` com o
@@ -2181,39 +2190,6 @@
 @keyframes lp-mockup-hint-in-swipe {
   from { opacity: 0; transform: translateY(-50%) scale(0.85); }
   to { opacity: 1; transform: translateY(-50%) scale(1); }
-}
-
-/* Ponte pós-demonstração (pedido real, 2026-10-19; reforçado depois de
- *  feedback real — queria do tamanho/estilo do CTA de verdade da página,
- *  não um selo pequeno, e centralizado na tela, não grudado embaixo).
- *  Reaproveita `.lp-btn`/`.lp-btn--whatsapp` (mesmo visual do botão
- *  "QUERO MEU MENU DIGITAL" da seção de Oferta) — qualquer ajuste de cor
- *  futuro ali já reflete aqui também, sem duplicar estilo. Botão de
- *  verdade (diferente das dicas, que são só decorativas), por isso vive
- *  dentro do `.lp-mockup-modal-scaler` (mesma caixa 390×844 do design, pra
- *  ter o tamanho certo em qualquer celular) e NÃO tem `pointer-events:
- *  none`. */
-.lp-mockup-cta-plans {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 45;
-  width: calc(100% - 64px);
-  max-width: 340px;
-  font-size: 1.05rem;
-  line-height: 1.35;
-  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.4), 0 8px 26px rgba(37, 211, 102, 0.4);
-  animation: lp-mockup-cta-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.lp-mockup-cta-plans:active {
-  transform: translate(-50%, -50%) scale(0.97);
-}
-
-@keyframes lp-mockup-cta-in {
-  from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
-  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
 
 /* Botão de fechar bem evidente (pedido real, 2026-10-14 — o anterior era
