@@ -180,7 +180,7 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
     singleAnnualPlanTest: {
       price: 119.9,
       anchorPrice: 199.9,
-      ctaLabel: 'TESTAR NO MEU STUDIO',
+      ctaLabel: 'QUERO VER NO MEU STUDIO',
       nicheLabel: 'Lash Designer',
     },
     subscriptionFaqOverride: {
