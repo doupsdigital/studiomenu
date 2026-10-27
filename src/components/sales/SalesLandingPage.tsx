@@ -165,6 +165,8 @@ export function SalesLandingPage({ content, variant = 'longa' }: SalesLandingPag
 
                 <h2 className="lp-hero-title">{content.heroTitle}</h2>
 
+                {content.heroTagline && <p className="lp-hero-tagline">{content.heroTagline}</p>}
+
                 {/* Imagem "WhatsApp bagunçado" (pedido real, 2026-10-20) —
                  *  mostra na prática a dor que a Hero descreve em texto
                  *  (tabela de preços e fotos soltas no WhatsApp, com X
