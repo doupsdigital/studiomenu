@@ -85,6 +85,9 @@ export default async function ProfessionalAppLayout({ children, params }: AppLay
   // `inicio/page.tsx` já fazem cada um pra si, custo desprezível.
   const order = await getOrderForProfessionalApp(slug);
   const showNav = order?.plan_tier !== 'catalog';
+  // Produto "Catálogo apenas" (2026-10-27): admin decide, por pedido, se essa
+  // cliente vê Agenda/Config — `false` deixa só a aba Início acessível.
+  const inicioOnly = order?.show_full_app === false;
 
   return (
     <div className={`pro-app-shell min-h-screen bg-cream text-ink font-body-pro ${showNav ? 'pb-20' : ''}`}>
@@ -105,7 +108,7 @@ export default async function ProfessionalAppLayout({ children, params }: AppLay
        *  os tooltips do `InicioTour`, que já se adaptam sozinhos. */}
       {order && order.plan_tier === 'plus' && <WelcomeOnboarding slug={slug} planTier={order.plan_tier} />}
       {children}
-      {showNav && <BottomNav slug={slug} />}
+      {showNav && <BottomNav slug={slug} inicioOnly={inicioOnly} />}
     </div>
   );
 }

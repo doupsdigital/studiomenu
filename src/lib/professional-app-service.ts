@@ -65,6 +65,12 @@ export interface ProfessionalOrderSummary {
   lifetime_price_override: number | null;
   /** Data/hora de criação do catálogo/pedido (ISO string). */
   created_at?: string;
+  /** Produto "Catálogo apenas" (2026-10-27) — `false` esconde Agenda e Config
+   *  do app da profissional (só a aba Início fica acessível). Não é sobre o
+   *  catálogo público (ver `show_cover`/`show_instructions`/`show_contact_cta`
+   *  em `CatalogOrderData`, `src/types/catalog.ts`) — esse aqui é sobre o app
+   *  dela. `true` por default, igual todo catálogo já existente hoje. */
+  show_full_app: boolean;
 }
 
 /** Busca os dados que o app da profissional (`/app/[slug]`) precisa — um
@@ -76,7 +82,7 @@ export async function getOrderForProfessionalApp(slug: string): Promise<Professi
   const { data, error } = await supabaseAdmin
     .from('orders')
     .select(
-      'id, slug, edit_token, client_name, studio_name, whatsapp_number, plan_tier, subscription_status, billing_email, billing_cpf_cnpj, payment_method, booking_enabled, auth_user_id, first_offer_tier, agenda_paused, manual_plan, billing_price_override, catalog_billing_mode, agenda_billing_mode, agenda_price_override, asaas_subscription_id, lifetime_price_override, created_at'
+      'id, slug, edit_token, client_name, studio_name, whatsapp_number, plan_tier, subscription_status, billing_email, billing_cpf_cnpj, payment_method, booking_enabled, auth_user_id, first_offer_tier, agenda_paused, manual_plan, billing_price_override, catalog_billing_mode, agenda_billing_mode, agenda_price_override, asaas_subscription_id, lifetime_price_override, created_at, show_full_app'
     )
     .eq('slug', normalizedSlug)
     .single();
@@ -110,5 +116,6 @@ export async function getOrderForProfessionalApp(slug: string): Promise<Professi
     has_real_subscription: Boolean(data.asaas_subscription_id),
     lifetime_price_override: data.lifetime_price_override === null || data.lifetime_price_override === undefined ? null : Number(data.lifetime_price_override),
     created_at: data.created_at || undefined,
+    show_full_app: data.show_full_app !== false,
   };
 }

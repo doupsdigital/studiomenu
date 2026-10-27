@@ -63,7 +63,9 @@ export default async function InicioPage({ params }: InicioPageProps) {
   // Mesma condição de exibição do card de upsell logo abaixo — só busca o
   // catálogo completo (com procedures) quando ele de fato vai aparecer, pra
   // não pagar essa consulta extra em quem já é Plus.
-  const showPlusUpsell = !isPlusAtivo && order.subscription_status !== 'suspenso';
+  // Produto "Catálogo apenas" (2026-10-27): com Agenda/Config inacessíveis
+  // (`show_full_app === false`), não faz sentido anunciar o Plus/Agenda aqui.
+  const showPlusUpsell = order.show_full_app !== false && !isPlusAtivo && order.subscription_status !== 'suspenso';
 
   const [todayAppointments, pendingAppointments, businessHours, plusUpsellCatalog] = await Promise.all([
     getAppointmentsForDay(order.id, todayInSaoPaulo()),
@@ -103,8 +105,10 @@ export default async function InicioPage({ params }: InicioPageProps) {
       <OpenChargeBanner slug={slug} />
 
       {/* Só fazem sentido com o agendamento de fato funcionando — senão
-       *  ficam sempre zerados, sem nenhuma ação possível por trás. */}
-      {schedulingLive && (
+       *  ficam sempre zerados, sem nenhuma ação possível por trás. Também só
+       *  com a Agenda acessível (`show_full_app`, 2026-10-27) — senão os
+       *  cards linkariam pra uma rota que redireciona de volta pro Início. */}
+      {schedulingLive && order.show_full_app !== false && (
         <div className="grid grid-cols-2 gap-3">
           <StatCard icon={CalendarDays} label="Agendamentos hoje" value={todayAppointments.length} href={`/app/${slug}/agenda`} dataTour="stat-today" />
           <StatCard

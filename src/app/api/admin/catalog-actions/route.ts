@@ -23,6 +23,10 @@ export async function PATCH(request: Request) {
       agenda_billing_mode,
       agenda_price_override,
       lifetime_price_override,
+      show_cover,
+      show_instructions,
+      show_contact_cta,
+      show_full_app,
     } = (await request.json()) as {
       id: string;
       status?: string;
@@ -32,6 +36,12 @@ export async function PATCH(request: Request) {
       plan_tier?: 'catalog' | 'basico' | 'plus';
       subscription_status?: 'none' | 'ativo' | 'suspenso' | 'cancelado';
       manual_plan?: boolean;
+      /** Flags do produto "Catálogo apenas" (2026-10-27) — editáveis a
+       *  qualquer momento, mesmo depois do catálogo já criado. */
+      show_cover?: boolean;
+      show_instructions?: boolean;
+      show_contact_cta?: boolean;
+      show_full_app?: boolean;
       /** Preço customizado do Plano Catálogo pra essa cliente específica —
        *  `null` volta ao padrão (`CATALOGO_PRICE`, src/lib/pricing.ts). */
       billing_price_override?: number | null;
@@ -64,7 +74,11 @@ export async function PATCH(request: Request) {
         catalog_billing_mode === undefined &&
         agenda_billing_mode === undefined &&
         agenda_price_override === undefined &&
-        lifetime_price_override === undefined)
+        lifetime_price_override === undefined &&
+        show_cover === undefined &&
+        show_instructions === undefined &&
+        show_contact_cta === undefined &&
+        show_full_app === undefined)
     ) {
       return NextResponse.json(
         { success: false, message: 'id e ao menos um campo pra atualizar são obrigatórios.' },
@@ -101,6 +115,10 @@ export async function PATCH(request: Request) {
       agenda_billing_mode?: 'recorrente' | 'anual';
       agenda_price_override?: number | null;
       lifetime_price_override?: number | null;
+      show_cover?: boolean;
+      show_instructions?: boolean;
+      show_contact_cta?: boolean;
+      show_full_app?: boolean;
       /** Só escrito internamente aqui (nunca vem do request) — limpa a
        *  assinatura real cancelada ao conceder plano manual, ver abaixo. */
       asaas_subscription_id?: string | null;
@@ -119,6 +137,10 @@ export async function PATCH(request: Request) {
     if (agenda_billing_mode !== undefined) updates.agenda_billing_mode = agenda_billing_mode;
     if (agenda_price_override !== undefined) updates.agenda_price_override = agenda_price_override;
     if (lifetime_price_override !== undefined) updates.lifetime_price_override = lifetime_price_override;
+    if (show_cover !== undefined) updates.show_cover = show_cover;
+    if (show_instructions !== undefined) updates.show_instructions = show_instructions;
+    if (show_contact_cta !== undefined) updates.show_contact_cta = show_contact_cta;
+    if (show_full_app !== undefined) updates.show_full_app = show_full_app;
 
     // Conceder plano manual (Fase 26) numa cliente que JÁ tem uma assinatura
     // Asaas de verdade por trás (Fase 27: Plano Catálogo recorrente, ou um
