@@ -104,13 +104,14 @@ export function SalesLandingPage({ content, variant = 'longa' }: SalesLandingPag
     : ANUAL_DISCOUNT_PERCENT;
   const anualCtaLabel = singlePlanTest?.ctaLabel ?? 'QUERO O PLANO ANUAL';
   /* Mensagem do WhatsApp:
-   *  Diferenciada por variante para rastreio direto no WhatsApp sem alterar Meta Ads:
-   *  - Curta: termina com '✨' (mensagem mais direta)
-   *  - Longa: termina com '😊' (mensagem clássica) */
+   *  Diferenciada por variante para rastreio direto no WhatsApp sem alterar Meta Ads.
+   *  Emoji no final removido (pedido real, 2026-10-27) — chegava desconfigurado
+   *  pra lead (mesmo bug de encoding já visto antes nesse projeto; não vamos
+   *  tentar consertar o encoding de novo, só tirar o emoji daqui mesmo). */
   const anualWhatsappMessage = singlePlanTest
     ? isCurta
-      ? `Oi! Vi o StudioMenu pra ${singlePlanTest.nicheLabel} e quero testar o Menu Digital no meu studio ✨`
-      : `Oi! Vi a página do StudioMenu pra ${singlePlanTest.nicheLabel} e quero testar como ficaria o Menu Digital no meu studio 😊`
+      ? `Oi! Vi o StudioMenu pra ${singlePlanTest.nicheLabel} e quero testar o Menu Digital no meu studio`
+      : `Oi! Vi a página do StudioMenu pra ${singlePlanTest.nicheLabel} e quero testar como ficaria o Menu Digital no meu studio`
     : `Olá! Vi a página do StudioMenu e quero o Menu Digital Plano Anual por R$${anualParts.whole},${anualParts.cents}, pagamento único`;
   const agendaParts = priceParts(AGENDA_PRICE);
   const [mockupOpen, setMockupOpen] = useState(false);
