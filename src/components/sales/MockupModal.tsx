@@ -65,9 +65,9 @@ export function MockupModal({ showcaseSlug, isOpen, onClose }: MockupModalProps)
   // Tema ativo no catálogo embutido (pedido real, 2026-10-19) — usado só
   // pra decidir em qual botão (Rosé/Luxury) mostrar a dica "Mude as cores
   // do tema": sempre no OPOSTO do tema atual, nunca no que já está ativo.
-  // Default 'luxury' (pedido real, 2026-10-26) — bate com o `?tema=luxury`
-  // mandado pro iframe abaixo, que agora abre o mockup direto em Luxury.
-  const [theme, setTheme] = useState<'rose' | 'luxury'>('luxury');
+  // Default 'luxury' testado 2026-10-26, revertido pra 'rose' em 2026-10-27
+  // (pedido real) — mockup volta a abrir no tema padrão de sempre.
+  const [theme, setTheme] = useState<'rose' | 'luxury'>('rose');
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [overlayModalOpen, setOverlayModalOpen] = useState(false);
   const [hintsReady, setHintsReady] = useState(false);
@@ -194,7 +194,7 @@ export function MockupModal({ showcaseSlug, isOpen, onClose }: MockupModalProps)
         <div className="lp-mockup-modal-notch" />
         <div className="lp-mockup-modal-screen">
           <div className="lp-mockup-modal-scaler" style={{ transform: `scale(${scale})` }}>
-            <iframe ref={iframeRef} src={`/c/showcase/${showcaseSlug}?tema=luxury`} title="Teste o Menu Digital StudioMenu" />
+            <iframe ref={iframeRef} src={`/c/showcase/${showcaseSlug}`} title="Teste o Menu Digital StudioMenu" />
           </div>
         </div>
 
