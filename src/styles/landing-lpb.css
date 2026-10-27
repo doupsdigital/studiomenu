@@ -320,7 +320,7 @@
 }
 
 .lp-hero-brand-h1 {
-  font-size: clamp(2.6rem, 5.8vw, 3.8rem);
+  font-size: clamp(1.9rem, 4.3vw, 3rem);
   font-weight: 800;
   color: #34222c;
   letter-spacing: -0.035em;
@@ -356,7 +356,7 @@
 }
 
 .lp-hero-title {
-  font-size: clamp(1.6rem, 3.6vw, 2.5rem);
+  font-size: clamp(2rem, 4.6vw, 3.1rem);
   font-weight: 900;
   line-height: 1.16;
   letter-spacing: -0.03em;
@@ -415,6 +415,19 @@
 
 .lp-hero-subtitle .lp-text-wine {
   text-decoration: underline;
+}
+
+/* Linha curta entre o título e a imagem de dor (pedido real, 2026-10-27) —
+ *  reforça o título numa frase só, antes da `whatsappPainImage`. Menor que
+ *  `.lp-hero-title`, maior que `.lp-hero-subtitle` normal, pra funcionar
+ *  como subtítulo de transição. */
+.lp-hero-tagline {
+  font-size: clamp(1.08rem, 2.26vw, 1.31rem);
+  font-weight: 600;
+  color: var(--lp-muted);
+  line-height: 1.4;
+  margin: 0 0 16px;
+  max-width: 480px;
 }
 
 /* Imagem "WhatsApp bagunçado" (pedido real, 2026-10-20) — representa
