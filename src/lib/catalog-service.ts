@@ -104,6 +104,9 @@ export async function getCatalogBySlug(slug: string): Promise<CatalogOrderData |
       booking_enabled: Boolean(orderData.booking_enabled),
       agenda_paused: Boolean(orderData.agenda_paused),
       catalog_disabled: Boolean(orderData.catalog_disabled),
+      show_cover: orderData.show_cover !== false,
+      show_instructions: orderData.show_instructions !== false,
+      show_contact_cta: orderData.show_contact_cta !== false,
       // Origem recorrente (Catálogo vendido como assinatura, ou um Plano
       // Agenda que veio de um Catálogo recorrente — `catalog_billing_mode`
       // nunca é apagado na troca de tier) com a cobrança não em dia agora,

@@ -56,6 +56,15 @@ export default function CriarComIAPage() {
   // clientes oferecem os 2 serviços, visto no Instagram delas). Só afeta o
   // ponto de partida; ela edita livremente depois na revisão.
   const [lashIncludeEyebrows, setLashIncludeEyebrows] = useState(false);
+  // Produto "Catálogo apenas" (pedido real, 2026-10-27) — a venda padrão
+  // passa a ser só o Catálogo; essas 4 nascem desligadas de propósito, e o
+  // admin liga manualmente o que quiser liberar pra uma cliente específica
+  // (perfil mais visual/techy). Dá pra mudar cada uma depois em
+  // /admin/catalogos, mesmo já com o catálogo criado.
+  const [showCover, setShowCover] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(false);
+  const [showContactCta, setShowContactCta] = useState(false);
+  const [showFullApp, setShowFullApp] = useState(false);
 
   const [isExtracting, setIsExtracting] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
@@ -161,6 +170,10 @@ export default function CriarComIAPage() {
       if (coverFile) fd.append('coverFile', await compressImageFile(coverFile));
       fd.append('aiAdaptCover', aiAdaptCover ? '1' : '0');
       fd.append('firstOfferTier', sellPlusDirect ? 'plus' : 'basico');
+      fd.append('showCover', showCover ? 'true' : 'false');
+      fd.append('showInstructions', showInstructions ? 'true' : 'false');
+      fd.append('showContactCta', showContactCta ? 'true' : 'false');
+      fd.append('showFullApp', showFullApp ? 'true' : 'false');
 
       const res = await fetch('/api/admin/finalize-catalog', {
         method: 'POST',
@@ -403,6 +416,42 @@ export default function CriarComIAPage() {
                 }`}
               />
             </button>
+          </div>
+
+          <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-3">
+            <div>
+              <p className="text-sm font-semibold text-slate-300">O que essa cliente vai ver</p>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Padrão é só o Catálogo — mais simples de usar e mais barato. Ligue o que quiser
+                liberar pra essa cliente específica (dá pra mudar depois em /admin/catalogos).
+              </p>
+            </div>
+            {([
+              ['Capa', 'Tela de abertura com foto e nome da profissional.', showCover, setShowCover],
+              ['Orientações', 'Tela de regras/cuidados (tolerância, pré e pós-procedimento).', showInstructions, setShowInstructions],
+              ['Links e Contato', 'Tela final com WhatsApp, Instagram e localização.', showContactCta, setShowContactCta],
+              ['App completo', 'Agenda e Configurações no app dela (sem isso, só a aba Início).', showFullApp, setShowFullApp],
+            ] as const).map(([label, hint, value, setValue]) => (
+              <div key={label} className="flex items-center justify-between gap-3">
+                <div className="pr-2">
+                  <p className="text-sm font-semibold text-slate-300">{label}</p>
+                  <p className="text-xs text-slate-500 mt-0.5">{hint}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setValue((v) => !v)}
+                  className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${
+                    value ? 'bg-rose-500' : 'bg-slate-700'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${
+                      value ? 'translate-x-[18px]' : 'translate-x-[3px]'
+                    }`}
+                  />
+                </button>
+              </div>
+            ))}
           </div>
 
           <div>

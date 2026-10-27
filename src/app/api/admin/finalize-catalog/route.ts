@@ -26,6 +26,14 @@ export async function POST(request: Request) {
     const coverFile = formData.get('coverFile') as File | null;
     const aiAdaptCover = formData.get('aiAdaptCover') === '1';
     const firstOfferTier = formData.get('firstOfferTier') === 'plus' ? 'plus' : 'basico';
+    // Produto "Catálogo apenas" (2026-10-27) — toggles nascem desligados no
+    // formulário (ver criar-com-ia/page.tsx), então a ausência do campo
+    // também deve cair em `false` aqui (e não no `true` de quem nunca manda
+    // o campo, como o onboarding self-serve).
+    const showCover = formData.get('showCover') === 'true';
+    const showInstructions = formData.get('showInstructions') === 'true';
+    const showContactCta = formData.get('showContactCta') === 'true';
+    const showFullApp = formData.get('showFullApp') === 'true';
 
     if (!clientName || !whatsappNumber) {
       return NextResponse.json({ success: false, message: 'Nome e WhatsApp são obrigatórios.' }, { status: 400 });
@@ -113,6 +121,10 @@ export async function POST(request: Request) {
           themeVariant: themeVariant as ThemeVariant,
           coverUrl,
           firstOfferTier,
+          showCover,
+          showInstructions,
+          showContactCta,
+          showFullApp,
         })
       )
       .select()

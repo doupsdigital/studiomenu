@@ -678,8 +678,10 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
       <div className={`mosaico-app is-visible ${isLuxury ? 'is-luxury' : ''}`}>
         {/* Hero Section (Foto da Capa, Nome da Profissional, Frase Hero) —
          *  não renderiza quando `hideCoverSection` (ver comentário na prop
-         *  acima). */}
-        {!hideCoverSection && (
+         *  acima) nem quando o produto vendido é "Catálogo apenas"
+         *  (`show_cover === false`, 2026-10-27) — vale em qualquer modo,
+         *  inclusive edição, de propósito (menos tela pra ela mexer). */}
+        {!hideCoverSection && catalogState.show_cover !== false && (
           <HeaderCover
             data={catalogState}
             categories={categories}
@@ -733,11 +735,13 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
           layoutSwitcher={layoutSwitcher}
         />
 
-        {/* Seção Orientações — some de vez na visualização pública se a
-         *  profissional apagou todos os itens (pedido real, 2026-10-09);
-         *  em modo de edição continua visível pra ela poder adicionar de
-         *  novo. */}
-        {(isEditMode || (catalogState.instructions?.items?.length || 0) > 0) && (
+        {/* Seção Orientações — primeiro checa o flag de produto
+         *  (`show_instructions`, "Catálogo apenas", 2026-10-27), que vale em
+         *  qualquer modo; só dentro disso o `isEditMode` continua decidindo
+         *  se aparece vazia pra ela preencher, ou se some de vez na
+         *  visualização pública quando ela apagou todos os itens (pedido
+         *  real, 2026-10-09). */}
+        {catalogState.show_instructions !== false && (isEditMode || (catalogState.instructions?.items?.length || 0) > 0) && (
           <InstructionsSection
             instructions={catalogState.instructions}
             bgUrl={catalogState.instructions_bg_url}
@@ -749,16 +753,20 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
           />
         )}
 
-        {/* Seção Contato & Localização */}
-        <CTASection
-          data={catalogState}
-          isEditMode={isEditMode}
-          onOpenSocialModal={(type) => {
-            setEditingSocialType(type);
-            setActiveModal('social');
-          }}
-          demoMode={demoBookingOnly}
-        />
+        {/* Seção Contato & Localização — some quando o produto vendido é
+         *  "Catálogo apenas" (`show_contact_cta === false`, 2026-10-27), em
+         *  qualquer modo. */}
+        {catalogState.show_contact_cta !== false && (
+          <CTASection
+            data={catalogState}
+            isEditMode={isEditMode}
+            onOpenSocialModal={(type) => {
+              setEditingSocialType(type);
+              setActiveModal('social');
+            }}
+            demoMode={demoBookingOnly}
+          />
+        )}
       </div>
 
       {/* Wizard de Agendamento (cliente final, só quando booking_enabled) */}

@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { Settings } from 'lucide-react';
 import { getOrderForProfessionalApp } from '@/lib/professional-app-service';
 import { getBusinessHours, getScheduleBlocks } from '@/lib/scheduling/config-service';
@@ -14,6 +14,9 @@ export default async function ConfigPage({ params }: ConfigPageProps) {
   const order = await getOrderForProfessionalApp(slug);
 
   if (!order) notFound();
+  // Produto "Catálogo apenas" (2026-10-27): Config fica inacessível mesmo por
+  // URL direta, não só escondida da navegação (ver BottomNav/layout.tsx).
+  if (order.show_full_app === false) redirect(`/app/${slug}/inicio`);
 
   const [businessHours, scheduleBlocks] = await Promise.all([
     getBusinessHours(order.id),

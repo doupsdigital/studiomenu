@@ -7,6 +7,9 @@ import { Home, Settings, CalendarCheck } from 'lucide-react';
 
 interface BottomNavProps {
   slug: string;
+  /** Produto "Catálogo apenas" (2026-10-27) — quando `true`, mostra só o
+   *  Início (sem Config, sem o botão central de Agenda). */
+  inicioOnly?: boolean;
 }
 
 const SIDE_TAB_LEFT = { key: 'inicio', label: 'Início', icon: Home } as const;
@@ -16,7 +19,7 @@ const SIDE_TAB_RIGHT = { key: 'config', label: 'Config', icon: Settings } as con
  *  direita, e um botão central elevado pra Agenda, mesmo padrão do `TabBar`
  *  do LashAgenda (docs/REESTRUTURACAO_VISUAL_APP.md, Fase 1). O Catálogo
  *  saiu da tabbar — agora só se chega lá pelo card de destaque no Início. */
-export const BottomNav: React.FC<BottomNavProps> = ({ slug }) => {
+export const BottomNav: React.FC<BottomNavProps> = ({ slug, inicioOnly = false }) => {
   const pathname = usePathname();
 
   // O editor do catálogo (chegado pelo card do Início, não mais uma aba) já
@@ -68,17 +71,22 @@ export const BottomNav: React.FC<BottomNavProps> = ({ slug }) => {
          *  em metades (mais perto do centro do que ficariam em 3 colunas
          *  iguais, que empurrava tudo pras bordas). */}
         {renderTab(SIDE_TAB_LEFT)}
-        {renderTab(SIDE_TAB_RIGHT)}
+        {/* Produto "Catálogo apenas" (2026-10-27): sem Config nem Agenda —
+         *  só o Início, que já cobre ver/editar catálogo e compartilhar o
+         *  link. */}
+        {!inicioOnly && renderTab(SIDE_TAB_RIGHT)}
 
         {/* Botão central em destaque — Agenda */}
-        <Link
-          href={`/app/${slug}/agenda`}
-          className={`absolute left-1/2 -translate-x-1/2 -top-6 w-16 h-16 rounded-full flex items-center justify-center text-white shadow-lg shadow-rose-600/30 border-4 border-surface transition duration-150 active:scale-90 ${
-            isAgendaActive ? 'bg-rose-700' : 'bg-rose-600'
-          }`}
-        >
-          <CalendarCheck className="w-7 h-7" />
-        </Link>
+        {!inicioOnly && (
+          <Link
+            href={`/app/${slug}/agenda`}
+            className={`absolute left-1/2 -translate-x-1/2 -top-6 w-16 h-16 rounded-full flex items-center justify-center text-white shadow-lg shadow-rose-600/30 border-4 border-surface transition duration-150 active:scale-90 ${
+              isAgendaActive ? 'bg-rose-700' : 'bg-rose-600'
+            }`}
+          >
+            <CalendarCheck className="w-7 h-7" />
+          </Link>
+        )}
       </div>
     </nav>
   );

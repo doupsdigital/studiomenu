@@ -138,7 +138,21 @@ CREATE TABLE IF NOT EXISTS public.orders (
     -- Login real da profissional (docs/PLANO_PRODUCAO_V1.md, Fase 17): vínculo
     -- 1:1 opcional com uma conta do Supabase Auth. NULL até ela "reivindicar"
     -- o login (continua entrando só pelo link mágico até lá).
-    auth_user_id UUID UNIQUE REFERENCES auth.users(id) ON DELETE SET NULL
+    auth_user_id UUID UNIQUE REFERENCES auth.users(id) ON DELETE SET NULL,
+    -- Flags de visibilidade por pedido (produto "Catálogo apenas", pedido real
+    -- 2026-10-27) — permitem vender só o Catálogo pra clientes com menos
+    -- intimidade com tecnologia ou pra fugir da comparação direta com apps de
+    -- agendamento do mercado, reservando o "site completo" como oferta à
+    -- parte. DEFAULT true em todos pra não mudar nada nos catálogos já
+    -- existentes; só pedidos novos criados pelo admin nascem com `false`.
+    -- Valem em qualquer modo, inclusive edição (ver CatalogLayout.tsx).
+    show_cover BOOLEAN NOT NULL DEFAULT true,
+    show_instructions BOOLEAN NOT NULL DEFAULT true,
+    show_contact_cta BOOLEAN NOT NULL DEFAULT true,
+    -- Controla o app da profissional (não o catálogo público): false = só a
+    -- aba Início, Agenda e Config ficam inacessíveis (ver
+    -- src/app/app/[slug]/layout.tsx e BottomNav.tsx).
+    show_full_app BOOLEAN NOT NULL DEFAULT true
 );
 
 -- Index para buscas ultrarrápidas por slug e edit_token
