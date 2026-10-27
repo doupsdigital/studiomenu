@@ -25,6 +25,12 @@ export interface LandingNicheContent {
   heroBrandName?: { prefix: string; highlight: string };
   /** Título principal da Hero — alinhado aos criativos. */
   heroTitle: ReactNode;
+  /** Linha curta logo abaixo do `heroTitle`, antes da `whatsappPainImage`
+   *  (pedido real, 2026-10-27) — reforça o título em 1 frase só, no mesmo
+   *  espírito da legenda do criativo ("Transforme seu Catálogo..."). Fica
+   *  ENTRE o título e a imagem; a `heroSubtitle` de sempre ("Conheça o
+   *  StudioMenu...") continua depois da imagem, sem mudar de lugar. */
+  heroTagline?: ReactNode;
   heroSubtitle: ReactNode;
   /** Imagem "WhatsApp bagunçado" (pedido real, 2026-10-20) — mostra na
    *  prática a dor que a Hero descreve em texto (tabela de preços e fotos
@@ -138,11 +144,20 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
         Feito para <span className="lp-eyebrow-highlight">Lash Designer</span>
       </>
     ),
+    // Headline curta (pedido real, 2026-10-27) — alinhada à legenda do
+    // criativo ("NÃO MANDE MAIS PDF PARA SUAS CLIENTES"), trocando a antiga
+    // headline mais longa ("Sua cliente compra com os olhos..."). Jogo de
+    // cores: "PDF" em vinho (o problema) e "Clientes" no gradiente de marca
+    // (quem importa), mesmo padrão de destaque já usado no resto da página.
     heroTitle: (
       <>
-        Sua cliente compra com os <span className="lp-text-gradient">olhos</span>: troque o{' '}
-        <span className="lp-text-wine">PDF antigo</span> por um{' '}
-        <span className="lp-text-gradient">Menu Digital</span> moderno e interativo.
+        Não mande mais <span className="lp-text-wine">PDF</span> para suas{' '}
+        <span className="lp-text-gradient">Clientes</span>.
+      </>
+    ),
+    heroTagline: (
+      <>
+        Transforme seu Catálogo de <strong className="lp-text-gradient">Lash Designer</strong> em um <strong className="lp-text-wine">Menu Digital</strong> profissional que valoriza seu trabalho.
       </>
     ),
     heroSubtitle: (
@@ -150,8 +165,6 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
         <span className="lp-hero-subtitle-lead">
           Conheça o <strong className="lp-hero-subtitle-brand">Studio<em className="lp-text-gradient">Menu</em></strong>.
         </span>
-        Seu catálogo interativo em um link exclusivo para a Bio e WhatsApp.
-        <br />
         <strong className="lp-text-wine">Prático para a cliente escolher, irresistível para ela agendar.</strong>
       </>
     ),
