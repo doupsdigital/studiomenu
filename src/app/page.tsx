@@ -17,7 +17,8 @@ interface StudioMenuLandingPageProps {
  *
  *  `?v=curta` ou `?v=longa` permite forçar uma variante para testes.
  *  Se não vier na URL, confere o cookie `sm_lp_variant` para manter o visitante
- *  na mesma versão (split test 50/50 determinístico via código). */
+ *  na mesma versão (split test 70/30 a favor de 'curta', determinístico
+ *  via código). */
 export default async function StudioMenuLandingPage({ searchParams }: StudioMenuLandingPageProps) {
   const { nicho, v } = await searchParams;
   const resolvedNiche: LandingNiche = nicho && nicho in LANDING_NICHE_CONTENT ? (nicho as LandingNiche) : 'geral';
@@ -32,8 +33,11 @@ export default async function StudioMenuLandingPage({ searchParams }: StudioMenu
   } else if (savedVariant === 'curta' || savedVariant === 'longa') {
     variant = savedVariant;
   } else {
-    // Sorteio 50/50 limpo e distribuído para novos visitantes
-    variant = Math.random() < 0.5 ? 'curta' : 'longa';
+    // Sorteio 70/30 a favor de 'curta' (pedido real, 2026-10-27) — sinal
+    // inicial (padrão de sessões indecisas na 'longa' nos últimos dias +
+    // 1ª conversão rápida na 'curta') favorece ela; ainda não é prova
+    // definitiva, então mantém as duas rodando, só com mais peso.
+    variant = Math.random() < 0.7 ? 'curta' : 'longa';
   }
 
   return (
