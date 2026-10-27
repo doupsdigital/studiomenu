@@ -50,6 +50,12 @@ export default function CriarComIAPage() {
   const [sellPlusDirect, setSellPlusDirect] = useState(false);
   const [menuFiles, setMenuFiles] = useState<File[]>([]);
   const [procedures, setProcedures] = useState<ProcedureItem[]>([]);
+  // Só pro nicho Lash (pedido real, 2026-10-27) — quando não tem tabela de
+  // preços pra extrair, decide se o catálogo nasce só com Extensão de
+  // Cílios (padrão de sempre) ou já com Sobrancelhas junto (algumas
+  // clientes oferecem os 2 serviços, visto no Instagram delas). Só afeta o
+  // ponto de partida; ela edita livremente depois na revisão.
+  const [lashIncludeEyebrows, setLashIncludeEyebrows] = useState(false);
 
   const [isExtracting, setIsExtracting] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
@@ -76,7 +82,12 @@ export default function CriarComIAPage() {
     // com os 4 primeiros serviços do preset do nicho, pra adiantar a criação
     // e trocar pelos dela depois no editor — pedido real, 2026-10-01.
     if (!menuFiles.length) {
-      setProcedures(preset.procedures.slice(0, 4).map((p, i) => ({ ...p, id: `preset-${Date.now()}-${i}` })));
+      const baseProcedures = preset.procedures.slice(0, 4);
+      const defaultProcedures =
+        niche === 'lash' && lashIncludeEyebrows
+          ? [...baseProcedures, ...preset.procedures.filter((p) => ['design-sobrancelha', 'sobrancelha-henna'].includes(p.id))]
+          : baseProcedures;
+      setProcedures(defaultProcedures.map((p, i) => ({ ...p, id: `preset-${Date.now()}-${i}` })));
       setStep('reviewing');
       return;
     }
@@ -422,6 +433,35 @@ export default function CriarComIAPage() {
               })}
             </div>
           </div>
+
+          {/* Só Lash (pedido real, 2026-10-27) — algumas clientes também
+           *  oferecem Sobrancelha junto com Extensão de Cílios. Só decide o
+           *  ponto de partida quando não tem tabela de preços pra extrair. */}
+          {niche === 'lash' && (
+            <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-950 border border-slate-800">
+              <div className="pr-3">
+                <p className="text-sm font-semibold text-slate-300">Incluir Sobrancelhas nos serviços padrão</p>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  {lashIncludeEyebrows
+                    ? 'Sem tabela de preços, o catálogo nasce com 4 de Extensão de Cílios + 2 de Sobrancelhas.'
+                    : 'Sem tabela de preços, o catálogo nasce só com 4 de Extensão de Cílios (como sempre).'}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setLashIncludeEyebrows((v) => !v)}
+                className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${
+                  lashIncludeEyebrows ? 'bg-rose-500' : 'bg-slate-700'
+                }`}
+              >
+                <span
+                  className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${
+                    lashIncludeEyebrows ? 'translate-x-[18px]' : 'translate-x-[3px]'
+                  }`}
+                />
+              </button>
+            </div>
+          )}
 
           <div>
             <div className="flex items-center justify-between mb-1.5">
