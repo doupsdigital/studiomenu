@@ -234,6 +234,18 @@ button {
   -webkit-overflow-scrolling: touch;
 }
 
+/* Produto "Catálogo apenas" (pedido real, 2026-10-28, testado em celular
+ *  de verdade): com Capa/Orientações/Contato escondidos, sobra só UMA
+ *  "tela" (o Catálogo de procedimentos) — ela sozinha já é o `scroll-snap`
+ *  mandatório inteiro. Rolar uma lista mais longa (8 procedimentos) dentro
+ *  de um único ponto de encaixe `scroll-snap-stop: always` ficava travando/
+ *  grudando a cada tentativa de rolagem, porque o navegador tenta "voltar"
+ *  pro início do único snap point sempre que a rolagem não o ultrapassa de
+ *  propósito. Sem telas pra "deslizar entre", o snap não serve pra nada
+ *  aqui — desligar devolve a rolagem nativa fluida. */
+.mosaico-app--single-screen {
+  scroll-snap-type: none;
+}
 
 .container {
   width: 100%;
