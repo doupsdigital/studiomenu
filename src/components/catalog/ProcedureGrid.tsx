@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect, useLayoutEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, GripVertical } from 'lucide-react';
 import {
   DndContext,
@@ -23,7 +23,6 @@ import { ProcedureItem, LayoutModel } from '@/types/catalog';
 import { ProcedureCard } from './ProcedureCard';
 import { ProcedureDetailModal } from './ProcedureDetailModal';
 import { ProcedureImage } from './ProcedureImage';
-import { useFitText } from '@/hooks/useFitText';
 
 interface ProcedureGridProps {
   procedures: ProcedureItem[];
@@ -163,28 +162,6 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
 }) => {
   const [selectedProcedure, setSelectedProcedure] = useState<ProcedureItem | null>(null);
 
-  // Produto "Catálogo apenas" (2026-10-28): nome do studio e título "Catálogo
-  // de procedimentos" nunca podem quebrar em 2 linhas, em nenhuma largura de
-  // tela — `headerRef` (o `<header>`, que ocupa 100% da largura do cartão) é
-  // a referência de largura disponível pros dois (ver `useFitText`).
-  const studioHeaderRef = useRef<HTMLElement | null>(null);
-  const { ref: studioNomeRef, refit: refitStudioNome } = useFitText<HTMLHeadingElement>(studioHeaderRef, {
-    maxFontSize: 40,
-    minFontSize: 16,
-  });
-  const { ref: studioTituloRef, refit: refitStudioTitulo } = useFitText<HTMLHeadingElement>(studioHeaderRef, {
-    maxFontSize: 34,
-    minFontSize: 16,
-  });
-  useLayoutEffect(() => {
-    if (!showStudioHeader) return;
-    refitStudioNome();
-  }, [showStudioHeader, clientName, refitStudioNome]);
-  useLayoutEffect(() => {
-    if (!showStudioHeader) return;
-    refitStudioTitulo();
-  }, [showStudioHeader, layoutModel, refitStudioTitulo]);
-
   // Avisa o pai (mockup/modal de teste da landing page) se o modal de
   // detalhe do procedimento está aberto ou não — pedido real, 2026-10-16:
   // a dica "Clique nos cards" (`MockupModal.tsx`) precisa sumir enquanto
@@ -285,7 +262,6 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
       <div className="container">
 
         <header
-          ref={studioHeaderRef}
           className={`secao-catalogo__header anim-fade-up delay-1${showStudioHeader ? ' secao-catalogo__header--studio' : ''}`}
         >
           {showStudioHeader && (
@@ -308,15 +284,12 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
                 <span className="lm-catalogo-studio-divider"></span>
               </div>
               <h1
-                ref={studioNomeRef}
                 className="lm-catalogo-studio-nome"
-                style={{ whiteSpace: 'nowrap' }}
                 data-tour="cat-text"
                 data-lm-editable={isEditMode ? 'true' : undefined}
                 contentEditable={isEditMode}
                 suppressContentEditableWarning={true}
                 suppressHydrationWarning={isEditMode}
-                onInput={refitStudioNome}
                 onBlur={(e) => {
                   if (isEditMode && onUpdateClientName) {
                     onUpdateClientName(e.currentTarget.innerText.trim());
@@ -358,10 +331,7 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
               )}
             </div>
           )}
-          <h2
-            ref={showStudioHeader ? studioTituloRef : undefined}
-            className={`secao-catalogo__titulo${showStudioHeader ? ' secao-catalogo__titulo--fit' : ''}`}
-          >
+          <h2 className="secao-catalogo__titulo">
             {showStudioHeader
               ? (isClassico ? <>Menu de <em>serviços</em></> : <>Catálogo de <em>procedimentos</em></>)
               : (isClassico ? <>Procedimentos &amp; <em>Valores</em></> : <>Escolha o seu <em>estilo</em></>)}
