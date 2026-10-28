@@ -522,11 +522,37 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
   // tentar acertar um número de offset. Só o passo de editar/excluir um
   // serviço (que pode estar em qualquer posição da lista) continua rolando
   // de verdade.
+  // Produto "Catálogo apenas" (2026-10-27, achado testando de verdade): com
+  // os 3 flags públicos desligados, Capa/Textos e Orientações nem renderizam
+  // mais no editor (ver guards de `show_cover`/`show_instructions` abaixo) —
+  // sem filtrar os passos daqui, o Joyride tentava apontar pra alvos que não
+  // existem no DOM e os balões saíam "soltos"/fora de posição. Além disso,
+  // a usuária pediu de propósito que esse modo simplificado mostre só 2
+  // passos (editar serviço + tema/layout), sem o de "Salvar" — menos coisa
+  // pra explicar pra cliente com menos intimidade com tecnologia.
+  const catalogOnlyProduct =
+    catalogState.show_cover === false &&
+    catalogState.show_instructions === false &&
+    catalogState.show_contact_cta === false;
+
   const catalogEditorSteps = useMemo<Step[]>(() => {
-    const steps: Step[] = [
-      { target: '[data-tour="cat-cover"]', title: 'Troque a foto de capa', content: 'Toque aqui pra escolher uma nova foto de capa do seu catálogo.', skipScroll: true },
-      { target: '[data-tour="cat-text"]', title: 'Textos editáveis', content: 'Toque em qualquer texto marcado (nome, frase) pra editar direto na tela.', skipScroll: true },
-    ];
+    const steps: Step[] = [];
+    const showsCover = !hideCoverSection && catalogState.show_cover !== false;
+    if (showsCover) {
+      steps.push({ target: '[data-tour="cat-cover"]', title: 'Troque a foto de capa', content: 'Toque aqui pra escolher uma nova foto de capa do seu catálogo.', skipScroll: true });
+    }
+    // "cat-text" aponta pro nome editável — na Capa completa (nome+frase) ou,
+    // no produto "Catálogo apenas" (2026-10-28), pro mini-cabeçalho "STUDIO +
+    // Nome" que o `ProcedureGrid` passa a mostrar sozinho quando a Capa não
+    // renderiza (é o único lugar pra editar o nome nesse modo).
+    steps.push({
+      target: '[data-tour="cat-text"]',
+      title: 'Textos editáveis',
+      content: showsCover
+        ? 'Toque em qualquer texto marcado (nome, frase) pra editar direto na tela.'
+        : 'Toque no nome do seu studio pra editar direto na tela.',
+      skipScroll: true,
+    });
     if (catalogState.procedures.length > 0) {
       steps.push({
         target: '[data-tour="cat-edit-proc"]',
@@ -534,26 +560,28 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
         content: 'Toque em ✏️ pra editar ou 🗑️ pra excluir, direto no card do serviço.',
       });
     }
-    steps.push(
-      // Passo "cat-add-proc" (Adicionar novos serviços) removido — o botão
-      // fica logo depois da lista de procedimentos, e o balão nunca ficou
-      // bem posicionado ali antes de descobrirmos o `skipScroll` (2026-09-24).
-      //
-      // "cat-orientacoes" (pedido real, 2026-10-19) — essa tela, diferente
-      // das outras, só aparece pra visitante real se tiver pelo menos 1
-      // item (`InstructionsSection.tsx`), mas sempre aparece aqui no editor
-      // — sem esse passo do tour, ninguém saberia por que ela "some" pro
-      // lead/cliente final se deixar tudo vazio.
-      {
+    // Passo "cat-add-proc" (Adicionar novos serviços) removido — o botão
+    // fica logo depois da lista de procedimentos, e o balão nunca ficou
+    // bem posicionado ali antes de descobrirmos o `skipScroll` (2026-09-24).
+    //
+    // "cat-orientacoes" (pedido real, 2026-10-19) — essa tela, diferente
+    // das outras, só aparece pra visitante real se tiver pelo menos 1
+    // item (`InstructionsSection.tsx`), mas sempre aparece aqui no editor
+    // — sem esse passo do tour, ninguém saberia por que ela "some" pro
+    // lead/cliente final se deixar tudo vazio.
+    if (catalogState.show_instructions !== false) {
+      steps.push({
         target: '[data-tour="cat-orientacoes"]',
         title: 'Informações importantes',
         content: 'Essa tela é opcional: se você deixar todos os campos vazios, ela não aparece pra sua cliente.',
-      },
-      { target: '[data-tour="cat-theme"]', title: 'Personalize tema e layout', content: 'Esses botões trocam a paleta de cores e o modelo da grade (Mosaico/Clássico).', skipScroll: true },
-      { target: '[data-tour="cat-save"]', title: 'Não esqueça de salvar', content: 'As mudanças só valem pra cliente final depois de tocar aqui.', skipScroll: true }
-    );
+      });
+    }
+    steps.push({ target: '[data-tour="cat-theme"]', title: 'Personalize tema e layout', content: 'Esses botões trocam a paleta de cores e o modelo da grade (Mosaico/Clássico).', skipScroll: true });
+    if (!catalogOnlyProduct) {
+      steps.push({ target: '[data-tour="cat-save"]', title: 'Não esqueça de salvar', content: 'As mudanças só valem pra cliente final depois de tocar aqui.', skipScroll: true });
+    }
     return steps;
-  }, [catalogState.procedures.length]);
+  }, [catalogState.procedures.length, hideCoverSection, catalogState.show_cover, catalogState.show_instructions, catalogOnlyProduct]);
 
   // Reordenar categoria (setas ‹ › nos chips de filtro, modo edição).
   // Usa a lista `categories` completa (não só catalogState.categories) pra
@@ -678,8 +706,10 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
       <div className={`mosaico-app is-visible ${isLuxury ? 'is-luxury' : ''}`}>
         {/* Hero Section (Foto da Capa, Nome da Profissional, Frase Hero) —
          *  não renderiza quando `hideCoverSection` (ver comentário na prop
-         *  acima). */}
-        {!hideCoverSection && (
+         *  acima) nem quando o produto vendido é "Catálogo apenas"
+         *  (`show_cover === false`, 2026-10-27) — vale em qualquer modo,
+         *  inclusive edição, de propósito (menos tela pra ela mexer). */}
+        {!hideCoverSection && catalogState.show_cover !== false && (
           <HeaderCover
             data={catalogState}
             categories={categories}
@@ -700,6 +730,13 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
           clientName={catalogState.client_name}
           layoutModel={catalogState.layout_model}
           isEditMode={isEditMode}
+          // Produto "Catálogo apenas" (2026-10-28): sem a Capa, esse
+          // componente vira a primeira tela — mostra o mini-cabeçalho
+          // "STUDIO" + nome (único lugar pra editar o nome nesse modo).
+          showStudioHeader={hideCoverSection || catalogState.show_cover === false}
+          studioLabel={catalogState.studio_label}
+          onUpdateClientName={handleUpdateClientName}
+          onUpdateStudioLabel={handleUpdateStudioLabel}
           onEditProc={(proc) => {
             const idx = catalogState.procedures.findIndex((p) => p.id === proc.id);
             setEditingProc(proc);
@@ -733,11 +770,13 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
           layoutSwitcher={layoutSwitcher}
         />
 
-        {/* Seção Orientações — some de vez na visualização pública se a
-         *  profissional apagou todos os itens (pedido real, 2026-10-09);
-         *  em modo de edição continua visível pra ela poder adicionar de
-         *  novo. */}
-        {(isEditMode || (catalogState.instructions?.items?.length || 0) > 0) && (
+        {/* Seção Orientações — primeiro checa o flag de produto
+         *  (`show_instructions`, "Catálogo apenas", 2026-10-27), que vale em
+         *  qualquer modo; só dentro disso o `isEditMode` continua decidindo
+         *  se aparece vazia pra ela preencher, ou se some de vez na
+         *  visualização pública quando ela apagou todos os itens (pedido
+         *  real, 2026-10-09). */}
+        {catalogState.show_instructions !== false && (isEditMode || (catalogState.instructions?.items?.length || 0) > 0) && (
           <InstructionsSection
             instructions={catalogState.instructions}
             bgUrl={catalogState.instructions_bg_url}
@@ -749,16 +788,20 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
           />
         )}
 
-        {/* Seção Contato & Localização */}
-        <CTASection
-          data={catalogState}
-          isEditMode={isEditMode}
-          onOpenSocialModal={(type) => {
-            setEditingSocialType(type);
-            setActiveModal('social');
-          }}
-          demoMode={demoBookingOnly}
-        />
+        {/* Seção Contato & Localização — some quando o produto vendido é
+         *  "Catálogo apenas" (`show_contact_cta === false`, 2026-10-27), em
+         *  qualquer modo. */}
+        {catalogState.show_contact_cta !== false && (
+          <CTASection
+            data={catalogState}
+            isEditMode={isEditMode}
+            onOpenSocialModal={(type) => {
+              setEditingSocialType(type);
+              setActiveModal('social');
+            }}
+            demoMode={demoBookingOnly}
+          />
+        )}
       </div>
 
       {/* Wizard de Agendamento (cliente final, só quando booking_enabled) */}

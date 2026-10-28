@@ -91,6 +91,14 @@ export interface OrderInsertInput {
    *  22) — 'plus' pra venda focada em agendamento automático, sem passar
    *  pelo Básico. Padrão 'basico' (o de sempre). */
   firstOfferTier?: 'basico' | 'plus';
+  /** Flags do produto "Catálogo apenas" (2026-10-27) — `undefined` cai no
+   *  default `true` da coluna (site completo, comportamento de sempre).
+   *  Quem envia `false` explicitamente é só o formulário de criação do admin
+   *  (`criar-com-ia`), que agora nasce com essas 4 desligadas por padrão. */
+  showCover?: boolean;
+  showInstructions?: boolean;
+  showContactCta?: boolean;
+  showFullApp?: boolean;
 }
 
 /** Monta o payload completo pra criar um catálogo novo. Os campos "de
@@ -127,6 +135,10 @@ export function buildOrderInsertPayload(input: OrderInsertInput) {
     // cliente em /admin/catalogos.
     catalog_billing_mode: 'recorrente' as const,
     billing_price_override: CATALOGO_RECORRENTE_DEFAULT_PRICE,
+    show_cover: input.showCover ?? true,
+    show_instructions: input.showInstructions ?? true,
+    show_contact_cta: input.showContactCta ?? true,
+    show_full_app: input.showFullApp ?? true,
   };
 }
 

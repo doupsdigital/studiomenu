@@ -795,6 +795,135 @@ button {
   gap: 8px;
 }
 
+/* Produto "Catálogo apenas" (2026-10-28): sem a Capa, esse cabeçalho abre a
+   tela — alinhado à esquerda (como um cabeçalho de página comum) em vez de
+   centralizado, pra acomodar o mini-cabeçalho "STUDIO + Nome" acima dele. */
+.secao-catalogo__header--studio {
+  text-align: left;
+  align-items: flex-start;
+}
+
+.lm-catalogo-studio {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 4px;
+}
+
+.lm-catalogo-studio-line {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+}
+
+.lm-catalogo-studio-label {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--grid-title-color);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.lm-catalogo-studio-divider {
+  flex: 1;
+  height: 1px;
+  background: var(--grid-sub-color);
+  opacity: 0.35;
+}
+
+/* Brilho deslizando pelo nome (pedido real, 2026-10-28) — mesma ideia visual
+ *  de `.hero__chip::after`/`heroChipShine` (faixa clara cruzando em loop),
+ *  mas pra texto em vez de uma cápsula com fundo sólido: aqui o "brilho" é
+ *  uma faixa dentro do próprio gradiente do texto, recortado nas letras via
+ *  `background-clip: text`. `-webkit-text-fill-color: transparent` (não
+ *  `color: transparent`) de propósito — em qualquer navegador sem suporte a
+ *  isso, o `color` abaixo continua valendo e o nome só aparece sólido, sem
+ *  quebrar (nunca fica invisível). */
+.lm-catalogo-studio-nome {
+  margin: 0;
+  font-family: 'Fraunces', Georgia, serif;
+  /* Tamanho fixo, sem cálculo nenhum em tempo real (CSS ou JS) — pedido
+   *  real, 2026-10-28: as tentativas de ajustar dinamicamente (JS medindo
+   *  o texto, depois CSS com container query) sempre causavam algum tipo de
+   *  "mudança visível" ao carregar a tela (ou encolhendo, ou crescendo, ou
+   *  um vazio antes de aparecer), pior experiência que só aceitar um valor
+   *  padrão pra largura de tela comum. Em nomes bem compridos ou telas bem
+   *  estreitas, a linha pode quebrar em 2 — aceito como trade-off. */
+  font-size: 40px;
+  font-weight: 400;
+  font-style: italic;
+  line-height: 1.1;
+  color: var(--grid-title-em-color);
+  background: linear-gradient(100deg, var(--grid-title-em-color) 35%, #fff 50%, var(--grid-title-em-color) 65%);
+  background-size: 300% 100%;
+  background-position: 100% 0;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: nomeStudioShine 3.6s linear infinite;
+}
+
+/* Em modo de edição, ao clicar/focar pra digitar, desliga o brilho e mostra
+ *  o nome sólido — achado relatado de verdade, 2026-10-28: com
+ *  `-webkit-text-fill-color: transparent`, o texto fica ilegível/some
+ *  enquanto está em edição (cursor piscando, seleção do navegador não lida
+ *  bem com texto "transparente"). Volta a brilhar normalmente ao sair do
+ *  campo (perder o foco). */
+.lm-catalogo-studio-nome:focus {
+  background: none;
+  -webkit-text-fill-color: unset;
+  animation: none;
+}
+
+/* O ✏️ (`[data-lm-editable]::after` em visual-editor.css) herda
+ *  `-webkit-text-fill-color: transparent` do nome (propriedade de texto,
+ *  herdada pelo pseudo-elemento igual `color`) — ficava com a aparência
+ *  "puxando" a cor/gradiente do nome em vez do emoji normal, só corrigindo
+ *  ao focar (quando o `:focus` acima já reseta isso no elemento pai).
+ *  Reseta aqui pra já nascer com a cor própria do emoji, clicado ou não —
+ *  achado relatado de verdade, 2026-10-28. */
+.lm-catalogo-studio-nome::after {
+  -webkit-text-fill-color: initial;
+  color: initial;
+}
+
+/* `background-position` fica sempre dentro de 0%-100% de propósito (achado
+ *  relatado de verdade, 2026-10-28: com valores fora dessa faixa — 200% a
+ *  -50% na primeira versão — o brilho passava certo na primeira volta, mas
+ *  nas voltas seguintes só aparecia no finalzinho do nome, "pulando" o resto
+ *  — provável inconsistência do navegador relendo o `background-position`
+ *  percentual "excedente" a cada novo loop do `infinite`). Dentro da faixa
+ *  padrão 0%-100% o espectro inteiro do gradiente passa de ponta a ponta de
+ *  forma previsível, toda vez.
+ *
+ *  Direção esquerda→direita (pedido real, 2026-10-28): com
+ *  `background-size` maior que o elemento, ir de `100%` pra `0%` é o que
+ *  faz a faixa clara entrar pela esquerda e sair pela direita — o sentido
+ *  inverso (`0%`→`100%`) entra pela direita. */
+@keyframes nomeStudioShine {
+  0% {
+    background-position: 100% 0;
+  }
+  60% {
+    background-position: 0% 0;
+  }
+  100% {
+    background-position: 0% 0;
+  }
+}
+
+.lm-catalogo-studio-filete {
+  width: 44px;
+  height: 2px;
+  background: var(--grid-title-em-color);
+}
+
 .secao-catalogo__titulo {
   margin: 0;
   font-family: 'Fraunces', Georgia, serif;
@@ -807,6 +936,28 @@ button {
 .secao-catalogo__titulo em {
   font-style: italic;
   color: var(--grid-title-em-color);
+}
+
+/* Mesma técnica (e mesmo motivo) do ajuste real feito em
+ *  `.secao-orientacoes__titulo` pra "Informações importantes" (cliente
+ *  Bruna, iPhone, 2026-10-23): iPhones costumam ter a tela um pouco mais
+ *  estreita (~375-393px úteis) que a maioria dos Android recentes
+ *  (~412px+), e "Catálogo de procedimentos" fica bem no limite da largura
+ *  disponível — poucos pixels de diferença bastam pra quebrar em 2 linhas
+ *  num aparelho e caber perfeitamente no outro. `clamp()` com `vw` reduz a
+ *  fonte gradualmente nas telas mais estreitas (sem salto de breakpoint) —
+ *  só CSS, sem JS nem container query (pedido real, 2026-10-28, depois de 2
+ *  tentativas mais complexas que pioraram a experiência).
+ *
+ *  Valores iguais aos de `.secao-orientacoes__titulo` (não um cálculo novo
+ *  meu, que errou o tamanho 2 vezes seguidas aqui) — mesma faixa de
+ *  largura real validada em aparelho de cliente de verdade pra um texto de
+ *  comprimento parecido ("Informações importantes"). Teto cai de 34px pra
+ *  30px de propósito: "Catálogo de procedimentos" é um pouco mais comprido,
+ *  34px nunca coube com folga em nenhuma largura real testada até agora. */
+.secao-catalogo__titulo--fit {
+  font-size: clamp(25px, 6.9vw, 30px);
+  white-space: nowrap;
 }
 
 .secao-catalogo__sub {

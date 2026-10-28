@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import { getOrderForProfessionalApp } from '@/lib/professional-app-service';
 import { getCatalogBySlug } from '@/lib/catalog-service';
@@ -90,6 +90,9 @@ export default async function AgendaPage({ params, searchParams }: AgendaPagePro
   const order = await getOrderForProfessionalApp(slug);
 
   if (!order) notFound();
+  // Produto "Catálogo apenas" (2026-10-27): Agenda fica inacessível mesmo por
+  // URL direta, não só escondida da navegação (ver BottomNav/layout.tsx).
+  if (order.show_full_app === false) redirect(`/app/${slug}/inicio`);
 
   // A Agenda é liberada por `booking_enabled` (o que de fato diz se o
   // agendamento automático está ligado pro cliente final), não pelo status

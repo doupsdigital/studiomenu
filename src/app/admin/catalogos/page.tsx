@@ -51,6 +51,10 @@ type AdminCatalog = CatalogOrderData & {
    *  (Fase 28) — `null`/ausente usa o padrão (`CATALOGO_VITALICIO_PRICE`,
    *  src/lib/pricing.ts). */
   lifetime_price_override?: number | null;
+  /** Produto "Catálogo apenas" (2026-10-27) — controla Agenda/Config no app
+   *  da profissional; `show_cover`/`show_instructions`/`show_contact_cta` já
+   *  vêm de `CatalogOrderData`. */
+  show_full_app?: boolean;
 };
 
 type SectionTone = 'rose' | 'sky' | 'amber' | 'red';
@@ -630,6 +634,43 @@ export default function AdminCatalogosPage() {
     }
   };
 
+  /** Produto "Catálogo apenas" (2026-10-27) — os 4 flags de visibilidade por
+   *  pedido (3 do catálogo público + 1 do app da profissional), editáveis a
+   *  qualquer momento depois do catálogo já criado. `undefined`/ausente
+   *  conta como visível (mesmo default `true` da coluna). */
+  const VISIBILITY_FLAGS: { key: 'show_cover' | 'show_instructions' | 'show_contact_cta' | 'show_full_app'; label: string }[] = [
+    { key: 'show_cover', label: 'Capa' },
+    { key: 'show_instructions', label: 'Orientações' },
+    { key: 'show_contact_cta', label: 'Links e Contato' },
+    { key: 'show_full_app', label: 'App completo (Agenda/Config)' },
+  ];
+
+  const toggleVisibilityFlag = async (
+    item: AdminCatalog,
+    field: 'show_cover' | 'show_instructions' | 'show_contact_cta' | 'show_full_app'
+  ) => {
+    if (!item.id) return;
+    const currentlyVisible = item[field] !== false;
+    try {
+      const res = await fetch('/api/admin/catalog-actions', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ id: item.id, [field]: !currentlyVisible }),
+      });
+      const result = await res.json();
+      if (!result.success) {
+        showToast('❌ Erro ao atualizar visibilidade.');
+        return;
+      }
+      showToast(currentlyVisible ? '🙈 Escondido da cliente.' : '👁️ Mostrando de novo.');
+      fetchCatalogs();
+    } catch (e) {
+      console.error('Erro ao atualizar flag de visibilidade:', e);
+      showToast('❌ Erro ao atualizar visibilidade.');
+    }
+  };
+
   /** Fase 26: caso de borda — cliente pagando fora do sistema (ex: uma
    *  vez só, via Pix direto), sem assinatura Asaas de verdade por trás.
    *  Libera o acesso ao app dela igual a uma assinatura real (mesmo
@@ -1197,6 +1238,35 @@ export default function AdminCatalogosPage() {
                             </button>
                           </div>
                         )}
+                      </AdminCardSection>
+
+                      <AdminCardSection
+                        label="Experiência entregue"
+                        subtitle="Catálogo apenas, ou site completo (telas e app)"
+                        icon={Globe}
+                        tone="amber"
+                        isOpen={isSectionOpen(cardKey, 'experiencia', false)}
+                        onToggle={() => toggleSection(cardKey, 'experiencia')}
+                      >
+                        <div className="flex flex-col gap-1.5">
+                          {VISIBILITY_FLAGS.map(({ key, label }) => {
+                            const visible = item[key] !== false;
+                            return (
+                              <button
+                                key={key}
+                                onClick={() => toggleVisibilityFlag(item, key)}
+                                className={`w-full px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 border transition-all ${
+                                  visible
+                                    ? 'bg-emerald-500/20 border-emerald-500/60 text-emerald-300'
+                                    : 'bg-slate-800 border-slate-600 text-slate-200'
+                                }`}
+                              >
+                                {visible ? <PlayCircle className="w-3.5 h-3.5" /> : <PauseCircle className="w-3.5 h-3.5" />}
+                                {label}: {visible ? 'Visível' : 'Escondida'}
+                              </button>
+                            );
+                          })}
+                        </div>
                       </AdminCardSection>
 
                       <AdminCardSection

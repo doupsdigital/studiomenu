@@ -97,6 +97,13 @@ export interface CatalogOrderData {
    *  (pagamento único, o padrão) nunca liga essa flag — é pra sempre dela,
    *  por definição. */
   catalog_payment_lapsed?: boolean;
+  /** Flags de visibilidade por pedido (produto "Catálogo apenas") — controlam
+   *  se a Capa, as Orientações e a tela final de Links/Contato aparecem,
+   *  valendo em qualquer modo (público ou edição). `undefined`/ausente conta
+   *  como visível (mesmo default `true` da coluna no banco). */
+  show_cover?: boolean;
+  show_instructions?: boolean;
+  show_contact_cta?: boolean;
   categories?: string[];
   procedures: ProcedureItem[];
   instructions?: CatalogInstructions;
