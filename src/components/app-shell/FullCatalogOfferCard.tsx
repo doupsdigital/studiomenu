@@ -14,6 +14,12 @@ interface FullCatalogOfferCardProps {
    *  `true` = ela já paga o Catálogo simples (preço é só a diferença,
    *  "Quero esse" abre um checkout avulso embutido aqui mesmo). */
   alreadyPaid: boolean;
+  /** Chamado assim que ela decide (aceita OU recusa) — usado pelo
+   *  `FirstContactScreen` pra abrir sozinho o acordeão "Pagamento" logo em
+   *  seguida (pedido real, 2026-10-28: antes do card de pagamento virar
+   *  acordeão, ele já aparecia aberto; decidir aqui não devia deixá-lo
+   *  fechado). Opcional — `/inicio` (`alreadyPaid`) não tem esse acordeão. */
+  onDecided?: () => void;
 }
 
 /** Card da oferta automática de upsell "Catálogo Completo" (2026-10-28) —
@@ -26,7 +32,7 @@ interface FullCatalogOfferCardProps {
  *  preço + decisão. Esse "já viu o preview" é só estado local, não persiste
  *  (recarregar a página mostra o teaser de novo — inofensivo, a decisão em
  *  si continua 'pending' no banco até ela de fato escolher). */
-export const FullCatalogOfferCard: React.FC<FullCatalogOfferCardProps> = ({ slug, price, alreadyPaid }) => {
+export const FullCatalogOfferCard: React.FC<FullCatalogOfferCardProps> = ({ slug, price, alreadyPaid, onDecided }) => {
   const router = useRouter();
   const [previewed, setPreviewed] = useState(false);
   const [wantsUpgrade, setWantsUpgrade] = useState(false);
@@ -47,6 +53,7 @@ export const FullCatalogOfferCard: React.FC<FullCatalogOfferCardProps> = ({ slug
         setError(json.message || 'Não foi possível salvar sua escolha.');
         return;
       }
+      onDecided?.();
       router.refresh();
     } catch {
       setError('Falha na conexão.');

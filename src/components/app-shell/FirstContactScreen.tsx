@@ -151,7 +151,14 @@ export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order })
         </SectionCard>
       </div>
 
-      {showFullCatalogOffer && <FullCatalogOfferCard slug={order.slug} price={fullCatalogUpgradePrice} alreadyPaid={false} />}
+      {showFullCatalogOffer && (
+        <FullCatalogOfferCard
+          slug={order.slug}
+          price={fullCatalogUpgradePrice}
+          alreadyPaid={false}
+          onDecided={() => setIsPaymentOpen(true)}
+        />
+      )}
 
       <ProductTour tourId="primeiro-contato" slug={order.slug} steps={steps} enabled onFinish={handleTourFinish} />
     </main>
