@@ -71,6 +71,17 @@ export interface ProfessionalOrderSummary {
    *  em `CatalogOrderData`, `src/types/catalog.ts`) — esse aqui é sobre o app
    *  dela. `true` por default, igual todo catálogo já existente hoje. */
   show_full_app: boolean;
+  /** Oferta automática de upsell "Catálogo Completo" (2026-10-28) — ligada
+   *  por cliente pelo admin. `full_catalog_offer_decision` é 'pending'
+   *  enquanto ela não decide (ou sempre que o admin religa a oferta depois
+   *  de desligada — isso funciona como "resetar"); os 2 overrides de preço
+   *  seguem o mesmo padrão de `billing_price_override`/`lifetime_price_override`
+   *  (ver `resolveFullCatalogPrice`/`resolveFullCatalogUpgradePrice`,
+   *  `src/lib/pricing.ts`). */
+  full_catalog_offer_enabled: boolean;
+  full_catalog_offer_decision: 'pending' | 'accepted' | 'declined';
+  full_catalog_price_override: number | null;
+  full_catalog_upgrade_price_override: number | null;
 }
 
 /** Busca os dados que o app da profissional (`/app/[slug]`) precisa — um
@@ -82,7 +93,7 @@ export async function getOrderForProfessionalApp(slug: string): Promise<Professi
   const { data, error } = await supabaseAdmin
     .from('orders')
     .select(
-      'id, slug, edit_token, client_name, studio_name, whatsapp_number, plan_tier, subscription_status, billing_email, billing_cpf_cnpj, payment_method, booking_enabled, auth_user_id, first_offer_tier, agenda_paused, manual_plan, billing_price_override, catalog_billing_mode, agenda_billing_mode, agenda_price_override, asaas_subscription_id, lifetime_price_override, created_at, show_full_app'
+      'id, slug, edit_token, client_name, studio_name, whatsapp_number, plan_tier, subscription_status, billing_email, billing_cpf_cnpj, payment_method, booking_enabled, auth_user_id, first_offer_tier, agenda_paused, manual_plan, billing_price_override, catalog_billing_mode, agenda_billing_mode, agenda_price_override, asaas_subscription_id, lifetime_price_override, created_at, show_full_app, full_catalog_offer_enabled, full_catalog_offer_decision, full_catalog_price_override, full_catalog_upgrade_price_override'
     )
     .eq('slug', normalizedSlug)
     .single();
@@ -117,5 +128,16 @@ export async function getOrderForProfessionalApp(slug: string): Promise<Professi
     lifetime_price_override: data.lifetime_price_override === null || data.lifetime_price_override === undefined ? null : Number(data.lifetime_price_override),
     created_at: data.created_at || undefined,
     show_full_app: data.show_full_app !== false,
+    full_catalog_offer_enabled: Boolean(data.full_catalog_offer_enabled),
+    full_catalog_offer_decision:
+      data.full_catalog_offer_decision === 'accepted' || data.full_catalog_offer_decision === 'declined'
+        ? data.full_catalog_offer_decision
+        : 'pending',
+    full_catalog_price_override:
+      data.full_catalog_price_override === null || data.full_catalog_price_override === undefined ? null : Number(data.full_catalog_price_override),
+    full_catalog_upgrade_price_override:
+      data.full_catalog_upgrade_price_override === null || data.full_catalog_upgrade_price_override === undefined
+        ? null
+        : Number(data.full_catalog_upgrade_price_override),
   };
 }

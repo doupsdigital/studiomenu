@@ -12,6 +12,7 @@ interface CatalogPageProps {
   searchParams: Promise<{
     edit?: string;
     new?: string;
+    preview?: string;
   }>;
 }
 
@@ -71,7 +72,7 @@ export async function generateMetadata({ params }: CatalogPageProps): Promise<Me
 // 2. Renderização SSR Principal da Página do Catálogo do Cliente
 export default async function CatalogPage({ params, searchParams }: CatalogPageProps) {
   const { slug } = await params;
-  const { edit, new: isNew } = await searchParams;
+  const { edit, new: isNew, preview } = await searchParams;
   const catalog = await getCatalogBySlug(slug);
 
   if (!catalog) {
@@ -119,6 +120,11 @@ export default async function CatalogPage({ params, searchParams }: CatalogPageP
   }
 
   const isEditAuthorized = Boolean(edit && catalog.edit_token && edit === catalog.edit_token);
+  // Preview isolado da oferta "Catálogo Completo" (2026-10-28) — só decide o
+  // que o CatalogLayout mostra NESTA requisição; nunca grava nada em
+  // `publicCatalog`/`orders`. Mesmo padrão de `hideCoverSection` (showroom),
+  // só que forçando mostrar em vez de esconder.
+  const forcePreviewFull = preview === 'completo';
 
   // Nunca repassar o edit_token real pro client component — ele nunca é lido no
   // client (que usa o token vindo da própria URL), e enviá-lo exporia a credencial
@@ -145,6 +151,7 @@ export default async function CatalogPage({ params, searchParams }: CatalogPageP
         isEditMode={isEditAuthorized}
         editToken={edit || ''}
         isNewCatalog={isEditAuthorized && isNew === '1'}
+        forcePreviewFull={forcePreviewFull}
       />
     </>
   );

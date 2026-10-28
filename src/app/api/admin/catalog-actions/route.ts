@@ -27,6 +27,10 @@ export async function PATCH(request: Request) {
       show_instructions,
       show_contact_cta,
       show_full_app,
+      full_catalog_offer_enabled,
+      full_catalog_offer_decision,
+      full_catalog_price_override,
+      full_catalog_upgrade_price_override,
     } = (await request.json()) as {
       id: string;
       status?: string;
@@ -60,6 +64,15 @@ export async function PATCH(request: Request) {
        *  (Fase 28) — `null` volta ao padrão (`CATALOGO_VITALICIO_PRICE`,
        *  src/lib/pricing.ts). */
       lifetime_price_override?: number | null;
+      /** Oferta automática de upsell "Catálogo Completo" (2026-10-28) — ver
+       *  comentário completo no schema (`docs/schema.sql`). Ligar de novo
+       *  (`true`) depois de desligada deve vir sempre acompanhado de
+       *  `full_catalog_offer_decision: 'pending'` (reseta a decisão — ver
+       *  `admin/catalogos/page.tsx`). */
+      full_catalog_offer_enabled?: boolean;
+      full_catalog_offer_decision?: 'pending' | 'accepted' | 'declined';
+      full_catalog_price_override?: number | null;
+      full_catalog_upgrade_price_override?: number | null;
     };
     if (
       !id ||
@@ -78,7 +91,11 @@ export async function PATCH(request: Request) {
         show_cover === undefined &&
         show_instructions === undefined &&
         show_contact_cta === undefined &&
-        show_full_app === undefined)
+        show_full_app === undefined &&
+        full_catalog_offer_enabled === undefined &&
+        full_catalog_offer_decision === undefined &&
+        full_catalog_price_override === undefined &&
+        full_catalog_upgrade_price_override === undefined)
     ) {
       return NextResponse.json(
         { success: false, message: 'id e ao menos um campo pra atualizar são obrigatórios.' },
@@ -101,6 +118,16 @@ export async function PATCH(request: Request) {
         return NextResponse.json({ success: false, message: 'Preço inválido (mínimo R$5).' }, { status: 400 });
       }
     }
+    if (full_catalog_price_override !== undefined && full_catalog_price_override !== null) {
+      if (!Number.isFinite(full_catalog_price_override) || full_catalog_price_override < 5) {
+        return NextResponse.json({ success: false, message: 'Preço inválido (mínimo R$5).' }, { status: 400 });
+      }
+    }
+    if (full_catalog_upgrade_price_override !== undefined && full_catalog_upgrade_price_override !== null) {
+      if (!Number.isFinite(full_catalog_upgrade_price_override) || full_catalog_upgrade_price_override < 5) {
+        return NextResponse.json({ success: false, message: 'Preço inválido (mínimo R$5).' }, { status: 400 });
+      }
+    }
 
     const updates: {
       status?: string;
@@ -119,6 +146,10 @@ export async function PATCH(request: Request) {
       show_instructions?: boolean;
       show_contact_cta?: boolean;
       show_full_app?: boolean;
+      full_catalog_offer_enabled?: boolean;
+      full_catalog_offer_decision?: 'pending' | 'accepted' | 'declined';
+      full_catalog_price_override?: number | null;
+      full_catalog_upgrade_price_override?: number | null;
       /** Só escrito internamente aqui (nunca vem do request) — limpa a
        *  assinatura real cancelada ao conceder plano manual, ver abaixo. */
       asaas_subscription_id?: string | null;
@@ -141,6 +172,10 @@ export async function PATCH(request: Request) {
     if (show_instructions !== undefined) updates.show_instructions = show_instructions;
     if (show_contact_cta !== undefined) updates.show_contact_cta = show_contact_cta;
     if (show_full_app !== undefined) updates.show_full_app = show_full_app;
+    if (full_catalog_offer_enabled !== undefined) updates.full_catalog_offer_enabled = full_catalog_offer_enabled;
+    if (full_catalog_offer_decision !== undefined) updates.full_catalog_offer_decision = full_catalog_offer_decision;
+    if (full_catalog_price_override !== undefined) updates.full_catalog_price_override = full_catalog_price_override;
+    if (full_catalog_upgrade_price_override !== undefined) updates.full_catalog_upgrade_price_override = full_catalog_upgrade_price_override;
 
     // Conceder plano manual (Fase 26) numa cliente que JÁ tem uma assinatura
     // Asaas de verdade por trás (Fase 27: Plano Catálogo recorrente, ou um

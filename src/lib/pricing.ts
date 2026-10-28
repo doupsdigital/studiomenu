@@ -12,8 +12,11 @@ import type { AsaasCycle } from './asaas';
  *  sempre, que significa "catálogo grátis, nunca pagou nada" — não confundir
  *  com o produto "Plano Catálogo" (que por baixo dos panos é `plan_tier =
  *  'basico'`, só pago). */
-export const CATALOGO_PRICE = 89.9;
-export const CATALOGO_PRICE_LABEL = 'R$ 89,90';
+// R$79,00 (2026-10-28) — período de teste vendendo só o produto "Catálogo
+// apenas" como padrão (pedido real: "vou vender sempre esse catálogo mais
+// simples por 79 reais, pelo menos por enquanto"). Era R$89,90 antes disso.
+export const CATALOGO_PRICE = 79.0;
+export const CATALOGO_PRICE_LABEL = 'R$ 79,00';
 
 /** Preço/modo padrão pra catálogo NOVO criado pelo admin (2026-10-13,
  *  atualizado pra R$22,90 em 2026-10-14) — passa a nascer como assinatura
@@ -102,6 +105,31 @@ export function resolveAgendaPrice(
   const price = override !== null && Number.isFinite(override) && override >= 5 && override <= basePrice ? override : basePrice;
   const suffix = mode === 'anual' ? '/ano' : '/mês';
   return { price, label: `R$ ${price.toFixed(2).replace('.', ',')}${suffix}` };
+}
+
+/** Preço do upsell "Catálogo Completo" (as 3 telas escondidas no produto
+ *  "Catálogo apenas" — Capa/Orientações/Contato — de volta, pedido real
+ *  2026-10-28). Dois valores, mesmo padrão de override por cliente de
+ *  `resolveCatalogPrice`:
+ *  - ANTES de pagar qualquer coisa (tela de primeiro contato): preço cheio.
+ *  - DEPOIS de já ter pago o Catálogo simples (R$79): só a diferença.
+ *  Qual dos dois mostrar/cobrar é decidido por quem chama (olhando
+ *  `plan_tier`/`subscription_status`), não aqui. */
+export const CATALOGO_COMPLETO_PRICE = 139.0;
+export const CATALOGO_COMPLETO_PRICE_LABEL = 'R$ 139,00';
+export const CATALOGO_COMPLETO_UPGRADE_PRICE = 60.0;
+export const CATALOGO_COMPLETO_UPGRADE_PRICE_LABEL = 'R$ 60,00';
+
+export function resolveFullCatalogPrice(fullCatalogPriceOverride: number | null | undefined): { price: number; label: string } {
+  const override = fullCatalogPriceOverride === null || fullCatalogPriceOverride === undefined ? null : Number(fullCatalogPriceOverride);
+  const price = override !== null && Number.isFinite(override) && override >= 5 ? override : CATALOGO_COMPLETO_PRICE;
+  return { price, label: `R$ ${price.toFixed(2).replace('.', ',')}` };
+}
+
+export function resolveFullCatalogUpgradePrice(fullCatalogUpgradePriceOverride: number | null | undefined): { price: number; label: string } {
+  const override = fullCatalogUpgradePriceOverride === null || fullCatalogUpgradePriceOverride === undefined ? null : Number(fullCatalogUpgradePriceOverride);
+  const price = override !== null && Number.isFinite(override) && override >= 5 ? override : CATALOGO_COMPLETO_UPGRADE_PRICE;
+  return { price, label: `R$ ${price.toFixed(2).replace('.', ',')}` };
 }
 
 /** Única fonte de verdade pra "qual ciclo Asaas (MONTHLY/YEARLY) esse tier

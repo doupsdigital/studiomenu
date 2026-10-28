@@ -2,13 +2,15 @@
 
 import React, { useMemo, useState } from 'react';
 import type { Step } from 'react-joyride';
+import { CreditCard } from 'lucide-react';
 import { ViewCatalogCard } from './ViewCatalogCard';
 import { EditCatalogCard } from './EditCatalogCard';
-import { CatalogReadyPreview } from './CatalogReadyPreview';
 import { ConfettiBurst } from './ConfettiBurst';
+import { FullCatalogOfferCard } from './FullCatalogOfferCard';
+import { SectionCard } from './SectionCard';
 import { PlanSubscribeCard } from '@/components/billing/PlanSubscribeCard';
 import { ProductTour } from '@/components/tour/ProductTour';
-import { resolveAgendaPrice, resolveCatalogPrice } from '@/lib/pricing';
+import { resolveAgendaPrice, resolveCatalogPrice, resolveFullCatalogPrice } from '@/lib/pricing';
 import type { ProfessionalOrderSummary } from '@/lib/professional-app-service';
 
 interface FirstContactScreenProps {
@@ -36,7 +38,15 @@ interface FirstContactScreenProps {
  *  muda conforme o plano ofertado (Fase 22). */
 export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order }) => {
   const isAgendaOffer = order.first_offer_tier === 'plus';
-  const catalogPrice = resolveCatalogPrice(order.billing_price_override);
+  // Oferta "Catálogo Completo" (2026-10-28): se ela já aceitou (ANTES de
+  // pagar qualquer coisa — quem já paga usa a tela `/inicio`, não esta), o
+  // card de assinar abaixo já cobra/mostra o preço cheio em vez do simples —
+  // mesma condição usada em `fullCatalogAccepted`,
+  // `src/app/api/billing/checkout/route.ts`, nunca pode divergir dali.
+  const fullCatalogAccepted = !isAgendaOffer && order.full_catalog_offer_decision === 'accepted';
+  const basePrice = fullCatalogAccepted
+    ? resolveFullCatalogPrice(order.full_catalog_price_override)
+    : resolveCatalogPrice(order.billing_price_override);
   // Mesmo preço/campo de sempre (`billing_price_override`) — só o rótulo
   // ganha "/mês" ou "/ano" quando o admin marcou esse catálogo como
   // recorrente/anual (Fase 27, + 2026-10-15), pra bater com o que o
@@ -44,14 +54,22 @@ export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order })
   const catalogBillingSuffix =
     order.catalog_billing_mode === 'anual' ? '/ano' : order.catalog_billing_mode === 'recorrente' ? '/mês' : '';
   const catalogDisplayPrice = catalogBillingSuffix
-    ? { price: catalogPrice.price, label: `${catalogPrice.label}${catalogBillingSuffix}` }
-    : catalogPrice;
+    ? { price: basePrice.price, label: `${basePrice.label}${catalogBillingSuffix}` }
+    : basePrice;
+  const fullCatalogUpgradePrice = resolveFullCatalogPrice(order.full_catalog_price_override);
+  const showFullCatalogOffer = !isAgendaOffer && order.full_catalog_offer_enabled && order.full_catalog_offer_decision === 'pending';
   // Campo PRÓPRIO do Agenda (`agenda_price_override`, 2026-10-15) — não o
   // `billing_price_override` do Catálogo, senão vaza o preço de um plano pro
   // outro (achado real testando). Rótulo já sai com "/mês" ou "/ano" certo.
   const agendaDisplayPrice = resolveAgendaPrice(order.agenda_billing_mode, order.agenda_price_override);
   const [highlightView, setHighlightView] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  // Card de pagamento vira acordeão (pedido real, 2026-10-28) — antes ficava
+  // "aberto e grande" direto na tela; agora só mostra o conteúdo (formulário
+  // de CPF/e-mail, Pix/cartão) quando ela clica pra expandir. Mesmo
+  // componente/padrão visual do acordeão da aba Config (`SectionCard`,
+  // `ConfigAccordion.tsx`). Começa fechado.
+  const [isPaymentOpen, setIsPaymentOpen] = useState(false);
 
   // Quando o tour termina, concluído ou pulado: o último passo fica lá
   // embaixo, perto do card de assinar. Ela pediu, 2026-09-24, pra voltar o
@@ -92,8 +110,6 @@ export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order })
         <h1 className="font-serif-pro font-bold text-2xl text-ink">Olá, {order.client_name}! ✨</h1>
       </div>
 
-      <CatalogReadyPreview slug={order.slug} />
-
       <div className="relative">
         {highlightView && (
           <span
@@ -105,33 +121,44 @@ export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order })
       </div>
       <EditCatalogCard slug={order.slug} dataTour="fc-edit" />
 
-      <div className="mt-2" data-tour="fc-subscribe">
-        {isAgendaOffer && (
-          <p className="text-[15px] text-ink-soft text-center mb-3">
-            Suas clientes agendam sozinhas, sem trocar mensagem no WhatsApp — assine o Plano Agenda e libere o agendamento automático.
-          </p>
-        )}
+      <div className="mt-2">
+        <SectionCard icon={CreditCard} title="Pagamento" isOpen={isPaymentOpen} onToggle={() => setIsPaymentOpen((v) => !v)} dataTour="fc-subscribe">
+          {isAgendaOffer && (
+            <p className="text-[15px] text-ink-soft text-center mb-3">
+              Suas clientes agendam sozinhas, sem trocar mensagem no WhatsApp — assine o Plano Agenda e libere o agendamento automático.
+            </p>
+          )}
 
-        {isAgendaOffer ? (
-          <PlanSubscribeCard
-            slug={order.slug}
-            plan="plus"
-            billingEmail={order.billing_email}
-            billingCpfCnpj={order.billing_cpf_cnpj}
-            priceOverride={agendaDisplayPrice}
-            billingMode={order.agenda_billing_mode}
-          />
-        ) : (
-          <PlanSubscribeCard
-            slug={order.slug}
-            plan="basico"
-            billingEmail={order.billing_email}
-            billingCpfCnpj={order.billing_cpf_cnpj}
-            priceOverride={catalogDisplayPrice}
-            billingMode={order.catalog_billing_mode}
-          />
-        )}
+          {isAgendaOffer ? (
+            <PlanSubscribeCard
+              slug={order.slug}
+              plan="plus"
+              billingEmail={order.billing_email}
+              billingCpfCnpj={order.billing_cpf_cnpj}
+              priceOverride={agendaDisplayPrice}
+              billingMode={order.agenda_billing_mode}
+            />
+          ) : (
+            <PlanSubscribeCard
+              slug={order.slug}
+              plan="basico"
+              billingEmail={order.billing_email}
+              billingCpfCnpj={order.billing_cpf_cnpj}
+              priceOverride={catalogDisplayPrice}
+              billingMode={order.catalog_billing_mode}
+            />
+          )}
+        </SectionCard>
       </div>
+
+      {showFullCatalogOffer && (
+        <FullCatalogOfferCard
+          slug={order.slug}
+          price={fullCatalogUpgradePrice}
+          alreadyPaid={false}
+          onDecided={() => setIsPaymentOpen(true)}
+        />
+      )}
 
       <ProductTour tourId="primeiro-contato" slug={order.slug} steps={steps} enabled onFinish={handleTourFinish} />
     </main>

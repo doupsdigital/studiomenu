@@ -80,7 +80,9 @@ export async function buildPaymentResponse(payment: AsaasPayment, method: Paymen
 export async function activateSubscription(orderId: string, confirmedPaymentId?: string): Promise<void> {
   const { data: before } = await supabaseAdmin
     .from('orders')
-    .select('subscription_status, client_name, whatsapp_number, slug, pending_plan_tier, asaas_subscription_id, pending_lifetime_payment_id')
+    .select(
+      'subscription_status, client_name, whatsapp_number, slug, pending_plan_tier, asaas_subscription_id, pending_lifetime_payment_id, full_catalog_offer_decision, pending_full_catalog_payment_id'
+    )
     .eq('id', orderId)
     .single();
 
@@ -105,10 +107,19 @@ export async function activateSubscription(orderId: string, confirmedPaymentId?:
   // até o admin lembrar de ligar manualmente o toggle no painel (achado da
   // revisão pós-Fase 7, ver docs/historico/PLANO_AGENDAMENTO_STUDIOMENU_PLUS.md). O
   // Básico nunca liga agendamento (só catálogo + edição).
-  await supabaseAdmin
-    .from('orders')
-    .update({ plan_tier: tier, subscription_status: 'ativo', booking_enabled: tier === 'plus' })
-    .eq('id', orderId);
+  // Oferta "Catálogo Completo" (2026-10-28) — ela aceitou pagar o preço
+  // cheio em vez do Catálogo simples ANTES de pagar qualquer coisa (ver
+  // `fullCatalogAccepted`, `src/app/api/billing/checkout/route.ts`). Destrava
+  // as 3 telas públicas no exato momento em que ESSE pagamento confirma, e
+  // desliga a oferta (nada mais pra decidir).
+  const tierUpdates: Record<string, unknown> = { plan_tier: tier, subscription_status: 'ativo', booking_enabled: tier === 'plus' };
+  if (tier === 'basico' && before?.full_catalog_offer_decision === 'accepted') {
+    tierUpdates.show_cover = true;
+    tierUpdates.show_instructions = true;
+    tierUpdates.show_contact_cta = true;
+    tierUpdates.full_catalog_offer_enabled = false;
+  }
+  await supabaseAdmin.from('orders').update(tierUpdates).eq('id', orderId);
 
   if (before && before.subscription_status !== 'ativo') {
     const nowStr = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
@@ -181,6 +192,29 @@ export async function activateSubscription(orderId: string, confirmedPaymentId?:
         contentName: 'Plano Vitalício StudioMenu',
       }).catch((err) => console.error('[Meta CAPI Async Error]:', err));
     }
+  }
+
+  // Confirmação do pagamento avulso do upgrade "Catálogo Completo" pra quem
+  // JÁ pagava o Catálogo simples (2026-10-28) — setado em
+  // `pending_full_catalog_payment_id` por `/api/billing/upgrade-to-full-catalog`
+  // antes de criar a cobrança. Mesma cautela antifraude do resto do fluxo:
+  // só destrava as telas depois do pagamento confirmado, nunca antes.
+  if (before?.pending_full_catalog_payment_id && before.pending_full_catalog_payment_id === confirmedPaymentId) {
+    await supabaseAdmin
+      .from('orders')
+      .update({
+        show_cover: true,
+        show_instructions: true,
+        show_contact_cta: true,
+        full_catalog_offer_enabled: false,
+        pending_full_catalog_payment_id: null,
+      })
+      .eq('id', orderId);
+
+    const nowStr = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+    await sendTelegramMessage(
+      `💰 Upgrade pro Catálogo Completo!\n\n👤 ${before.client_name}\n🔗 https://studiomenu.art/c/${before.slug}\n🕒 ${nowStr}`
+    );
   }
 }
 
@@ -323,6 +357,7 @@ export async function setSubscriptionStatus(
     asaas_subscription_id?: null;
     pending_plan_tier?: null;
     pending_lifetime_payment_id?: null;
+    pending_full_catalog_payment_id?: null;
   } = {
     subscription_status: status,
   };
@@ -336,6 +371,9 @@ export async function setSubscriptionStatus(
     // `activateSubscription` reativava a assinatura do zero a partir de um
     // pagamento que não tem mais nenhuma assinatura real por trás.
     updates.pending_lifetime_payment_id = null;
+    // Mesmo cuidado pra oferta "Catálogo Completo" (2026-10-28) — Pix do
+    // upgrade gerado e não pago enquanto ela cancela tudo.
+    updates.pending_full_catalog_payment_id = null;
   }
   await supabaseAdmin.from('orders').update(updates).eq('id', orderId);
 }

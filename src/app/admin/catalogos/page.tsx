@@ -7,7 +7,13 @@ import { compressImageFiles } from '@/lib/image-compress-client';
 import Link from 'next/link';
 import { ArrowLeft, Sparkles, ExternalLink, Search, RefreshCw, Plus, Trash2, MessageCircle, Phone, Smartphone, CalendarClock, Globe, Crown, ChevronDown, PauseCircle, PlayCircle, Gift, Bot, Upload, FileText, X, Wallet, Settings2, AlertTriangle, type LucideIcon } from 'lucide-react';
 import { usesSubdomainRouting, PRODUCTION_DOMAIN } from '@/lib/public-url';
-import { AGENDA_PRICE_LABEL, CATALOGO_PRICE_LABEL, CATALOGO_VITALICIO_PRICE_LABEL } from '@/lib/pricing';
+import {
+  AGENDA_PRICE_LABEL,
+  CATALOGO_PRICE_LABEL,
+  CATALOGO_VITALICIO_PRICE_LABEL,
+  CATALOGO_COMPLETO_PRICE_LABEL,
+  CATALOGO_COMPLETO_UPGRADE_PRICE_LABEL,
+} from '@/lib/pricing';
 
 /** `res.json()` direto quebra quando o corpo não é JSON de verdade (ex: erro
  *  413 da Vercel antes mesmo da rota rodar) — mesmo utilitário já usado em
@@ -55,6 +61,12 @@ type AdminCatalog = CatalogOrderData & {
    *  da profissional; `show_cover`/`show_instructions`/`show_contact_cta` já
    *  vêm de `CatalogOrderData`. */
   show_full_app?: boolean;
+  /** Oferta automática de upsell "Catálogo Completo" (2026-10-28) — ver
+   *  comentário completo em `docs/schema.sql`. */
+  full_catalog_offer_enabled?: boolean;
+  full_catalog_offer_decision?: 'pending' | 'accepted' | 'declined';
+  full_catalog_price_override?: number | null;
+  full_catalog_upgrade_price_override?: number | null;
 };
 
 type SectionTone = 'rose' | 'sky' | 'amber' | 'red';
@@ -671,6 +683,122 @@ export default function AdminCatalogosPage() {
     }
   };
 
+  /** Oferta automática de upsell "Catálogo Completo" (2026-10-28) — religar
+   *  depois de desligada SEMPRE reseta `full_catalog_offer_decision` pra
+   *  'pending' (é como a admin "reseta a oferta" pra ela decidir de novo,
+   *  sem precisar de um segundo botão). Desligar só esconde o card, sem
+   *  mudar a decisão que ela já tinha tomado. */
+  const toggleFullCatalogOffer = async (item: AdminCatalog) => {
+    if (!item.id) return;
+    const turningOn = !item.full_catalog_offer_enabled;
+    try {
+      const res = await fetch('/api/admin/catalog-actions', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify(
+          turningOn
+            ? { id: item.id, full_catalog_offer_enabled: true, full_catalog_offer_decision: 'pending' }
+            : { id: item.id, full_catalog_offer_enabled: false }
+        ),
+      });
+      const result = await res.json();
+      if (!result.success) {
+        showToast('❌ Erro ao atualizar a oferta.');
+        return;
+      }
+      showToast(turningOn ? '✨ Oferta do Catálogo Completo ligada!' : '⏸️ Oferta do Catálogo Completo desligada.');
+      fetchCatalogs();
+    } catch (e) {
+      console.error('Erro ao atualizar full_catalog_offer_enabled:', e);
+      showToast('❌ Erro ao atualizar a oferta.');
+    }
+  };
+
+  const [fullCatalogPriceDrafts, setFullCatalogPriceDrafts] = useState<Record<string, string>>({});
+
+  const getFullCatalogPriceDraft = (item: AdminCatalog) => {
+    const id = item.id || '';
+    if (fullCatalogPriceDrafts[id] !== undefined) return fullCatalogPriceDrafts[id];
+    return item.full_catalog_price_override != null ? item.full_catalog_price_override.toFixed(2).replace('.', ',') : '';
+  };
+
+  const saveFullCatalogPriceOverride = async (item: AdminCatalog) => {
+    if (!item.id) return;
+    const raw = (fullCatalogPriceDrafts[item.id] ?? '').trim();
+    const value = raw === '' ? null : Number(raw.replace(',', '.'));
+    if (value !== null && (!Number.isFinite(value) || value < 5)) {
+      showToast('❌ Preço inválido (mínimo R$5).');
+      return;
+    }
+    try {
+      const res = await fetch('/api/admin/catalog-actions', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ id: item.id, full_catalog_price_override: value }),
+      });
+      const result = await res.json();
+      if (!result.success) {
+        showToast('❌ Erro ao salvar o preço.');
+        return;
+      }
+      showToast(value === null ? '🔄 Preço do Completo voltou ao padrão.' : '💰 Preço do Completo atualizado!');
+      setFullCatalogPriceDrafts((prev) => {
+        const next = { ...prev };
+        delete next[item.id!];
+        return next;
+      });
+      fetchCatalogs();
+    } catch (e) {
+      console.error('Erro ao salvar full_catalog_price_override:', e);
+      showToast('❌ Erro ao salvar o preço.');
+    }
+  };
+
+  const [fullCatalogUpgradePriceDrafts, setFullCatalogUpgradePriceDrafts] = useState<Record<string, string>>({});
+
+  const getFullCatalogUpgradePriceDraft = (item: AdminCatalog) => {
+    const id = item.id || '';
+    if (fullCatalogUpgradePriceDrafts[id] !== undefined) return fullCatalogUpgradePriceDrafts[id];
+    return item.full_catalog_upgrade_price_override != null
+      ? item.full_catalog_upgrade_price_override.toFixed(2).replace('.', ',')
+      : '';
+  };
+
+  const saveFullCatalogUpgradePriceOverride = async (item: AdminCatalog) => {
+    if (!item.id) return;
+    const raw = (fullCatalogUpgradePriceDrafts[item.id] ?? '').trim();
+    const value = raw === '' ? null : Number(raw.replace(',', '.'));
+    if (value !== null && (!Number.isFinite(value) || value < 5)) {
+      showToast('❌ Preço inválido (mínimo R$5).');
+      return;
+    }
+    try {
+      const res = await fetch('/api/admin/catalog-actions', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ id: item.id, full_catalog_upgrade_price_override: value }),
+      });
+      const result = await res.json();
+      if (!result.success) {
+        showToast('❌ Erro ao salvar o preço.');
+        return;
+      }
+      showToast(value === null ? '🔄 Preço do upgrade voltou ao padrão.' : '💰 Preço do upgrade atualizado!');
+      setFullCatalogUpgradePriceDrafts((prev) => {
+        const next = { ...prev };
+        delete next[item.id!];
+        return next;
+      });
+      fetchCatalogs();
+    } catch (e) {
+      console.error('Erro ao salvar full_catalog_upgrade_price_override:', e);
+      showToast('❌ Erro ao salvar o preço.');
+    }
+  };
+
   /** Fase 26: caso de borda — cliente pagando fora do sistema (ex: uma
    *  vez só, via Pix direto), sem assinatura Asaas de verdade por trás.
    *  Libera o acesso ao app dela igual a uma assinatura real (mesmo
@@ -1266,6 +1394,85 @@ export default function AdminCatalogosPage() {
                               </button>
                             );
                           })}
+
+                          {/* Oferta automática de upsell "Catálogo Completo"
+                           *  (2026-10-28) — religar sempre reseta a decisão
+                           *  dela pra 'pending' (ver `toggleFullCatalogOffer`). */}
+                          <div className="mt-1.5 pt-1.5 border-t border-slate-800/70 flex flex-col gap-1.5">
+                            <button
+                              onClick={() => toggleFullCatalogOffer(item)}
+                              className={`w-full px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 border transition-all ${
+                                item.full_catalog_offer_enabled
+                                  ? 'bg-rose-500/20 border-rose-500/60 text-rose-300'
+                                  : 'bg-slate-800 border-slate-600 text-slate-200'
+                              }`}
+                            >
+                              <Sparkles className="w-3.5 h-3.5" />
+                              Oferta Catálogo Completo: {item.full_catalog_offer_enabled ? 'Ligada' : 'Desligada'}
+                            </button>
+                            {item.full_catalog_offer_enabled && (
+                              <>
+                                <p className="text-[11px] text-slate-400 text-center">
+                                  Decisão dela:{' '}
+                                  <span className="font-bold text-slate-300">
+                                    {item.full_catalog_offer_decision === 'accepted'
+                                      ? 'Aceitou ✅'
+                                      : item.full_catalog_offer_decision === 'declined'
+                                        ? 'Recusou 🙅'
+                                        : 'Pendente ⏳'}
+                                  </span>
+                                </p>
+                                <div className="p-3 rounded-xl bg-slate-950/40 border border-slate-800/70 flex items-center gap-2">
+                                  <span className="text-xs text-slate-400 shrink-0">Antes de pagar:</span>
+                                  <div className="relative flex-1">
+                                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">
+                                      R$
+                                    </span>
+                                    <input
+                                      type="text"
+                                      inputMode="decimal"
+                                      placeholder={CATALOGO_COMPLETO_PRICE_LABEL.replace('R$ ', '')}
+                                      value={getFullCatalogPriceDraft(item)}
+                                      onChange={(e) =>
+                                        setFullCatalogPriceDrafts((prev) => ({ ...prev, [item.id || '']: e.target.value }))
+                                      }
+                                      className="w-full bg-slate-800 border border-slate-700 rounded-lg pl-7 pr-2 py-2 text-sm text-white placeholder-slate-400 focus:border-rose-500 focus:outline-none"
+                                    />
+                                  </div>
+                                  <button
+                                    onClick={() => saveFullCatalogPriceOverride(item)}
+                                    className="px-3 py-2 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold transition-all shrink-0"
+                                  >
+                                    Salvar
+                                  </button>
+                                </div>
+                                <div className="p-3 rounded-xl bg-slate-950/40 border border-slate-800/70 flex items-center gap-2">
+                                  <span className="text-xs text-slate-400 shrink-0">Já pagou (diferença):</span>
+                                  <div className="relative flex-1">
+                                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">
+                                      R$
+                                    </span>
+                                    <input
+                                      type="text"
+                                      inputMode="decimal"
+                                      placeholder={CATALOGO_COMPLETO_UPGRADE_PRICE_LABEL.replace('R$ ', '')}
+                                      value={getFullCatalogUpgradePriceDraft(item)}
+                                      onChange={(e) =>
+                                        setFullCatalogUpgradePriceDrafts((prev) => ({ ...prev, [item.id || '']: e.target.value }))
+                                      }
+                                      className="w-full bg-slate-800 border border-slate-700 rounded-lg pl-7 pr-2 py-2 text-sm text-white placeholder-slate-400 focus:border-rose-500 focus:outline-none"
+                                    />
+                                  </div>
+                                  <button
+                                    onClick={() => saveFullCatalogUpgradePriceOverride(item)}
+                                    className="px-3 py-2 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold transition-all shrink-0"
+                                  >
+                                    Salvar
+                                  </button>
+                                </div>
+                              </>
+                            )}
+                          </div>
                         </div>
                       </AdminCardSection>
 

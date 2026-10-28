@@ -152,7 +152,28 @@ CREATE TABLE IF NOT EXISTS public.orders (
     -- Controla o app da profissional (não o catálogo público): false = só a
     -- aba Início, Agenda e Config ficam inacessíveis (ver
     -- src/app/app/[slug]/layout.tsx e BottomNav.tsx).
-    show_full_app BOOLEAN NOT NULL DEFAULT true
+    show_full_app BOOLEAN NOT NULL DEFAULT true,
+    -- Oferta automática de upsell "Catálogo Completo" (pedido real,
+    -- 2026-10-28) — liga de volta as 3 telas públicas acima (Capa/
+    -- Orientações/Contato) pra clientes vendidas no produto "Catálogo
+    -- apenas", escolhido caso a caso pelo admin. Preço depende de ela já ter
+    -- pago o Catálogo simples ou não (ver resolveFullCatalogPrice/
+    -- resolveFullCatalogUpgradePrice em src/lib/pricing.ts). Religar
+    -- `full_catalog_offer_enabled` depois de desligado SEMPRE volta
+    -- `full_catalog_offer_decision` pra 'pending' (ver admin/catalogos) —
+    -- é como o admin "reseta" a oferta pra ela decidir de novo.
+    full_catalog_offer_enabled BOOLEAN NOT NULL DEFAULT false,
+    full_catalog_offer_decision TEXT NOT NULL DEFAULT 'pending'
+        CHECK (full_catalog_offer_decision IN ('pending', 'accepted', 'declined')),
+    full_catalog_price_override NUMERIC(10,2)
+        CHECK (full_catalog_price_override IS NULL OR full_catalog_price_override >= 5),
+    full_catalog_upgrade_price_override NUMERIC(10,2)
+        CHECK (full_catalog_upgrade_price_override IS NULL OR full_catalog_upgrade_price_override >= 5),
+    -- Trava de idempotência da cobrança avulsa do upgrade (mesmo padrão de
+    -- `pending_lifetime_payment_id`) — comparada com o `payment.id`
+    -- confirmado dentro de `activateSubscription` antes de destravar as
+    -- telas, pra não processar a mesma confirmação duas vezes.
+    pending_full_catalog_payment_id TEXT
 );
 
 -- Index para buscas ultrarrápidas por slug e edit_token
