@@ -128,7 +128,13 @@ export const ProductTour: React.FC<ProductTourProps> = ({ tourId, slug, steps, e
         backgroundColor: '#ffffff',
         arrowColor: '#ffffff',
         overlayColor: 'rgba(44, 24, 16, 0.55)',
-        zIndex: 10000,
+        // Tem que ficar por cima da barra flutuante inferior do editor
+        // (`#lm-editor-bottom-bar`, `z-index: 999990` em visual-editor.css)
+        // — com 10000 ela cobria o balão quando ele aparecia perto do fundo
+        // da tela (passo "Informações importantes"), tampando justamente o
+        // botão "Próximo"/"Concluir" e travando a pessoa no tour (achado
+        // relatado de verdade, 2026-10-28).
+        zIndex: 1000000,
         showProgress: true,
         buttons: ['back', 'skip', 'primary'],
         skipBeacon: true,
