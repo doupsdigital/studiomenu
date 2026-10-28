@@ -855,7 +855,7 @@ button {
    *  um vazio antes de aparecer), pior experiência que só aceitar um valor
    *  padrão pra largura de tela comum. Em nomes bem compridos ou telas bem
    *  estreitas, a linha pode quebrar em 2 — aceito como trade-off. */
-  font-size: 38px;
+  font-size: 40px;
   font-weight: 400;
   font-style: italic;
   line-height: 1.1;
