@@ -803,6 +803,51 @@ button {
   align-items: flex-start;
 }
 
+/* Seletores de tema/layout do showroom, acima de tudo (pedido real,
+ *  2026-10-28) — só aparecem no mockup/showroom (layoutSwitcher/
+ *  themeSwitcher nunca vêm preenchidos num catálogo de cliente de
+ *  verdade). */
+.lm-catalogo-studio-switchers {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  width: 100%;
+  margin-bottom: 14px;
+}
+
+/* Agrupa os 2 pills de cada seletor (pedido real, 2026-10-28: ficavam
+ *  "soltos", os 4 pareciam opções do mesmo grupo) — rótulo pequeno +
+ *  "trilho" arredondado com fundo/borda próprios, reaproveitando as
+ *  mesmas variáveis de cor de `.layout-pill` (já responsivas por tema). */
+.lm-catalogo-switch-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.lm-catalogo-switch-group-label {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--grid-sub-color);
+  opacity: 0.75;
+  white-space: nowrap;
+}
+
+.lm-catalogo-switch-group-pills {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--chip-bg);
+  border: 1px solid var(--chip-border);
+}
+
 .lm-catalogo-studio {
   display: flex;
   flex-direction: column;
