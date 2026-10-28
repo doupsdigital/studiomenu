@@ -200,10 +200,12 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
       </div>
     ),
     // Teste de plano único anual (pedido real, 2026-10-19, preço ajustado
-    // pra R$119,90 em 2026-10-24) — ver comentário de `singleAnnualPlanTest`
-    // na interface acima.
+    // pra R$79,00 em 2026-10-28, testando o produto "Catálogo apenas") —
+    // ver comentário de `singleAnnualPlanTest` na interface acima. O
+    // desconto do badge é sempre CALCULADO contra `anchorPrice`, não
+    // precisa reajustar manualmente.
     singleAnnualPlanTest: {
-      price: 97.0,
+      price: 79.0,
       anchorPrice: 199.9,
       ctaLabel: 'QUERO VER NO MEU STUDIO',
       nicheLabel: 'Lash Designer',
