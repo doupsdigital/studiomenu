@@ -5,9 +5,10 @@ import type { Step } from 'react-joyride';
 import { ViewCatalogCard } from './ViewCatalogCard';
 import { EditCatalogCard } from './EditCatalogCard';
 import { ConfettiBurst } from './ConfettiBurst';
+import { FullCatalogOfferCard } from './FullCatalogOfferCard';
 import { PlanSubscribeCard } from '@/components/billing/PlanSubscribeCard';
 import { ProductTour } from '@/components/tour/ProductTour';
-import { resolveAgendaPrice, resolveCatalogPrice } from '@/lib/pricing';
+import { resolveAgendaPrice, resolveCatalogPrice, resolveFullCatalogPrice } from '@/lib/pricing';
 import type { ProfessionalOrderSummary } from '@/lib/professional-app-service';
 
 interface FirstContactScreenProps {
@@ -35,7 +36,15 @@ interface FirstContactScreenProps {
  *  muda conforme o plano ofertado (Fase 22). */
 export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order }) => {
   const isAgendaOffer = order.first_offer_tier === 'plus';
-  const catalogPrice = resolveCatalogPrice(order.billing_price_override);
+  // Oferta "Catálogo Completo" (2026-10-28): se ela já aceitou (ANTES de
+  // pagar qualquer coisa — quem já paga usa a tela `/inicio`, não esta), o
+  // card de assinar abaixo já cobra/mostra o preço cheio em vez do simples —
+  // mesma condição usada em `fullCatalogAccepted`,
+  // `src/app/api/billing/checkout/route.ts`, nunca pode divergir dali.
+  const fullCatalogAccepted = !isAgendaOffer && order.full_catalog_offer_decision === 'accepted';
+  const basePrice = fullCatalogAccepted
+    ? resolveFullCatalogPrice(order.full_catalog_price_override)
+    : resolveCatalogPrice(order.billing_price_override);
   // Mesmo preço/campo de sempre (`billing_price_override`) — só o rótulo
   // ganha "/mês" ou "/ano" quando o admin marcou esse catálogo como
   // recorrente/anual (Fase 27, + 2026-10-15), pra bater com o que o
@@ -43,8 +52,10 @@ export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order })
   const catalogBillingSuffix =
     order.catalog_billing_mode === 'anual' ? '/ano' : order.catalog_billing_mode === 'recorrente' ? '/mês' : '';
   const catalogDisplayPrice = catalogBillingSuffix
-    ? { price: catalogPrice.price, label: `${catalogPrice.label}${catalogBillingSuffix}` }
-    : catalogPrice;
+    ? { price: basePrice.price, label: `${basePrice.label}${catalogBillingSuffix}` }
+    : basePrice;
+  const fullCatalogUpgradePrice = resolveFullCatalogPrice(order.full_catalog_price_override);
+  const showFullCatalogOffer = !isAgendaOffer && order.full_catalog_offer_enabled && order.full_catalog_offer_decision === 'pending';
   // Campo PRÓPRIO do Agenda (`agenda_price_override`, 2026-10-15) — não o
   // `billing_price_override` do Catálogo, senão vaza o preço de um plano pro
   // outro (achado real testando). Rótulo já sai com "/mês" ou "/ano" certo.
@@ -129,6 +140,8 @@ export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order })
           />
         )}
       </div>
+
+      {showFullCatalogOffer && <FullCatalogOfferCard slug={order.slug} price={fullCatalogUpgradePrice} alreadyPaid={false} />}
 
       <ProductTour tourId="primeiro-contato" slug={order.slug} steps={steps} enabled onFinish={handleTourFinish} />
     </main>

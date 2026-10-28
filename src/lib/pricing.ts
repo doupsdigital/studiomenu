@@ -104,6 +104,31 @@ export function resolveAgendaPrice(
   return { price, label: `R$ ${price.toFixed(2).replace('.', ',')}${suffix}` };
 }
 
+/** Preço do upsell "Catálogo Completo" (as 3 telas escondidas no produto
+ *  "Catálogo apenas" — Capa/Orientações/Contato — de volta, pedido real
+ *  2026-10-28). Dois valores, mesmo padrão de override por cliente de
+ *  `resolveCatalogPrice`:
+ *  - ANTES de pagar qualquer coisa (tela de primeiro contato): preço cheio.
+ *  - DEPOIS de já ter pago o Catálogo simples (R$79): só a diferença.
+ *  Qual dos dois mostrar/cobrar é decidido por quem chama (olhando
+ *  `plan_tier`/`subscription_status`), não aqui. */
+export const CATALOGO_COMPLETO_PRICE = 139.0;
+export const CATALOGO_COMPLETO_PRICE_LABEL = 'R$ 139,00';
+export const CATALOGO_COMPLETO_UPGRADE_PRICE = 60.0;
+export const CATALOGO_COMPLETO_UPGRADE_PRICE_LABEL = 'R$ 60,00';
+
+export function resolveFullCatalogPrice(fullCatalogPriceOverride: number | null | undefined): { price: number; label: string } {
+  const override = fullCatalogPriceOverride === null || fullCatalogPriceOverride === undefined ? null : Number(fullCatalogPriceOverride);
+  const price = override !== null && Number.isFinite(override) && override >= 5 ? override : CATALOGO_COMPLETO_PRICE;
+  return { price, label: `R$ ${price.toFixed(2).replace('.', ',')}` };
+}
+
+export function resolveFullCatalogUpgradePrice(fullCatalogUpgradePriceOverride: number | null | undefined): { price: number; label: string } {
+  const override = fullCatalogUpgradePriceOverride === null || fullCatalogUpgradePriceOverride === undefined ? null : Number(fullCatalogUpgradePriceOverride);
+  const price = override !== null && Number.isFinite(override) && override >= 5 ? override : CATALOGO_COMPLETO_UPGRADE_PRICE;
+  return { price, label: `R$ ${price.toFixed(2).replace('.', ',')}` };
+}
+
 /** Única fonte de verdade pra "qual ciclo Asaas (MONTHLY/YEARLY) esse tier
  *  resolve hoje" (2026-10-15) — usada tanto pela cobrança real
  *  (`checkout/route.ts`, decide se precisa trocar de ciclo numa troca de

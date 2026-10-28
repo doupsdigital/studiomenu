@@ -51,6 +51,14 @@ interface CatalogLayoutProps {
    *  no topo, sem nenhuma chamada de scroll envolvida. Não muda nada em
    *  catálogos reais nem no showroom normal — default `false`. */
   hideCoverSection?: boolean;
+  /** Preview isolado da oferta "Catálogo Completo" (2026-10-28,
+   *  `/c/[slug]?preview=completo`) — força Capa/Orientações/Contato a
+   *  aparecer (OR com o flag real, nunca substitui) SEM gravar nada em
+   *  `data`/banco. Mesmo padrão de `hideCoverSection` (prop solta, lida de
+   *  `searchParams` em `src/app/c/[slug]/page.tsx`), só que na direção
+   *  contrária: forçar mostrar, não esconder. Default `false` — não muda
+   *  nada em nenhum catálogo real nem no showroom. */
+  forcePreviewFull?: boolean;
 }
 
 export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
@@ -63,6 +71,7 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
   themeSwitcher,
   layoutSwitcher,
   hideCoverSection = false,
+  forcePreviewFull = false,
 }) => {
   const [showWelcomeOverlay, setShowWelcomeOverlay] = useState(isNewCatalog);
   const [catalogState, setCatalogState] = useState<CatalogOrderData>(data);
@@ -531,6 +540,7 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
   // passos (editar serviço + tema/layout), sem o de "Salvar" — menos coisa
   // pra explicar pra cliente com menos intimidade com tecnologia.
   const catalogOnlyProduct =
+    !forcePreviewFull &&
     catalogState.show_cover === false &&
     catalogState.show_instructions === false &&
     catalogState.show_contact_cta === false;
@@ -711,7 +721,7 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
          *  acima) nem quando o produto vendido é "Catálogo apenas"
          *  (`show_cover === false`, 2026-10-27) — vale em qualquer modo,
          *  inclusive edição, de propósito (menos tela pra ela mexer). */}
-        {!hideCoverSection && catalogState.show_cover !== false && (
+        {!hideCoverSection && (forcePreviewFull || catalogState.show_cover !== false) && (
           <HeaderCover
             data={catalogState}
             categories={categories}
@@ -735,7 +745,7 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
           // Produto "Catálogo apenas" (2026-10-28): sem a Capa, esse
           // componente vira a primeira tela — mostra o mini-cabeçalho
           // "STUDIO" + nome (único lugar pra editar o nome nesse modo).
-          showStudioHeader={hideCoverSection || catalogState.show_cover === false}
+          showStudioHeader={!forcePreviewFull && (hideCoverSection || catalogState.show_cover === false)}
           studioLabel={catalogState.studio_label}
           onUpdateClientName={handleUpdateClientName}
           onUpdateStudioLabel={handleUpdateStudioLabel}
@@ -782,7 +792,8 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
          *  se aparece vazia pra ela preencher, ou se some de vez na
          *  visualização pública quando ela apagou todos os itens (pedido
          *  real, 2026-10-09). */}
-        {catalogState.show_instructions !== false && (isEditMode || (catalogState.instructions?.items?.length || 0) > 0) && (
+        {(forcePreviewFull || catalogState.show_instructions !== false) &&
+          (forcePreviewFull || isEditMode || (catalogState.instructions?.items?.length || 0) > 0) && (
           <InstructionsSection
             instructions={catalogState.instructions}
             bgUrl={catalogState.instructions_bg_url}
@@ -797,7 +808,7 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
         {/* Seção Contato & Localização — some quando o produto vendido é
          *  "Catálogo apenas" (`show_contact_cta === false`, 2026-10-27), em
          *  qualquer modo. */}
-        {catalogState.show_contact_cta !== false && (
+        {(forcePreviewFull || catalogState.show_contact_cta !== false) && (
           <CTASection
             data={catalogState}
             isEditMode={isEditMode}

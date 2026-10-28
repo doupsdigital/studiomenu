@@ -12,9 +12,11 @@ import { PlusUpsellCard } from '@/components/app-shell/PlusUpsellCard';
 import { ShareLinkButton } from '@/components/app-shell/ShareLinkButton';
 import { PageTitleBar } from '@/components/app-shell/PageTitleBar';
 import { FirstContactScreen } from '@/components/app-shell/FirstContactScreen';
+import { FullCatalogOfferCard } from '@/components/app-shell/FullCatalogOfferCard';
 import { OnboardingCardStack } from '@/components/app-shell/OnboardingCardStack';
 import { OpenChargeBanner } from '@/components/billing/OpenChargeBanner';
 import { InicioTour } from '@/components/tour/InicioTour';
+import { resolveFullCatalogUpgradePrice } from '@/lib/pricing';
 import { CalendarDays, Clock, Share2, Crown, Home } from 'lucide-react';
 
 interface InicioPageProps {
@@ -66,6 +68,14 @@ export default async function InicioPage({ params }: InicioPageProps) {
   // Produto "Catálogo apenas" (2026-10-27): com Agenda/Config inacessíveis
   // (`show_full_app === false`), não faz sentido anunciar o Plus/Agenda aqui.
   const showPlusUpsell = order.show_full_app !== false && !isPlusAtivo && order.subscription_status !== 'suspenso';
+  // Oferta "Catálogo Completo" (2026-10-28) — pra quem já paga o Catálogo
+  // simples (plan_tier 'basico', ativo); quem ainda não pagou nada vê a
+  // versão dessa mesma oferta em `FirstContactScreen`, não aqui.
+  const showFullCatalogOffer =
+    order.plan_tier === 'basico' &&
+    order.subscription_status === 'ativo' &&
+    order.full_catalog_offer_enabled &&
+    order.full_catalog_offer_decision !== 'declined';
 
   const [todayAppointments, pendingAppointments, businessHours, plusUpsellCatalog] = await Promise.all([
     getAppointmentsForDay(order.id, todayInSaoPaulo()),
@@ -155,6 +165,14 @@ export default async function InicioPage({ params }: InicioPageProps) {
           billingEmail={order.billing_email}
           billingCpfCnpj={order.billing_cpf_cnpj}
           hasRealSubscription={order.has_real_subscription}
+        />
+      )}
+
+      {showFullCatalogOffer && (
+        <FullCatalogOfferCard
+          slug={order.slug}
+          price={resolveFullCatalogUpgradePrice(order.full_catalog_upgrade_price_override)}
+          alreadyPaid
         />
       )}
 

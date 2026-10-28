@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { capture } from '@/lib/analytics';
-import { Crown, BookOpen, Gift, Check, CreditCard, QrCode, ExternalLink, Info, type LucideIcon } from 'lucide-react';
+import { Crown, BookOpen, Gift, Sparkles, Check, CreditCard, QrCode, ExternalLink, Info, type LucideIcon } from 'lucide-react';
 import { PLAN_PRICING, type PayablePlanTier } from '@/lib/pricing';
 import { formatCpfCnpj } from '@/lib/format';
 
@@ -31,6 +31,12 @@ interface PlanSubscribeCardProps {
    *  pedir CPF/e-mail de novo (ela já é cliente paga confirmada) e com copy
    *  própria. Só faz sentido com `plan === 'basico'`. */
   lifetimeConversion?: boolean;
+  /** Autoatendimento da oferta "Catálogo Completo" (2026-10-28) pra quem JÁ
+   *  paga o Catálogo simples — submete pro endpoint dedicado
+   *  `/api/billing/upgrade-to-full-catalog` em vez do checkout genérico, sem
+   *  pedir CPF/e-mail de novo, mesma ideia de `lifetimeConversion`. Só faz
+   *  sentido com `plan === 'basico'`. */
+  fullCatalogUpgrade?: boolean;
 }
 
 type PaymentMethod = 'pix' | 'card';
@@ -90,6 +96,21 @@ const LIFETIME_SUCCESS_COPY = {
   benefits: ['Catálogo online sempre no ar, sem cobrança nenhuma', 'Edite fotos, preços e serviços quando quiser', 'Link profissional pra compartilhar com suas clientes'],
 };
 
+/** Copy própria do upgrade "Catálogo Completo" pra quem já paga o Catálogo
+ *  simples (2026-10-28) — ela já é cliente paga, isso é "libere o resto do
+ *  site", não "garanta seu catálogo". */
+const FULL_CATALOG_UPGRADE_COPY = {
+  icon: Sparkles,
+  headline: 'Catálogo Completo',
+  benefits: ['Capa personalizada do seu Studio', 'Tela de Orientações pras suas clientes', 'Links e Contato completos'],
+};
+
+const FULL_CATALOG_UPGRADE_SUCCESS_COPY = {
+  headline: 'Catálogo Completo liberado! ✅',
+  subheadline: '🎉 Suas telas novas já estão no ar',
+  benefits: ['Capa personalizada do seu Studio', 'Tela de Orientações pras suas clientes', 'Links e Contato completos'],
+};
+
 const formatShortDate = (iso: string) =>
   new Date(`${iso}T12:00:00`).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
 
@@ -136,11 +157,17 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
   priceOverride,
   billingMode = 'avulso',
   lifetimeConversion = false,
+  fullCatalogUpgrade = false,
 }) => {
   const router = useRouter();
-  const copy = lifetimeConversion ? LIFETIME_COPY : PLAN_COPY[plan];
+  const copy = lifetimeConversion ? LIFETIME_COPY : fullCatalogUpgrade ? FULL_CATALOG_UPGRADE_COPY : PLAN_COPY[plan];
   const pricing = priceOverride ?? PLAN_PRICING[plan];
-  const successCopy = lifetimeConversion ? LIFETIME_SUCCESS_COPY : SUCCESS_COPY[plan];
+  const successCopy = lifetimeConversion ? LIFETIME_SUCCESS_COPY : fullCatalogUpgrade ? FULL_CATALOG_UPGRADE_SUCCESS_COPY : SUCCESS_COPY[plan];
+  /** Nem `lifetimeConversion` nem `fullCatalogUpgrade` são "venda de
+   *  entrada" — ela já é cliente paga nos dois casos, então nem a faixa
+   *  "OFERTA 🔥" nem o formulário de CPF/e-mail (já preenchidos antes) fazem
+   *  sentido. */
+  const isReturningCustomerFlow = lifetimeConversion || fullCatalogUpgrade;
   /** Sem seletor de método = troca de plano de quem já é assinante (Básico →
    *  Plus): ativa na hora, o novo valor só vale na próxima mensalidade. */
   const isUpgrade = !showMethodChoice;
@@ -255,11 +282,17 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ slug, method }),
           })
-        : await fetch('/api/billing/checkout', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ slug, email: email.trim(), cpf_cnpj: cpfCnpj.trim(), plan, method: showMethodChoice ? method : undefined }),
-          });
+        : fullCatalogUpgrade
+          ? await fetch('/api/billing/upgrade-to-full-catalog', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ slug, method }),
+            })
+          : await fetch('/api/billing/checkout', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ slug, email: email.trim(), cpf_cnpj: cpfCnpj.trim(), plan, method: showMethodChoice ? method : undefined }),
+            });
       const json = await res.json();
       if (!json.success) {
         setError(json.message || 'Não foi possível iniciar a assinatura.');
@@ -358,7 +391,7 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
        *  data/contador fixo pra não virar promessa que não dá pra sustentar.
        *  Não faz sentido pro autoatendimento de vitalício (Fase 28) — ela já
        *  é cliente paga, não é uma oferta de entrada. */}
-      {!lifetimeConversion && (
+      {!isReturningCustomerFlow && (
         <div
           className="absolute -left-11 top-6 w-40 -rotate-45 bg-rose-600 py-1.5 text-center shadow-md"
           aria-hidden="true"
@@ -437,7 +470,7 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
               </li>
             ))}
           </ul>
-          {!lifetimeConversion && (
+          {!isReturningCustomerFlow && (
             <>
               <div className="relative">
                 <input
@@ -557,9 +590,11 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
                 ? 'Continuar pro pagamento seguro'
                 : lifetimeConversion
                   ? `Pagar ${pricing.label} e virar vitalício`
-                  : isOneTime
-                    ? `Pagar ${pricing.label} e garantir meu Catálogo`
-                    : `Assinar por ${pricing.label}`}
+                  : fullCatalogUpgrade
+                    ? `Pagar ${pricing.label} e liberar o Completo`
+                    : isOneTime
+                      ? `Pagar ${pricing.label} e garantir meu Catálogo`
+                      : `Assinar por ${pricing.label}`}
           </button>
         </form>
       )}
