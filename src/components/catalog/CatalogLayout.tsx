@@ -703,7 +703,9 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
       )}
 
       {/* 3. APP MOBILE CONTAINER COM SUPORTE A EDIÇÃO IN-PLACE */}
-      <div className={`mosaico-app is-visible ${isLuxury ? 'is-luxury' : ''}`}>
+      <div
+        className={`mosaico-app is-visible ${isLuxury ? 'is-luxury' : ''}${catalogOnlyProduct ? ' mosaico-app--single-screen' : ''}`}
+      >
         {/* Hero Section (Foto da Capa, Nome da Profissional, Frase Hero) —
          *  não renderiza quando `hideCoverSection` (ver comentário na prop
          *  acima) nem quando o produto vendido é "Catálogo apenas"
