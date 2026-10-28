@@ -801,6 +801,11 @@ button {
 .secao-catalogo__header--studio {
   text-align: left;
   align-items: flex-start;
+  /* Habilita unidades `cqi` pros filhos (nome + título) calcularem o
+   *  tamanho de fonte com base na largura REAL disponível (já descontado o
+   *  padding do `.container` e o teto de 480px do `.mosaico-app`) — ver
+   *  `.lm-catalogo-studio-nome`/`.secao-catalogo__titulo--fit` abaixo. */
+  container-type: inline-size;
 }
 
 .lm-catalogo-studio {
@@ -848,7 +853,17 @@ button {
 .lm-catalogo-studio-nome {
   margin: 0;
   font-family: 'Fraunces', Georgia, serif;
-  font-size: 34px;
+  /* Base segura em CSS puro (sem depender de JS) — cabe numa linha só pra
+   *  nomes "normais" de profissional em qualquer largura real do app (280px
+   *  a 440px). `useFitText` (ver hook) só ajusta esse valor daqui pra
+   *  frente, com transição suave, se o nome digitado for grande demais mesmo
+   *  pra esse cálculo (nome bem comprido). Sem isso, teríamos ou esperar o
+   *  JS rodar pra mostrar o texto (ficava "piscando vazio" antes) ou mostrar
+   *  o tamanho máximo fixo até o JS corrigir (ficava "se ajustando" na
+   *  tela) — achado relatado de verdade, 2026-10-28, as duas tentativas
+   *  anteriores. */
+  font-size: clamp(16px, 7cqi, 40px);
+  transition: font-size 0.25s ease;
   font-weight: 400;
   font-style: italic;
   line-height: 1.1;
@@ -905,6 +920,17 @@ button {
 .secao-catalogo__titulo em {
   font-style: italic;
   color: var(--grid-title-em-color);
+}
+
+/* Produto "Catálogo apenas" (2026-10-28): mesma lógica de base segura em
+ *  CSS + ajuste fino via JS (`useFitText`) que `.lm-catalogo-studio-nome`
+ *  usa — ver comentário lá. Só esse modificador (não a classe base, pra não
+ *  afetar o título "Escolha o seu estilo"/"Procedimentos & Valores" do
+ *  modo completo, que nunca teve esse problema). */
+.secao-catalogo__titulo--fit {
+  font-size: clamp(16px, 6cqi, 34px);
+  white-space: nowrap;
+  transition: font-size 0.25s ease;
 }
 
 .secao-catalogo__sub {

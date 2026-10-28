@@ -29,16 +29,16 @@ interface UseFitTextOptions {
  *  `<header>` que ocupa 100% da largura do cartão) é o que dá a largura real
  *  disponível.
  *
- *  Também controla a visibilidade (`opacity`) do texto — não só o tamanho.
- *  Achado relatado de verdade, 2026-10-28: sem isso, o HTML que vem do
- *  servidor já mostra o texto no tamanho "cheio" (`maxFontSize`, via CSS),
- *  e só depois que o React hidrata no navegador e esse hook mede a largura
- *  de verdade é que ele encolhe pro tamanho certo — ao entrar na tela ou
- *  recarregar, dava pra VER esse "pulo" do tamanho grande pro final. Por
- *  isso o elemento nasce com `opacity: 0` (ver `ProcedureGrid.tsx`, mesmo
- *  valor no servidor e no cliente, sem mismatch de hidratação) e só esse
- *  hook revela (`opacity: 1`) depois de já calcular o tamanho certo — a
- *  pessoa nunca chega a ver o estado "ainda não ajustado". */
+ *  Importante (achado relatado de verdade, 2026-10-28, duas tentativas
+ *  erradas antes dessa): o CSS do elemento já define um tamanho de base
+ *  seguro via `clamp()`/`cqi` (não depende de JS, não quebra linha, some
+ *  texto sumido) — esse hook só ENCOLHE um pouco mais, se precisar, ou
+ *  volta pro teto `maxFontSize` quando já tem espaço de sobra. Nunca
+ *  controla visibilidade (`opacity`): esconder o texto até o JS calcular
+ *  trocava "ver encolhendo" por "ver um vazio antes de aparecer", mesmo
+ *  problema disfarçado. Como o ponto de partida (CSS) já é seguro, o ajuste
+ *  do JS tende a ser pequeno — e o `transition: font-size` no CSS absorve
+ *  essa diferença suavemente em vez de "pular". */
 export function useFitText<T extends HTMLElement>(
   boundsRef: RefObject<HTMLElement | null>,
   { maxFontSize, minFontSize = 12 }: UseFitTextOptions
@@ -56,7 +56,6 @@ export function useFitText<T extends HTMLElement>(
       const scale = available / needed;
       el.style.fontSize = `${Math.max(minFontSize, Math.floor(maxFontSize * scale))}px`;
     }
-    el.style.opacity = '1';
   }, [boundsRef, maxFontSize, minFontSize]);
 
   useLayoutEffect(() => {
