@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useLayoutEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, GripVertical } from 'lucide-react';
 import {
   DndContext,
@@ -23,6 +23,7 @@ import { ProcedureItem, LayoutModel } from '@/types/catalog';
 import { ProcedureCard } from './ProcedureCard';
 import { ProcedureDetailModal } from './ProcedureDetailModal';
 import { ProcedureImage } from './ProcedureImage';
+import { useFitText } from '@/hooks/useFitText';
 
 interface ProcedureGridProps {
   procedures: ProcedureItem[];
@@ -162,6 +163,28 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
 }) => {
   const [selectedProcedure, setSelectedProcedure] = useState<ProcedureItem | null>(null);
 
+  // Produto "Catálogo apenas" (2026-10-28): nome do studio e título "Catálogo
+  // de procedimentos" nunca podem quebrar em 2 linhas, em nenhuma largura de
+  // tela — `headerRef` (o `<header>`, que ocupa 100% da largura do cartão) é
+  // a referência de largura disponível pros dois (ver `useFitText`).
+  const studioHeaderRef = useRef<HTMLElement | null>(null);
+  const { ref: studioNomeRef, refit: refitStudioNome } = useFitText<HTMLHeadingElement>(studioHeaderRef, {
+    maxFontSize: 34,
+    minFontSize: 18,
+  });
+  const { ref: studioTituloRef, refit: refitStudioTitulo } = useFitText<HTMLHeadingElement>(studioHeaderRef, {
+    maxFontSize: 34,
+    minFontSize: 20,
+  });
+  useLayoutEffect(() => {
+    if (!showStudioHeader) return;
+    refitStudioNome();
+  }, [showStudioHeader, clientName, refitStudioNome]);
+  useLayoutEffect(() => {
+    if (!showStudioHeader) return;
+    refitStudioTitulo();
+  }, [showStudioHeader, layoutModel, refitStudioTitulo]);
+
   // Avisa o pai (mockup/modal de teste da landing page) se o modal de
   // detalhe do procedimento está aberto ou não — pedido real, 2026-10-16:
   // a dica "Clique nos cards" (`MockupModal.tsx`) precisa sumir enquanto
@@ -261,7 +284,10 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
     <section className="secao-catalogo is-visible" id="catalogo" data-screen-label={isClassico ? 'Serviços' : 'Mosaico'}>
       <div className="container">
 
-        <header className={`secao-catalogo__header anim-fade-up delay-1${showStudioHeader ? ' secao-catalogo__header--studio' : ''}`}>
+        <header
+          ref={studioHeaderRef}
+          className={`secao-catalogo__header anim-fade-up delay-1${showStudioHeader ? ' secao-catalogo__header--studio' : ''}`}
+        >
           {showStudioHeader && (
             <div className="lm-catalogo-studio">
               <div className="lm-catalogo-studio-line">
@@ -282,12 +308,15 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
                 <span className="lm-catalogo-studio-divider"></span>
               </div>
               <h1
+                ref={studioNomeRef}
                 className="lm-catalogo-studio-nome"
+                style={{ whiteSpace: 'nowrap' }}
                 data-tour="cat-text"
                 data-lm-editable={isEditMode ? 'true' : undefined}
                 contentEditable={isEditMode}
                 suppressContentEditableWarning={true}
                 suppressHydrationWarning={isEditMode}
+                onInput={refitStudioNome}
                 onBlur={(e) => {
                   if (isEditMode && onUpdateClientName) {
                     onUpdateClientName(e.currentTarget.innerText.trim());
@@ -299,29 +328,44 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
               <span className="lm-catalogo-studio-filete"></span>
             </div>
           )}
-          <div className={`etiqueta-linha${layoutSwitcher ? ' etiqueta-linha--with-switcher' : ''}`}>
-            {layoutSwitcher && (
-              <button
-                type="button"
-                onClick={() => layoutSwitcher.onChange('mosaico')}
-                className={`layout-pill ${layoutSwitcher.value === 'mosaico' ? 'layout-pill--active' : ''}`}
-              >
-                Mosaico
-              </button>
-            )}
-            <span className="etiqueta">{isClassico ? 'Menu de Serviços' : 'Catálogo de Procedimentos'}</span>
-            {layoutSwitcher && (
-              <button
-                type="button"
-                onClick={() => layoutSwitcher.onChange('classico')}
-                className={`layout-pill ${layoutSwitcher.value === 'classico' ? 'layout-pill--active' : ''}`}
-              >
-                Clássico
-              </button>
-            )}
-          </div>
-          <h2 className="secao-catalogo__titulo">
-            {isClassico ? <>Procedimentos &amp; <em>Valores</em></> : <>Escolha o seu <em>estilo</em></>}
+          {/* Etiqueta pequena some no mini-cabeçalho "STUDIO" (2026-10-28,
+           *  print do protótipo aprovado) — o texto dela vira o título
+           *  grande abaixo, pra não repetir "Catálogo de Procedimentos" duas
+           *  vezes na mesma tela. A linha só continua existindo se tiver o
+           *  switcher Mosaico/Clássico do showroom pra não perder os botões. */}
+          {(!showStudioHeader || layoutSwitcher) && (
+            <div className={`etiqueta-linha${layoutSwitcher ? ' etiqueta-linha--with-switcher' : ''}`}>
+              {layoutSwitcher && (
+                <button
+                  type="button"
+                  onClick={() => layoutSwitcher.onChange('mosaico')}
+                  className={`layout-pill ${layoutSwitcher.value === 'mosaico' ? 'layout-pill--active' : ''}`}
+                >
+                  Mosaico
+                </button>
+              )}
+              {!showStudioHeader && (
+                <span className="etiqueta">{isClassico ? 'Menu de Serviços' : 'Catálogo de Procedimentos'}</span>
+              )}
+              {layoutSwitcher && (
+                <button
+                  type="button"
+                  onClick={() => layoutSwitcher.onChange('classico')}
+                  className={`layout-pill ${layoutSwitcher.value === 'classico' ? 'layout-pill--active' : ''}`}
+                >
+                  Clássico
+                </button>
+              )}
+            </div>
+          )}
+          <h2
+            ref={showStudioHeader ? studioTituloRef : undefined}
+            className="secao-catalogo__titulo"
+            style={showStudioHeader ? { whiteSpace: 'nowrap' } : undefined}
+          >
+            {showStudioHeader
+              ? (isClassico ? <>Menu de <em>serviços</em></> : <>Catálogo de <em>procedimentos</em></>)
+              : (isClassico ? <>Procedimentos &amp; <em>Valores</em></> : <>Escolha o seu <em>estilo</em></>)}
           </h2>
           <p className="secao-catalogo__sub">
             {isEditMode ? 'Segure e arraste um card pra reordenar.' : 'Toque nos Cards para ver detalhes, tempo e valores.'}
