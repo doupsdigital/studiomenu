@@ -27,7 +27,18 @@ interface UseFitTextOptions {
  *  a largura "disponível" nele mesmo sempre daria "cabe perfeitamente" (ele
  *  é do tamanho do próprio texto). Passar um ancestral de verdade (ex: o
  *  `<header>` que ocupa 100% da largura do cartão) é o que dá a largura real
- *  disponível. */
+ *  disponível.
+ *
+ *  Também controla a visibilidade (`opacity`) do texto — não só o tamanho.
+ *  Achado relatado de verdade, 2026-10-28: sem isso, o HTML que vem do
+ *  servidor já mostra o texto no tamanho "cheio" (`maxFontSize`, via CSS),
+ *  e só depois que o React hidrata no navegador e esse hook mede a largura
+ *  de verdade é que ele encolhe pro tamanho certo — ao entrar na tela ou
+ *  recarregar, dava pra VER esse "pulo" do tamanho grande pro final. Por
+ *  isso o elemento nasce com `opacity: 0` (ver `ProcedureGrid.tsx`, mesmo
+ *  valor no servidor e no cliente, sem mismatch de hidratação) e só esse
+ *  hook revela (`opacity: 1`) depois de já calcular o tamanho certo — a
+ *  pessoa nunca chega a ver o estado "ainda não ajustado". */
 export function useFitText<T extends HTMLElement>(
   boundsRef: RefObject<HTMLElement | null>,
   { maxFontSize, minFontSize = 12 }: UseFitTextOptions
@@ -45,6 +56,7 @@ export function useFitText<T extends HTMLElement>(
       const scale = available / needed;
       el.style.fontSize = `${Math.max(minFontSize, Math.floor(maxFontSize * scale))}px`;
     }
+    el.style.opacity = '1';
   }, [boundsRef, maxFontSize, minFontSize]);
 
   useLayoutEffect(() => {
