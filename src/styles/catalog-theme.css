@@ -914,6 +914,22 @@ button {
   color: var(--grid-title-em-color);
 }
 
+/* Mesma técnica (e mesmo motivo) do ajuste real feito em
+ *  `.secao-orientacoes__titulo` pra "Informações importantes" (cliente
+ *  Bruna, iPhone, 2026-10-23): iPhones costumam ter a tela um pouco mais
+ *  estreita (~375-393px úteis) que a maioria dos Android recentes
+ *  (~412px+), e "Catálogo de procedimentos" fica bem no limite da largura
+ *  disponível em 34px — poucos pixels de diferença bastam pra quebrar em 2
+ *  linhas num aparelho e caber perfeitamente no outro. `clamp()` com `vw`
+ *  reduz a fonte gradualmente nas telas mais estreitas (sem salto de
+ *  breakpoint) e mantém 34px de sempre a partir de ~435px, onde já cabia —
+ *  só CSS, sem JS nem container query (pedido real, 2026-10-28, depois de
+ *  2 tentativas mais complexas que pioraram a experiência). */
+.secao-catalogo__titulo--fit {
+  font-size: clamp(27px, 7.8vw, 34px);
+  white-space: nowrap;
+}
+
 .secao-catalogo__sub {
   margin: 0;
   font-size: 13.5px;
