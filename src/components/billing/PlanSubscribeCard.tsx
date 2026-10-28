@@ -593,7 +593,7 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
                   : fullCatalogUpgrade
                     ? `Pagar ${pricing.label} e liberar o Completo`
                     : isOneTime
-                      ? `Pagar ${pricing.label} e garantir meu Catálogo`
+                      ? 'Realizar pagamento'
                       : `Assinar por ${pricing.label}`}
           </button>
         </form>
