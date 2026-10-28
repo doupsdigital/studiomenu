@@ -4,7 +4,6 @@ import React, { useMemo, useState } from 'react';
 import type { Step } from 'react-joyride';
 import { ViewCatalogCard } from './ViewCatalogCard';
 import { EditCatalogCard } from './EditCatalogCard';
-import { CatalogReadyPreview } from './CatalogReadyPreview';
 import { ConfettiBurst } from './ConfettiBurst';
 import { PlanSubscribeCard } from '@/components/billing/PlanSubscribeCard';
 import { ProductTour } from '@/components/tour/ProductTour';
@@ -91,8 +90,6 @@ export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order })
       <div className="text-center">
         <h1 className="font-serif-pro font-bold text-2xl text-ink">Olá, {order.client_name}! ✨</h1>
       </div>
-
-      <CatalogReadyPreview slug={order.slug} />
 
       <div className="relative">
         {highlightView && (
