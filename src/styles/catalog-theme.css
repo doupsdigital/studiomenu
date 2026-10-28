@@ -803,6 +803,19 @@ button {
   align-items: flex-start;
 }
 
+/* Seletores de tema/layout do showroom, acima de tudo (pedido real,
+ *  2026-10-28) — só aparecem no mockup/showroom (layoutSwitcher/
+ *  themeSwitcher nunca vêm preenchidos num catálogo de cliente de
+ *  verdade). */
+.lm-catalogo-studio-switchers {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 14px;
+}
+
 .lm-catalogo-studio {
   display: flex;
   flex-direction: column;

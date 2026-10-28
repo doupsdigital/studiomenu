@@ -768,6 +768,10 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
             demoBookingOnly && (!catalogState.booking_enabled || catalogState.agenda_paused) ? setFakeWhatsappItem : undefined
           }
           layoutSwitcher={layoutSwitcher}
+          // Mesma ideia — no modo "Catálogo apenas" (sem Capa), o
+          // ProcedureGrid vira o único lugar pra mostrar o seletor de tema
+          // do showroom (normalmente fica dentro do HeaderCover).
+          themeSwitcher={themeSwitcher}
         />
 
         {/* Seção Orientações — primeiro checa o flag de produto

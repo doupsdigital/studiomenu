@@ -19,7 +19,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-import { ProcedureItem, LayoutModel } from '@/types/catalog';
+import { ProcedureItem, LayoutModel, ThemeVariant } from '@/types/catalog';
 import { ProcedureCard } from './ProcedureCard';
 import { ProcedureDetailModal } from './ProcedureDetailModal';
 import { ProcedureImage } from './ProcedureImage';
@@ -46,6 +46,11 @@ interface ProcedureGridProps {
    *  cabeçalho, mesma ideia do Rosé/Luxury no `HeaderCover`. `undefined`
    *  em catálogos reais, que continuam sem alteração nenhuma aqui. */
   layoutSwitcher?: { value: LayoutModel; onChange: (layout: LayoutModel) => void };
+  /** Mesma ideia do `layoutSwitcher` acima, mas pro tema (Rosé/Luxury) —
+   *  normalmente fica dentro do `HeaderCover` (Capa), que não existe no
+   *  modo "Catálogo apenas" (2026-10-28); passado aqui pra não perder essa
+   *  opção no showroom quando a Capa está escondida. */
+  themeSwitcher?: { value: ThemeVariant; onChange: (variant: ThemeVariant) => void };
   /** Produto "Catálogo apenas" (2026-10-28) — quando a Capa não renderiza
    *  (`show_cover === false` ou `hideCoverSection`, ver `CatalogLayout`),
    *  esse componente vira a primeira tela, então precisa mostrar (e, em
@@ -155,6 +160,7 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
   onRequestBooking,
   onFakeWhatsapp,
   layoutSwitcher,
+  themeSwitcher,
   showStudioHeader = false,
   studioLabel,
   onUpdateClientName,
@@ -264,6 +270,50 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
         <header
           className={`secao-catalogo__header anim-fade-up delay-1${showStudioHeader ? ' secao-catalogo__header--studio' : ''}`}
         >
+          {/* Seletores de tema/layout do showroom (2026-10-28, pedido real)
+           *  — ficam acima de tudo, inclusive do "STUDIO", só quando a Capa
+           *  está escondida (único lugar "livre" no topo nesse modo; no modo
+           *  completo eles continuam dentro da Capa/etiqueta, como sempre). */}
+          {showStudioHeader && (layoutSwitcher || themeSwitcher) && (
+            <div className="lm-catalogo-studio-switchers">
+              {themeSwitcher && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => themeSwitcher.onChange('rose')}
+                    className={`layout-pill ${themeSwitcher.value === 'rose' ? 'layout-pill--active' : ''}`}
+                  >
+                    🌸 Rosé
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => themeSwitcher.onChange('luxury')}
+                    className={`layout-pill ${themeSwitcher.value === 'luxury' ? 'layout-pill--active' : ''}`}
+                  >
+                    👑 Luxury
+                  </button>
+                </>
+              )}
+              {layoutSwitcher && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => layoutSwitcher.onChange('mosaico')}
+                    className={`layout-pill ${layoutSwitcher.value === 'mosaico' ? 'layout-pill--active' : ''}`}
+                  >
+                    Mosaico
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => layoutSwitcher.onChange('classico')}
+                    className={`layout-pill ${layoutSwitcher.value === 'classico' ? 'layout-pill--active' : ''}`}
+                  >
+                    Clássico
+                  </button>
+                </>
+              )}
+            </div>
+          )}
           {showStudioHeader && (
             <div className="lm-catalogo-studio">
               <div className="lm-catalogo-studio-line">
@@ -304,9 +354,9 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
           {/* Etiqueta pequena some no mini-cabeçalho "STUDIO" (2026-10-28,
            *  print do protótipo aprovado) — o texto dela vira o título
            *  grande abaixo, pra não repetir "Catálogo de Procedimentos" duas
-           *  vezes na mesma tela. A linha só continua existindo se tiver o
-           *  switcher Mosaico/Clássico do showroom pra não perder os botões. */}
-          {(!showStudioHeader || layoutSwitcher) && (
+           *  vezes na mesma tela. Os pills Mosaico/Clássico que ficavam
+           *  aqui foram pro bloco de seletores no topo (ver acima). */}
+          {!showStudioHeader && (
             <div className={`etiqueta-linha${layoutSwitcher ? ' etiqueta-linha--with-switcher' : ''}`}>
               {layoutSwitcher && (
                 <button
@@ -317,9 +367,7 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
                   Mosaico
                 </button>
               )}
-              {!showStudioHeader && (
-                <span className="etiqueta">{isClassico ? 'Menu de Serviços' : 'Catálogo de Procedimentos'}</span>
-              )}
+              <span className="etiqueta">{isClassico ? 'Menu de Serviços' : 'Catálogo de Procedimentos'}</span>
               {layoutSwitcher && (
                 <button
                   type="button"
