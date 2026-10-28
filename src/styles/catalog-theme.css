@@ -919,14 +919,20 @@ button {
  *  Bruna, iPhone, 2026-10-23): iPhones costumam ter a tela um pouco mais
  *  estreita (~375-393px úteis) que a maioria dos Android recentes
  *  (~412px+), e "Catálogo de procedimentos" fica bem no limite da largura
- *  disponível em 34px — poucos pixels de diferença bastam pra quebrar em 2
- *  linhas num aparelho e caber perfeitamente no outro. `clamp()` com `vw`
- *  reduz a fonte gradualmente nas telas mais estreitas (sem salto de
- *  breakpoint) e mantém 34px de sempre a partir de ~435px, onde já cabia —
- *  só CSS, sem JS nem container query (pedido real, 2026-10-28, depois de
- *  2 tentativas mais complexas que pioraram a experiência). */
+ *  disponível — poucos pixels de diferença bastam pra quebrar em 2 linhas
+ *  num aparelho e caber perfeitamente no outro. `clamp()` com `vw` reduz a
+ *  fonte gradualmente nas telas mais estreitas (sem salto de breakpoint) —
+ *  só CSS, sem JS nem container query (pedido real, 2026-10-28, depois de 2
+ *  tentativas mais complexas que pioraram a experiência).
+ *
+ *  Valores iguais aos de `.secao-orientacoes__titulo` (não um cálculo novo
+ *  meu, que errou o tamanho 2 vezes seguidas aqui) — mesma faixa de
+ *  largura real validada em aparelho de cliente de verdade pra um texto de
+ *  comprimento parecido ("Informações importantes"). Teto cai de 34px pra
+ *  30px de propósito: "Catálogo de procedimentos" é um pouco mais comprido,
+ *  34px nunca coube com folga em nenhuma largura real testada até agora. */
 .secao-catalogo__titulo--fit {
-  font-size: clamp(27px, 7.8vw, 34px);
+  font-size: clamp(25px, 6.9vw, 30px);
   white-space: nowrap;
 }
 
