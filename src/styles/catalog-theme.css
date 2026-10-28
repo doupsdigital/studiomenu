@@ -795,6 +795,64 @@ button {
   gap: 8px;
 }
 
+/* Produto "Catálogo apenas" (2026-10-28): sem a Capa, esse cabeçalho abre a
+   tela — alinhado à esquerda (como um cabeçalho de página comum) em vez de
+   centralizado, pra acomodar o mini-cabeçalho "STUDIO + Nome" acima dele. */
+.secao-catalogo__header--studio {
+  text-align: left;
+  align-items: flex-start;
+}
+
+.lm-catalogo-studio {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 4px;
+}
+
+.lm-catalogo-studio-line {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+}
+
+.lm-catalogo-studio-label {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--grid-title-color);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.lm-catalogo-studio-divider {
+  flex: 1;
+  height: 1px;
+  background: var(--grid-sub-color);
+  opacity: 0.35;
+}
+
+.lm-catalogo-studio-nome {
+  margin: 0;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 34px;
+  font-weight: 400;
+  font-style: italic;
+  line-height: 1.1;
+  color: var(--grid-title-em-color);
+}
+
+.lm-catalogo-studio-filete {
+  width: 44px;
+  height: 2px;
+  background: var(--grid-title-em-color);
+}
+
 .secao-catalogo__titulo {
   margin: 0;
   font-family: 'Fraunces', Georgia, serif;
