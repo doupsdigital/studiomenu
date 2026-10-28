@@ -837,6 +837,14 @@ button {
   opacity: 0.35;
 }
 
+/* Brilho deslizando pelo nome (pedido real, 2026-10-28) — mesma ideia visual
+ *  de `.hero__chip::after`/`heroChipShine` (faixa clara cruzando em loop),
+ *  mas pra texto em vez de uma cápsula com fundo sólido: aqui o "brilho" é
+ *  uma faixa dentro do próprio gradiente do texto, recortado nas letras via
+ *  `background-clip: text`. `-webkit-text-fill-color: transparent` (não
+ *  `color: transparent`) de propósito — em qualquer navegador sem suporte a
+ *  isso, o `color` abaixo continua valendo e o nome só aparece sólido, sem
+ *  quebrar (nunca fica invisível). */
 .lm-catalogo-studio-nome {
   margin: 0;
   font-family: 'Fraunces', Georgia, serif;
@@ -845,6 +853,38 @@ button {
   font-style: italic;
   line-height: 1.1;
   color: var(--grid-title-em-color);
+  background: linear-gradient(100deg, var(--grid-title-em-color) 35%, #fff 50%, var(--grid-title-em-color) 65%);
+  background-size: 300% 100%;
+  background-position: 100% 0;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: nomeStudioShine 3.6s linear infinite;
+}
+
+/* `background-position` fica sempre dentro de 0%-100% de propósito (achado
+ *  relatado de verdade, 2026-10-28: com valores fora dessa faixa — 200% a
+ *  -50% na primeira versão — o brilho passava certo na primeira volta, mas
+ *  nas voltas seguintes só aparecia no finalzinho do nome, "pulando" o resto
+ *  — provável inconsistência do navegador relendo o `background-position`
+ *  percentual "excedente" a cada novo loop do `infinite`). Dentro da faixa
+ *  padrão 0%-100% o espectro inteiro do gradiente passa de ponta a ponta de
+ *  forma previsível, toda vez.
+ *
+ *  Direção esquerda→direita (pedido real, 2026-10-28): com
+ *  `background-size` maior que o elemento, ir de `100%` pra `0%` é o que
+ *  faz a faixa clara entrar pela esquerda e sair pela direita — o sentido
+ *  inverso (`0%`→`100%`) entra pela direita. */
+@keyframes nomeStudioShine {
+  0% {
+    background-position: 100% 0;
+  }
+  60% {
+    background-position: 0% 0;
+  }
+  100% {
+    background-position: 0% 0;
+  }
 }
 
 .lm-catalogo-studio-filete {
