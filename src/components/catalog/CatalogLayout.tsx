@@ -537,12 +537,22 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
 
   const catalogEditorSteps = useMemo<Step[]>(() => {
     const steps: Step[] = [];
-    if (!hideCoverSection && catalogState.show_cover !== false) {
-      steps.push(
-        { target: '[data-tour="cat-cover"]', title: 'Troque a foto de capa', content: 'Toque aqui pra escolher uma nova foto de capa do seu catálogo.', skipScroll: true },
-        { target: '[data-tour="cat-text"]', title: 'Textos editáveis', content: 'Toque em qualquer texto marcado (nome, frase) pra editar direto na tela.', skipScroll: true }
-      );
+    const showsCover = !hideCoverSection && catalogState.show_cover !== false;
+    if (showsCover) {
+      steps.push({ target: '[data-tour="cat-cover"]', title: 'Troque a foto de capa', content: 'Toque aqui pra escolher uma nova foto de capa do seu catálogo.', skipScroll: true });
     }
+    // "cat-text" aponta pro nome editável — na Capa completa (nome+frase) ou,
+    // no produto "Catálogo apenas" (2026-10-28), pro mini-cabeçalho "STUDIO +
+    // Nome" que o `ProcedureGrid` passa a mostrar sozinho quando a Capa não
+    // renderiza (é o único lugar pra editar o nome nesse modo).
+    steps.push({
+      target: '[data-tour="cat-text"]',
+      title: 'Textos editáveis',
+      content: showsCover
+        ? 'Toque em qualquer texto marcado (nome, frase) pra editar direto na tela.'
+        : 'Toque no nome do seu studio pra editar direto na tela.',
+      skipScroll: true,
+    });
     if (catalogState.procedures.length > 0) {
       steps.push({
         target: '[data-tour="cat-edit-proc"]',
@@ -720,6 +730,13 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
           clientName={catalogState.client_name}
           layoutModel={catalogState.layout_model}
           isEditMode={isEditMode}
+          // Produto "Catálogo apenas" (2026-10-28): sem a Capa, esse
+          // componente vira a primeira tela — mostra o mini-cabeçalho
+          // "STUDIO" + nome (único lugar pra editar o nome nesse modo).
+          showStudioHeader={hideCoverSection || catalogState.show_cover === false}
+          studioLabel={catalogState.studio_label}
+          onUpdateClientName={handleUpdateClientName}
+          onUpdateStudioLabel={handleUpdateStudioLabel}
           onEditProc={(proc) => {
             const idx = catalogState.procedures.findIndex((p) => p.id === proc.id);
             setEditingProc(proc);

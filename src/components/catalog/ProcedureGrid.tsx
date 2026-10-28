@@ -46,6 +46,15 @@ interface ProcedureGridProps {
    *  cabeçalho, mesma ideia do Rosé/Luxury no `HeaderCover`. `undefined`
    *  em catálogos reais, que continuam sem alteração nenhuma aqui. */
   layoutSwitcher?: { value: LayoutModel; onChange: (layout: LayoutModel) => void };
+  /** Produto "Catálogo apenas" (2026-10-28) — quando a Capa não renderiza
+   *  (`show_cover === false` ou `hideCoverSection`, ver `CatalogLayout`),
+   *  esse componente vira a primeira tela, então precisa mostrar (e, em
+   *  modo edição, permitir editar) o nome da profissional — senão ela não
+   *  teria lugar nenhum pra fazer isso. */
+  showStudioHeader?: boolean;
+  studioLabel?: string;
+  onUpdateClientName?: (newName: string) => void;
+  onUpdateStudioLabel?: (newLabel: string) => void;
 }
 
 /** Envolve um card de procedimento (mosaico OU clássico) pra deixar arrastar
@@ -146,6 +155,10 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
   onRequestBooking,
   onFakeWhatsapp,
   layoutSwitcher,
+  showStudioHeader = false,
+  studioLabel,
+  onUpdateClientName,
+  onUpdateStudioLabel,
 }) => {
   const [selectedProcedure, setSelectedProcedure] = useState<ProcedureItem | null>(null);
 
@@ -248,7 +261,44 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
     <section className="secao-catalogo is-visible" id="catalogo" data-screen-label={isClassico ? 'Serviços' : 'Mosaico'}>
       <div className="container">
 
-        <header className="secao-catalogo__header anim-fade-up delay-1">
+        <header className={`secao-catalogo__header anim-fade-up delay-1${showStudioHeader ? ' secao-catalogo__header--studio' : ''}`}>
+          {showStudioHeader && (
+            <div className="lm-catalogo-studio">
+              <div className="lm-catalogo-studio-line">
+                <span
+                  className="lm-catalogo-studio-label"
+                  data-lm-editable={isEditMode ? 'true' : undefined}
+                  contentEditable={isEditMode}
+                  suppressContentEditableWarning={true}
+                  suppressHydrationWarning={isEditMode}
+                  onBlur={(e) => {
+                    if (isEditMode && onUpdateStudioLabel) {
+                      onUpdateStudioLabel(e.currentTarget.innerText.trim());
+                    }
+                  }}
+                >
+                  {studioLabel || 'STUDIO'}
+                </span>
+                <span className="lm-catalogo-studio-divider"></span>
+              </div>
+              <h1
+                className="lm-catalogo-studio-nome"
+                data-tour="cat-text"
+                data-lm-editable={isEditMode ? 'true' : undefined}
+                contentEditable={isEditMode}
+                suppressContentEditableWarning={true}
+                suppressHydrationWarning={isEditMode}
+                onBlur={(e) => {
+                  if (isEditMode && onUpdateClientName) {
+                    onUpdateClientName(e.currentTarget.innerText.trim());
+                  }
+                }}
+              >
+                {clientName}
+              </h1>
+              <span className="lm-catalogo-studio-filete"></span>
+            </div>
+          )}
           <div className={`etiqueta-linha${layoutSwitcher ? ' etiqueta-linha--with-switcher' : ''}`}>
             {layoutSwitcher && (
               <button
