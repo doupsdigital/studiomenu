@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { isProfessionalRequestAuthorized } from '@/lib/professional-session';
-import { PLAN_PRICING, resolveAgendaPrice, resolveBillingCycle, resolveCatalogPrice, type PayablePlanTier } from '@/lib/pricing';
+import { PLAN_PRICING, resolveAgendaPrice, resolveBillingCycle, resolveCatalogPrice, resolveFullCatalogPrice, type PayablePlanTier } from '@/lib/pricing';
 import { activateSubscription, buildPaymentResponse, switchSubscriptionCycle } from '@/lib/billing-service';
 import {
   AsaasConfigError,
@@ -66,7 +66,7 @@ export async function POST(request: Request) {
     const { data: order, error: orderErr } = await supabaseAdmin
       .from('orders')
       .select(
-        'id, client_name, plan_tier, subscription_status, asaas_customer_id, asaas_subscription_id, payment_method, billing_price_override, catalog_billing_mode, agenda_billing_mode, agenda_price_override'
+        'id, client_name, plan_tier, subscription_status, asaas_customer_id, asaas_subscription_id, payment_method, billing_price_override, catalog_billing_mode, agenda_billing_mode, agenda_price_override, full_catalog_offer_decision, full_catalog_price_override'
       )
       .eq('slug', normalizedSlug)
       .single();
@@ -91,6 +91,16 @@ export async function POST(request: Request) {
 
     const pricing = PLAN_PRICING[plan];
 
+    // Oferta "Catálogo Completo" (2026-10-28) — ela aceitou pagar o preço
+    // cheio em vez do Catálogo simples, ANTES de pagar qualquer coisa (quem
+    // já pagou e tá pedindo só a diferença passa pelo endpoint dedicado
+    // `/api/billing/upgrade-to-full-catalog`, nunca por aqui). Ver
+    // `resolveFullCatalogPrice`, src/lib/pricing.ts.
+    const fullCatalogAccepted =
+      plan === 'basico' &&
+      order.full_catalog_offer_decision === 'accepted' &&
+      !(order.plan_tier === 'basico' && order.subscription_status === 'ativo');
+
     // Plano Catálogo (pagamento único/recorrente/anual): preço customizável
     // livremente pelo admin por cliente, sem teto (resolveCatalogPrice,
     // src/lib/pricing.ts). Plano Agenda (sempre assinatura, mensal ou anual
@@ -100,8 +110,11 @@ export async function POST(request: Request) {
     // outro) continua sendo só um desconto, nunca acima do preço base do modo.
     const price =
       plan === 'basico'
-        ? resolveCatalogPrice(order.billing_price_override).price
+        ? fullCatalogAccepted
+          ? resolveFullCatalogPrice(order.full_catalog_price_override).price
+          : resolveCatalogPrice(order.billing_price_override).price
         : resolveAgendaPrice(order.agenda_billing_mode === 'anual' ? 'anual' : 'recorrente', order.agenda_price_override).price;
+    const description = fullCatalogAccepted ? 'StudioMenu Catálogo Completo' : pricing.description;
 
     // Já tem assinatura Asaas e é um tier DIFERENTE do atual → troca de
     // plano (ex: Básico → Plus, ou o contrário). Se o CICLO não muda
@@ -218,7 +231,7 @@ export async function POST(request: Request) {
       const payment = await createPayment({
         customerId: customer.id,
         value: price,
-        description: pricing.description,
+        description,
         billingType: BILLING_TYPE[method],
       });
 
@@ -233,7 +246,7 @@ export async function POST(request: Request) {
     const subscription = await createSubscription({
       customerId: customer.id,
       value: price,
-      description: pricing.description,
+      description,
       billingType: BILLING_TYPE[method],
       cycle,
     });
