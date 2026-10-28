@@ -2,10 +2,12 @@
 
 import React, { useMemo, useState } from 'react';
 import type { Step } from 'react-joyride';
+import { CreditCard } from 'lucide-react';
 import { ViewCatalogCard } from './ViewCatalogCard';
 import { EditCatalogCard } from './EditCatalogCard';
 import { ConfettiBurst } from './ConfettiBurst';
 import { FullCatalogOfferCard } from './FullCatalogOfferCard';
+import { SectionCard } from './SectionCard';
 import { PlanSubscribeCard } from '@/components/billing/PlanSubscribeCard';
 import { ProductTour } from '@/components/tour/ProductTour';
 import { resolveAgendaPrice, resolveCatalogPrice, resolveFullCatalogPrice } from '@/lib/pricing';
@@ -62,6 +64,12 @@ export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order })
   const agendaDisplayPrice = resolveAgendaPrice(order.agenda_billing_mode, order.agenda_price_override);
   const [highlightView, setHighlightView] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  // Card de pagamento vira acordeão (pedido real, 2026-10-28) — antes ficava
+  // "aberto e grande" direto na tela; agora só mostra o conteúdo (formulário
+  // de CPF/e-mail, Pix/cartão) quando ela clica pra expandir. Mesmo
+  // componente/padrão visual do acordeão da aba Config (`SectionCard`,
+  // `ConfigAccordion.tsx`). Começa fechado.
+  const [isPaymentOpen, setIsPaymentOpen] = useState(false);
 
   // Quando o tour termina, concluído ou pulado: o último passo fica lá
   // embaixo, perto do card de assinar. Ela pediu, 2026-09-24, pra voltar o
@@ -113,32 +121,34 @@ export const FirstContactScreen: React.FC<FirstContactScreenProps> = ({ order })
       </div>
       <EditCatalogCard slug={order.slug} dataTour="fc-edit" />
 
-      <div className="mt-2" data-tour="fc-subscribe">
-        {isAgendaOffer && (
-          <p className="text-[15px] text-ink-soft text-center mb-3">
-            Suas clientes agendam sozinhas, sem trocar mensagem no WhatsApp — assine o Plano Agenda e libere o agendamento automático.
-          </p>
-        )}
+      <div className="mt-2">
+        <SectionCard icon={CreditCard} title="Pagamento" isOpen={isPaymentOpen} onToggle={() => setIsPaymentOpen((v) => !v)} dataTour="fc-subscribe">
+          {isAgendaOffer && (
+            <p className="text-[15px] text-ink-soft text-center mb-3">
+              Suas clientes agendam sozinhas, sem trocar mensagem no WhatsApp — assine o Plano Agenda e libere o agendamento automático.
+            </p>
+          )}
 
-        {isAgendaOffer ? (
-          <PlanSubscribeCard
-            slug={order.slug}
-            plan="plus"
-            billingEmail={order.billing_email}
-            billingCpfCnpj={order.billing_cpf_cnpj}
-            priceOverride={agendaDisplayPrice}
-            billingMode={order.agenda_billing_mode}
-          />
-        ) : (
-          <PlanSubscribeCard
-            slug={order.slug}
-            plan="basico"
-            billingEmail={order.billing_email}
-            billingCpfCnpj={order.billing_cpf_cnpj}
-            priceOverride={catalogDisplayPrice}
-            billingMode={order.catalog_billing_mode}
-          />
-        )}
+          {isAgendaOffer ? (
+            <PlanSubscribeCard
+              slug={order.slug}
+              plan="plus"
+              billingEmail={order.billing_email}
+              billingCpfCnpj={order.billing_cpf_cnpj}
+              priceOverride={agendaDisplayPrice}
+              billingMode={order.agenda_billing_mode}
+            />
+          ) : (
+            <PlanSubscribeCard
+              slug={order.slug}
+              plan="basico"
+              billingEmail={order.billing_email}
+              billingCpfCnpj={order.billing_cpf_cnpj}
+              priceOverride={catalogDisplayPrice}
+              billingMode={order.catalog_billing_mode}
+            />
+          )}
+        </SectionCard>
       </div>
 
       {showFullCatalogOffer && <FullCatalogOfferCard slug={order.slug} price={fullCatalogUpgradePrice} alreadyPaid={false} />}
