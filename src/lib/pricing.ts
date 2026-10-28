@@ -12,8 +12,11 @@ import type { AsaasCycle } from './asaas';
  *  sempre, que significa "catálogo grátis, nunca pagou nada" — não confundir
  *  com o produto "Plano Catálogo" (que por baixo dos panos é `plan_tier =
  *  'basico'`, só pago). */
-export const CATALOGO_PRICE = 89.9;
-export const CATALOGO_PRICE_LABEL = 'R$ 89,90';
+// R$79,00 (2026-10-28) — período de teste vendendo só o produto "Catálogo
+// apenas" como padrão (pedido real: "vou vender sempre esse catálogo mais
+// simples por 79 reais, pelo menos por enquanto"). Era R$89,90 antes disso.
+export const CATALOGO_PRICE = 79.0;
+export const CATALOGO_PRICE_LABEL = 'R$ 79,00';
 
 /** Preço/modo padrão pra catálogo NOVO criado pelo admin (2026-10-13,
  *  atualizado pra R$22,90 em 2026-10-14) — passa a nascer como assinatura

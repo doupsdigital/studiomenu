@@ -17,7 +17,7 @@
 //
 // Preços centralizados em `src/lib/pricing.ts`; os valores de Catálogo usados aqui (R$22,90/mês)
 // são os de teste do X1 atual (`TEST_CATALOGO_PRICE` em `SalesLandingPage.tsx`), não o preço
-// "oficial" de catálogo avulso (`CATALOGO_PRICE`, R$89,90) — se o teste mudar de preço, estas
+// "oficial" de catálogo avulso (`CATALOGO_PRICE`, R$79,00) — se o teste mudar de preço, estas
 // mensagens devem ser atualizadas junto, porque citam o valor literal que a lead acabou de ver.
 
 export interface FunilV3Step {
