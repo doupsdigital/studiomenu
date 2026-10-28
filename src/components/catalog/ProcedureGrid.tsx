@@ -333,7 +333,7 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
           )}
           <h2 className={`secao-catalogo__titulo${showStudioHeader ? ' secao-catalogo__titulo--fit' : ''}`}>
             {showStudioHeader
-              ? (isClassico ? <>Menu de <em>serviços</em></> : <>Catálogo de <em>procedimentos</em></>)
+              ? <>Catálogo de <em>procedimentos</em></>
               : (isClassico ? <>Procedimentos &amp; <em>Valores</em></> : <>Escolha o seu <em>estilo</em></>)}
           </h2>
           <p className="secao-catalogo__sub">
