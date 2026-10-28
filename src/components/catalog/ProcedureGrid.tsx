@@ -170,11 +170,11 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
   const studioHeaderRef = useRef<HTMLElement | null>(null);
   const { ref: studioNomeRef, refit: refitStudioNome } = useFitText<HTMLHeadingElement>(studioHeaderRef, {
     maxFontSize: 40,
-    minFontSize: 18,
+    minFontSize: 16,
   });
   const { ref: studioTituloRef, refit: refitStudioTitulo } = useFitText<HTMLHeadingElement>(studioHeaderRef, {
     maxFontSize: 34,
-    minFontSize: 20,
+    minFontSize: 16,
   });
   useLayoutEffect(() => {
     if (!showStudioHeader) return;
@@ -288,16 +288,6 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
           ref={studioHeaderRef}
           className={`secao-catalogo__header anim-fade-up delay-1${showStudioHeader ? ' secao-catalogo__header--studio' : ''}`}
         >
-          {/* Sem JS, o `useFitText` nunca chega a rodar e os dois textos
-           *  acima ficariam com `opacity: 0` pra sempre (ver hook) —
-           *  salvaguarda pra crawler/navegador sem JS continuar vendo o
-           *  nome e o título normalmente, só sem o ajuste automático de
-           *  tamanho (que é supérfluo sem JS mesmo). */}
-          {showStudioHeader && (
-            <noscript>
-              <style>{`.secao-catalogo__header--studio .lm-catalogo-studio-nome, .secao-catalogo__header--studio .secao-catalogo__titulo { opacity: 1 !important; }`}</style>
-            </noscript>
-          )}
           {showStudioHeader && (
             <div className="lm-catalogo-studio">
               <div className="lm-catalogo-studio-line">
@@ -320,7 +310,7 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
               <h1
                 ref={studioNomeRef}
                 className="lm-catalogo-studio-nome"
-                style={{ whiteSpace: 'nowrap', opacity: 0 }}
+                style={{ whiteSpace: 'nowrap' }}
                 data-tour="cat-text"
                 data-lm-editable={isEditMode ? 'true' : undefined}
                 contentEditable={isEditMode}
@@ -370,8 +360,7 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
           )}
           <h2
             ref={showStudioHeader ? studioTituloRef : undefined}
-            className="secao-catalogo__titulo"
-            style={showStudioHeader ? { whiteSpace: 'nowrap', opacity: 0 } : undefined}
+            className={`secao-catalogo__titulo${showStudioHeader ? ' secao-catalogo__titulo--fit' : ''}`}
           >
             {showStudioHeader
               ? (isClassico ? <>Menu de <em>serviços</em></> : <>Catálogo de <em>procedimentos</em></>)
