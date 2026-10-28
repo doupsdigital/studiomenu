@@ -522,11 +522,27 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
   // tentar acertar um número de offset. Só o passo de editar/excluir um
   // serviço (que pode estar em qualquer posição da lista) continua rolando
   // de verdade.
+  // Produto "Catálogo apenas" (2026-10-27, achado testando de verdade): com
+  // os 3 flags públicos desligados, Capa/Textos e Orientações nem renderizam
+  // mais no editor (ver guards de `show_cover`/`show_instructions` abaixo) —
+  // sem filtrar os passos daqui, o Joyride tentava apontar pra alvos que não
+  // existem no DOM e os balões saíam "soltos"/fora de posição. Além disso,
+  // a usuária pediu de propósito que esse modo simplificado mostre só 2
+  // passos (editar serviço + tema/layout), sem o de "Salvar" — menos coisa
+  // pra explicar pra cliente com menos intimidade com tecnologia.
+  const catalogOnlyProduct =
+    catalogState.show_cover === false &&
+    catalogState.show_instructions === false &&
+    catalogState.show_contact_cta === false;
+
   const catalogEditorSteps = useMemo<Step[]>(() => {
-    const steps: Step[] = [
-      { target: '[data-tour="cat-cover"]', title: 'Troque a foto de capa', content: 'Toque aqui pra escolher uma nova foto de capa do seu catálogo.', skipScroll: true },
-      { target: '[data-tour="cat-text"]', title: 'Textos editáveis', content: 'Toque em qualquer texto marcado (nome, frase) pra editar direto na tela.', skipScroll: true },
-    ];
+    const steps: Step[] = [];
+    if (!hideCoverSection && catalogState.show_cover !== false) {
+      steps.push(
+        { target: '[data-tour="cat-cover"]', title: 'Troque a foto de capa', content: 'Toque aqui pra escolher uma nova foto de capa do seu catálogo.', skipScroll: true },
+        { target: '[data-tour="cat-text"]', title: 'Textos editáveis', content: 'Toque em qualquer texto marcado (nome, frase) pra editar direto na tela.', skipScroll: true }
+      );
+    }
     if (catalogState.procedures.length > 0) {
       steps.push({
         target: '[data-tour="cat-edit-proc"]',
@@ -534,26 +550,28 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
         content: 'Toque em ✏️ pra editar ou 🗑️ pra excluir, direto no card do serviço.',
       });
     }
-    steps.push(
-      // Passo "cat-add-proc" (Adicionar novos serviços) removido — o botão
-      // fica logo depois da lista de procedimentos, e o balão nunca ficou
-      // bem posicionado ali antes de descobrirmos o `skipScroll` (2026-09-24).
-      //
-      // "cat-orientacoes" (pedido real, 2026-10-19) — essa tela, diferente
-      // das outras, só aparece pra visitante real se tiver pelo menos 1
-      // item (`InstructionsSection.tsx`), mas sempre aparece aqui no editor
-      // — sem esse passo do tour, ninguém saberia por que ela "some" pro
-      // lead/cliente final se deixar tudo vazio.
-      {
+    // Passo "cat-add-proc" (Adicionar novos serviços) removido — o botão
+    // fica logo depois da lista de procedimentos, e o balão nunca ficou
+    // bem posicionado ali antes de descobrirmos o `skipScroll` (2026-09-24).
+    //
+    // "cat-orientacoes" (pedido real, 2026-10-19) — essa tela, diferente
+    // das outras, só aparece pra visitante real se tiver pelo menos 1
+    // item (`InstructionsSection.tsx`), mas sempre aparece aqui no editor
+    // — sem esse passo do tour, ninguém saberia por que ela "some" pro
+    // lead/cliente final se deixar tudo vazio.
+    if (catalogState.show_instructions !== false) {
+      steps.push({
         target: '[data-tour="cat-orientacoes"]',
         title: 'Informações importantes',
         content: 'Essa tela é opcional: se você deixar todos os campos vazios, ela não aparece pra sua cliente.',
-      },
-      { target: '[data-tour="cat-theme"]', title: 'Personalize tema e layout', content: 'Esses botões trocam a paleta de cores e o modelo da grade (Mosaico/Clássico).', skipScroll: true },
-      { target: '[data-tour="cat-save"]', title: 'Não esqueça de salvar', content: 'As mudanças só valem pra cliente final depois de tocar aqui.', skipScroll: true }
-    );
+      });
+    }
+    steps.push({ target: '[data-tour="cat-theme"]', title: 'Personalize tema e layout', content: 'Esses botões trocam a paleta de cores e o modelo da grade (Mosaico/Clássico).', skipScroll: true });
+    if (!catalogOnlyProduct) {
+      steps.push({ target: '[data-tour="cat-save"]', title: 'Não esqueça de salvar', content: 'As mudanças só valem pra cliente final depois de tocar aqui.', skipScroll: true });
+    }
     return steps;
-  }, [catalogState.procedures.length]);
+  }, [catalogState.procedures.length, hideCoverSection, catalogState.show_cover, catalogState.show_instructions, catalogOnlyProduct]);
 
   // Reordenar categoria (setas ‹ › nos chips de filtro, modo edição).
   // Usa a lista `categories` completa (não só catalogState.categories) pra
