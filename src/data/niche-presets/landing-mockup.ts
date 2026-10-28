@@ -98,4 +98,11 @@ export const landingMockupPreset: CatalogOrderData = {
     tolerances: 'Tolerância de 15 minutos de atraso.',
     items: [],
   },
+  // Produto "Catálogo apenas" (pedido real, 2026-10-28) — mesmo tratamento
+  // do `lashLandingMockupPreset`: esconde Capa/Orientações/Contato tanto no
+  // mockup estático da Hero quanto no modal fullscreen de teste, mostrando
+  // só o mini-cabeçalho "STUDIO + Nome" + procedimentos.
+  show_cover: false,
+  show_instructions: false,
+  show_contact_cta: false,
 };
