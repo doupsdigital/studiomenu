@@ -811,9 +811,39 @@ button {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 18px;
   width: 100%;
   margin-bottom: 14px;
+}
+
+/* Agrupa os 2 pills de cada seletor (pedido real, 2026-10-28: ficavam
+ *  "soltos", os 4 pareciam opções do mesmo grupo) — rótulo pequeno +
+ *  "trilho" arredondado com fundo/borda próprios, reaproveitando as
+ *  mesmas variáveis de cor de `.layout-pill` (já responsivas por tema). */
+.lm-catalogo-switch-group {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.lm-catalogo-switch-group-label {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--grid-sub-color);
+  opacity: 0.75;
+  white-space: nowrap;
+}
+
+.lm-catalogo-switch-group-pills {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--chip-bg);
+  border: 1px solid var(--chip-border);
 }
 
 .lm-catalogo-studio {

@@ -277,40 +277,46 @@ export const ProcedureGrid: React.FC<ProcedureGridProps> = ({
           {showStudioHeader && (layoutSwitcher || themeSwitcher) && (
             <div className="lm-catalogo-studio-switchers">
               {themeSwitcher && (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => themeSwitcher.onChange('rose')}
-                    className={`layout-pill ${themeSwitcher.value === 'rose' ? 'layout-pill--active' : ''}`}
-                  >
-                    🌸 Rosé
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => themeSwitcher.onChange('luxury')}
-                    className={`layout-pill ${themeSwitcher.value === 'luxury' ? 'layout-pill--active' : ''}`}
-                  >
-                    👑 Luxury
-                  </button>
-                </>
+                <div className="lm-catalogo-switch-group">
+                  <span className="lm-catalogo-switch-group-label">Tema</span>
+                  <div className="lm-catalogo-switch-group-pills">
+                    <button
+                      type="button"
+                      onClick={() => themeSwitcher.onChange('rose')}
+                      className={`layout-pill ${themeSwitcher.value === 'rose' ? 'layout-pill--active' : ''}`}
+                    >
+                      🌸 Rosé
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => themeSwitcher.onChange('luxury')}
+                      className={`layout-pill ${themeSwitcher.value === 'luxury' ? 'layout-pill--active' : ''}`}
+                    >
+                      👑 Luxury
+                    </button>
+                  </div>
+                </div>
               )}
               {layoutSwitcher && (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => layoutSwitcher.onChange('mosaico')}
-                    className={`layout-pill ${layoutSwitcher.value === 'mosaico' ? 'layout-pill--active' : ''}`}
-                  >
-                    Mosaico
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => layoutSwitcher.onChange('classico')}
-                    className={`layout-pill ${layoutSwitcher.value === 'classico' ? 'layout-pill--active' : ''}`}
-                  >
-                    Clássico
-                  </button>
-                </>
+                <div className="lm-catalogo-switch-group">
+                  <span className="lm-catalogo-switch-group-label">Layout</span>
+                  <div className="lm-catalogo-switch-group-pills">
+                    <button
+                      type="button"
+                      onClick={() => layoutSwitcher.onChange('mosaico')}
+                      className={`layout-pill ${layoutSwitcher.value === 'mosaico' ? 'layout-pill--active' : ''}`}
+                    >
+                      Mosaico
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => layoutSwitcher.onChange('classico')}
+                      className={`layout-pill ${layoutSwitcher.value === 'classico' ? 'layout-pill--active' : ''}`}
+                    >
+                      Clássico
+                    </button>
+                  </div>
+                </div>
               )}
             </div>
           )}
