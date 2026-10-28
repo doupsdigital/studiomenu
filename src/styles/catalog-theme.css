@@ -869,6 +869,18 @@ button {
   animation: nomeStudioShine 3.6s linear infinite;
 }
 
+/* Em modo de edição, ao clicar/focar pra digitar, desliga o brilho e mostra
+ *  o nome sólido — achado relatado de verdade, 2026-10-28: com
+ *  `-webkit-text-fill-color: transparent`, o texto fica ilegível/some
+ *  enquanto está em edição (cursor piscando, seleção do navegador não lida
+ *  bem com texto "transparente"). Volta a brilhar normalmente ao sair do
+ *  campo (perder o foco). */
+.lm-catalogo-studio-nome:focus {
+  background: none;
+  -webkit-text-fill-color: unset;
+  animation: none;
+}
+
 /* `background-position` fica sempre dentro de 0%-100% de propósito (achado
  *  relatado de verdade, 2026-10-28: com valores fora dessa faixa — 200% a
  *  -50% na primeira versão — o brilho passava certo na primeira volta, mas
