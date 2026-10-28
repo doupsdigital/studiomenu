@@ -881,6 +881,18 @@ button {
   animation: none;
 }
 
+/* O ✏️ (`[data-lm-editable]::after` em visual-editor.css) herda
+ *  `-webkit-text-fill-color: transparent` do nome (propriedade de texto,
+ *  herdada pelo pseudo-elemento igual `color`) — ficava com a aparência
+ *  "puxando" a cor/gradiente do nome em vez do emoji normal, só corrigindo
+ *  ao focar (quando o `:focus` acima já reseta isso no elemento pai).
+ *  Reseta aqui pra já nascer com a cor própria do emoji, clicado ou não —
+ *  achado relatado de verdade, 2026-10-28. */
+.lm-catalogo-studio-nome::after {
+  -webkit-text-fill-color: initial;
+  color: initial;
+}
+
 /* `background-position` fica sempre dentro de 0%-100% de propósito (achado
  *  relatado de verdade, 2026-10-28: com valores fora dessa faixa — 200% a
  *  -50% na primeira versão — o brilho passava certo na primeira volta, mas
