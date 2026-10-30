@@ -384,7 +384,13 @@ export default function AdminCatalogosPage() {
     const app = item.app_short_code
       ? `${rootDomainOrigin}/a/${item.app_short_code}`
       : `${root}/api/professional/login?slug=${item.slug}&token=${item.edit_token}`;
-    return { official, edit: `${official}?edit=${item.edit_token}`, app };
+    // Link de edição: mesmo alias curto, via `/e/[code]` (2026-10-30), no
+    // subdomínio da cliente (`anapaula.studiomenu.art/e/...`) — pedido real,
+    // começa com o nome dela igual ao Link Oficial.
+    const edit = item.app_short_code
+      ? `${root}/e/${item.app_short_code}`
+      : `${official}?edit=${item.edit_token}`;
+    return { official, edit, app };
   };
 
   const toggleBookingEnabled = async (item: AdminCatalog) => {
@@ -1237,6 +1243,29 @@ export default function AdminCatalogosPage() {
                             {item.slug}.{PRODUCTION_DOMAIN}
                           </p>
                           <p className="text-[11px] text-rose-300/60">É esse que ela divulga: bio, WhatsApp, etc.</p>
+                        </div>
+
+                        {/* Removido em 5a656bb (2026-10-13), restaurado em
+                         *  2026-10-30 a pedido real — a operação voltou a
+                         *  precisar mandar o link de edição pra cliente. */}
+                        <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1.5">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold uppercase tracking-wider text-slate-300">Link Mágico da Cliente</span>
+                            {item.edit_token && (
+                              <button
+                                onClick={() => {
+                                  navigator.clipboard.writeText(buildProfessionalLinks(item).edit);
+                                  showToast('🔗 Link Mágico de Edição copiado!');
+                                }}
+                                className="text-xs text-rose-400 hover:text-rose-300 font-bold underline flex items-center gap-1"
+                              >
+                                Copiar Link
+                              </button>
+                            )}
+                          </div>
+                          <p className="text-xs font-mono text-slate-300 truncate">
+                            {item.edit_token ? buildProfessionalLinks(item).edit : `${item.slug}.${PRODUCTION_DOMAIN}`}
+                          </p>
                         </div>
 
                         {item.edit_token && (
