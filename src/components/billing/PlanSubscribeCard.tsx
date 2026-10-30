@@ -176,6 +176,12 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
    *  como recorrente, mensal ou anual (Fase 27 / 2026-10-15). Pro Agenda
    *  sempre é recorrente. */
   const isOneTime = plan === 'basico' && billingMode === 'avulso';
+  /** Catálogo anual (2026-10-30, pedido real): botão "Pagar R$ X" em vez de
+   *  "Assinar por R$ X/ano" — "Assinar" passava a ideia de mensalidade pro
+   *  público de beleza. Só o valor, sem o "/ano" do `pricing.label`.
+   *  Catálogo mensal e Agenda continuam "Assinar por ...". */
+  const isCatalogAnnual = plan === 'basico' && billingMode === 'anual';
+  const priceOnlyLabel = `R$ ${pricing.price.toFixed(2).replace('.', ',')}`;
 
   const [email, setEmail] = useState(billingEmail || '');
   const [cpfCnpj, setCpfCnpj] = useState(formatCpfCnpj(billingCpfCnpj || ''));
@@ -594,7 +600,9 @@ export const PlanSubscribeCard: React.FC<PlanSubscribeCardProps> = ({
                     ? `Pagar ${pricing.label} e liberar o Completo`
                     : isOneTime
                       ? 'Realizar pagamento'
-                      : `Assinar por ${pricing.label}`}
+                      : isCatalogAnnual
+                        ? `Pagar ${priceOnlyLabel}`
+                        : `Assinar por ${pricing.label}`}
           </button>
         </form>
       )}
