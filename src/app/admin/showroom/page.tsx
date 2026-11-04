@@ -27,8 +27,8 @@ export default function AdminShowroomPage() {
     setTimeout(() => setToastMessage(null), 3000);
   };
 
-  const copyShowcaseLink = (niche: NicheType) => {
-    const url = `${window.location.origin}/c/showcase/${niche}`;
+  const copyShowcaseLink = (slug: string) => {
+    const url = `${window.location.origin}/c/showcase/${slug}`;
     navigator.clipboard.writeText(url);
     showToast('🔗 Link de vitrine copiado!');
   };
@@ -99,6 +99,51 @@ export default function AdminShowroomPage() {
                   <button
                     type="button"
                     onClick={() => copyShowcaseLink(niche)}
+                    className="flex-1 px-3 py-2.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 text-sm font-bold flex items-center justify-center gap-1.5 transition-all"
+                  >
+                    <Link2 className="w-3.5 h-3.5" />
+                    <span>Copiar Link</span>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Exemplos reduzidos — produto "Catálogo apenas" (pedido real,
+         *  2026-11-04): exemplo fiel do que o lead recebe de verdade por
+         *  R$79, sem Orientações/Contato. Só Lash por enquanto. */}
+        <section className="space-y-2.5">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+            Exemplos "Catálogo apenas" (Lash)
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {[
+              { slug: 'lashcatalogo', label: 'Só o Catálogo', description: 'Abre direto no nome da profissional + procedimentos, sem Capa.' },
+              { slug: 'lashcapa', label: 'Capa + Catálogo', description: 'Abre na Capa e depois cai no Catálogo.' },
+            ].map(({ slug, label, description }) => (
+              <div
+                key={slug}
+                className="p-5 rounded-2xl bg-slate-900 border border-slate-800 hover:border-rose-500/50 transition-all space-y-3.5"
+              >
+                <div className="flex items-center gap-2.5 text-rose-400">
+                  <Scissors className="w-5 h-5" />
+                  <h3 className="font-bold text-white text-base">{label}</h3>
+                </div>
+                <p className="text-xs text-slate-400">{description}</p>
+                <p className="text-xs font-mono text-slate-500 truncate">/c/showcase/{slug}</p>
+                <div className="flex items-center gap-2">
+                  <Link
+                    href={`/c/showcase/${slug}`}
+                    target="_blank"
+                    className="flex-1 px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm font-semibold text-white flex items-center justify-center gap-1.5 transition-all"
+                  >
+                    <span>Ver</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => copyShowcaseLink(slug)}
                     className="flex-1 px-3 py-2.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 text-sm font-bold flex items-center justify-center gap-1.5 transition-all"
                   >
                     <Link2 className="w-3.5 h-3.5" />
