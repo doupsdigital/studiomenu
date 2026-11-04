@@ -234,16 +234,19 @@ button {
   -webkit-overflow-scrolling: touch;
 }
 
-/* Produto "Catálogo apenas" (pedido real, 2026-10-28, testado em celular
- *  de verdade): com Capa/Orientações/Contato escondidos, sobra só UMA
- *  "tela" (o Catálogo de procedimentos) — ela sozinha já é o `scroll-snap`
- *  mandatório inteiro. Rolar uma lista mais longa (8 procedimentos) dentro
- *  de um único ponto de encaixe `scroll-snap-stop: always` ficava travando/
- *  grudando a cada tentativa de rolagem, porque o navegador tenta "voltar"
- *  pro início do único snap point sempre que a rolagem não o ultrapassa de
- *  propósito. Sem telas pra "deslizar entre", o snap não serve pra nada
- *  aqui — desligar devolve a rolagem nativa fluida. */
-.mosaico-app--single-screen {
+/* Catálogo como ÚLTIMA tela do scroll-snap (pedido real, 2026-10-28,
+ *  testado em celular de verdade; generalizado 2026-11-04 pra também cobrir
+ *  "Capa + Catálogo", não só "Catálogo apenas") — com Orientações/Contato
+ *  escondidos, o Catálogo de procedimentos é sempre o último ponto de
+ *  encaixe do `scroll-snap` mandatório (às vezes o único, às vezes o 2º
+ *  depois da Capa). Rolar uma lista mais longa (8 procedimentos) dentro
+ *  desse ponto com `scroll-snap-stop: always` ficava travando/grudando a
+ *  cada tentativa de rolagem, porque o navegador tenta "voltar" pro início
+ *  do snap point sempre que a rolagem não ultrapassa pra um PRÓXIMO ponto —
+ *  que não existe, sendo o último. Desligar o snap devolve a rolagem nativa
+ *  fluida (também solto entre Capa→Catálogo quando as 2 existem, sem
+ *  problema — só 2 telas, não precisa de snap pra "guiar" a transição). */
+.mosaico-app--catalog-is-last {
   scroll-snap-type: none;
 }
 

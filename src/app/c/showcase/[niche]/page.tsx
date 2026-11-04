@@ -4,6 +4,7 @@ import { ShowcaseClient } from './ShowcaseClient';
 import { landingMockupPreset } from '@/data/niche-presets/landing-mockup';
 import { lashLandingMockupPreset } from '@/data/niche-presets/lash-landing-mockup';
 import { nailLandingMockupPreset } from '@/data/niche-presets/nail-landing-mockup';
+import { lashCatalogoMockupPreset, lashCapaCatalogoMockupPreset } from '@/data/niche-presets/lash-catalogo-mockup';
 
 interface ShowcasePageProps {
   params: Promise<{ niche: string }>;
@@ -57,6 +58,12 @@ const SHOWCASE_SLUGS: Record<string, { niche: NicheType; forceBasico: boolean; c
   // `landing-niche-content.tsx`) — `nails` continua intocado, sem o
   // presetOverride, pra não perder esse exemplo também.
   naillanding: { niche: 'nail', forceBasico: true, coverOverride: '/capa_nail.png', presetOverride: nailLandingMockupPreset },
+  // Exemplos reais do produto "Catálogo apenas" pra mandar de link pro lead
+  // no WhatsApp (pedido real, 2026-11-04) — só Lash por enquanto. Diferente
+  // de `lashlanding` (procedimentos filtrados, só pro mockup da landing),
+  // esses usam o preset completo do nicho.
+  lashcatalogo: { niche: 'lash', forceBasico: true, coverOverride: '/capa_lash.png', presetOverride: lashCatalogoMockupPreset },
+  lashcapa: { niche: 'lash', forceBasico: true, coverOverride: '/capa_lash.png', presetOverride: lashCapaCatalogoMockupPreset },
 };
 
 function resolveShowcaseSlug(slug: string): { niche: NicheType; forceBasico: boolean; coverOverride?: string; presetOverride?: CatalogOrderData } {

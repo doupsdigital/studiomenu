@@ -545,6 +545,19 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
     catalogState.show_instructions === false &&
     catalogState.show_contact_cta === false;
 
+  // Mesma trava de rolagem do "Catálogo apenas" (ver `mosaico-app--catalog-is-last`
+  // no CSS) também acontece quando a Capa continua visível mas Orientações/
+  // Contato ficam escondidos (vitrine "Capa + Catálogo", pedido real
+  // 2026-11-04) — o Catálogo vira a ÚLTIMA tela do scroll-snap de qualquer
+  // forma, sem próximo ponto de encaixe pra "avançar", travando a rolagem
+  // interna de uma lista de procedimentos mais longa do mesmo jeito.
+  // Por isso não reaproveita `catalogOnlyProduct` (que exige Capa escondida
+  // também, e segue sendo usado só pra decidir os passos do tour do editor).
+  const catalogIsLastSection =
+    !forcePreviewFull &&
+    catalogState.show_instructions === false &&
+    catalogState.show_contact_cta === false;
+
   const catalogEditorSteps = useMemo<Step[]>(() => {
     const steps: Step[] = [];
     const showsCover = !hideCoverSection && catalogState.show_cover !== false;
@@ -714,7 +727,7 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
 
       {/* 3. APP MOBILE CONTAINER COM SUPORTE A EDIÇÃO IN-PLACE */}
       <div
-        className={`mosaico-app is-visible ${isLuxury ? 'is-luxury' : ''}${catalogOnlyProduct ? ' mosaico-app--single-screen' : ''}`}
+        className={`mosaico-app is-visible ${isLuxury ? 'is-luxury' : ''}${catalogIsLastSection ? ' mosaico-app--catalog-is-last' : ''}`}
       >
         {/* Hero Section (Foto da Capa, Nome da Profissional, Frase Hero) —
          *  não renderiza quando `hideCoverSection` (ver comentário na prop
