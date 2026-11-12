@@ -101,6 +101,8 @@ export interface LandingNicheContent {
      *  string simples (não dá pra colocar JSX dentro de um link de
      *  WhatsApp). */
     nicheLabel: string;
+    /** Subtítulo de preço opcional (ex: "menos de 11 reais por mês") */
+    priceSub?: string;
   };
   /** Override da 1ª pergunta destacada do FAQ (`SUBSCRIPTION_FAQ_ITEM` em
    *  `FaqSection.tsx`) — só faz sentido junto com `singleAnnualPlanTest`:
@@ -199,16 +201,15 @@ export const LANDING_NICHE_CONTENT: Record<LandingNiche, LandingNicheContent> = 
         <span className="lp-hero-niche-ribbon" />
       </div>
     ),
-    // Teste de plano único anual (pedido real, 2026-10-19, preço ajustado
-    // pra R$79,00 em 2026-10-28, testando o produto "Catálogo apenas") —
+    // Teste de plano único anual (preço ajustado pra R$127,00/ano no nicho Lash) —
     // ver comentário de `singleAnnualPlanTest` na interface acima. O
-    // desconto do badge é sempre CALCULADO contra `anchorPrice`, não
-    // precisa reajustar manualmente.
+    // desconto do badge é sempre CALCULADO contra `anchorPrice`.
     singleAnnualPlanTest: {
-      price: 79.0,
+      price: 127.0,
       anchorPrice: 199.9,
       ctaLabel: 'QUERO VER NO MEU STUDIO',
       nicheLabel: 'Lash Designer',
+      priceSub: 'menos de 11 reais por mês',
     },
     subscriptionFaqOverride: {
       question: 'Por que o pagamento é anual?',

@@ -392,9 +392,10 @@ export function SalesLandingPage({ content, variant = 'longa' }: SalesLandingPag
                   </div>
                   <div className="lp-tier-price-sub">
                     {singlePlanTest
-                      ? anualPrice <= 97
-                        ? 'menos de 8 reais por mês'
-                        : 'menos de R$ 10,00 por mês'
+                      ? singlePlanTest.priceSub ??
+                        (anualPrice <= 97
+                          ? 'menos de 8 reais por mês'
+                          : 'menos de 11 reais por mês')
                       : 'pagamento único'}
                   </div>
                 </div>
