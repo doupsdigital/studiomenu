@@ -3,7 +3,9 @@ import { getCatalogBySlug } from '@/lib/catalog-service';
 import { CatalogLayout } from '@/components/catalog/CatalogLayout';
 import Link from 'next/link';
 import { Sparkles, ArrowLeft } from 'lucide-react';
-import { PRODUCTION_DOMAIN } from '@/lib/public-url';
+import { headers } from 'next/headers';
+import { PRODUCTION_DOMAIN, usesSubdomainRouting } from '@/lib/public-url';
+import { isPreviewExpired, isPreviewOrder } from '@/lib/preview';
 
 interface CatalogPageProps {
   params: Promise<{
@@ -13,6 +15,7 @@ interface CatalogPageProps {
     edit?: string;
     new?: string;
     preview?: string;
+    embed?: string;
   }>;
 }
 
@@ -47,6 +50,8 @@ export async function generateMetadata({ params }: CatalogPageProps): Promise<Me
   return {
     title: title,
     description: description,
+    // Prévias gratuitas de 24h não devem ir pro Google.
+    ...(isPreviewOrder(catalog) ? { robots: { index: false, follow: false } } : {}),
     openGraph: {
       title: title,
       description: description,
@@ -72,7 +77,7 @@ export async function generateMetadata({ params }: CatalogPageProps): Promise<Me
 // 2. Renderização SSR Principal da Página do Catálogo do Cliente
 export default async function CatalogPage({ params, searchParams }: CatalogPageProps) {
   const { slug } = await params;
-  const { edit, new: isNew, preview } = await searchParams;
+  const { edit, new: isNew, preview, embed } = await searchParams;
   const catalog = await getCatalogBySlug(slug);
 
   if (!catalog) {
@@ -119,7 +124,38 @@ export default async function CatalogPage({ params, searchParams }: CatalogPageP
     );
   }
 
-  const isEditAuthorized = Boolean(edit && catalog.edit_token && edit === catalog.edit_token);
+  // Prévia gratuita do funil `/lash` (2026-11-17, ver `src/lib/preview.ts`).
+  // Links relativos não funcionam no subdomínio dela (o proxy reescreve tudo
+  // pra `/c/<slug>`), então no domínio oficial o funil vai com URL absoluta.
+  const isPreview = isPreviewOrder(catalog);
+  const hostname = ((await headers()).get('host') || '').split(':')[0];
+  const funnelUrl = usesSubdomainRouting(hostname) ? `https://${PRODUCTION_DOMAIN}/lash` : '/lash';
+
+  if (isPreview && isPreviewExpired(catalog)) {
+    return (
+      <main className="min-h-screen flex items-center justify-center p-6 bg-rose-50 text-center">
+        <div className="max-w-sm w-full p-8 rounded-3xl bg-white border border-rose-100 shadow-2xl">
+          <div className="w-16 h-16 rounded-2xl bg-rose-100 text-rose-500 flex items-center justify-center mx-auto mb-4">
+            <Sparkles className="w-8 h-8" />
+          </div>
+          <h1 className="font-serif text-2xl font-bold mb-2 text-rose-900">Essa prévia expirou</h1>
+          <p className="text-sm text-rose-900/70 leading-relaxed mb-6">
+            A prévia gratuita do menu fica disponível por 24 horas. Crie a sua de novo, leva só alguns segundos.
+          </p>
+          <a
+            href={funnelUrl}
+            className="inline-flex items-center justify-center gap-2 w-full px-5 py-3 rounded-xl bg-rose-500 hover:bg-rose-600 text-white text-sm font-bold transition-all shadow-md"
+          >
+            <Sparkles className="w-4 h-4" />
+            <span>Criar meu menu grátis</span>
+          </a>
+        </div>
+      </main>
+    );
+  }
+
+  // Prévia nunca entra em modo edição, nem com o token certo na URL.
+  const isEditAuthorized = !isPreview && Boolean(edit && catalog.edit_token && edit === catalog.edit_token);
   // Preview isolado da oferta "Catálogo Completo" (2026-10-28) — só decide o
   // que o CatalogLayout mostra NESTA requisição; nunca grava nada em
   // `publicCatalog`/`orders`. Mesmo padrão de `hideCoverSection` (showroom),
@@ -152,6 +188,11 @@ export default async function CatalogPage({ params, searchParams }: CatalogPageP
         editToken={edit || ''}
         isNewCatalog={isEditAuthorized && isNew === '1'}
         forcePreviewFull={forcePreviewFull}
+        previewMode={
+          isPreview && catalog.preview_expires_at
+            ? { expiresAt: catalog.preview_expires_at, activateUrl: `${funnelUrl}#oferta`, showBanner: embed !== '1' }
+            : undefined
+        }
       />
     </>
   );

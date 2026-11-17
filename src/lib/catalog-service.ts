@@ -126,6 +126,8 @@ export async function getCatalogBySlug(slug: string): Promise<CatalogOrderData |
             orderData.plan_tier !== 'catalog' &&
             !orderData.manual_plan &&
             orderData.subscription_status !== 'ativo',
+      plan_tier: orderData.plan_tier,
+      preview_expires_at: orderData.preview_expires_at ?? null,
       client_name: orderData.client_name || orderData.name || normalizedSlug,
       studio_name: orderData.studio_name || `Studio ${orderData.client_name || normalizedSlug}`,
       studio_label: orderData.studio_label || 'STUDIO',
