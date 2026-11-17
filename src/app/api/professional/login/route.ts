@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { isPreviewOrder } from '@/lib/preview';
 import { timingSafeEqual } from 'crypto';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
@@ -38,13 +39,14 @@ export async function GET(request: Request) {
 
     const { data: order, error } = await supabaseAdmin
       .from('orders')
-      .select('edit_token')
+      .select('edit_token, plan_tier, preview_expires_at')
       .eq('slug', slug)
       .single();
 
     // Mesma resposta genérica pra slug inexistente e token errado — não vaza
     // se o catálogo existe (evita enumeração de slugs).
-    if (error || !order || !order.edit_token || !tokensMatch(token, order.edit_token)) {
+    // Prévia gratuita do funil `/lash` (2026-11-17) não tem app até pagar.
+    if (error || !order || !order.edit_token || isPreviewOrder(order) || !tokensMatch(token, order.edit_token)) {
       return NextResponse.json(GENERIC_ERROR, { status: 401 });
     }
 

@@ -17,6 +17,10 @@ interface HeaderCoverProps {
    *  em catálogos reais, que continuam mostrando só o selo, sem alteração
    *  nenhuma. */
   themeSwitcher?: { value: ThemeVariant; onChange: (variant: ThemeVariant) => void };
+  /** Só na prévia gratuita do funil `/lash` (2026-11-17): o botão flutuante
+   *  de WhatsApp abre a simulação em vez do link real (ainda não existe o
+   *  número dela). Ausente = link real de sempre. */
+  onWhatsappClick?: () => void;
 }
 
 export const HeaderCover: React.FC<HeaderCoverProps> = ({
@@ -28,6 +32,7 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
   onUpdateHeroPhrase,
   onUpdateStudioLabel,
   themeSwitcher,
+  onWhatsappClick,
 }) => {
   const wspText = encodeURIComponent(`Olá! Vim pelo seu catálogo digital e gostaria de tirar uma dúvida.`);
   const wspUrl = `https://wa.me/${data.whatsapp_number}?text=${wspText}`;
@@ -222,6 +227,14 @@ export const HeaderCover: React.FC<HeaderCoverProps> = ({
         rel="noopener noreferrer"
         className="wsp-float-btn"
         id="wsp-float-btn"
+        onClick={
+          onWhatsappClick
+            ? (e) => {
+                e.preventDefault();
+                onWhatsappClick();
+              }
+            : undefined
+        }
         aria-label="Falar comigo no WhatsApp"
       >
         <div className="wsp-float-btn__icon">

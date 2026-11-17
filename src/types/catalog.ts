@@ -97,6 +97,10 @@ export interface CatalogOrderData {
    *  (pagamento único, o padrão) nunca liga essa flag — é pra sempre dela,
    *  por definição. */
   catalog_payment_lapsed?: boolean;
+  /** Prévia gratuita do funil `/lash` (2026-11-17, ver `src/lib/preview.ts`):
+   *  `preview_expires_at` só existe enquanto ela não pagou. */
+  plan_tier?: string;
+  preview_expires_at?: string | null;
   /** Flags de visibilidade por pedido (produto "Catálogo apenas") — controlam
    *  se a Capa, as Orientações e a tela final de Links/Contato aparecem,
    *  valendo em qualquer modo (público ou edição). `undefined`/ausente conta

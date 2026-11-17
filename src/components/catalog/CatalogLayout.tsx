@@ -16,6 +16,7 @@ import { FakeBookingModal } from './modals/FakeBookingModal';
 import { AgendaDemoScreen } from './modals/AgendaDemoScreen';
 import { FakeWhatsappScreen } from './modals/FakeWhatsappScreen';
 import { ProductTour } from '@/components/tour/ProductTour';
+import { PreviewBanner } from './PreviewBanner';
 
 import '@/styles/visual-editor.css';
 
@@ -59,6 +60,12 @@ interface CatalogLayoutProps {
    *  contrária: forçar mostrar, não esconder. Default `false` — não muda
    *  nada em nenhum catálogo real nem no showroom. */
   forcePreviewFull?: boolean;
+  /** Prévia gratuita do funil `/lash` (2026-11-17) — catálogo ainda não
+   *  pago. O WhatsApp vira a simulação (`FakeWhatsappScreen`, a mesma do
+   *  showroom), porque ainda não existe o número dela; `showBanner` mostra a
+   *  faixa "Prévia · expira em… · Ativar" (desligada quando o catálogo está
+   *  embutido na própria página de vendas). Nunca combinado com edição. */
+  previewMode?: { expiresAt: string; activateUrl: string; showBanner: boolean };
 }
 
 export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
@@ -72,6 +79,7 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
   layoutSwitcher,
   hideCoverSection = false,
   forcePreviewFull = false,
+  previewMode,
 }) => {
   const [showWelcomeOverlay, setShowWelcomeOverlay] = useState(isNewCatalog);
   const [catalogState, setCatalogState] = useState<CatalogOrderData>(data);
@@ -744,6 +752,15 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
             onUpdateHeroPhrase={handleUpdateHeroPhrase}
             onUpdateStudioLabel={handleUpdateStudioLabel}
             themeSwitcher={themeSwitcher}
+            onWhatsappClick={
+              previewMode
+                ? () => {
+                    const procs = catalogState.procedures;
+                    const pick = procs.find((p) => p.is_highlight) || procs[0];
+                    if (pick) setFakeWhatsappItem(pick);
+                  }
+                : undefined
+            }
           />
         )}
 
@@ -790,7 +807,9 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
           // nunca passa isso, então o link de WhatsApp de verdade continua
           // intacto em produção.
           onFakeWhatsapp={
-            demoBookingOnly && (!catalogState.booking_enabled || catalogState.agenda_paused) ? setFakeWhatsappItem : undefined
+            previewMode || (demoBookingOnly && (!catalogState.booking_enabled || catalogState.agenda_paused))
+              ? setFakeWhatsappItem
+              : undefined
           }
           layoutSwitcher={layoutSwitcher}
           // Mesma ideia — no modo "Catálogo apenas" (sem Capa), o
@@ -858,6 +877,10 @@ export const CatalogLayout: React.FC<CatalogLayoutProps> = ({
 
       {agendaDemo && (
         <AgendaDemoScreen booked={agendaDemo} onClose={() => setAgendaDemo(null)} />
+      )}
+
+      {previewMode?.showBanner && !isEditMode && (
+        <PreviewBanner expiresAt={previewMode.expiresAt} activateUrl={previewMode.activateUrl} />
       )}
 
       {fakeWhatsappItem && (
