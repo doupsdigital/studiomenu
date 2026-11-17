@@ -28,9 +28,15 @@ interface HeroMockupProps {
    *  (pedido real, 2026-10-14: corrige conflito de gesto de scroll entre a
    *  página e o iframe, visto em gravações do PostHog). */
   onTap?: () => void;
+  /** URL completa do iframe, no lugar da vitrine `/c/showcase/...` — usado
+   *  só pela página `/lash` (2026-11-17) pra mostrar a prévia DELA depois de
+   *  gerada. Ausente = comportamento de sempre. */
+  iframeSrc?: string;
+  /** Texto do selo "Toque para testar" (mesma página `/lash`). */
+  tapLabel?: string;
 }
 
-export function HeroMockup({ showcaseSlug = 'landingpage', onTap }: HeroMockupProps) {
+export function HeroMockup({ showcaseSlug = 'landingpage', onTap, iframeSrc, tapLabel }: HeroMockupProps) {
   const [screen, setScreen] = useState<MockupScreen>('cover');
   const interactive = !onTap;
 
@@ -78,7 +84,8 @@ export function HeroMockup({ showcaseSlug = 'landingpage', onTap }: HeroMockupPr
                *  nenhuma chamada de scroll envolvida, o bug deixa de ser
                *  possível estruturalmente. */}
               <iframe
-                src={`/c/showcase/${showcaseSlug}${onTap ? '?tela=catalogo' : ''}`}
+                key={iframeSrc || showcaseSlug}
+                src={iframeSrc || `/c/showcase/${showcaseSlug}${onTap ? '?tela=catalogo' : ''}`}
                 title="Prévia ao vivo do Menu Digital StudioMenu"
                 tabIndex={-1}
               />
@@ -116,7 +123,7 @@ export function HeroMockup({ showcaseSlug = 'landingpage', onTap }: HeroMockupPr
                   <path d="M11 10a1.5 1.5 0 0 0-3 0v4" />
                   <path d="M8 11.5a1.5 1.5 0 0 0-3 0V15a6 6 0 0 0 6 6h2a6 6 0 0 0 6-6v-3a1.5 1.5 0 0 0-3 0" />
                 </svg>
-                <span>Toque para testar</span>
+                <span>{tapLabel || 'Toque para testar'}</span>
               </span>
             </button>
           )}
