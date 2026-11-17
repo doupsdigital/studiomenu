@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { formatClock, useRemaining, type FunnelPreview } from './funnel';
+import type { FunnelPreview } from './funnel';
 
 interface PreviewRevealModalProps {
   preview: FunnelPreview | null;
@@ -18,15 +18,20 @@ const DESIGN_H = 844;
 const BEZEL = 12;
 const FRAME_W = DESIGN_W + BEZEL * 2;
 const FRAME_H = DESIGN_H + BEZEL * 2;
-const MAX_SCALE = 380 / FRAME_W;
-/** Espaço reservado acima/abaixo do celular pra pílula do link e o botão. */
-const TOP_RESERVE = 64;
-const BOTTOM_RESERVE = 96;
+const MAX_SCALE = 400 / FRAME_W;
+/** Margens do overlay em volta do celular: em cima só um respiro, embaixo o
+ *  espaço do botão "Gostou? Ativar meu menu". O tamanho do celular é
+ *  calculado a partir delas — a moldura mantém SEMPRE a proporção de um
+ *  celular de verdade (390×844 + bezel) e nunca é achatada. */
+const PAD_TOP = 18;
+const PAD_SIDE = 14;
+const PAD_BOTTOM = 92;
 
 /** Revelação da prévia em tela cheia (página `/lash`, 2026-11-17). Mesma
  *  moldura de celular do `MockupModal` (mesmas classes CSS), mas com o
- *  catálogo DELA (`/c/<slug>?embed=1`) e, por fora do celular, a pílula com
- *  o link + contagem real e o botão "Ativar meu menu". Componente à parte de
+ *  catálogo DELA (`/c/<slug>?embed=1`) e, por baixo do celular, só o botão
+ *  "Gostou? Ativar meu menu" (link/contagem por cima foram tirados a pedido
+ *  da dona: tomavam altura e deixavam o celular "quadrado"). Componente à parte de
  *  propósito, pra não mexer no modal da página `/` que está no ar.
  *
  *  Fica montado assim que existe uma prévia (o iframe carrega por trás da
@@ -34,15 +39,14 @@ const BOTTOM_RESERVE = 96;
 export const PreviewRevealModal: React.FC<PreviewRevealModalProps> = ({ preview, isOpen, onClose, onActivate, onLoaded }) => {
   const overlayRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.8);
-  const remaining = useRemaining(preview?.expiresAt, 1000);
 
   useEffect(() => {
     const el = overlayRef.current;
     if (!el) return;
     function updateScale() {
       if (!el) return;
-      const availW = el.clientWidth - 32;
-      const availH = el.clientHeight - TOP_RESERVE - BOTTOM_RESERVE;
+      const availW = el.clientWidth - PAD_SIDE * 2;
+      const availH = el.clientHeight - PAD_TOP - PAD_BOTTOM;
       if (availW <= 0 || availH <= 0) return;
       setScale(Math.min(availW / FRAME_W, availH / FRAME_H, MAX_SCALE));
     }
@@ -70,28 +74,16 @@ export const PreviewRevealModal: React.FC<PreviewRevealModalProps> = ({ preview,
     <div
       ref={overlayRef}
       className={`lp-mockup-modal-overlay lp-ss-reveal${isOpen ? ' is-open' : ''}`}
-      style={{ paddingTop: TOP_RESERVE, paddingBottom: BOTTOM_RESERVE }}
+      style={{ padding: `${PAD_TOP}px ${PAD_SIDE}px ${PAD_BOTTOM}px` }}
       onClick={onClose}
       aria-hidden={!isOpen}
       role="dialog"
       aria-modal="true"
       aria-label="Prévia do seu menu"
     >
-      <div className="lp-ss-reveal-top" onClick={(e) => e.stopPropagation()}>
-        <div className="lp-ss-link-pill lp-ss-link-pill--dark">
-          <span className="lp-ss-link-dot" aria-hidden="true" />
-          {preview.displayUrl}
-        </div>
-        {remaining !== null && (
-          <span className="lp-ss-reveal-timer">
-            prévia: <strong>{formatClock(remaining)}</strong>
-          </span>
-        )}
-      </div>
-
       <div
         className="lp-mockup-modal-phone"
-        style={{ width: FRAME_W * scale, height: FRAME_H * scale, padding: BEZEL * scale }}
+        style={{ width: FRAME_W * scale, height: FRAME_H * scale, padding: BEZEL * scale, flexShrink: 0 }}
         onClick={(e) => e.stopPropagation()}
       >
         <button type="button" className="lp-mockup-modal-close" onClick={onClose} aria-label="Fechar">
@@ -120,7 +112,6 @@ export const PreviewRevealModal: React.FC<PreviewRevealModalProps> = ({ preview,
             <path d="M5 12h14m-7-7 7 7-7 7" />
           </svg>
         </button>
-        <p className="lp-ss-reveal-hint">Toque nos serviços para ver como suas clientes vão te chamar</p>
       </div>
     </div>
   );
