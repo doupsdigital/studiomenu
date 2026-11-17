@@ -7,7 +7,7 @@ import { supabaseAdmin } from './supabase-admin';
 const ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
 const CODE_LENGTH = 7;
 
-function generateCode(): string {
+export function generateCode(): string {
   const bytes = randomBytes(CODE_LENGTH);
   let code = '';
   for (let i = 0; i < CODE_LENGTH; i += 1) {
