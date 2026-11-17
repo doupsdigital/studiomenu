@@ -2,6 +2,7 @@
 @import '../styles/catalog-theme.css';
 @import '../styles/landing-lpb.css';
 @import '../styles/landing-classica.css';
+@import '../styles/landing-selfserve.css';
 
 @tailwind base;
 @tailwind components;
