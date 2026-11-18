@@ -102,7 +102,7 @@ export const SelfServeOffer: React.FC<SelfServeOfferProps> = ({ preview, onCheck
               <li>{CHECK}<span>Edite serviços, fotos e preços pelo celular</span></li>
               <li>{CHECK}<span>Ativação na hora</span></li>
             </ul>
-            <button type="button" className="lp-btn lp-ss-btn-outline lp-ss-btn-block" onClick={() => onCheckout('mensal')}>
+            <button type="button" className="lp-btn lp-btn--primary lp-ss-btn-block" onClick={() => onCheckout('mensal')}>
               ATIVAR NO CARTÃO
             </button>
           </div>
@@ -116,14 +116,6 @@ export const SelfServeOffer: React.FC<SelfServeOfferProps> = ({ preview, onCheck
             </button>
           </p>
         )}
-
-        <ul className="lp-ss-objections" data-reveal aria-label="Garantias">
-          <li><span aria-hidden="true">🔓</span>Cancele quando quiser</li>
-          <li><span aria-hidden="true">🛡️</span>Garantia de 7 dias</li>
-          <li><span aria-hidden="true">⚡</span>Ativação na hora</li>
-          <li><span aria-hidden="true">📱</span>Você edita pelo celular</li>
-          <li><span aria-hidden="true">🔗</span>Seu link continua o mesmo</li>
-        </ul>
 
         <div className="lp-ss-after" data-reveal>
           <h3 className="lp-ss-after-title">O que acontece depois de pagar</h3>

@@ -8,10 +8,6 @@ const ITEMS = [
     a: 'Pelo próprio celular. Depois de ativar, você entra no seu app e toca em qualquer texto, foto ou preço para trocar. Um passo a passo guiado mostra onde tocar na primeira vez.',
   },
   {
-    q: 'Preciso entender de tecnologia?',
-    a: 'Não. Se você usa Instagram e WhatsApp, consegue. O menu já vem pronto com o seu nome e serviços de exemplo — você só troca pelos seus.',
-  },
-  {
     q: 'Como eu cancelo o plano mensal?',
     a: 'Quando quiser, sem multa e sem fidelidade. Você mesma cancela pelo seu app (ou no portal de assinaturas da Cakto, com o e-mail da compra), e seu menu continua no ar até o fim do mês que você já pagou.',
   },
