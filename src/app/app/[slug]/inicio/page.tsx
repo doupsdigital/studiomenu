@@ -17,7 +17,10 @@ import { OnboardingCardStack } from '@/components/app-shell/OnboardingCardStack'
 import { OpenChargeBanner } from '@/components/billing/OpenChargeBanner';
 import { InicioTour } from '@/components/tour/InicioTour';
 import { resolveFullCatalogUpgradePrice } from '@/lib/pricing';
-import { CalendarDays, Clock, Share2, Crown, Home } from 'lucide-react';
+import { countSelfServeStepsDone, SELF_SERVE_STEP_ORDER } from '@/lib/self-serve-onboarding';
+import Link from 'next/link';
+import { CaktoPlanCard } from '@/components/billing/CaktoPlanCard';
+import { CalendarDays, Clock, Share2, Crown, Home, ListChecks, ChevronRight } from 'lucide-react';
 
 interface InicioPageProps {
   params: Promise<{ slug: string }>;
@@ -86,6 +89,26 @@ export default async function InicioPage({ params }: InicioPageProps) {
   ]);
   const hoursDone = businessHours.length > 0;
 
+  // Funil `/lash` (Cakto, 2026-11-18): enquanto o checklist "Primeiros
+  // passos" não termina, um card no topo leva ela de volta pra lá.
+  const selfServeTotal = SELF_SERVE_STEP_ORDER.length;
+  const selfServeDone = countSelfServeStepsDone(order.onboarding_steps, Boolean(order.auth_user_id));
+  const showSelfServeContinue = order.billing_provider === 'cakto' && selfServeDone < selfServeTotal;
+
+  // Card "Meu plano" da Cakto: no topo quando precisa de ação (fora do ar,
+  // renovação recusada, cancelada), senão no fim da tela.
+  const isCakto = order.billing_provider === 'cakto';
+  const caktoNeedsAttention =
+    isCakto && (order.subscription_status !== 'ativo' || !order.paid_until || new Date(order.paid_until).getTime() < Date.now());
+  const caktoPlanCard = isCakto ? (
+    <CaktoPlanCard
+      plan={order.cakto_plan}
+      status={order.subscription_status}
+      paidUntil={order.paid_until}
+      checkoutRef={order.cakto_checkout_ref}
+    />
+  ) : null;
+
   const greeting = getGreeting();
   const firstName = order.client_name.split(' ')[0];
 
@@ -113,6 +136,29 @@ export default async function InicioPage({ params }: InicioPageProps) {
       </GradientHeader>
 
       <OpenChargeBanner slug={slug} />
+
+      {caktoNeedsAttention && caktoPlanCard}
+
+      {showSelfServeContinue && (
+        <Link
+          href={`/app/${slug}/primeiros-passos`}
+          className="flex items-center gap-4 rounded-2xl p-4 bg-surface border-2 border-rose-300 shadow-sm transition-transform active:scale-[0.98]"
+        >
+          <div className="w-11 h-11 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+            <ListChecks className="w-6 h-6" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-bold text-[16px] text-ink leading-tight">Continue de onde parou</p>
+            <p className="text-sm text-ink-soft mt-0.5">
+              Primeiros passos: {selfServeDone} de {selfServeTotal} feitos
+            </p>
+            <div className="h-1.5 rounded-full bg-linen mt-2 overflow-hidden">
+              <div className="h-full rounded-full bg-rose-600" style={{ width: `${(selfServeDone / selfServeTotal) * 100}%` }} />
+            </div>
+          </div>
+          <ChevronRight className="w-5 h-5 text-ink-faint shrink-0" />
+        </Link>
+      )}
 
       {/* Só fazem sentido com o agendamento de fato funcionando — senão
        *  ficam sempre zerados, sem nenhuma ação possível por trás. Também só
@@ -175,6 +221,8 @@ export default async function InicioPage({ params }: InicioPageProps) {
           alreadyPaid
         />
       )}
+
+      {isCakto && !caktoNeedsAttention && caktoPlanCard}
 
       <OnboardingCardStack slug={slug} planTier={order.plan_tier} subscriptionStatus={order.subscription_status} hasAccount={Boolean(order.auth_user_id)} hoursDone={hoursDone} />
 

@@ -1,4 +1,5 @@
 import { supabaseAdmin } from './supabase-admin';
+import { parseOnboardingSteps, type OnboardingSteps } from './self-serve-onboarding';
 
 export interface ProfessionalOrderSummary {
   id: string;
@@ -82,6 +83,17 @@ export interface ProfessionalOrderSummary {
   full_catalog_offer_decision: 'pending' | 'accepted' | 'declined';
   full_catalog_price_override: number | null;
   full_catalog_upgrade_price_override: number | null;
+  /** Quem cobra esse catálogo (2026-11-18): 'asaas' (todo mundo até hoje)
+   *  ou 'cakto' (funil de autosserviço `/lash`). */
+  billing_provider: 'asaas' | 'cakto';
+  /** Só Cakto: até quando o acesso está pago, e qual plano ela comprou. */
+  paid_until: string | null;
+  cakto_plan: 'mensal' | 'anual' | null;
+  /** Código da prévia de origem — vai no `sck` do checkout da Cakto quando
+   *  ela renova/reativa, pra compra cair NESTE catálogo. */
+  cakto_checkout_ref: string | null;
+  /** Progresso do checklist "Primeiros passos" (só Cakto). */
+  onboarding_steps: OnboardingSteps;
 }
 
 /** Busca os dados que o app da profissional (`/app/[slug]`) precisa — um
@@ -93,7 +105,7 @@ export async function getOrderForProfessionalApp(slug: string): Promise<Professi
   const { data, error } = await supabaseAdmin
     .from('orders')
     .select(
-      'id, slug, edit_token, client_name, studio_name, whatsapp_number, plan_tier, subscription_status, billing_email, billing_cpf_cnpj, payment_method, booking_enabled, auth_user_id, first_offer_tier, agenda_paused, manual_plan, billing_price_override, catalog_billing_mode, agenda_billing_mode, agenda_price_override, asaas_subscription_id, lifetime_price_override, created_at, show_full_app, full_catalog_offer_enabled, full_catalog_offer_decision, full_catalog_price_override, full_catalog_upgrade_price_override'
+      'id, slug, edit_token, client_name, studio_name, whatsapp_number, plan_tier, subscription_status, billing_email, billing_cpf_cnpj, payment_method, booking_enabled, auth_user_id, first_offer_tier, agenda_paused, manual_plan, billing_price_override, catalog_billing_mode, agenda_billing_mode, agenda_price_override, asaas_subscription_id, lifetime_price_override, created_at, show_full_app, full_catalog_offer_enabled, full_catalog_offer_decision, full_catalog_price_override, full_catalog_upgrade_price_override, billing_provider, paid_until, cakto_plan, onboarding_steps, preview_code'
     )
     .eq('slug', normalizedSlug)
     .single();
@@ -139,5 +151,10 @@ export async function getOrderForProfessionalApp(slug: string): Promise<Professi
       data.full_catalog_upgrade_price_override === null || data.full_catalog_upgrade_price_override === undefined
         ? null
         : Number(data.full_catalog_upgrade_price_override),
+    billing_provider: data.billing_provider === 'cakto' ? 'cakto' : 'asaas',
+    paid_until: data.paid_until || null,
+    cakto_plan: data.cakto_plan === 'mensal' || data.cakto_plan === 'anual' ? data.cakto_plan : null,
+    onboarding_steps: parseOnboardingSteps(data.onboarding_steps),
+    cakto_checkout_ref: data.preview_code || null,
   };
 }

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { isPreviewOrder } from '@/lib/preview';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 import { usesSubdomainRouting, PRODUCTION_DOMAIN } from '@/lib/public-url';
@@ -21,11 +22,12 @@ export async function GET(request: Request, { params }: { params: Promise<{ code
 
   const { data: order } = await supabaseAdmin
     .from('orders')
-    .select('slug, edit_token')
+    .select('slug, edit_token, plan_tier, preview_expires_at')
     .eq('app_short_code', code)
     .maybeSingle();
 
-  if (!order || !order.edit_token) {
+  // Prévia gratuita do funil `/lash` (2026-11-17): sem app/edição até pagar.
+  if (!order || !order.edit_token || isPreviewOrder(order)) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 

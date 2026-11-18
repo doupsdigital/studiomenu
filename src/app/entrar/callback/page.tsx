@@ -72,7 +72,9 @@ function EntrarCallbackContent() {
           return;
         }
 
-        router.replace(`/app/${claimSlug}/config?vinculado=google`);
+        // Veio do checklist "Primeiros passos" (funil `/lash`): volta pra lá.
+        const backToSteps = searchParams.get('volta') === 'passos';
+        router.replace(`/app/${claimSlug}/${backToSteps ? 'primeiros-passos' : 'config'}?vinculado=google`);
         return;
       }
 

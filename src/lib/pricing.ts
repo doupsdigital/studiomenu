@@ -37,6 +37,15 @@ export const CATALOGO_RECORRENTE_DEFAULT_PRICE = 22.9;
  *  escolhe manualmente pra uma cliente específica. */
 export const CATALOGO_ANUAL_DEFAULT_PRICE = 139.9;
 
+/** Funil de autosserviço Lash vendido pela Cakto (2026-11-17) — preços
+ *  cobrados de verdade ficam configurados nos produtos da Cakto; estes
+ *  valores são só o que a página `/lash` mostra e o que o webhook grava em
+ *  `billing_price_override` (pra o admin ver o valor certo). Mudar aqui
+ *  SEM mudar na Cakto deixa a página mostrando um preço diferente do
+ *  checkout. */
+export const CAKTO_MENSAL_PRICE = 22.9;
+export const CAKTO_ANUAL_PRICE = 127.0;
+
 export const AGENDA_PRICE = 34.9;
 export const AGENDA_PRICE_LABEL = 'R$ 34,90/mês';
 

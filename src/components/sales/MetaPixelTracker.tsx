@@ -3,14 +3,17 @@
 import Script from 'next/script';
 
 /** ID do Pixel oficial da Meta do StudioMenu */
-const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || '1042165951490026';
+const DEFAULT_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || '1042165951490026';
 
 /** Meta Pixel Tracker para a landing page pública de vendas.
  *  Carrega o script oficial do Meta Pixel (fbevents.js) e dispara PageView.
  *  Gera os cookies _fbp e _fbc automaticamente no navegador do visitante
  *  para garantir atribuição precisa no Meta Ads e na API de Conversões (CAPI).
  */
-export function MetaPixelTracker() {
+export function MetaPixelTracker({ pixelId }: { pixelId?: string } = {}) {
+  // `pixelId` explícito (2026-11-17): a página `/lash` usa outro pixel
+  // (ver `LASH_FUNNEL_PIXEL_ID`); sem a prop, o comportamento de sempre.
+  const PIXEL_ID = pixelId || DEFAULT_PIXEL_ID;
   return (
     <>
       <Script

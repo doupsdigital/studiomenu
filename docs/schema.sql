@@ -173,8 +173,41 @@ CREATE TABLE IF NOT EXISTS public.orders (
     -- `pending_lifetime_payment_id`) — comparada com o `payment.id`
     -- confirmado dentro de `activateSubscription` antes de destravar as
     -- telas, pra não processar a mesma confirmação duas vezes.
-    pending_full_catalog_payment_id TEXT
+    pending_full_catalog_payment_id TEXT,
+    -- Funil de autosserviço Lash + checkout Cakto (2026-11-17, ver
+    -- docs/migrations/20261117_cakto_autosservico.sql). Tudo aditivo:
+    -- catálogos antigos continuam 'asaas' e nunca leem as colunas abaixo.
+    billing_provider TEXT NOT NULL DEFAULT 'asaas'
+        CONSTRAINT orders_billing_provider_check CHECK (billing_provider IN ('asaas', 'cakto')),
+    preview_expires_at TIMESTAMPTZ,
+    preview_code TEXT,
+    cakto_order_id TEXT,
+    cakto_subscription_ref TEXT,
+    cakto_plan TEXT CONSTRAINT orders_cakto_plan_check CHECK (cakto_plan IS NULL OR cakto_plan IN ('mensal', 'anual')),
+    paid_until TIMESTAMPTZ,
+    acquisition_source TEXT,
+    onboarding_steps JSONB NOT NULL DEFAULT '{}'::jsonb
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_orders_preview_code ON public.orders(preview_code) WHERE preview_code IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_orders_cakto_subscription_ref ON public.orders(cakto_subscription_ref) WHERE cakto_subscription_ref IS NOT NULL;
+
+-- Log de todo evento do webhook da Cakto (ela não reenvia em caso de erro).
+CREATE TABLE IF NOT EXISTS public.cakto_events (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    received_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    event TEXT,
+    cakto_order_id TEXT,
+    dedupe_key TEXT,
+    slug TEXT,
+    result TEXT NOT NULL CHECK (result IN ('processed', 'ignored', 'rejected', 'error')),
+    message TEXT,
+    payload JSONB
+);
+CREATE INDEX IF NOT EXISTS idx_cakto_events_dedupe ON public.cakto_events(dedupe_key);
+CREATE INDEX IF NOT EXISTS idx_cakto_events_received ON public.cakto_events(received_at DESC);
+ALTER TABLE public.cakto_events ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON public.cakto_events FROM anon;
 
 -- Index para buscas ultrarrápidas por slug e edit_token
 CREATE INDEX IF NOT EXISTS idx_orders_slug ON public.orders(slug);

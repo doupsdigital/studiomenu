@@ -1,6 +1,7 @@
 import { supabaseAdmin } from './supabase-admin';
 import { CatalogOrderData, ProcedureItem } from '@/types/catalog';
 import { normalizeWhatsappBR } from './format';
+import { isCaktoAccessLapsed } from './cakto';
 
 export async function getCatalogBySlug(slug: string): Promise<CatalogOrderData | null> {
   const normalizedSlug = slug.toLowerCase().trim();
@@ -114,11 +115,19 @@ export async function getCatalogBySlug(slug: string): Promise<CatalogOrderData |
       // manual, só que automático. `plan_tier === 'catalog'` (nunca pagou
       // nada) fica de fora de propósito — já cai no fallback de
       // procedimentos de exemplo, não faz sentido também "desativar".
+      // Cakto (funil de autosserviço, 2026-11-17): decide pela data paga
+      // (`paid_until` + folga), não pelo status — cancelar mantém o menu no
+      // ar até o fim do período pago, e um evento perdido do webhook não
+      // derruba ninguém. O ramo do Asaas (todo o resto) segue igual.
       catalog_payment_lapsed:
-        orderData.catalog_billing_mode !== 'avulso' &&
-        orderData.plan_tier !== 'catalog' &&
-        !orderData.manual_plan &&
-        orderData.subscription_status !== 'ativo',
+        orderData.billing_provider === 'cakto'
+          ? orderData.plan_tier !== 'catalog' && !orderData.manual_plan && isCaktoAccessLapsed(orderData.paid_until)
+          : orderData.catalog_billing_mode !== 'avulso' &&
+            orderData.plan_tier !== 'catalog' &&
+            !orderData.manual_plan &&
+            orderData.subscription_status !== 'ativo',
+      plan_tier: orderData.plan_tier,
+      preview_expires_at: orderData.preview_expires_at ?? null,
       client_name: orderData.client_name || orderData.name || normalizedSlug,
       studio_name: orderData.studio_name || `Studio ${orderData.client_name || normalizedSlug}`,
       studio_label: orderData.studio_label || 'STUDIO',

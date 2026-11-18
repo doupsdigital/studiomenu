@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { CatalogOrderData } from '@/types/catalog';
 import { buildOrderUpdatePayload, buildServicesPayload, isValidServiceId } from '@/lib/order-payload';
+import { isPreviewOrder } from '@/lib/preview';
 
 export async function POST(request: Request) {
   try {
@@ -22,9 +23,18 @@ export async function POST(request: Request) {
     // 1. Verificar se o slug e edit_token correspondem no Supabase
     const { data: existingOrder, error: fetchError } = await supabaseAdmin
       .from('orders')
-      .select('id, edit_token')
+      .select('id, edit_token, plan_tier, preview_expires_at')
       .eq('slug', slug.toLowerCase().trim())
       .single();
+
+    // Prévia gratuita do funil `/lash` (2026-11-17) nunca é editável — só
+    // depois do pagamento aprovado.
+    if (existingOrder && isPreviewOrder(existingOrder)) {
+      return NextResponse.json(
+        { success: false, message: 'Ative seu menu para poder editar.' },
+        { status: 403 }
+      );
+    }
 
     if (fetchError || !existingOrder) {
       return NextResponse.json(
