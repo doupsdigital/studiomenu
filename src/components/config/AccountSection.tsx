@@ -12,6 +12,12 @@ interface AccountSectionProps {
   /** Presente quando a profissional já vinculou um login (Supabase Auth) —
    *  a partir daí ela pode entrar direto por `/entrar`, sem link mágico. */
   hasAccount: boolean;
+  /** Usado dentro de "Primeiros passos" (funil `/lash`, 2026-11-18): o login
+   *  com Google volta pra essa tela (a Config fica escondida pra quem é
+   *  "Catálogo apenas"), sem o botão "Sair desse dispositivo", e avisa o pai
+   *  quando o acesso fica pronto. */
+  inOnboarding?: boolean;
+  onDone?: () => void;
 }
 
 /** Vincula uma conta do Supabase Auth (recém criada/logada no client) ao
@@ -25,7 +31,7 @@ async function claimAccount(slug: string, accessToken: string): Promise<{ succes
   return res.json();
 }
 
-export const AccountSection: React.FC<AccountSectionProps> = ({ slug, hasAccount }) => {
+export const AccountSection: React.FC<AccountSectionProps> = ({ slug, hasAccount, inOnboarding = false, onDone }) => {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -66,6 +72,7 @@ export const AccountSection: React.FC<AccountSectionProps> = ({ slug, hasAccount
     }
     setDone(true);
     setNeedsConfirmation(false);
+    onDone?.();
   };
 
   const handleCreateAccount = async (e: React.FormEvent) => {
@@ -119,7 +126,7 @@ export const AccountSection: React.FC<AccountSectionProps> = ({ slug, hasAccount
     setLoading('google');
     setError('');
     try {
-      const redirectTo = `${window.location.origin}/entrar/callback?claim=1&slug=${slug}`;
+      const redirectTo = `${window.location.origin}/entrar/callback?claim=1&slug=${slug}${inOnboarding ? '&volta=passos' : ''}`;
       const { error: authError } = await supabaseBrowser.auth.signInWithOAuth({
         provider: 'google',
         options: { redirectTo },
@@ -172,7 +179,7 @@ export const AccountSection: React.FC<AccountSectionProps> = ({ slug, hasAccount
             </div>
           </div>
         </div>
-        {logoutButton}
+        {!inOnboarding && logoutButton}
       </div>
     );
   }
@@ -256,7 +263,7 @@ export const AccountSection: React.FC<AccountSectionProps> = ({ slug, hasAccount
           )}
         </button>
       </div>
-      {logoutButton}
+      {!inOnboarding && logoutButton}
     </div>
   );
 };

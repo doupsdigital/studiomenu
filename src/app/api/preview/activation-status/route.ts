@@ -7,10 +7,9 @@ import { createProfessionalSessionValue, PROFESSIONAL_SESSION_COOKIE } from '@/l
 
 export const dynamic = 'force-dynamic';
 
-/** Pra onde ela vai depois de ativar. Vira `/primeiros-passos` quando o
- *  checklist guiado existir (próxima etapa da Fase 4). */
+/** Pra onde ela vai depois de ativar: o checklist guiado. */
 function appEntryPath(slug: string): string {
-  return `/app/${slug}/inicio`;
+  return `/app/${slug}/primeiros-passos`;
 }
 
 /** GET /api/preview/activation-status
