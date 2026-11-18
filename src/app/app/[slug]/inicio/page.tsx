@@ -20,6 +20,7 @@ import { resolveFullCatalogUpgradePrice } from '@/lib/pricing';
 import { countSelfServeStepsDone, SELF_SERVE_STEP_ORDER } from '@/lib/self-serve-onboarding';
 import Link from 'next/link';
 import { CaktoPlanCard } from '@/components/billing/CaktoPlanCard';
+import { SupportFooterCard } from '@/components/app-shell/SupportFooterCard';
 import { CalendarDays, Clock, Share2, Crown, Home, ListChecks, ChevronRight } from 'lucide-react';
 
 interface InicioPageProps {
@@ -234,6 +235,11 @@ export default async function InicioPage({ params }: InicioPageProps) {
         hoursDone={hoursDone}
         schedulingLive={schedulingLive}
       />
+
+      {/* Suporte no fim do Início só pra quem NÃO vê a Config (produto
+       *  "Catálogo apenas", ex: Cakto) — quem tem a Config já tem a seção
+       *  "Suporte e dúvidas" lá. */}
+      {order.show_full_app === false && <SupportFooterCard name={order.client_name} slug={slug} />}
       </main>
     </>
   );
