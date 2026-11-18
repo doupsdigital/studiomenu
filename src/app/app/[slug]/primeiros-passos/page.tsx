@@ -25,7 +25,7 @@ export default async function PrimeirosPassosPage({ params }: PrimeirosPassosPag
       <main className="max-w-md mx-auto px-5 pt-6 pb-6 flex flex-col gap-4">
         <SelfServeChecklist
           slug={order.slug}
-          name={order.studio_name || order.client_name}
+          name={order.client_name || order.studio_name || ''}
           whatsapp={order.whatsapp_number}
           hasAccount={Boolean(order.auth_user_id)}
           initialSteps={order.onboarding_steps}
