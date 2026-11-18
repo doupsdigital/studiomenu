@@ -19,6 +19,7 @@ import { InicioTour } from '@/components/tour/InicioTour';
 import { resolveFullCatalogUpgradePrice } from '@/lib/pricing';
 import { countSelfServeStepsDone, SELF_SERVE_STEP_ORDER } from '@/lib/self-serve-onboarding';
 import Link from 'next/link';
+import { CaktoPlanCard } from '@/components/billing/CaktoPlanCard';
 import { CalendarDays, Clock, Share2, Crown, Home, ListChecks, ChevronRight } from 'lucide-react';
 
 interface InicioPageProps {
@@ -94,6 +95,20 @@ export default async function InicioPage({ params }: InicioPageProps) {
   const selfServeDone = countSelfServeStepsDone(order.onboarding_steps, Boolean(order.auth_user_id));
   const showSelfServeContinue = order.billing_provider === 'cakto' && selfServeDone < selfServeTotal;
 
+  // Card "Meu plano" da Cakto: no topo quando precisa de ação (fora do ar,
+  // renovação recusada, cancelada), senão no fim da tela.
+  const isCakto = order.billing_provider === 'cakto';
+  const caktoNeedsAttention =
+    isCakto && (order.subscription_status !== 'ativo' || !order.paid_until || new Date(order.paid_until).getTime() < Date.now());
+  const caktoPlanCard = isCakto ? (
+    <CaktoPlanCard
+      plan={order.cakto_plan}
+      status={order.subscription_status}
+      paidUntil={order.paid_until}
+      checkoutRef={order.cakto_checkout_ref}
+    />
+  ) : null;
+
   const greeting = getGreeting();
   const firstName = order.client_name.split(' ')[0];
 
@@ -121,6 +136,8 @@ export default async function InicioPage({ params }: InicioPageProps) {
       </GradientHeader>
 
       <OpenChargeBanner slug={slug} />
+
+      {caktoNeedsAttention && caktoPlanCard}
 
       {showSelfServeContinue && (
         <Link
@@ -204,6 +221,8 @@ export default async function InicioPage({ params }: InicioPageProps) {
           alreadyPaid
         />
       )}
+
+      {isCakto && !caktoNeedsAttention && caktoPlanCard}
 
       <OnboardingCardStack slug={slug} planTier={order.plan_tier} subscriptionStatus={order.subscription_status} hasAccount={Boolean(order.auth_user_id)} hoursDone={hoursDone} />
 

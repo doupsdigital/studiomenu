@@ -89,6 +89,9 @@ export interface ProfessionalOrderSummary {
   /** Só Cakto: até quando o acesso está pago, e qual plano ela comprou. */
   paid_until: string | null;
   cakto_plan: 'mensal' | 'anual' | null;
+  /** Código da prévia de origem — vai no `sck` do checkout da Cakto quando
+   *  ela renova/reativa, pra compra cair NESTE catálogo. */
+  cakto_checkout_ref: string | null;
   /** Progresso do checklist "Primeiros passos" (só Cakto). */
   onboarding_steps: OnboardingSteps;
 }
@@ -102,7 +105,7 @@ export async function getOrderForProfessionalApp(slug: string): Promise<Professi
   const { data, error } = await supabaseAdmin
     .from('orders')
     .select(
-      'id, slug, edit_token, client_name, studio_name, whatsapp_number, plan_tier, subscription_status, billing_email, billing_cpf_cnpj, payment_method, booking_enabled, auth_user_id, first_offer_tier, agenda_paused, manual_plan, billing_price_override, catalog_billing_mode, agenda_billing_mode, agenda_price_override, asaas_subscription_id, lifetime_price_override, created_at, show_full_app, full_catalog_offer_enabled, full_catalog_offer_decision, full_catalog_price_override, full_catalog_upgrade_price_override, billing_provider, paid_until, cakto_plan, onboarding_steps'
+      'id, slug, edit_token, client_name, studio_name, whatsapp_number, plan_tier, subscription_status, billing_email, billing_cpf_cnpj, payment_method, booking_enabled, auth_user_id, first_offer_tier, agenda_paused, manual_plan, billing_price_override, catalog_billing_mode, agenda_billing_mode, agenda_price_override, asaas_subscription_id, lifetime_price_override, created_at, show_full_app, full_catalog_offer_enabled, full_catalog_offer_decision, full_catalog_price_override, full_catalog_upgrade_price_override, billing_provider, paid_until, cakto_plan, onboarding_steps, preview_code'
     )
     .eq('slug', normalizedSlug)
     .single();
@@ -152,5 +155,6 @@ export async function getOrderForProfessionalApp(slug: string): Promise<Professi
     paid_until: data.paid_until || null,
     cakto_plan: data.cakto_plan === 'mensal' || data.cakto_plan === 'anual' ? data.cakto_plan : null,
     onboarding_steps: parseOnboardingSteps(data.onboarding_steps),
+    cakto_checkout_ref: data.preview_code || null,
   };
 }
