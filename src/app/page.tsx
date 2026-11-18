@@ -4,6 +4,7 @@ import { PostHogTracker } from '@/components/sales/PostHogTracker';
 import { MetaPixelTracker } from '@/components/sales/MetaPixelTracker';
 import { LANDING_NICHE_CONTENT, type LandingNiche } from '@/data/landing-niche-content';
 import { cookies } from 'next/headers';
+import { LashSelfServeEntry } from '@/components/self-serve/LashSelfServeEntry';
 
 interface StudioMenuLandingPageProps {
   searchParams: Promise<{ nicho?: string; v?: string }>;
@@ -23,6 +24,14 @@ export default async function StudioMenuLandingPage({ searchParams }: StudioMenu
   const { nicho, v } = await searchParams;
   const resolvedNiche: LandingNiche = nicho && nicho in LANDING_NICHE_CONTENT ? (nicho as LandingNiche) : 'geral';
   const content = LANDING_NICHE_CONTENT[resolvedNiche];
+
+  // `?nicho=lash` é o link do anúncio que está rodando (2026-11-18): passa a
+  // mostrar a página de autosserviço (prévia grátis + Cakto), sem precisar
+  // trocar a URL no Gerenciador. A landing antiga de Lash (X1/WhatsApp)
+  // continua acessível em `?nicho=lash&v=antiga`, caso precise voltar.
+  if (resolvedNiche === 'lash' && v !== 'antiga') {
+    return <LashSelfServeEntry />;
+  }
 
   const cookieStore = await cookies();
   const savedVariant = cookieStore.get('sm_lp_variant')?.value;

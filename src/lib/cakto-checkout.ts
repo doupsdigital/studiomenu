@@ -5,11 +5,13 @@
  *
  *  Mensal: R$ 22,90/mês, assinatura, só cartão de crédito.
  *  Anual:  R$ 127, pagamento único no Pix, acesso de 1 ano. */
-/** Pixel da Meta do funil `/lash` (2026-11-17) — o mesmo cadastrado nos 2
- *  produtos da Cakto. NÃO é o pixel antigo da landing `/`
- *  (`1042165951490026`, com restrição na Meta); a página `/lash` deve usar
- *  este explicitamente, sem depender de `NEXT_PUBLIC_META_PIXEL_ID`. */
-export const LASH_FUNNEL_PIXEL_ID = '1015955554886103';
+/** Pixel da Meta do funil de autosserviço Lash — exclusivo do StudioMenu,
+ *  criado em 2026-11-17 (o anterior, `1015955554886103`, era de outro
+ *  produto). Precisa ser o MESMO cadastrado nos 2 produtos da Cakto, que
+ *  dispara o Purchase. NÃO é o pixel antigo da landing `/`
+ *  (`1042165951490026`); a página Lash usa este explicitamente, sem
+ *  depender de `NEXT_PUBLIC_META_PIXEL_ID`. */
+export const LASH_FUNNEL_PIXEL_ID = '1170978082151966';
 
 export const CAKTO_CHECKOUT_URLS = {
   mensal: 'https://pay.cakto.com.br/h2p6djs_1336617',
