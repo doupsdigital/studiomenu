@@ -9,7 +9,7 @@ import {
   PREVIEW_SESSION_COOKIE,
   PREVIEW_SESSION_TTL_MS,
   createPreviewSessionValue,
-  readPreviewSessionSlug,
+  readPreviewSession,
 } from '@/lib/preview-session';
 import { PRODUCTION_DOMAIN, usesSubdomainRouting } from '@/lib/public-url';
 
@@ -51,7 +51,7 @@ export async function POST(request: Request) {
         displayUrl: `${slug}.${PRODUCTION_DOMAIN}`,
         publicUrl: usesSubdomainRouting(hostname) ? `https://${slug}.${PRODUCTION_DOMAIN}` : `/c/${slug}`,
       });
-      res.cookies.set(PREVIEW_SESSION_COOKIE, createPreviewSessionValue(slug), {
+      res.cookies.set(PREVIEW_SESSION_COOKIE, createPreviewSessionValue(slug, previewCode), {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
@@ -61,23 +61,28 @@ export async function POST(request: Request) {
       return res;
     };
 
+    // Mesmo navegador gerando de novo com o mesmo nome: devolve a prévia que
+    // ela já tem. Conferido ANTES de criar (2026-11-18) — com nome de 3+
+    // palavras, o slug de 2 palavras ocupado pela própria prévia fazia
+    // `resolveProfessionalSlug` cair no slug de 3 palavras e criar uma
+    // SEGUNDA prévia em vez de reaproveitar.
+    const session = readPreviewSession(cookieStore.get(PREVIEW_SESSION_COOKIE)?.value);
+    if (session) {
+      const { data: own } = await supabaseAdmin
+        .from('orders')
+        .select('slug, client_name, plan_tier, preview_code, preview_expires_at')
+        .eq('slug', session.slug)
+        .maybeSingle();
+      const sameName = (own?.client_name || '').trim().toLowerCase() === name.toLowerCase();
+      if (own && sameName && isPreviewOrder(own) && !isPreviewExpired(own) && own.preview_code === session.previewCode) {
+        return respond(own.slug, own.preview_code, own.preview_expires_at, true);
+      }
+    }
+
     const created = await createSelfServeLashCatalog({ name, asPreview: true, acquisitionSource: 'lp_preview' });
 
     if (!created.ok) {
       if (created.reason === 'slug_taken') {
-        // Mesmo navegador gerando de novo com o mesmo nome: devolve a prévia
-        // que ela já tem, em vez de dizer que o nome está ocupado.
-        const ownSlug = readPreviewSessionSlug(cookieStore.get(PREVIEW_SESSION_COOKIE)?.value);
-        if (ownSlug && ownSlug === created.attemptedSlug) {
-          const { data: own } = await supabaseAdmin
-            .from('orders')
-            .select('slug, plan_tier, preview_code, preview_expires_at')
-            .eq('slug', ownSlug)
-            .maybeSingle();
-          if (own && isPreviewOrder(own) && !isPreviewExpired(own) && own.preview_code) {
-            return respond(own.slug, own.preview_code, own.preview_expires_at, true);
-          }
-        }
         return NextResponse.json(
           {
             success: false,
