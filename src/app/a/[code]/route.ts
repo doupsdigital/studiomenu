@@ -28,7 +28,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ code
 
   // Prévia gratuita do funil `/lash` (2026-11-17): sem app/edição até pagar.
   if (!order || isPreviewOrder(order)) {
-    return NextResponse.redirect(new URL('/', request.url));
+    // Página principal de hoje é a de Lash (pedido da usuária, 2026-11-18).
+    return NextResponse.redirect(new URL('/?nicho=lash', request.url));
   }
 
   return NextResponse.redirect(new URL(`/api/professional/login?slug=${order.slug}&token=${order.edit_token}`, request.url));
