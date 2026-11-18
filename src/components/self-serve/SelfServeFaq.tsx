@@ -13,7 +13,7 @@ const ITEMS = [
   },
   {
     q: 'Como eu cancelo o plano mensal?',
-    a: 'Quando quiser, sem multa e sem fidelidade. O cancelamento é feito pela plataforma de pagamento (Cakto), e seu menu continua no ar até o fim do mês que você já pagou.',
+    a: 'Quando quiser, sem multa e sem fidelidade. Você mesma cancela pelo seu app (ou no portal de assinaturas da Cakto, com o e-mail da compra), e seu menu continua no ar até o fim do mês que você já pagou.',
   },
   {
     q: 'E se eu não ativar a prévia?',
