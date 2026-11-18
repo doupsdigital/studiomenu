@@ -732,6 +732,13 @@
 /* Revelação em tela cheia ------------------------------------------------- */
 .lp-ss-reveal {
   z-index: 1050;
+  /* Altura = área REALMENTE visível (dvh muda quando a barra de endereço
+     do celular aparece/some). `inset: 0` usa a altura "teórica" e, no
+     Chrome do Android, sobrava uns px por baixo da barra — o celular é
+     calculado a partir dessa altura (ResizeObserver no componente). */
+  bottom: auto;
+  height: 100vh;
+  height: 100dvh;
 }
 
 
