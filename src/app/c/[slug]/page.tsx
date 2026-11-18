@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { getCatalogBySlug } from '@/lib/catalog-service';
 import { CatalogLayout } from '@/components/catalog/CatalogLayout';
+import { PreviewCatalogClient } from '@/components/self-serve/PreviewCatalogClient';
 import Link from 'next/link';
 import { Sparkles, ArrowLeft } from 'lucide-react';
 import { headers } from 'next/headers';
@@ -166,6 +167,17 @@ export default async function CatalogPage({ params, searchParams }: CatalogPageP
   // client (que usa o token vindo da própria URL), e enviá-lo exporia a credencial
   // de edição de todo catálogo a qualquer visitante, não só a quem tem o link mágico.
   const { edit_token: _editToken, ...publicCatalog } = catalog;
+
+  // Prévia grátis (2026-11-18): ganha os botões de Tema/Modelo do showroom,
+  // que só trocam a aparência na tela — nada vai pro banco.
+  if (isPreview && catalog.preview_expires_at) {
+    return (
+      <PreviewCatalogClient
+        data={publicCatalog}
+        previewMode={{ expiresAt: catalog.preview_expires_at, activateUrl: `${funnelUrl}#oferta`, showBanner: embed !== '1' }}
+      />
+    );
+  }
 
   return (
     <>
