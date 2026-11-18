@@ -5,7 +5,7 @@ import { CatalogOrderData, ProcedureItem } from '@/types/catalog';
 import { normalizeWhatsappBR } from '@/lib/format';
 import { compressImageFiles } from '@/lib/image-compress-client';
 import Link from 'next/link';
-import { ArrowLeft, Sparkles, ExternalLink, Search, RefreshCw, Plus, Trash2, MessageCircle, Phone, Smartphone, CalendarClock, Globe, Crown, ChevronDown, PauseCircle, PlayCircle, Gift, Bot, Upload, FileText, X, Wallet, Settings2, AlertTriangle, type LucideIcon } from 'lucide-react';
+import { ArrowLeft, Sparkles, ExternalLink, Search, RefreshCw, Plus, Trash2, MessageCircle, Phone, Smartphone, CalendarClock, Globe, Crown, ChevronDown, PauseCircle, PlayCircle, Gift, Bot, Upload, FileText, X, Wallet, Settings2, AlertTriangle, Webhook, type LucideIcon } from 'lucide-react';
 import { usesSubdomainRouting, PRODUCTION_DOMAIN } from '@/lib/public-url';
 import {
   AGENDA_PRICE_LABEL,
@@ -67,7 +67,35 @@ type AdminCatalog = CatalogOrderData & {
   full_catalog_offer_decision?: 'pending' | 'accepted' | 'declined';
   full_catalog_price_override?: number | null;
   full_catalog_upgrade_price_override?: number | null;
+  /** Funil de autosserviço `/lash` (2026-11-18). */
+  billing_provider?: 'asaas' | 'cakto';
+  paid_until?: string | null;
+  cakto_plan?: 'mensal' | 'anual' | null;
+  preview_code?: string | null;
 };
+
+type ListFilter = 'clientes' | 'previas' | 'cakto' | 'todos';
+
+/** Prévia gratuita de 24h do funil `/lash` (ainda não paga). */
+function isPreviewItem(c: AdminCatalog) {
+  return (!c.plan_tier || c.plan_tier === 'catalog') && Boolean(c.preview_expires_at);
+}
+
+function formatShortDate(iso: string, withYear = false) {
+  return new Date(iso).toLocaleDateString('pt-BR', {
+    timeZone: 'America/Sao_Paulo',
+    day: '2-digit',
+    month: '2-digit',
+    ...(withYear ? { year: '2-digit' } : {}),
+  });
+}
+
+function previewTimeLeft(iso: string) {
+  const ms = new Date(iso).getTime() - Date.now();
+  if (ms <= 0) return 'vencida';
+  const h = Math.floor(ms / 3600e3);
+  return h >= 1 ? `${h}h restantes` : `${Math.max(1, Math.floor(ms / 60e3))}min restantes`;
+}
 
 type SectionTone = 'rose' | 'sky' | 'amber' | 'red';
 
@@ -127,6 +155,11 @@ export default function AdminCatalogosPage() {
   const [catalogs, setCatalogs] = useState<AdminCatalog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  // Prévias do `/lash` ficam fora da lista padrão (2026-11-18): são muitas,
+  // somem em 24h e poluiriam a lista de clientes de verdade.
+  const [listFilter, setListFilter] = useState<ListFilter>('clientes');
+  const [caktoConfirm, setCaktoConfirm] = useState<string | null>(null);
+  const [caktoBusy, setCaktoBusy] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [catalogToDelete, setCatalogToDelete] = useState<AdminCatalog | null>(null);
   // Card começa "fechado" (só o essencial pro dia-a-dia) — links e ações
@@ -299,12 +332,52 @@ export default function AdminCatalogosPage() {
     fetchCatalogs();
   }, []);
 
+  const matchesFilter = (c: AdminCatalog, f: ListFilter) =>
+    f === 'todos' ||
+    (f === 'previas' && isPreviewItem(c)) ||
+    (f === 'clientes' && !isPreviewItem(c)) ||
+    (f === 'cakto' && c.billing_provider === 'cakto' && !isPreviewItem(c));
+  const filterCounts: Record<ListFilter, number> = {
+    clientes: catalogs.filter((c) => matchesFilter(c, 'clientes')).length,
+    previas: catalogs.filter((c) => matchesFilter(c, 'previas')).length,
+    cakto: catalogs.filter((c) => matchesFilter(c, 'cakto')).length,
+    todos: catalogs.length,
+  };
   const filteredCatalogs = catalogs.filter(
     (c) =>
-      c.client_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      c.studio_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      c.slug?.toLowerCase().includes(searchTerm.toLowerCase())
+      matchesFilter(c, listFilter) &&
+      (c.client_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        c.studio_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        c.slug?.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+
+  /** Ativa/estende à mão como cliente Cakto (compra que não caiu no menu
+   *  certo). Confirmação em 2 toques, sem `confirm()` nativo. */
+  const caktoActivate = async (item: AdminCatalog, plan: 'mensal' | 'anual') => {
+    const key = `${item.id}:${plan}`;
+    if (caktoConfirm !== key) {
+      setCaktoConfirm(key);
+      return;
+    }
+    setCaktoConfirm(null);
+    setCaktoBusy(key);
+    try {
+      const res = await fetch('/api/admin/cakto', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: item.id, plan }),
+      });
+      const json = await readJsonSafely(res);
+      if (!json.success) {
+        showToast(`⚠️ ${json.message || 'Erro ao ativar.'}`);
+        return;
+      }
+      showToast(`✅ Ativado na Cakto até ${formatShortDate(json.paidUntil, true)}`);
+      fetchCatalogs();
+    } finally {
+      setCaktoBusy(null);
+    }
+  };
 
   const deleteCatalog = async (id?: string) => {
     if (!id) return;
@@ -925,6 +998,37 @@ export default function AdminCatalogosPage() {
           />
         </div>
 
+        <div className="flex gap-2 flex-wrap">
+          {(
+            [
+              ['clientes', 'Clientes'],
+              ['cakto', 'Cakto'],
+              ['previas', 'Prévias /lash'],
+              ['todos', 'Todos'],
+            ] as [ListFilter, string][]
+          ).map(([key, label]) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setListFilter(key)}
+              className={`px-4 py-2 rounded-xl text-sm font-bold border transition-all ${
+                listFilter === key
+                  ? 'bg-rose-500 border-rose-500 text-white'
+                  : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
+              }`}
+            >
+              {label} <span className="opacity-70 font-semibold">{filterCounts[key]}</span>
+            </button>
+          ))}
+          <Link
+            href="/admin/cakto"
+            className="ml-auto px-4 py-2 rounded-xl text-sm font-bold border bg-slate-900 border-slate-800 text-violet-300 hover:border-violet-500/50 flex items-center gap-1.5"
+          >
+            <Webhook className="w-4 h-4" />
+            Eventos Cakto
+          </Link>
+        </div>
+
         {/* Tabela / Grid de Catálogos Registrados */}
         {isLoading ? (
           <div className="text-center py-16 text-slate-500 text-sm animate-pulse">
@@ -974,6 +1078,17 @@ export default function AdminCatalogosPage() {
                         >
                           {isPending ? 'Pendente' : 'Aprovado'}
                         </span>
+                        {isPreviewItem(item) && item.preview_expires_at && (
+                          <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border bg-fuchsia-500/10 text-fuchsia-300 border-fuchsia-500/30">
+                            Prévia · {previewTimeLeft(item.preview_expires_at)}
+                          </span>
+                        )}
+                        {item.billing_provider === 'cakto' && !isPreviewItem(item) && (
+                          <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border bg-violet-500/10 text-violet-300 border-violet-500/30">
+                            Cakto{item.cakto_plan ? ` · ${item.cakto_plan}` : ''}
+                            {item.paid_until ? ` · até ${formatShortDate(item.paid_until)}` : ''}
+                          </span>
+                        )}
                         {item.catalog_disabled && (
                           <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border bg-amber-500/10 text-amber-400 border-amber-500/30">
                             Desativado
@@ -1012,6 +1127,48 @@ export default function AdminCatalogosPage() {
                         onToggle={() => toggleSection(cardKey, 'principal')}
                       >
                       <div className="rounded-2xl border border-slate-700/70 bg-slate-900/60 divide-y divide-slate-800 overflow-hidden">
+                        {(item.billing_provider === 'cakto' || isPreviewItem(item)) && (
+                          <div className="p-4 space-y-3 bg-violet-500/5">
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-xs font-bold uppercase tracking-wider text-violet-300 flex items-center gap-1.5">
+                                <Webhook className="w-3.5 h-3.5" />
+                                Cakto
+                              </span>
+                              <Link href={`/admin/cakto?slug=${item.slug}`} className="text-xs font-semibold text-violet-300 hover:underline">
+                                Ver eventos
+                              </Link>
+                            </div>
+                            <p className="text-sm text-slate-300">
+                              {isPreviewItem(item)
+                                ? `Prévia grátis (código ${item.preview_code || '—'}), ainda sem pagamento.`
+                                : `Plano ${item.cakto_plan || '—'} · pago até ${item.paid_until ? formatShortDate(item.paid_until, true) : '—'} · ${item.subscription_status || '—'}`}
+                            </p>
+                            <p className="text-xs text-slate-500">
+                              Compra que não caiu neste menu? Ative à mão (+1 mês ou +1 ano a partir de hoje ou do vencimento atual).
+                            </p>
+                            <div className="grid grid-cols-2 gap-2">
+                              {(['mensal', 'anual'] as const).map((plan) => {
+                                const key = `${item.id}:${plan}`;
+                                const confirming = caktoConfirm === key;
+                                return (
+                                  <button
+                                    key={plan}
+                                    type="button"
+                                    disabled={caktoBusy !== null}
+                                    onClick={() => caktoActivate(item, plan)}
+                                    className={`py-2.5 rounded-xl text-sm font-bold border transition-all disabled:opacity-50 ${
+                                      confirming
+                                        ? 'bg-violet-500 border-violet-500 text-white'
+                                        : 'bg-slate-900 border-violet-500/40 text-violet-200 hover:bg-violet-500/15'
+                                    }`}
+                                  >
+                                    {caktoBusy === key ? 'Ativando…' : confirming ? 'Toque de novo p/ confirmar' : plan === 'mensal' ? '+1 mês' : '+1 ano'}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
                         <div className="p-3 flex items-center gap-2">
                           <Link
                             href={`/c/${item.slug}`}
