@@ -741,6 +741,21 @@
   height: 100dvh;
 }
 
+/* "X" na lateral direita, no alto da moldura (não acima dela): a margem de
+   cima da revelação é curta e, acima, ele ficava embaixo da barra do
+   navegador. Na altura do notch, sem cobrir os botões de tema da capa. */
+.lp-ss-reveal .lp-mockup-modal-close {
+  top: 6px;
+  right: -12px;
+  width: 36px;
+  height: 36px;
+}
+
+.lp-ss-reveal .lp-mockup-modal-close svg {
+  width: 18px;
+  height: 18px;
+}
+
 
 
 
