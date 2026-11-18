@@ -11,4 +11,8 @@ export const RESERVED_SLUGS = [
   'c',
   'modelos',
   'clientes',
+  // Subdomínios do DNS do Resend (e-mail, 2026-11-18): o registro CNAME
+  // fixo ganharia do `*`, então um catálogo com esse slug nunca abriria.
+  'send',
+  'rsend',
 ];

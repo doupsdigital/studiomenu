@@ -5,6 +5,7 @@ import { assignAppShortCode } from '@/lib/short-link';
 import { normalizeWhatsappBR } from '@/lib/format';
 import { CAKTO_ANUAL_PRICE, CAKTO_MENSAL_PRICE } from '@/lib/pricing';
 import { createSelfServeLashCatalog } from '@/lib/self-serve-catalog';
+import { buildAccessEmail, sendEmail } from '@/lib/email';
 import {
   CAKTO_APPROVED_EVENTS,
   CAKTO_GRACE_MS,
@@ -232,15 +233,28 @@ export async function POST(request: Request) {
       return done('error', `erro ao ativar catálogo ${order.slug}: ${updateError.message}`, order.slug);
     }
 
-    if (!order.app_short_code) await assignAppShortCode(order.id);
+    const shortCode = order.app_short_code || (await assignAppShortCode(order.id));
+
+    // E-mail de acesso só na primeira ativação (renovação não reenvia). Falha
+    // não derruba nada: fica anotada no log do evento.
+    let emailNote = '';
+    if (isFirstActivation) {
+      if (buyerEmail && shortCode) {
+        const mail = buildAccessEmail({ name: order.client_name || buyerName, slug: order.slug, shortCode });
+        const sent = await sendEmail({ to: buyerEmail, ...mail });
+        emailNote = sent.ok ? ' · e-mail de acesso enviado' : ` · e-mail FALHOU (${sent.error})`;
+      } else {
+        emailNote = ` · e-mail não enviado (${buyerEmail ? 'sem código curto' : 'compra sem e-mail'})`;
+      }
+    }
 
     if (isFirstActivation) {
       await sendTelegramMessage(
-        `💳 Nova venda Cakto (${plan === 'anual' ? 'Anual R$127 Pix' : 'Mensal R$22,90'})!${createdWithoutPreview ? '\n⚠️ Sem prévia — catálogo criado pelo nome da compra, conferir.' : ''}\n\n👤 ${buyerName}\n🔗 https://studiomenu.art/c/${order.slug}\n🕒 ${nowBR()}`
+        `💳 Nova venda Cakto (${plan === 'anual' ? 'Anual R$127 Pix' : 'Mensal R$22,90'})!${createdWithoutPreview ? '\n⚠️ Sem prévia — catálogo criado pelo nome da compra, conferir.' : ''}\n\n👤 ${buyerName}\n🔗 https://studiomenu.art/c/${order.slug}\n🕒 ${nowBR()}\n📧${emailNote.replace(' · ', ' ')}`
       );
     }
 
-    return done('processed', `${isFirstActivation ? 'ativado' : 'renovado'} (${plan}) até ${updates.paid_until}`, order.slug);
+    return done('processed', `${isFirstActivation ? 'ativado' : 'renovado'} (${plan}) até ${updates.paid_until}${emailNote}`, order.slug);
   } catch (error) {
     console.error('[Cakto Webhook Exception]:', error);
     return done('error', `exceção: ${error instanceof Error ? error.message : String(error)}`);
