@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { HeroMockup } from '@/components/sales/HeroMockup';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 import { CAKTO_ANUAL_PRICE, CAKTO_MENSAL_PRICE } from '@/lib/pricing';
 import type { LandingNicheContent } from '@/data/landing-niche-content';
@@ -211,7 +210,7 @@ export function SelfServeLandingPage({ content }: SelfServeLandingPageProps) {
         <section className="lp-hero-section">
           {content.cornerBadge}
           <div className="lp-container">
-            <div className="lp-hero-grid">
+            <div className="lp-hero-grid lp-ss-hero-grid--single">
               <div className="lp-hero-content">
                 <div className={`lp-hero-brand-block${content.heroBrandName ? ' lp-hero-brand-block--compact' : ''}`}>
                   <h1 className="lp-hero-brand-h1">
@@ -241,25 +240,9 @@ export function SelfServeLandingPage({ content }: SelfServeLandingPageProps) {
                   </div>
                 )}
                 <p className="lp-hero-subtitle">{content.heroSubtitle}</p>
-                <button type="button" className="lp-ss-hero-cta" onClick={preview ? openReveal : focusGenerator}>
-                  <span>{preview ? 'Ver o meu menu' : 'Ver como fica com o meu nome'}</span>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <line x1="12" y1="5" x2="12" y2="19" />
-                    <polyline points="19 12 12 19 5 12" />
-                  </svg>
-                </button>
               </div>
-
-              <HeroMockup
-                showcaseSlug={content.showcaseSlug}
-                iframeSrc={preview ? `/c/${preview.slug}?embed=1` : undefined}
-                tapLabel={preview ? 'Ver o meu menu' : 'Ver com o meu nome'}
-                onTap={() => {
-                  trackFunnel('hero_mockup_tap', { has_preview: Boolean(preview) });
-                  if (preview) openReveal();
-                  else focusGenerator();
-                }}
-              />
+              {/* Sem o celular de exemplo (2026-11-18): a primeira vez que ela
+                  vê um menu completo é o DELA, na revelação depois do nome. */}
             </div>
           </div>
         </section>

@@ -42,19 +42,6 @@
   border-color: var(--lp-accent);
 }
 
-.lp-ss-btn-outline {
-  background: #ffffff;
-  color: var(--lp-accent);
-  border: 2px solid var(--lp-accent);
-  font-weight: 800;
-  letter-spacing: 0.02em;
-}
-
-.lp-ss-btn-outline:hover {
-  background: var(--lp-accent);
-  color: #ffffff;
-}
-
 .lp-ss-text-link {
   background: none;
   border: none;
@@ -73,36 +60,12 @@
 }
 
 /* CTA da Hero ------------------------------------------------------------- */
-.lp-ss-hero-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 18px;
-  padding: 12px 20px;
-  border-radius: 999px;
-  border: 1.5px solid rgba(200, 75, 114, 0.35);
-  background: #ffffff;
-  color: var(--lp-accent);
-  font: inherit;
-  font-weight: 800;
-  font-size: 0.95rem;
-  cursor: pointer;
-  box-shadow: 0 6px 18px rgba(200, 75, 114, 0.12);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.lp-ss-hero-cta:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 24px rgba(200, 75, 114, 0.2);
-}
-
-.lp-ss-hero-cta svg {
-  animation: lp-ss-bounce 1.6s ease-in-out infinite;
-}
-
-@keyframes lp-ss-bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(3px); }
+/* Hero sem o celular de exemplo (2026-11-18): uma coluna só, centralizada
+   no desktop (a grade padrão da LP tem 2 colunas). */
+.lp-ss-hero-grid--single {
+  grid-template-columns: 1fr;
+  max-width: 640px;
+  margin: 0 auto;
 }
 
 /* Pílula do link ---------------------------------------------------------- */
@@ -140,7 +103,7 @@
 
 /* Gerador ----------------------------------------------------------------- */
 .lp-ss-gen-section {
-  padding: 8px 0 clamp(44px, 7vw, 72px);
+  padding: 0 0 clamp(44px, 7vw, 72px);
   scroll-margin-top: 24px;
 }
 
@@ -164,6 +127,130 @@
   background: linear-gradient(180deg, #ffffff 0%, #fff6f8 100%);
 }
 
+/* Card do nome com cores invertidas (2026-11-18): fundo rosa escuro, igual à
+   faixa de preço do plano anual, pra ser o foco da página clara. */
+.lp-ss-gen-card--dark {
+  background: linear-gradient(160deg, #c84b72 0%, #a33a5c 100%);
+  border-color: transparent;
+  box-shadow: 0 22px 54px rgba(163, 58, 92, 0.38);
+}
+
+.lp-ss-gen-card--dark .lp-ss-gen-kicker {
+  color: #ffd9e4;
+}
+
+.lp-lashmenu .lp-ss-gen-card--dark .lp-ss-gen-title {
+  color: #ffffff;
+}
+
+.lp-ss-gen-card--dark .lp-ss-gen-title em {
+  color: #ffd9e4;
+}
+
+.lp-ss-gen-card--dark .lp-ss-gen-sub,
+.lp-ss-gen-card--dark .lp-ss-field-help {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.lp-ss-gen-card--dark .lp-ss-field-label {
+  color: #ffffff;
+}
+
+.lp-ss-gen-card--dark .lp-ss-field input {
+  background: #ffffff;
+  border-color: transparent;
+}
+
+.lp-ss-gen-card--dark .lp-ss-field input:focus {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.3);
+}
+
+.lp-ss-gen-card--dark .lp-ss-field input[aria-invalid='true'] {
+  border-color: #fecaca;
+}
+
+.lp-ss-gen-card--dark .lp-ss-field-error {
+  color: #ffffff;
+  background: rgba(127, 29, 29, 0.35);
+  border-radius: 8px;
+  padding: 6px 10px;
+  margin-top: 0;
+}
+
+/* Botão dourado/champanhe com letra vinho: contrasta com o rosa do card e
+   não se confunde com o campo branco do nome. */
+.lp-ss-gen-card--dark .lp-btn--primary {
+  background: linear-gradient(135deg, #ffe3a3 0%, #f4c160 55%, #e9a93f 100%);
+  color: #5a1530;
+  font-weight: 800;
+  font-size: 1.15rem;
+  border: 1px solid rgba(255, 240, 200, 0.7);
+  box-shadow: 0 10px 28px rgba(90, 21, 48, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+.lp-ss-gen-card--dark .lp-btn--primary:hover {
+  box-shadow: 0 14px 34px rgba(90, 21, 48, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+/* Card "Seu menu está pronto" também invertido: o pulso do botão vira
+   dourado (o verde padrão some no fundo rosa). */
+.lp-ss-gen-card--dark.lp-ss-gen-card--ready {
+  background: linear-gradient(160deg, #c84b72 0%, #a33a5c 100%);
+}
+
+.lp-ss-gen-card--dark .lp-tier-cta-pulse {
+  animation: lp-ss-gold-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes lp-ss-gold-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 8px 24px rgba(90, 21, 48, 0.32), 0 0 0 rgba(255, 214, 120, 0); }
+  50% { transform: scale(1.03); box-shadow: 0 12px 32px rgba(90, 21, 48, 0.4), 0 0 22px rgba(255, 214, 120, 0.55); }
+}
+
+.lp-ss-gen-card--dark .lp-ss-link-pill {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+}
+
+.lp-ss-gen-card--dark .lp-ss-gen-timer {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.lp-ss-gen-card--dark .lp-ss-gen-timer strong {
+  color: #ffe3a3;
+}
+
+.lp-ss-gen-card--dark .lp-ss-btn-ghost {
+  background: #ffffff;
+  border-color: #ffffff;
+  color: var(--lp-accent-dark);
+  font-weight: 800;
+  box-shadow: 0 6px 18px rgba(90, 21, 48, 0.22);
+}
+
+.lp-ss-gen-card--dark .lp-ss-btn-ghost:hover {
+  background: #fff3f6;
+  border-color: #fff3f6;
+}
+
+.lp-ss-gen-card--dark .lp-ss-text-link {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.lp-ss-gen-card--dark .lp-ss-text-link:hover {
+  color: #ffffff;
+}
+
+.lp-ss-gen-card--dark .lp-ss-trust {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.lp-ss-gen-card--dark .lp-ss-trust li::before {
+  color: #bbf7d0;
+}
+
 .lp-ss-gen-kicker {
   font-size: 0.75rem;
   font-weight: 800;
@@ -174,9 +261,10 @@
 
 .lp-lashmenu .lp-ss-gen-title {
   font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: clamp(1.9rem, 6vw, 2.3rem);
+  font-size: clamp(2.35rem, 10vw, 2.9rem);
   font-weight: 700;
-  line-height: 1.1;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
 }
 
 .lp-ss-gen-title em {
@@ -452,54 +540,61 @@
   margin: 32px auto 0;
   padding: 24px 22px;
   border-radius: 22px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #ffffff;
+  /* Branco como os cards dos planos (2026-11-18): o translúcido sobre o
+     rosa ficava sem contraste. */
+  background: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 18px 44px rgba(90, 21, 48, 0.22);
+  color: var(--lp-text);
 }
 
 .lp-lashmenu .lp-ss-after-title {
-  color: #ffffff;
-  font-size: 1.05rem;
+  color: var(--lp-text);
+  font-size: 1.1rem;
   font-weight: 800;
   text-align: center;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .lp-ss-after-steps {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
 .lp-ss-after-steps li {
   display: flex;
   gap: 12px;
   align-items: flex-start;
+  text-align: left;
 }
 
 .lp-ss-after-num {
   flex-shrink: 0;
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: #ffffff;
-  color: var(--lp-accent);
+  background: linear-gradient(160deg, #c84b72 0%, #a33a5c 100%);
+  color: #ffffff;
   font-weight: 900;
-  font-size: 0.85rem;
+  font-size: 0.88rem;
+  box-shadow: 0 4px 10px rgba(163, 58, 92, 0.3);
 }
 
 .lp-ss-after-steps strong {
   display: block;
-  font-size: 0.95rem;
+  font-size: 0.98rem;
+  color: var(--lp-text);
 }
 
 .lp-ss-after-steps p {
-  font-size: 0.84rem;
-  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.86rem;
+  color: var(--lp-muted);
   line-height: 1.45;
+  margin-top: 2px;
 }
 
 /* Rodapé ------------------------------------------------------------------ */
@@ -637,6 +732,28 @@
 /* Revelação em tela cheia ------------------------------------------------- */
 .lp-ss-reveal {
   z-index: 1050;
+  /* Altura = área REALMENTE visível (dvh muda quando a barra de endereço
+     do celular aparece/some). `inset: 0` usa a altura "teórica" e, no
+     Chrome do Android, sobrava uns px por baixo da barra — o celular é
+     calculado a partir dessa altura (ResizeObserver no componente). */
+  bottom: auto;
+  height: 100vh;
+  height: 100dvh;
+}
+
+/* "X" na lateral direita, no alto da moldura (não acima dela): a margem de
+   cima da revelação é curta e, acima, ele ficava embaixo da barra do
+   navegador. Na altura do notch, sem cobrir os botões de tema da capa. */
+.lp-ss-reveal .lp-mockup-modal-close {
+  top: 6px;
+  right: -12px;
+  width: 36px;
+  height: 36px;
+}
+
+.lp-ss-reveal .lp-mockup-modal-close svg {
+  width: 18px;
+  height: 18px;
 }
 
 
@@ -664,7 +781,6 @@
 
 
 @media (prefers-reduced-motion: reduce) {
-  .lp-ss-hero-cta svg,
   .lp-ss-creating-spinner,
   .lp-ss-creating-steps li.is-active .lp-ss-creating-check {
     animation: none;

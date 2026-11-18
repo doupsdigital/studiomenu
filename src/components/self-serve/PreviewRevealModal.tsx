@@ -23,6 +23,10 @@ const MAX_SCALE = 400 / FRAME_W;
  *  espaço do botão "Gostou? Ativar meu menu". O tamanho do celular é
  *  calculado a partir delas — a moldura mantém SEMPRE a proporção de um
  *  celular de verdade (390×844 + bezel) e nunca é achatada. */
+/** O "X" NÃO fica acima da moldura aqui (fica na lateral, ver
+ *  `.lp-ss-reveal .lp-mockup-modal-close`): acima dela, com só 18px de
+ *  margem, ele era cortado pela barra de endereço do Chrome no Android
+ *  (achado real, 2026-11-18). */
 const PAD_TOP = 18;
 const PAD_SIDE = 14;
 const PAD_BOTTOM = 92;

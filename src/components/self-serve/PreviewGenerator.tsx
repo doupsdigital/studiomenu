@@ -33,7 +33,7 @@ export const PreviewGenerator = forwardRef<HTMLInputElement, PreviewGeneratorPro
 
   if (preview) {
     return (
-      <div className="lp-ss-gen-card lp-ss-gen-card--ready">
+      <div className="lp-ss-gen-card lp-ss-gen-card--dark lp-ss-gen-card--ready">
         <p className="lp-ss-gen-kicker">✨ Seu menu está pronto</p>
         <h2 className="lp-ss-gen-title">
           Ficou lindo, <em>{firstName(preview.name)}</em>!
@@ -56,7 +56,7 @@ export const PreviewGenerator = forwardRef<HTMLInputElement, PreviewGeneratorPro
           </button>
         </div>
         <button type="button" className="lp-ss-text-link" onClick={onStartOver}>
-          Não é você? Criar com outro nome
+          Criar com outro nome
         </button>
       </div>
     );
@@ -64,7 +64,7 @@ export const PreviewGenerator = forwardRef<HTMLInputElement, PreviewGeneratorPro
 
   return (
     <form
-      className="lp-ss-gen-card"
+      className="lp-ss-gen-card lp-ss-gen-card--dark"
       onSubmit={(e) => {
         e.preventDefault();
         onSubmit();
@@ -75,7 +75,7 @@ export const PreviewGenerator = forwardRef<HTMLInputElement, PreviewGeneratorPro
       <h2 className="lp-ss-gen-title">
         Veja o <em>seu</em> menu pronto agora
       </h2>
-      <p className="lp-ss-gen-sub">Digite seu nome e veja como fica o seu Menu Digital, com seus serviços de lash.</p>
+      <p className="lp-ss-gen-sub">É só digitar seu nome. A gente monta o resto e você vê na hora como fica.</p>
 
       <label className="lp-ss-field" htmlFor="lp-ss-name">
         <span className="lp-ss-field-label">Seu nome profissional</span>
