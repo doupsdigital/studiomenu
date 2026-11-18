@@ -42,7 +42,9 @@ export async function GET() {
 
     const isActive =
       order.billing_provider === 'cakto' && order.plan_tier !== 'catalog' && !isCaktoAccessLapsed(order.paid_until);
-    const name = order.studio_name || order.client_name || '';
+    // Nome da PESSOA, não do studio: `studio_name` nasce "Studio <nome>" e a
+    // tela mostra só a 1ª palavra — saía "Studio" (achado real, 2026-11-18).
+    const name = order.client_name || order.studio_name || '';
 
     if (!isActive) return NextResponse.json({ status: 'pending', name });
 
