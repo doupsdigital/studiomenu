@@ -5,7 +5,8 @@
 > `docs/historico/` é registro de como chegamos até aqui — útil pra investigar uma decisão
 > antiga, mas **não** é instrução válida sobre o estado atual sem cruzar com o código.
 >
-> Atualizado em: 2026-09-22.
+> Atualizado em: 2026-11-18 (funil de autosserviço Lash + Cakto — ver
+> [`FUNIL_LASH_CAKTO.md`](FUNIL_LASH_CAKTO.md)).
 
 ---
 
@@ -42,6 +43,13 @@ com o produto "Plano Catálogo".
 Preços/labels centralizados em [`src/lib/pricing.ts`](../../src/lib/pricing.ts) — nunca
 hardcoded em outro lugar. Preço do Plano Catálogo é customizável por catálogo no admin
 (`billing_price_override`, sem teto, só piso de R$5) via `resolveCatalogPrice()`.
+
+**Funil de autosserviço Lash (em produção desde 2026-11-18):** o nicho Lash não é mais vendido
+por X1. `/?nicho=lash` (link do anúncio) e `/lash` geram uma prévia grátis de 24h pelo nome e
+vendem pela **Cakto** (R$ 22,90/mês cartão ou R$ 127/ano Pix), separado do Asaas por
+`orders.billing_provider = 'cakto'`. Tudo sobre isso (configuração, regras, arquivos,
+pendências) está em [`FUNIL_LASH_CAKTO.md`](FUNIL_LASH_CAKTO.md) — leitura obrigatória antes de
+mexer em Cakto, prévia, `/ativando`, "Primeiros passos" ou e-mail de acesso.
 
 A tela de primeiro contato (antes de assinar) pode vender o Plus em destaque ou o Básico em
 destaque, configurável por catálogo (`orders.first_offer_tier`) — ver `docs/historico/FASE22_OFERTA_PLUS_DIRETA.md`.
@@ -203,8 +211,11 @@ ficam separados de commits de documentação (`docs:`) por hábito.
 5. Ao abrir CNPJ: converter a conta Asaas, testar com valor baixo, só então reavaliar Pix Automático.
 6. Construir o banco de dados de desenvolvimento no Supabase (planejado, ainda não feito).
 
+5. Pendências do funil Lash/Cakto (token da API de Conversões da Meta na Cakto, vídeos dos
+   "Primeiros passos", etc.): ver seção 8 de [`FUNIL_LASH_CAKTO.md`](FUNIL_LASH_CAKTO.md).
+
 **Do lado técnico:**
-5. Contador de urgência da tela de primeiro contato (`UrgencyTimerBanner.tsx`, cronômetro de 2h
+6. Contador de urgência da tela de primeiro contato (`UrgencyTimerBanner.tsx`, cronômetro de 2h
    pro Plano Catálogo) foi **removido de `FirstContactScreen.tsx` em 2026-10-14** depois de uma
    gravação do PostHog mostrar o card "Modo Admin" (com botão de debug) em vez do cronômetro.
    Causa: o cookie de sessão do admin (`sm_admin_session`) é host-only pra `studiomenu.art`, e
@@ -237,6 +248,7 @@ Asaas → agenda bloqueada.
 - **Schema do banco:** `docs/schema.sql` (sempre a versão atual; migrações individuais ficam em
   `docs/historico/migrations/` só como log).
 - **Visão de negócio, posicionamento, nichos:** `docs/estrategia/VISAO_E_ROADMAP_STUDIOMENU.md`.
+- **Funil de autosserviço Lash + Cakto:** [`FUNIL_LASH_CAKTO.md`](FUNIL_LASH_CAKTO.md).
 - **Marketing/tráfego pago:** `docs/marketing/`.
 
 **Regra pra qualquer chat/agente:** nunca tratar um documento de `docs/historico/` como
