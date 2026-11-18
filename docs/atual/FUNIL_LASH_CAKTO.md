@@ -147,7 +147,11 @@ Também registra o que o sistema fez com cada um: `processed`, `ignored`, `rejec
 - não edita, porque o salvamento é recusado no servidor;
 - `?edit=` é ignorado;
 - `/a/` e `/e/` não resolvem;
-- não tem app.
+- não tem app;
+- **tem os botões de Tema (Rosé/Luxury) e Modelo (Mosaico/Clássico)** do showroom. A troca
+  aparece na hora e fica guardada na prévia (`POST /api/preview/style`), mas só para o navegador
+  que gerou a prévia (cookie `sm_preview`) e só enquanto ainda é prévia. Assim o menu já nasce
+  ativado do jeito que ela escolheu. Menu pago não mostra esses botões.
 
 ---
 
@@ -206,6 +210,13 @@ tem:
   - Reaproveita a prévia do próprio navegador com o mesmo nome.
   - Cookie `sm_preview` assinado (`slug.previewCode.exp.hmac`), em `src/lib/preview-session.ts`.
 - **Criação do catálogo:** `src/lib/self-serve-catalog.ts`. É usada pela prévia e pelo webhook.
+  - Serviços de exemplo: 4 extensões de cílios + 2 sobrancelhas (`PREVIEW_PROCEDURE_IDS`), para
+    a capa mostrar as duas "cápsulas" de categoria.
+  - `studio_name` nasce "Studio <nome>". Para falar com ela pelo nome, use `client_name`, nunca
+    a primeira palavra do `studio_name` (esse erro já fez aparecer "Studio" na tela).
+- **Prévia em tela cheia:** `PreviewRevealModal.tsx` (o "X" fica na lateral, no alto da moldura,
+  para não ser cortado pela barra do navegador no Android) e `PreviewCatalogClient.tsx` (botões de
+  Tema/Modelo).
 
 **Pós-pagamento:**
 - **`/ativando`:** `src/components/self-serve/ActivationScreen.tsx`.
