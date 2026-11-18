@@ -7,10 +7,10 @@ import { nichePresetsMap } from '@/data/niche-presets';
 /** Duração da prévia gratuita do funil de autosserviço (`/lash`). */
 export const PREVIEW_TTL_MS = 24 * 60 * 60 * 1000;
 
-/** Procedimentos de exemplo com que a prévia nasce: as 6 extensões de cílios
- *  do preset de Lash (mesmo recorte do mockup da página de vendas). Ela troca
- *  pelos dela depois de pagar, no editor. */
-const PREVIEW_PROCEDURE_IDS = ['brasileiro', 'classico', 'egipcio', 'hibrido', 'russo', 'mega'];
+/** Procedimentos de exemplo com que a prévia nasce: 4 extensões de cílios +
+ *  2 de sobrancelha (2026-11-18, eram 6 extensões) — assim a capa já mostra
+ *  as duas "cápsulas" de categoria. Ela troca pelos dela depois de pagar. */
+const PREVIEW_PROCEDURE_IDS = ['brasileiro', 'classico', 'egipcio', 'hibrido', 'design-sobrancelha', 'sobrancelha-henna'];
 
 export type CreateSelfServeResult =
   | { ok: true; orderId: string; slug: string; previewCode: string; previewExpiresAt: string | null }
