@@ -17,9 +17,10 @@ interface CaktoPlanCardProps {
 const GRACE_MS = 3 * 24 * 60 * 60 * 1000;
 const RENEW_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
 const SUPPORT_WHATSAPP = '5562991083435';
-/** Link onde a assinante cancela sozinha na Cakto, se existir. Vazio = o
- *  botão abre o WhatsApp do suporte com a mensagem pronta. */
-const CAKTO_CANCEL_URL = '';
+/** Portal da Cakto onde a assinante vê, altera ou cancela a assinatura
+ *  sozinha, entrando com o e-mail da compra (central de ajuda da Cakto,
+ *  conferido em 2026-11-18). O WhatsApp do suporte fica como reserva. */
+const CAKTO_SUBSCRIPTION_PORTAL_URL = 'https://assinatura.cakto.com.br/';
 
 function brl(value: number) {
   return value.toFixed(2).replace('.', ',');
@@ -164,16 +165,24 @@ export const CaktoPlanCard: React.FC<CaktoPlanCardProps> = ({ plan, status, paid
                 Você pode cancelar quando quiser, <strong className="text-ink">sem multa e sem fidelidade</strong>. Seu menu continua no ar
                 até o fim do mês que você já pagou.
               </p>
+              <p className="mt-2">
+                É só entrar no portal de assinaturas da Cakto com o <strong className="text-ink">e-mail que você usou na compra</strong>.
+              </p>
               <a
-                href={
-                  CAKTO_CANCEL_URL ||
-                  `https://wa.me/${SUPPORT_WHATSAPP}?text=${encodeURIComponent('Oi! Quero cancelar a assinatura mensal do meu StudioMenu.')}`
-                }
+                href={CAKTO_SUBSCRIPTION_PORTAL_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-3 inline-flex h-10 px-4 rounded-xl border border-linen text-ink-soft text-[14px] font-bold items-center"
+                className="mt-3 inline-flex h-10 px-4 rounded-xl border border-linen text-ink text-[14px] font-bold items-center"
               >
-                Pedir cancelamento
+                Abrir portal de assinaturas
+              </a>
+              <a
+                href={`https://wa.me/${SUPPORT_WHATSAPP}?text=${encodeURIComponent('Oi! Quero cancelar a assinatura mensal do meu StudioMenu.')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 block text-[13px] font-semibold text-rose-600 underline underline-offset-2"
+              >
+                Não conseguiu? Fale com a gente
               </a>
             </div>
           )}
