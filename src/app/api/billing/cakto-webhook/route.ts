@@ -79,6 +79,10 @@ function nowBR() {
   return new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
 }
 
+function brl(value: number) {
+  return value.toFixed(2).replace('.', ',');
+}
+
 export async function POST(request: Request) {
   const raw = await request.text();
   let payload: Json = null;
@@ -250,7 +254,7 @@ export async function POST(request: Request) {
 
     if (isFirstActivation) {
       await sendTelegramMessage(
-        `💳 Nova venda Cakto (${plan === 'anual' ? 'Anual R$127 Pix' : 'Mensal R$22,90'})!${createdWithoutPreview ? '\n⚠️ Sem prévia — catálogo criado pelo nome da compra, conferir.' : ''}\n\n👤 ${buyerName}\n🔗 https://studiomenu.art/c/${order.slug}\n🕒 ${nowBR()}\n📧${emailNote.replace(' · ', ' ')}`
+        `💳 Nova venda Cakto (${plan === 'anual' ? `Anual R$${brl(CAKTO_ANUAL_PRICE)}` : `Mensal R$${brl(CAKTO_MENSAL_PRICE)}`})!${createdWithoutPreview ? '\n⚠️ Sem prévia — catálogo criado pelo nome da compra, conferir.' : ''}\n\n👤 ${buyerName}\n🔗 https://studiomenu.art/c/${order.slug}\n🕒 ${nowBR()}\n📧${emailNote.replace(' · ', ' ')}`
       );
     }
 

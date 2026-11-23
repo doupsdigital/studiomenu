@@ -465,6 +465,11 @@
   margin: 0 auto;
 }
 
+/* Oferta de um plano só (`?plano=`, 2026-11-23): cartão único centralizado. */
+.lp-ss-tier-grid.lp-pricing-tier-grid--single {
+  max-width: 440px;
+}
+
 .lp-ss-savings {
   align-self: center;
   margin: -10px 0 18px;

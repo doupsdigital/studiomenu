@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 import { CAKTO_ANUAL_PRICE, CAKTO_MENSAL_PRICE } from '@/lib/pricing';
+import type { SelfServeOfferMode } from '@/lib/cakto-checkout';
 import type { LandingNicheContent } from '@/data/landing-niche-content';
 import { PreviewGenerator } from './PreviewGenerator';
 import { CreatingOverlay } from './CreatingOverlay';
@@ -15,6 +16,7 @@ import {
   guessSlug,
   loadPreview,
   savePreview,
+  setFunnelOffer,
   trackFunnel,
   trackPixel,
   type CaktoPlanKey,
@@ -29,7 +31,20 @@ const IFRAME_LOAD_TIMEOUT_MS = 7000;
 
 interface SelfServeLandingPageProps {
   content: LandingNicheContent;
+  /** `?plano=` (2026-11-23): uma oferta só (mensal ou anual) ou as duas. */
+  offer: SelfServeOfferMode;
 }
+
+function brl(value: number): string {
+  return value.toFixed(2).replace('.', ',');
+}
+
+/** Passo "Ative o seu menu" do "Simples assim", conforme a oferta. */
+const ACTIVATE_STEP: Record<SelfServeOfferMode, string> = {
+  ambos: 'Anual ou mensal, no Pix ou no cartão. A ativação é na hora.',
+  anual: `R$ ${brl(CAKTO_ANUAL_PRICE)} por 1 ano, no Pix ou no cartão. A ativação é na hora.`,
+  mensal: `R$ ${brl(CAKTO_MENSAL_PRICE)} por mês, no Pix ou no cartão. A ativação é na hora.`,
+};
 
 /** Página de vendas de autosserviço do nicho Lash (`/lash`, 2026-11-17).
  *
@@ -41,8 +56,12 @@ interface SelfServeLandingPageProps {
  *  Reaproveita o visual (classes `lp-*`) e o conteúdo nichado da página `/`
  *  (`LANDING_NICHE_CONTENT.lash`), sem alterar a `/`, que continua no ar
  *  rodando a campanha atual. */
-export function SelfServeLandingPage({ content }: SelfServeLandingPageProps) {
+export function SelfServeLandingPage({ content, offer }: SelfServeLandingPageProps) {
   useScrollReveal();
+
+  useEffect(() => {
+    setFunnelOffer(offer);
+  }, [offer]);
 
   const [name, setName] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -146,14 +165,14 @@ export function SelfServeLandingPage({ content }: SelfServeLandingPageProps) {
       setPreview(created); // monta o iframe por trás da animação
       savePreview(created);
       trackFunnel('preview_created', { reused: Boolean(json.reused) });
-      trackPixel('Lead', { content_name: 'Prévia StudioMenu Lash' });
+      trackPixel('Lead', { content_name: 'Prévia StudioMenu Lash', content_category: offer });
     } catch {
       setCreating(false);
       setBusy(false);
       setError('Sem conexão. Confira sua internet e tente de novo.');
       trackFunnel('preview_error', { code: 'network' });
     }
-  }, [name]);
+  }, [name, offer]);
 
   const handleCreatingDone = useCallback(() => {
     setCreating(false);
@@ -166,10 +185,15 @@ export function SelfServeLandingPage({ content }: SelfServeLandingPageProps) {
     (plan: CaktoPlanKey) => {
       const value = plan === 'anual' ? CAKTO_ANUAL_PRICE : CAKTO_MENSAL_PRICE;
       trackFunnel('checkout_click', { plan, has_preview: Boolean(preview) });
-      trackPixel('AddToCart', { value, currency: 'BRL', content_name: `StudioMenu ${plan === 'anual' ? 'Anual' : 'Mensal'}` });
+      trackPixel('AddToCart', {
+        value,
+        currency: 'BRL',
+        content_name: `StudioMenu ${plan === 'anual' ? 'Anual' : 'Mensal'}`,
+        content_category: offer,
+      });
       window.location.href = buildCheckoutUrl(plan, preview?.previewCode ?? null);
     },
-    [preview]
+    [preview, offer]
   );
 
   const handleStartOver = useCallback(() => {
@@ -277,7 +301,7 @@ export function SelfServeLandingPage({ content }: SelfServeLandingPageProps) {
             <ol className="lp-ss-how-steps">
               {[
                 { t: 'Crie grátis com seu nome', d: 'Em 10 segundos você vê o seu menu pronto, com serviços de lash de exemplo.' },
-                { t: 'Ative o seu menu', d: 'Anual no Pix ou mensal no cartão. A ativação é na hora.' },
+                { t: 'Ative o seu menu', d: ACTIVATE_STEP[offer] },
                 { t: 'Edite e divulgue', d: 'Troque pelos seus serviços e preços pelo celular e coloque o link na bio.' },
               ].map((s, i) => (
                 <li key={i} data-reveal style={{ ['--reveal-delay' as string]: `${i * 0.1}s` }}>
@@ -291,10 +315,10 @@ export function SelfServeLandingPage({ content }: SelfServeLandingPageProps) {
         </section>
 
         {/* 4. OFERTA */}
-        <SelfServeOffer preview={preview} onCheckout={handleCheckout} onCreateFirst={focusGenerator} />
+        <SelfServeOffer preview={preview} offer={offer} onCheckout={handleCheckout} onCreateFirst={focusGenerator} />
 
         {/* 5. DÚVIDAS */}
-        <SelfServeFaq />
+        <SelfServeFaq offer={offer} />
       </main>
 
       <footer className="lp-site-footer">

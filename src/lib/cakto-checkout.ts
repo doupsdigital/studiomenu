@@ -3,8 +3,10 @@
  *  navegador. Os IDs dos produtos NÃO ficam aqui: vão na variável de
  *  ambiente `CAKTO_PRODUCT_MAP` (lida só pelo webhook, `src/lib/cakto.ts`).
  *
- *  Mensal: R$ 22,90/mês, assinatura, só cartão de crédito.
- *  Anual:  R$ 127, pagamento único no Pix, acesso de 1 ano. */
+ *  Mensal: R$ 19,99/mês (R$ 19 + taxa de R$ 0,99 da Cakto), assinatura,
+ *          Pix automático ou cartão de crédito.
+ *  Anual:  R$ 97, pagamento único, Pix ou cartão, acesso de 1 ano.
+ *  Preços em `src/lib/pricing.ts` (2026-11-23). */
 /** Pixel da Meta do funil de autosserviço Lash — exclusivo do StudioMenu,
  *  criado em 2026-11-17 (o anterior, `1015955554886103`, era de outro
  *  produto). Precisa ser o MESMO cadastrado nos 2 produtos da Cakto, que
@@ -17,3 +19,13 @@ export const CAKTO_CHECKOUT_URLS = {
   mensal: 'https://pay.cakto.com.br/h2p6djs_1336617',
   anual: 'https://pay.cakto.com.br/ts7e24e_1336652',
 } as const;
+
+/** Qual oferta a página de Lash mostra (2026-11-23, teste A/B dos anúncios):
+ *  `?plano=mensal` ou `?plano=anual` mostram só aquele plano; sem o parâmetro
+ *  (`ambos`), a página de sempre com as 2 opções. Fica aqui (e não em
+ *  `funnel.ts`, que é `'use client'`) porque é lido no servidor. */
+export type SelfServeOfferMode = 'ambos' | 'mensal' | 'anual';
+
+export function parseOfferMode(plano: string | string[] | undefined): SelfServeOfferMode {
+  return plano === 'mensal' || plano === 'anual' ? plano : 'ambos';
+}
