@@ -1,8 +1,12 @@
 'use client';
 
 import React, { useState, type CSSProperties } from 'react';
+import type { SelfServeOfferMode } from '@/lib/cakto-checkout';
 
-const ITEMS = [
+/** `only`: a pergunta só aparece com essas ofertas (`?plano=`, 2026-11-23) —
+ *  ex: "como cancelo o mensal" não faz sentido na página que só vende o
+ *  anual, e "qual a diferença" só faz sentido com as 2 opções. */
+const ITEMS: { q: string; a: string; only?: SelfServeOfferMode[] }[] = [
   {
     q: 'Como eu edito o meu menu?',
     a: 'Pelo próprio celular. Depois de ativar, você entra no seu app e toca em qualquer texto, foto ou preço para trocar. Um passo a passo guiado mostra onde tocar na primeira vez.',
@@ -10,6 +14,7 @@ const ITEMS = [
   {
     q: 'Como eu cancelo o plano mensal?',
     a: 'Quando quiser, sem multa e sem fidelidade. Você mesma cancela pelo seu app (ou no portal de assinaturas da Cakto, com o e-mail da compra), e seu menu continua no ar até o fim do mês que você já pagou.',
+    only: ['ambos', 'mensal'],
   },
   {
     q: 'E se eu não ativar a prévia?',
@@ -21,7 +26,13 @@ const ITEMS = [
   },
   {
     q: 'Qual a diferença entre o anual e o mensal?',
-    a: 'Os dois têm tudo. No anual você paga uma vez no Pix e sai mais barato por mês. No mensal você paga no cartão todo mês e pode cancelar quando quiser.',
+    a: 'Os dois têm tudo, e os dois aceitam Pix ou cartão. No anual você paga uma vez por 12 meses e sai mais barato por mês. No mensal você paga todo mês e pode cancelar quando quiser.',
+    only: ['ambos'],
+  },
+  {
+    q: 'O que acontece depois de 1 ano?',
+    a: 'Nada é cobrado sozinho: o anual é um pagamento único. Perto do fim, o seu app avisa e você renova por mais 1 ano se quiser, com o mesmo link.',
+    only: ['anual'],
   },
   {
     q: 'Minha cliente precisa baixar algum aplicativo?',
@@ -31,8 +42,9 @@ const ITEMS = [
 
 /** Dúvidas da página `/lash` (2026-11-17), focadas no autosserviço. Mesmas
  *  classes visuais do `FaqSection` da página `/`, conteúdo próprio. */
-export const SelfServeFaq: React.FC = () => {
+export const SelfServeFaq: React.FC<{ offer: SelfServeOfferMode }> = ({ offer }) => {
   const [open, setOpen] = useState<number | null>(null);
+  const items = ITEMS.filter((item) => !item.only || item.only.includes(offer));
 
   return (
     <section className="lp-faq-section" id="faq">
@@ -46,7 +58,7 @@ export const SelfServeFaq: React.FC = () => {
       </div>
       <div className="lp-container">
         <div className="lp-faq-list">
-          {ITEMS.map((item, i) => {
+          {items.map((item, i) => {
             const isOpen = open === i;
             return (
               <div
