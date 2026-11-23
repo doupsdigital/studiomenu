@@ -2,10 +2,14 @@
 
 import React, { type CSSProperties } from 'react';
 import { CAKTO_ANUAL_PRICE, CAKTO_MENSAL_PRICE } from '@/lib/pricing';
+import type { SelfServeOfferMode } from '@/lib/cakto-checkout';
 import { firstName, formatHoursMinutes, useRemaining, type CaktoPlanKey, type FunnelPreview } from './funnel';
 
 interface SelfServeOfferProps {
   preview: FunnelPreview | null;
+  /** `ambos` = as 2 opções lado a lado; `anual`/`mensal` = só aquele plano,
+   *  num cartão único, sem comparação (teste A/B, 2026-11-23). */
+  offer: SelfServeOfferMode;
   onCheckout: (plan: CaktoPlanKey) => void;
   onCreateFirst: () => void;
 }
@@ -23,13 +27,81 @@ const CHECK = (
 const ANNUAL_PER_MONTH = CAKTO_ANUAL_PRICE / 12;
 const ANNUAL_SAVINGS = CAKTO_MENSAL_PRICE * 12 - CAKTO_ANUAL_PRICE;
 
-/** Oferta da página `/lash` (2026-11-17): Anual no Pix em destaque (o que a
- *  dona quer estimular) e Mensal no cartão com "cancele quando quiser" bem
- *  visível. Personalizada quando já existe prévia (nome + tempo restante). */
-export const SelfServeOffer: React.FC<SelfServeOfferProps> = ({ preview, onCheckout, onCreateFirst }) => {
+/** Oferta da página `/lash` (2026-11-17): Anual em destaque (o que a dona
+ *  quer estimular) e Mensal com "cancele quando quiser" bem visível. Os dois
+ *  aceitam Pix ou cartão (2026-11-23). Com `offer` = um plano só, vira um
+ *  cartão único sem "mais vantajoso"/"economize" — não há com o que
+ *  comparar. Personalizada quando já existe prévia (nome + tempo restante). */
+export const SelfServeOffer: React.FC<SelfServeOfferProps> = ({ preview, offer, onCheckout, onCreateFirst }) => {
   const remaining = useRemaining(preview?.expiresAt, 30_000);
   const [annualWhole, annualCents] = brl(CAKTO_ANUAL_PRICE).split(',');
   const [monthlyWhole, monthlyCents] = brl(CAKTO_MENSAL_PRICE).split(',');
+  const single = offer !== 'ambos';
+
+  const annualCard = (
+    <div className="lp-pricing-tier-card lp-pricing-tier-card--vip" data-reveal>
+      <div className="lp-tier-badge lp-tier-badge--vip">{single ? '⭐ 1 ANO DE ACESSO' : '⭐ MAIS VANTAJOSO'}</div>
+      <h3 className="lp-tier-title">{single ? 'StudioMenu Anual' : 'Anual'}</h3>
+      <div className="lp-tier-price-box">
+        <div className="lp-tier-price-main">
+          <span className="lp-tier-currency">R$</span>
+          <span className="lp-tier-val">{annualWhole}</span>
+          <span className="lp-tier-cents">,{annualCents}</span>
+          <span className="lp-tier-period">/ano</span>
+        </div>
+        <div className="lp-tier-price-sub">= R$ {brl(ANNUAL_PER_MONTH)} por mês</div>
+      </div>
+      {!single && <p className="lp-ss-savings">Economize R$ {brl(ANNUAL_SAVINGS)} no ano</p>}
+      <ul className="lp-tier-bullets">
+        <li>{CHECK}<span><strong>Pague uma vez, sem mensalidade</strong></span></li>
+        <li>{CHECK}<span>Pix ou cartão de crédito</span></li>
+        <li>{CHECK}<span>Seu menu no ar por 12 meses</span></li>
+        <li>{CHECK}<span>Edite serviços, fotos e preços pelo celular</span></li>
+        <li>{CHECK}<span>Ativação na hora</span></li>
+      </ul>
+      <button type="button" className="lp-btn lp-btn--primary lp-ss-btn-block lp-tier-cta-pulse" onClick={() => onCheckout('anual')}>
+        {single ? 'ATIVAR MEU MENU' : 'ATIVAR ANUAL'}
+      </button>
+    </div>
+  );
+
+  const monthlyCard = (
+    <div
+      className={`lp-pricing-tier-card${single ? ' lp-pricing-tier-card--vip' : ''}`}
+      data-reveal
+      style={single ? undefined : ({ '--reveal-delay': '0.12s' } as CSSProperties)}
+    >
+      <div className={`lp-tier-badge ${single ? 'lp-tier-badge--vip' : 'lp-tier-badge--basic'}`}>
+        {single ? '🔁 ASSINATURA MENSAL' : '🔁 MENSAL'}
+      </div>
+      <h3 className="lp-tier-title">{single ? 'StudioMenu Mensal' : 'Mensal'}</h3>
+      <div className="lp-tier-price-box">
+        <div className="lp-tier-price-main">
+          <span className="lp-tier-currency">R$</span>
+          <span className="lp-tier-val">{monthlyWhole}</span>
+          <span className="lp-tier-cents">,{monthlyCents}</span>
+          <span className="lp-tier-period">/mês</span>
+        </div>
+      </div>
+      <div className="lp-ss-cancel-box">
+        <strong>Cancele quando quiser</strong>
+        <span>Sem fidelidade · sem multa</span>
+      </div>
+      <ul className="lp-tier-bullets">
+        <li>{CHECK}<span>Pix automático ou cartão de crédito</span></li>
+        <li>{CHECK}<span>Pague pouco por mês para testar com suas clientes</span></li>
+        <li>{CHECK}<span>Edite serviços, fotos e preços pelo celular</span></li>
+        <li>{CHECK}<span>Ativação na hora</span></li>
+      </ul>
+      <button
+        type="button"
+        className={`lp-btn lp-btn--primary lp-ss-btn-block${single ? ' lp-tier-cta-pulse' : ''}`}
+        onClick={() => onCheckout('mensal')}
+      >
+        {single ? 'ATIVAR MEU MENU' : 'ATIVAR MENSAL'}
+      </button>
+    </div>
+  );
 
   return (
     <section id="oferta" className="lp-pricing-section lp-ss-offer">
@@ -55,57 +127,9 @@ export const SelfServeOffer: React.FC<SelfServeOfferProps> = ({ preview, onCheck
           )}
         </div>
 
-        <div className="lp-pricing-tier-grid lp-ss-tier-grid">
-          {/* Anual — destaque */}
-          <div className="lp-pricing-tier-card lp-pricing-tier-card--vip" data-reveal>
-            <div className="lp-tier-badge lp-tier-badge--vip">⭐ MAIS VANTAJOSO</div>
-            <h3 className="lp-tier-title">Anual no Pix</h3>
-            <div className="lp-tier-price-box">
-              <div className="lp-tier-price-main">
-                <span className="lp-tier-currency">R$</span>
-                <span className="lp-tier-val">{annualWhole}</span>
-                <span className="lp-tier-cents">,{annualCents}</span>
-                <span className="lp-tier-period">/ano</span>
-              </div>
-              <div className="lp-tier-price-sub">= R$ {brl(ANNUAL_PER_MONTH)} por mês</div>
-            </div>
-            <p className="lp-ss-savings">Economize R$ {brl(ANNUAL_SAVINGS)} no ano</p>
-            <ul className="lp-tier-bullets">
-              <li>{CHECK}<span><strong>Pague uma vez no Pix, sem mensalidade</strong></span></li>
-              <li>{CHECK}<span>Seu menu no ar por 12 meses</span></li>
-              <li>{CHECK}<span>Edite serviços, fotos e preços pelo celular</span></li>
-              <li>{CHECK}<span>Ativação na hora, assim que o Pix cair</span></li>
-            </ul>
-            <button type="button" className="lp-btn lp-btn--primary lp-ss-btn-block lp-tier-cta-pulse" onClick={() => onCheckout('anual')}>
-              ATIVAR COM PIX
-            </button>
-          </div>
-
-          {/* Mensal */}
-          <div className="lp-pricing-tier-card" data-reveal style={{ '--reveal-delay': '0.12s' } as CSSProperties}>
-            <div className="lp-tier-badge lp-tier-badge--basic">🔁 MENSAL</div>
-            <h3 className="lp-tier-title">Mensal no cartão</h3>
-            <div className="lp-tier-price-box">
-              <div className="lp-tier-price-main">
-                <span className="lp-tier-currency">R$</span>
-                <span className="lp-tier-val">{monthlyWhole}</span>
-                <span className="lp-tier-cents">,{monthlyCents}</span>
-                <span className="lp-tier-period">/mês</span>
-              </div>
-            </div>
-            <div className="lp-ss-cancel-box">
-              <strong>Cancele quando quiser</strong>
-              <span>Sem fidelidade · sem multa</span>
-            </div>
-            <ul className="lp-tier-bullets">
-              <li>{CHECK}<span>Pague pouco por mês para testar com suas clientes</span></li>
-              <li>{CHECK}<span>Edite serviços, fotos e preços pelo celular</span></li>
-              <li>{CHECK}<span>Ativação na hora</span></li>
-            </ul>
-            <button type="button" className="lp-btn lp-btn--primary lp-ss-btn-block" onClick={() => onCheckout('mensal')}>
-              ATIVAR NO CARTÃO
-            </button>
-          </div>
+        <div className={`lp-pricing-tier-grid lp-ss-tier-grid${single ? ' lp-pricing-tier-grid--single' : ''}`}>
+          {offer !== 'mensal' && annualCard}
+          {offer !== 'anual' && monthlyCard}
         </div>
 
         {!preview && (

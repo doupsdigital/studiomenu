@@ -22,7 +22,7 @@ O funil novo **vende sozinho**:
 
 ```
 Anúncio → /?nicho=lash (ou /lash) → digita só o NOME → prévia Capa+Catálogo (24h, sem edição)
-  → "Ativar" → Cakto (R$ 22,90/mês cartão | R$ 127/ano Pix)
+  → "Ativar" → Cakto (R$ 19,99/mês | R$ 97/ano, os 2 no Pix ou cartão)
   → /ativando (loga sozinha) → /app/<slug>/primeiros-passos
   (+ e-mail de acesso pelo Resend, de reserva)
 ```
@@ -40,6 +40,8 @@ Anúncio → /?nicho=lash (ou /lash) → digita só o NOME → prévia Capa+Cat�
 |---|---|
 | `/?nicho=lash` | **Página de autosserviço.** É o link do anúncio que já está rodando. Qualquer `v=` diferente de `antiga` também cai aqui. |
 | `/lash` | A mesma página. |
+| `/?nicho=lash&plano=anual` | A mesma página, oferecendo **só o anual** (cartão único, sem comparação). Para o teste A/B dos anúncios (2026-11-23). Também funciona em `/lash?plano=anual`. |
+| `/?nicho=lash&plano=mensal` | A mesma página, oferecendo **só o mensal**. Idem. |
 | `/?nicho=lash&v=antiga` | Landing antiga de Lash (X1/WhatsApp), guardada caso precise voltar. |
 | `/lp` | Redireciona 307 para `/?nicho=lash`, mantendo UTMs e fbclid. |
 | `/` (sem nicho) | Landing de sempre, sem mudança. |
@@ -59,8 +61,8 @@ Anúncio → /?nicho=lash (ou /lash) → digita só o NOME → prévia Capa+Cat�
 
 | Produto | Preço / pagamento | ID | Checkout |
 |---|---|---|---|
-| StudioMenu Mensal | R$ 22,90/mês, assinatura, só cartão | `8f8da661-dffa-4cf4-bffb-93bd0f3136fb` | `https://pay.cakto.com.br/h2p6djs_1336617` |
-| StudioMenu Anual | R$ 127, pagamento único no Pix (1 ano de acesso) | `0914892a-e344-438a-83c0-e6d4cd22985f` | `https://pay.cakto.com.br/ts7e24e_1336652` |
+| StudioMenu Mensal | R$ 19,99/mês, assinatura, Pix automático ou cartão. Na Cakto o valor é R$ 19,00; o checkout soma a taxa de R$ 0,99 | `8f8da661-dffa-4cf4-bffb-93bd0f3136fb` | `https://pay.cakto.com.br/h2p6djs_1336617` |
+| StudioMenu Anual | R$ 97, pagamento único, Pix ou cartão (1 ano de acesso) | `0914892a-e344-438a-83c0-e6d4cd22985f` | `https://pay.cakto.com.br/ts7e24e_1336652` |
 
 - **Página de obrigado (os 2 produtos):** `https://www.studiomenu.art/ativando`.
 - **Webhook "studio-menu":** `https://www.studiomenu.art/api/billing/cakto-webhook`, só para os 2
@@ -114,6 +116,8 @@ Localmente, as chaves da Cakto ficam em `.env.development.local` e a do Resend e
 - `PageView`;
 - `Lead`, quando a prévia é gerada;
 - `AddToCart`, ao clicar em ativar.
+
+Os dois levam `content_category` com a oferta da página (`ambos`, `anual` ou `mensal`).
 
 `InitiateCheckout` e `Purchase` ficam com a Cakto. O webhook da Cakto **não** manda CAPI, para
 não duplicar o Purchase.
@@ -248,6 +252,8 @@ tem:
 - `preview_submit`, `preview_created`, `preview_error`;
 - `preview_reveal_open`, `checkout_click`, `activate_click`;
 - `activation_success`, `activation_slow`, `activation_no_session`.
+- Todo evento leva `offer` (`ambos`, `anual` ou `mensal`), conforme o `?plano=` da página. É o que
+  separa as duas páginas do teste A/B.
 
 ---
 

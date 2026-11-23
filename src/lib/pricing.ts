@@ -42,9 +42,14 @@ export const CATALOGO_ANUAL_DEFAULT_PRICE = 139.9;
  *  valores são só o que a página `/lash` mostra e o que o webhook grava em
  *  `billing_price_override` (pra o admin ver o valor certo). Mudar aqui
  *  SEM mudar na Cakto deixa a página mostrando um preço diferente do
- *  checkout. */
-export const CAKTO_MENSAL_PRICE = 22.9;
-export const CAKTO_ANUAL_PRICE = 127.0;
+ *  checkout.
+ *
+ *  2026-11-23 (pedido real): Mensal R$ 19,99/mês (Pix automático ou cartão)
+ *  — na Cakto o produto custa R$ 19,00 e o checkout soma a taxa de R$ 0,99,
+ *  então R$ 19,99 é o total que ela paga (anunciar 19,99 evita surpresa no
+ *  checkout). Anual R$ 97, pagamento único (Pix ou cartão), 1 ano de acesso. */
+export const CAKTO_MENSAL_PRICE = 19.99;
+export const CAKTO_ANUAL_PRICE = 97.0;
 
 export const AGENDA_PRICE = 34.9;
 export const AGENDA_PRICE_LABEL = 'R$ 34,90/mês';

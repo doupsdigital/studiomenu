@@ -46,7 +46,8 @@ hardcoded em outro lugar. Preço do Plano Catálogo é customizável por catálo
 
 **Funil de autosserviço Lash (em produção desde 2026-11-18):** o nicho Lash não é mais vendido
 por X1. `/?nicho=lash` (link do anúncio) e `/lash` geram uma prévia grátis de 24h pelo nome e
-vendem pela **Cakto** (R$ 22,90/mês cartão ou R$ 127/ano Pix), separado do Asaas por
+vendem pela **Cakto** (R$ 19,99/mês ou R$ 97/ano, Pix ou cartão; `&plano=mensal|anual` mostra
+só um dos dois), separado do Asaas por
 `orders.billing_provider = 'cakto'`. Tudo sobre isso (configuração, regras, arquivos,
 pendências) está em [`FUNIL_LASH_CAKTO.md`](FUNIL_LASH_CAKTO.md) — leitura obrigatória antes de
 mexer em Cakto, prévia, `/ativando`, "Primeiros passos" ou e-mail de acesso.

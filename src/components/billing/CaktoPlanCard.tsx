@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ChevronDown, CreditCard, QrCode, AlertTriangle, Crown } from 'lucide-react';
+import { ChevronDown, CalendarCheck, Repeat, AlertTriangle, Crown } from 'lucide-react';
 import { CAKTO_CHECKOUT_URLS } from '@/lib/cakto-checkout';
 import { CAKTO_ANUAL_PRICE, CAKTO_MENSAL_PRICE } from '@/lib/pricing';
 
@@ -60,15 +60,15 @@ export const CaktoPlanCard: React.FC<CaktoPlanCardProps> = ({ plan, status, paid
         href={checkoutUrl('anual', checkoutRef)}
         className="h-12 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-[15px] font-bold flex items-center justify-center gap-2 transition-colors"
       >
-        <QrCode className="w-4 h-4" />
-        Anual no Pix · R$ {brl(CAKTO_ANUAL_PRICE)}
+        <CalendarCheck className="w-4 h-4" />
+        Anual · R$ {brl(CAKTO_ANUAL_PRICE)}
       </a>
       <a
         href={checkoutUrl('mensal', checkoutRef)}
         className="h-12 rounded-xl border-2 border-rose-600 text-rose-600 text-[15px] font-bold flex items-center justify-center gap-2"
       >
-        <CreditCard className="w-4 h-4" />
-        Mensal no cartão · R$ {brl(CAKTO_MENSAL_PRICE)}
+        <Repeat className="w-4 h-4" />
+        Mensal · R$ {brl(CAKTO_MENSAL_PRICE)}/mês
       </a>
     </div>
   );
@@ -89,13 +89,13 @@ export const CaktoPlanCard: React.FC<CaktoPlanCardProps> = ({ plan, status, paid
     );
   }
 
-  // Renovação do cartão recusada (ainda dentro da folga).
+  // Renovação recusada — cartão ou Pix automático (ainda dentro da folga).
   if (status === 'suspenso') {
     return (
       <div className="rounded-2xl p-5 bg-amber-50 border-2 border-amber-300">
         <p className="flex items-center gap-2 font-bold text-[17px] text-amber-900">
           <AlertTriangle className="w-5 h-5" />
-          A renovação no cartão não passou
+          A renovação não passou
         </p>
         <p className="text-[15px] text-amber-900/80 mt-1.5 leading-relaxed">
           Seu menu continua no ar por mais alguns dias. Pra não sair do ar, ative de novo:
@@ -133,7 +133,7 @@ export const CaktoPlanCard: React.FC<CaktoPlanCardProps> = ({ plan, status, paid
           <p className="text-sm text-ink-soft mt-0.5">
             {isAnual
               ? `Seu menu está garantido até ${untilLabel}`
-              : `R$ ${brl(CAKTO_MENSAL_PRICE)}/mês no cartão · renova por volta de ${paidUntil ? formatDate(paidUntil, false) : ''}`}
+              : `R$ ${brl(CAKTO_MENSAL_PRICE)}/mês · renova por volta de ${paidUntil ? formatDate(paidUntil, false) : ''}`}
           </p>
         </div>
       </div>
@@ -143,7 +143,7 @@ export const CaktoPlanCard: React.FC<CaktoPlanCardProps> = ({ plan, status, paid
           href={checkoutUrl('anual', checkoutRef)}
           className="mt-4 h-12 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-[15px] font-bold flex items-center justify-center gap-2 transition-colors"
         >
-          <QrCode className="w-4 h-4" />
+          <CalendarCheck className="w-4 h-4" />
           Renovar por mais 1 ano · R$ {brl(CAKTO_ANUAL_PRICE)}
         </a>
       )}

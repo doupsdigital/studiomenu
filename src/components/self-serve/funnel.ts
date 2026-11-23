@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { capture } from '@/lib/analytics';
-import { CAKTO_CHECKOUT_URLS } from '@/lib/cakto-checkout';
+import { CAKTO_CHECKOUT_URLS, type SelfServeOfferMode } from '@/lib/cakto-checkout';
 
 /** Utilitários do funil de autosserviço `/lash` (2026-11-17). */
 
@@ -105,8 +105,17 @@ export function trackPixel(event: string, params?: Record<string, unknown>) {
   }
 }
 
+/** Oferta da página aberta (`?plano=`, 2026-11-23) — vai em todo evento do
+ *  funil pra separar o teste A/B mensal × anual no PostHog. Definida pela
+ *  `SelfServeLandingPage` ao montar. */
+let funnelOffer: SelfServeOfferMode = 'ambos';
+
+export function setFunnelOffer(offer: SelfServeOfferMode) {
+  funnelOffer = offer;
+}
+
 export function trackFunnel(event: string, properties?: Record<string, unknown>) {
-  capture(event, { funnel: 'lash_self_serve', ...properties });
+  capture(event, { funnel: 'lash_self_serve', offer: funnelOffer, ...properties });
 }
 
 /** Tempo restante até `expiresAt`, atualizado a cada `intervalMs`. */

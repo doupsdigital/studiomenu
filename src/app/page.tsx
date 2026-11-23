@@ -5,9 +5,10 @@ import { MetaPixelTracker } from '@/components/sales/MetaPixelTracker';
 import { LANDING_NICHE_CONTENT, type LandingNiche } from '@/data/landing-niche-content';
 import { cookies } from 'next/headers';
 import { LashSelfServeEntry } from '@/components/self-serve/LashSelfServeEntry';
+import { parseOfferMode } from '@/lib/cakto-checkout';
 
 interface StudioMenuLandingPageProps {
-  searchParams: Promise<{ nicho?: string; v?: string }>;
+  searchParams: Promise<{ nicho?: string; v?: string; plano?: string }>;
 }
 
 /** `?nicho=` troca a Hero pra falar a língua de quem clicou num anúncio
@@ -21,7 +22,7 @@ interface StudioMenuLandingPageProps {
  *  na mesma versão (split test 70/30 a favor de 'curta', determinístico
  *  via código). */
 export default async function StudioMenuLandingPage({ searchParams }: StudioMenuLandingPageProps) {
-  const { nicho, v } = await searchParams;
+  const { nicho, v, plano } = await searchParams;
   const resolvedNiche: LandingNiche = nicho && nicho in LANDING_NICHE_CONTENT ? (nicho as LandingNiche) : 'geral';
   const content = LANDING_NICHE_CONTENT[resolvedNiche];
 
@@ -29,8 +30,9 @@ export default async function StudioMenuLandingPage({ searchParams }: StudioMenu
   // mostrar a página de autosserviço (prévia grátis + Cakto), sem precisar
   // trocar a URL no Gerenciador. A landing antiga de Lash (X1/WhatsApp)
   // continua acessível em `?nicho=lash&v=antiga`, caso precise voltar.
+  // `&plano=mensal|anual` mostra uma oferta só (teste A/B, 2026-11-23).
   if (resolvedNiche === 'lash' && v !== 'antiga') {
-    return <LashSelfServeEntry />;
+    return <LashSelfServeEntry offer={parseOfferMode(plano)} />;
   }
 
   const cookieStore = await cookies();
