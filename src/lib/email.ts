@@ -113,3 +113,82 @@ Dúvidas? Fale com a gente no WhatsApp: ${whatsUrl}`;
 
   return { subject, html, text };
 }
+
+/* ------------------------------------------------------------------------
+ * E-mail da prévia (2026-11-26): "Quer pensar com calma?" no fim da página
+ * `/lash`. Ela deixa o e-mail e recebe UM e-mail, na hora, com o link do
+ * menu, até quando ele fica guardado e os botões de ativar (direto pro
+ * checkout da Cakto com `sck=<código da prévia>`). Sem lembrete/agendamento
+ * de propósito (decisão da dona: um único follow-up, o mais simples possível).
+ * --------------------------------------------------------------------- */
+
+export interface PreviewEmailParams {
+  name: string;
+  /** Link público da prévia (https://<slug>.studiomenu.art). */
+  menuUrl: string;
+  menuLabel: string;
+  /** Um botão por plano oferecido na página onde ela estava. */
+  checkouts: { label: string; url: string }[];
+  /** Ex.: "hoje às 18h" / "amanhã às 9h". */
+  expiresLabel: string;
+}
+
+export function buildPreviewSavedEmail(p: PreviewEmailParams) {
+  const firstName = p.name.trim().split(/\s+/)[0] || 'Oi';
+  const n = escapeHtml(firstName);
+  const exp = escapeHtml(p.expiresLabel);
+  const subject = `${firstName}, aqui está o seu menu`;
+  const whatsUrl = `https://wa.me/${SUPPORT_WHATSAPP}?text=${encodeURIComponent('Oi! Criei meu menu no StudioMenu e fiquei com uma dúvida.')}`;
+  const buttons = p.checkouts
+    .map(
+      (c) => `<tr><td align="center" style="padding:6px 0">
+      <a href="${c.url}" style="display:inline-block;min-width:240px;background:#c9587a;color:#ffffff;text-decoration:none;font-size:16px;font-weight:700;padding:15px 28px;border-radius:14px">${escapeHtml(c.label)}</a>
+    </td></tr>`
+    )
+    .join('');
+
+  const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(subject)}</title></head>
+<body style="margin:0;padding:0;background:#faf5f2;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#faf5f2;padding:24px 12px"><tr><td align="center">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border-radius:20px;border:1px solid #efe4df;overflow:hidden">
+  <tr><td style="background:linear-gradient(135deg,#e88aa3,#c9587a);background-color:#d16d8c;padding:28px 28px 24px;text-align:center">
+    <div style="font-size:13px;letter-spacing:2px;text-transform:uppercase;color:#ffe9ef;font-weight:700">StudioMenu</div>
+    <div style="font-size:25px;line-height:1.25;color:#ffffff;font-weight:700;margin-top:8px">${n}, seu menu está guardado 💗</div>
+  </td></tr>
+  <tr><td style="padding:28px">
+    <p style="margin:0 0 18px;font-size:15px;color:#4a3b40;line-height:1.6">Guardamos o menu que você criou. Ele fica disponível até <b>${exp}</b>. Depois disso ele é apagado e o link fica livre. Quando quiser, é só ativar e ele passa a ser seu, com o mesmo link.</p>
+
+    <div style="margin:0 0 22px;padding:16px;border-radius:14px;background:#faf5f2;border:1px solid #efe4df;text-align:center">
+      <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#8a7a80;font-weight:700">O seu menu</div>
+      <a href="${p.menuUrl}" style="display:block;margin-top:4px;font-size:17px;color:#c9587a;font-weight:700;text-decoration:none">${escapeHtml(p.menuLabel)}</a>
+      <a href="${p.menuUrl}" style="display:inline-block;margin-top:10px;font-size:14px;color:#4a3b40;font-weight:700;text-decoration:underline">Ver meu menu</a>
+    </div>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${buttons}</table>
+    <p style="margin:12px 0 0;font-size:13px;color:#8a7a80;line-height:1.5;text-align:center">🛡️ 7 dias de garantia · Ativação na hora · Pix ou cartão</p>
+
+    <div style="margin:24px 0 0;font-size:15px;font-weight:700;color:#2e2428">Depois de ativar</div>
+    <p style="margin:6px 0 0;font-size:14px;color:#4a3b40;line-height:1.6">Você recebe o acesso ao seu app exclusivo, onde troca os serviços, preços e fotos pelo celular, com um passo a passo te guiando.</p>
+  </td></tr>
+  <tr><td style="padding:18px 28px 26px;border-top:1px solid #efe4df;font-size:13px;color:#8a7a80;line-height:1.6;text-align:center">
+    Você recebeu este e-mail porque pediu o link do seu menu no StudioMenu.<br>
+    Ficou com dúvida? <a href="${whatsUrl}" style="color:#c9587a;font-weight:700">Fale com a gente no WhatsApp</a>
+  </td></tr>
+</table>
+</td></tr></table>
+</body></html>`;
+
+  const text = `${firstName}, seu menu está guardado até ${p.expiresLabel}.
+
+O seu menu: ${p.menuUrl}
+
+${p.checkouts.map((c) => `${c.label}: ${c.url}`).join('\n')}
+
+7 dias de garantia · Ativação na hora · Pix ou cartão
+
+Depois de ativar, você recebe o acesso ao seu app exclusivo, onde troca os serviços, preços e fotos pelo celular.
+
+Dúvidas? Fale com a gente no WhatsApp: ${whatsUrl}`;
+
+  return { subject, html, text };
+}

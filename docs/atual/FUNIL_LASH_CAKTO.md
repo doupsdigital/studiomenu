@@ -221,6 +221,32 @@ tem:
 - **Prévia em tela cheia:** `PreviewRevealModal.tsx` (o "X" fica na lateral, no alto da moldura,
   para não ser cortado pela barra do navegador no Android) e `PreviewCatalogClient.tsx` (botões de
   Tema/Modelo).
+  - Celular + botão "Gostei! Ver como funciona" formam um bloco centralizado; o tamanho do
+    celular é recalculado quando a prévia aparece (antes ficava preso em 80%).
+  - Dicas animadas na borda da moldura ("DESLIZE", "Clique nos cards", "Mude as cores do tema"):
+    `PreviewHints.tsx`, alimentado por `postMessage` do `PreviewCatalogClient` (mesmas mensagens
+    do showroom). O `MockupModal` da página `/` não foi tocado.
+  - Capa → Serviços com **uma** deslizada: `useCoverToCatalogSnap.ts`, **só na prévia**. Os menus
+    ativos das clientes continuam com a rolagem livre do formato "Capa + Catálogo".
+
+**Revelação em etapas da página (2026-11-26):** as gravações mostravam "cria → Ativar → vê o
+preço → sai". Agora quem chega vê só a Hero + o gerador. O botão da prévia libera o resto, nesta
+ordem:
+1. **Vídeo da edição** (`SelfServeEditDemo.tsx`, `public/landing/lash-edicao.mp4`, 2 MB, sem
+   áudio, em loop): ocupa uma tela inteira de celular, com o botão "Quero ativar o meu menu".
+2. **Preço** (`SelfServeOffer.tsx`): âncora de valor como 1º benefício do cartão, cartão "Garantia
+   de 7 dias", link "Ainda tenho dúvidas" e o bloco "Como funciona depois de pagar" (e-mail → app
+   exclusivo → passo a passo → link na bio + suporte 24h).
+3. **Dúvidas** (`SelfServeFaq.tsx`) com "Ativar meu menu" no fim (com um plano só, vai direto ao
+   checkout).
+4. **"Quer pensar com calma?"** (`SelfServeEmailCapture.tsx` → `POST /api/preview/email`): manda
+   **um único e-mail** (`buildPreviewSavedEmail`) com o link do menu, até quando ele fica guardado
+   e os botões de ativar direto na Cakto (`sck` + `utm_source=email`). Só para quem gerou a
+   prévia (cookie `sm_preview`), com limite por IP. **Sem lembrete, agendamento nem coluna no
+   banco** (decisão da dona); o histórico fica no painel do Resend.
+
+Quem volta com a prévia guardada (ou abre `/lash#oferta`) já vê a página inteira. A barra fixa
+do celular só aparece quando nenhum outro botão de ativar está na tela.
 
 **Pós-pagamento:**
 - **`/ativando`:** `src/components/self-serve/ActivationScreen.tsx`.
@@ -251,7 +277,10 @@ tem:
 **Analytics (PostHog `trackFunnel`):**
 - `preview_submit`, `preview_created`, `preview_error`;
 - `preview_reveal_open`, `checkout_click`, `activate_click`;
-- `activation_success`, `activation_slow`, `activation_no_session`.
+- `activation_success`, `activation_slow`, `activation_no_session`;
+- revelação em etapas (2026-11-26): `demo_view`, `demo_video_progress` (25/50/100),
+  `demo_cta_click`, `offer_view`, `faq_jump_click`, `faq_cta_click`, `sticky_bar_click`,
+  `email_capture_submit`, `email_capture_error`.
 - Todo evento leva `offer` (`ambos`, `anual` ou `mensal`), conforme o `?plano=` da página. É o que
   separa as duas páginas do teste A/B.
 
