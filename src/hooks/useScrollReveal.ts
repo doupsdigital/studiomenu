@@ -23,7 +23,10 @@ import { useEffect } from 'react';
  *  observer tinha adicionado por fora do React. Um atributo `data-*`
  *  separado (que o JSX nunca declara) não entra nesse diff — React nunca
  *  encosta nele, então sobrevive a qualquer re-render. */
-export function useScrollReveal() {
+export function useScrollReveal(rescanKey?: unknown) {
+  // `rescanKey` (2026-11-26): quando muda, procura de novo os `data-reveal`
+  // que ainda não apareceram — pra seções que só entram na página depois
+  // (ex.: a `/lash` libera vídeo/oferta/FAQ só depois do "Ativar").
   useEffect(() => {
     const elements = document.querySelectorAll<HTMLElement>('[data-reveal]:not([data-visible])');
     if (elements.length === 0) return;
@@ -41,5 +44,5 @@ export function useScrollReveal() {
 
     elements.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
-  }, []);
+  }, [rescanKey]);
 }

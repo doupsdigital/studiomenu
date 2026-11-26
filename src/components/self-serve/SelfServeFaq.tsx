@@ -17,6 +17,10 @@ const ITEMS: { q: string; a: string; only?: SelfServeOfferMode[] }[] = [
     only: ['ambos', 'mensal'],
   },
   {
+    q: 'E se eu não gostar?',
+    a: 'Você tem 7 dias de garantia. Se não gostar por qualquer motivo, é só pedir e devolvemos 100% do valor.',
+  },
+  {
     q: 'E se eu não ativar a prévia?',
     a: 'Ela fica disponível por 24 horas e depois é apagada. Você pode criar outra quando quiser, de graça.',
   },
@@ -42,7 +46,13 @@ const ITEMS: { q: string; a: string; only?: SelfServeOfferMode[] }[] = [
 
 /** Dúvidas da página `/lash` (2026-11-17), focadas no autosserviço. Mesmas
  *  classes visuais do `FaqSection` da página `/`, conteúdo próprio. */
-export const SelfServeFaq: React.FC<{ offer: SelfServeOfferMode }> = ({ offer }) => {
+interface SelfServeFaqProps {
+  offer: SelfServeOfferMode;
+  /** Botão "Ativar meu menu" no fim das dúvidas (2026-11-26). */
+  onActivate: () => void;
+}
+
+export const SelfServeFaq: React.FC<SelfServeFaqProps> = ({ offer, onActivate }) => {
   const [open, setOpen] = useState<number | null>(null);
   const items = ITEMS.filter((item) => !item.only || item.only.includes(offer));
 
@@ -83,6 +93,13 @@ export const SelfServeFaq: React.FC<{ offer: SelfServeOfferMode }> = ({ offer })
               </div>
             );
           })}
+        </div>
+
+        <div className="lp-ss-faq-cta" data-reveal>
+          <p>Pronta para ativar o seu menu?</p>
+          <button type="button" className="lp-btn lp-btn--primary lp-ss-btn-block lp-tier-cta-pulse" onClick={onActivate}>
+            Ativar meu menu
+          </button>
         </div>
       </div>
     </section>

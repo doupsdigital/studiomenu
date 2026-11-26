@@ -10,9 +10,12 @@ import { CreatingOverlay } from './CreatingOverlay';
 import { PreviewRevealModal } from './PreviewRevealModal';
 import { SelfServeOffer } from './SelfServeOffer';
 import { SelfServeFaq } from './SelfServeFaq';
+import { SelfServeEditDemo } from './SelfServeEditDemo';
+import { SelfServeEmailCapture } from './SelfServeEmailCapture';
 import {
   buildCheckoutUrl,
   clearPreview,
+  firstName,
   guessSlug,
   loadPreview,
   savePreview,
@@ -35,16 +38,9 @@ interface SelfServeLandingPageProps {
   offer: SelfServeOfferMode;
 }
 
-function brl(value: number): string {
-  return value.toFixed(2).replace('.', ',');
-}
-
-/** Passo "Ative o seu menu" do "Simples assim", conforme a oferta. */
-const ACTIVATE_STEP: Record<SelfServeOfferMode, string> = {
-  ambos: 'Anual ou mensal, no Pix ou no cartão. A ativação é na hora.',
-  anual: `R$ ${brl(CAKTO_ANUAL_PRICE)} por 1 ano, no Pix ou no cartão. A ativação é na hora.`,
-  mensal: `R$ ${brl(CAKTO_MENSAL_PRICE)} por mês, no Pix ou no cartão. A ativação é na hora.`,
-};
+/** Âncoras que, abertas direto (ex.: faixa da prévia no catálogo aponta
+ *  pra `/lash#oferta`), já liberam a página inteira. */
+const UNLOCK_HASHES = ['#oferta', '#como-editar', '#faq'];
 
 /** Página de vendas de autosserviço do nicho Lash (`/lash`, 2026-11-17).
  *
@@ -55,9 +51,18 @@ const ACTIVATE_STEP: Record<SelfServeOfferMode, string> = {
  *
  *  Reaproveita o visual (classes `lp-*`) e o conteúdo nichado da página `/`
  *  (`LANDING_NICHE_CONTENT.lash`), sem alterar a `/`, que continua no ar
- *  rodando a campanha atual. */
+ *  rodando a campanha atual.
+ *
+ *  Revelação em etapas (2026-11-26): quem chega do anúncio vê só a Hero e o
+ *  gerador. O "Ativar meu menu" libera (`unlocked`) o resto, nesta ordem:
+ *  vídeo da edição → preço (com garantia) → dúvidas (com CTA no fim). As
+ *  gravações mostravam: cria → "Ativar" → vê o preço → sai, sem nada
+ *  respondendo "vou conseguir editar sozinha?". */
 export function SelfServeLandingPage({ content, offer }: SelfServeLandingPageProps) {
-  useScrollReveal();
+  const [unlocked, setUnlocked] = useState(false);
+  /** Seção pra rolar assim que ela existir na página (depois de liberar). */
+  const [pendingScroll, setPendingScroll] = useState<string | null>(null);
+  useScrollReveal(unlocked);
 
   useEffect(() => {
     setFunnelOffer(offer);
@@ -75,38 +80,62 @@ export function SelfServeLandingPage({ content, offer }: SelfServeLandingPagePro
 
   const inputRef = useRef<HTMLInputElement>(null);
   const generatorRef = useRef<HTMLElement>(null);
-  const offerVisibleRef = useRef(false);
-  const generatorVisibleRef = useRef(true);
 
-  // Prévia guardada neste aparelho (voltou à página dentro das 24h).
+  // Prévia guardada neste aparelho (voltou à página dentro das 24h): ela já
+  // passou pela revelação, então a página vem inteira.
   useEffect(() => {
     const saved = loadPreview();
     if (saved) {
       setPreview(saved);
       setName(saved.name);
+      setUnlocked(true);
+    }
+    const hash = window.location.hash;
+    if (UNLOCK_HASHES.includes(hash)) {
+      setUnlocked(true);
+      setPendingScroll(hash.slice(1));
     }
   }, []);
 
-  // Barra fixa no celular: só quando nem o gerador nem a oferta estão na tela.
+  // Rola até a seção pedida depois que ela renderizou.
+  useEffect(() => {
+    if (!unlocked || !pendingScroll) return;
+    const id = window.setTimeout(() => {
+      document.getElementById(pendingScroll)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setPendingScroll(null);
+    }, 80);
+    return () => window.clearTimeout(id);
+  }, [unlocked, pendingScroll]);
+
+  // Barra fixa no celular: só com a página liberada e quando nenhum outro
+  // botão de ativar está na tela — gerador, vídeo, oferta, o CTA do fim do
+  // FAQ e o rodapé (2026-11-26: aparecia junto com o botão do FAQ, 2 botões
+  // iguais empilhados, e cobria o rodapé).
   useEffect(() => {
     const generator = generatorRef.current;
-    const offer = document.getElementById('oferta');
-    if (!generator || !offer) return;
-    const update = () => setStickyVisible(!generatorVisibleRef.current && !offerVisibleRef.current);
+    if (!unlocked || !generator) {
+      setStickyVisible(false);
+      return;
+    }
+    const watched = [
+      generator,
+      document.getElementById('como-editar'),
+      document.getElementById('oferta'),
+      document.querySelector<HTMLElement>('.lp-ss-faq-cta'),
+      document.getElementById('guardar'),
+      document.querySelector<HTMLElement>('.lp-site-footer'),
+    ].filter((el): el is HTMLElement => Boolean(el));
+    const visible = new Map<Element, boolean>();
     const observer = new IntersectionObserver(
       (entries) => {
-        for (const entry of entries) {
-          if (entry.target === generator) generatorVisibleRef.current = entry.isIntersecting;
-          if (entry.target === offer) offerVisibleRef.current = entry.isIntersecting;
-        }
-        update();
+        for (const entry of entries) visible.set(entry.target, entry.isIntersecting);
+        setStickyVisible(![...visible.values()].some(Boolean));
       },
       { threshold: 0.1 }
     );
-    observer.observe(generator);
-    observer.observe(offer);
+    watched.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
-  }, []);
+  }, [unlocked]);
 
   // Rede de segurança: não prender a animação se o iframe demorar.
   useEffect(() => {
@@ -120,10 +149,17 @@ export function SelfServeLandingPage({ content, offer }: SelfServeLandingPagePro
     window.setTimeout(() => inputRef.current?.focus({ preventScroll: true }), 450);
   }, []);
 
-  const goToOffer = useCallback((from: string) => {
+  /** "Ativar meu menu" (revelação / card do gerador): libera a página e
+   *  leva ao vídeo da edição — não mais direto ao preço. */
+  const goToDemo = useCallback((from: string) => {
     trackFunnel('activate_click', { from });
     setRevealOpen(false);
-    window.setTimeout(() => document.getElementById('oferta')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
+    setUnlocked(true);
+    setPendingScroll('como-editar');
+  }, []);
+
+  const scrollToSection = useCallback((id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, []);
 
   const handleSubmit = useCallback(async () => {
@@ -195,6 +231,14 @@ export function SelfServeLandingPage({ content, offer }: SelfServeLandingPagePro
     },
     [preview, offer]
   );
+
+  /** Botão no fim das dúvidas: com um plano só, vai direto ao checkout;
+   *  com os dois, volta pra escolha. */
+  const handleFaqActivate = useCallback(() => {
+    trackFunnel('faq_cta_click');
+    if (offer === 'ambos') scrollToSection('oferta');
+    else handleCheckout(offer);
+  }, [offer, handleCheckout, scrollToSection]);
 
   const handleStartOver = useCallback(() => {
     clearPreview();
@@ -286,39 +330,34 @@ export function SelfServeLandingPage({ content, offer }: SelfServeLandingPagePro
               busy={busy}
               error={error}
               onOpenPreview={openReveal}
-              onActivate={() => goToOffer('generator_card')}
+              onActivate={() => goToDemo('generator_card')}
               onStartOver={handleStartOver}
             />
           </div>
         </section>
 
-        {/* 3. COMO FUNCIONA */}
-        <section className="lp-ss-how">
-          <div className="lp-container">
-            <h2 className="lp-section-title" data-reveal>
-              Simples assim
-            </h2>
-            <ol className="lp-ss-how-steps">
-              {[
-                { t: 'Crie grátis com seu nome', d: 'Em 10 segundos você vê o seu menu pronto, com serviços de lash de exemplo.' },
-                { t: 'Ative o seu menu', d: ACTIVATE_STEP[offer] },
-                { t: 'Edite e divulgue', d: 'Troque pelos seus serviços e preços pelo celular e coloque o link na bio.' },
-              ].map((s, i) => (
-                <li key={i} data-reveal style={{ ['--reveal-delay' as string]: `${i * 0.1}s` }}>
-                  <span className="lp-ss-how-num">{i + 1}</span>
-                  <strong>{s.t}</strong>
-                  <p>{s.d}</p>
-                </li>
-              ))}
-            </ol>
-          </div>
-        </section>
-
-        {/* 4. OFERTA */}
-        <SelfServeOffer preview={preview} offer={offer} onCheckout={handleCheckout} onCreateFirst={focusGenerator} />
-
-        {/* 5. DÚVIDAS */}
-        <SelfServeFaq offer={offer} />
+        {/* 3–5. Só depois do "Ativar" (ou de volta com a prévia guardada). */}
+        {unlocked && (
+          <>
+            <SelfServeEditDemo
+              firstName={preview ? firstName(preview.name) : null}
+              onContinue={() => {
+                trackFunnel('demo_cta_click');
+                scrollToSection('oferta');
+              }}
+            />
+            <SelfServeOffer
+              preview={preview}
+              offer={offer}
+              onCheckout={handleCheckout}
+              onCreateFirst={focusGenerator}
+              onShowFaq={() => scrollToSection('faq')}
+            />
+            <SelfServeFaq offer={offer} onActivate={handleFaqActivate} />
+            {/* Só pra quem tem prévia (o envio exige o cookie dela). */}
+            {preview && <SelfServeEmailCapture offer={offer} />}
+          </>
+        )}
       </main>
 
       <footer className="lp-site-footer">
@@ -347,7 +386,11 @@ export function SelfServeLandingPage({ content, offer }: SelfServeLandingPagePro
         <button
           type="button"
           className="lp-btn lp-btn--primary lp-ss-btn-block"
-          onClick={() => (preview ? goToOffer('sticky_bar') : focusGenerator())}
+          onClick={() => {
+            if (!preview) return focusGenerator();
+            trackFunnel('sticky_bar_click');
+            scrollToSection('oferta');
+          }}
           tabIndex={stickyVisible ? 0 : -1}
         >
           {preview ? 'Ativar meu menu' : '✨ Criar meu menu grátis'}
@@ -365,7 +408,7 @@ export function SelfServeLandingPage({ content, offer }: SelfServeLandingPagePro
         preview={preview}
         isOpen={revealOpen}
         onClose={() => setRevealOpen(false)}
-        onActivate={() => goToOffer('reveal_modal')}
+        onActivate={() => goToDemo('reveal_modal')}
         onLoaded={() => preview && setLoadedSlug(preview.slug)}
       />
     </div>
